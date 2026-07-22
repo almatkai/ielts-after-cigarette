@@ -1,12 +1,14 @@
 import { RevealInView } from '../smoothui/reveal'
+import { ValueOrbitBackground } from './value-orbit-background'
 
 export function ValueSection() {
   return (
     <section
-      className="section-shell border-y border-[#e7e7e4] bg-white"
+      className="section-shell relative isolate overflow-hidden border-y border-[#e7e7e4] bg-white"
       aria-labelledby="value-heading"
     >
-      <div className="container-shell grid gap-10 lg:grid-cols-12 lg:items-end">
+      <ValueOrbitBackground />
+      <div className="container-shell relative z-10 grid gap-10 lg:grid-cols-12 lg:items-end">
         <RevealInView className="lg:col-span-8">
           <div className="mb-7 flex items-center gap-3" aria-hidden>
             <span className="size-2 rounded-full bg-[#e23b3b]" />

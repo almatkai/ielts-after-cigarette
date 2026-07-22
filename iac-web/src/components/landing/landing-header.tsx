@@ -1,4 +1,5 @@
 import { CloseSquare, HambergerMenu } from 'iconsax-react'
+import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { navigation } from '#/content/landing-content'
@@ -53,20 +54,18 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <button
-            type="button"
-            disabled
-            aria-label="Вход станет доступен после запуска личного кабинета"
-            className="min-h-11 px-3 text-sm font-medium text-[#69696d] disabled:cursor-not-allowed disabled:opacity-70"
+          <Link
+            to="/login"
+            className="inline-flex min-h-11 items-center px-3 text-sm font-medium text-[#69696d] no-underline transition-colors hover:text-[#111111]"
           >
             Войти
-          </button>
-          <a
-            href="#start"
+          </Link>
+          <Link
+            to="/register"
             className="inline-flex min-h-11 items-center rounded-[10px] bg-[#111111] px-4 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#2b2b2b]"
           >
             Начать подготовку
-          </a>
+          </Link>
         </div>
 
         <button
@@ -112,14 +111,20 @@ export function LandingHeader() {
             </a>
           ))}
           <div className="mt-3 flex items-center gap-3">
-            <span className="px-2 text-sm text-[#8b8b8e]">Вход — скоро</span>
-            <a
-              href="#start"
+            <Link
+              to="/login"
+              onClick={() => setIsMenuOpen(false)}
+              className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-[#69696d] no-underline"
+            >
+              Войти
+            </Link>
+            <Link
+              to="/register"
               onClick={() => setIsMenuOpen(false)}
               className="ml-auto inline-flex min-h-11 items-center rounded-[10px] bg-[#111111] px-4 text-sm font-semibold text-white no-underline"
             >
               Начать подготовку
-            </a>
+            </Link>
           </div>
         </nav>
       ) : null}

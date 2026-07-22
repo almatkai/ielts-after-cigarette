@@ -1,35 +1,29 @@
 import { ArrowRight } from 'iconsax-react'
+import { Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
 
 import { cn } from '#/lib/utils'
 
-type SmoothButtonProps = {
-  href: string
+type SmoothButtonBaseProps = {
   children: React.ReactNode
   variant?: 'primary' | 'secondary'
   className?: string
 }
 
-export function SmoothButton({
-  href,
-  children,
-  variant = 'primary',
-  className,
-}: SmoothButtonProps) {
-  return (
-    <motion.a
-      href={href}
-      whileHover={{ y: -2 }}
-      whileTap={{ y: 0 }}
-      transition={{ duration: 0.2 }}
-      className={cn(
-        'inline-flex min-h-11 items-center justify-center gap-2 rounded-[11px] px-5 text-sm font-semibold no-underline transition-colors',
-        variant === 'primary'
-          ? 'bg-[#e23b3b] text-white hover:bg-[#c92f2f]'
-          : 'border border-[#e7e7e4] bg-white text-[#111111] hover:bg-[#f4f4f1]',
-        className,
-      )}
-    >
+type SmoothButtonProps = SmoothButtonBaseProps &
+  ({ href: string; to?: never } | { href?: never; to: '/login' | '/register' })
+
+export function SmoothButton(props: SmoothButtonProps) {
+  const { children, variant = 'primary', className } = props
+  const classes = cn(
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-[11px] px-5 text-sm font-semibold no-underline transition-[color,background-color,transform] hover:-translate-y-0.5',
+    variant === 'primary'
+      ? 'bg-[#e23b3b] text-white hover:bg-[#c92f2f]'
+      : 'border border-[#e7e7e4] bg-white text-[#111111] hover:bg-[#f4f4f1]',
+    className,
+  )
+  const content = (
+    <>
       <span>{children}</span>
       {variant === 'primary' ? (
         <ArrowRight
@@ -39,6 +33,26 @@ export function SmoothButton({
           aria-hidden
         />
       ) : null}
+    </>
+  )
+
+  if (props.to) {
+    return (
+      <Link to={props.to} className={classes}>
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <motion.a
+      href={props.href}
+      whileHover={{ y: -2 }}
+      whileTap={{ y: 0 }}
+      transition={{ duration: 0.2 }}
+      className={classes}
+    >
+      {content}
     </motion.a>
   )
 }

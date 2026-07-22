@@ -88,7 +88,13 @@ button {
   font: inherit;
 }
 
-:where(a, button, input, textarea, select):focus-visible {
+:where(
+  a,
+  button,
+  textarea,
+  select,
+  input:not([data-slot='input'])
+):focus-visible {
   outline: 3px solid rgba(226, 59, 59, 0.28);
   outline-offset: 3px;
 }

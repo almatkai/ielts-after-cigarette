@@ -39,7 +39,7 @@ export function FinalCta() {
                 </h2>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:col-span-4 lg:flex-col lg:items-stretch">
-                <SmoothButton href="#practice" className="w-full">
+                <SmoothButton to="/register" className="w-full">
                   Начать подготовку
                 </SmoothButton>
                 <SmoothButton

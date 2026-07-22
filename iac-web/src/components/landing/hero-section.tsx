@@ -2,6 +2,7 @@ import { heroContent } from '#/content/landing-content'
 
 import { Reveal } from '../smoothui/reveal'
 import { SmoothButton } from '../smoothui/smooth-button'
+import SplashCursor from '../reactbits/splash-cursor'
 import { BandTrajectory } from './band-trajectory'
 import { HeroBackground } from './hero-background'
 
@@ -9,6 +10,22 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden pb-20 pt-32 sm:pb-24 sm:pt-40 lg:pb-28 lg:pt-44">
       <HeroBackground />
+      <SplashCursor
+        className="opacity-70"
+        SIM_RESOLUTION={96}
+        DYE_RESOLUTION={512}
+        DENSITY_DISSIPATION={2.8}
+        VELOCITY_DISSIPATION={1.7}
+        SPLAT_RADIUS={0.22}
+        SPLAT_FORCE={3600}
+        COLOR_UPDATE_SPEED={4}
+        RAINBOW_MODE={false}
+        COLOR="#e23b3b"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(250,250,248,0.34),rgba(250,250,248,0.08)_58%,rgba(250,250,248,0.28))]"
+        aria-hidden
+      />
       <div className="container-shell relative z-10">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-8">
           <div className="lg:col-span-7">
@@ -38,7 +55,7 @@ export function HeroSection() {
               delay={0.25}
               className="mt-9 flex flex-col gap-3 min-[440px]:flex-row"
             >
-              <SmoothButton href="#start" className="min-[440px]:w-auto">
+              <SmoothButton to="/register" className="min-[440px]:w-auto">
                 {heroContent.primaryAction}
               </SmoothButton>
               <SmoothButton

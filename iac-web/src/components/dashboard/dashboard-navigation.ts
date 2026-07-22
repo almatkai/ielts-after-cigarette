@@ -1,0 +1,57 @@
+import {
+  BarChart3,
+  CalendarRange,
+  Dumbbell,
+  LayoutDashboard,
+  Settings2,
+  TriangleAlert,
+} from 'lucide-react'
+
+export const primaryDashboardNavigation = [
+  {
+    label: 'Обзор',
+    to: '/dashboard',
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  {
+    label: 'План подготовки',
+    to: '/dashboard/plan',
+    icon: CalendarRange,
+    exact: false,
+  },
+  {
+    label: 'Практика',
+    to: '/dashboard/practice',
+    icon: Dumbbell,
+    exact: false,
+  },
+  {
+    label: 'Ошибки',
+    to: '/dashboard/mistakes',
+    icon: TriangleAlert,
+    exact: false,
+  },
+  {
+    label: 'Прогресс',
+    to: '/dashboard/progress',
+    icon: BarChart3,
+    exact: false,
+  },
+] as const
+
+export const settingsDashboardNavigation = {
+  label: 'Настройки',
+  to: '/dashboard/settings',
+  icon: Settings2,
+  exact: false,
+} as const
+
+export function getDashboardPageTitle(pathname: string) {
+  const navigationItem = [
+    ...primaryDashboardNavigation,
+    settingsDashboardNavigation,
+  ].find((item) => item.to === pathname)
+
+  return navigationItem?.label ?? 'Панель управления'
+}

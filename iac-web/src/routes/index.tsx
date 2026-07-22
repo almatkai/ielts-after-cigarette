@@ -1,14 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/')({ component: Home })
+import { LandingPage } from '#/pages/landing/ui/landing-page'
 
-function Home() {
-  return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-    </div>
-  )
-}
+export const Route = createFileRoute('/')({
+  head: () => ({
+    meta: [
+      { title: 'IAC — современная подготовка к IELTS' },
+      {
+        name: 'description',
+        content:
+          'Практикуйте все четыре навыка IELTS, отслеживайте прогресс и сосредоточьтесь на задачах, которые действительно влияют на ваш результат.',
+      },
+      { property: 'og:locale', content: 'ru_RU' },
+      { property: 'og:type', content: 'website' },
+      {
+        property: 'og:title',
+        content: 'Понятный путь к вашему целевому баллу IELTS',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Сфокусированная практика, разбор ошибок и прозрачное отслеживание прогресса.',
+      },
+    ],
+  }),
+  component: LandingPage,
+})

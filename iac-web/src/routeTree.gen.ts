@@ -17,6 +17,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardMistakesRouteImport } from './routes/dashboard.mistakes'
 import { Route as DashboardPlanRouteImport } from './routes/dashboard.plan'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard.practice'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 
@@ -60,6 +61,11 @@ const DashboardPracticeRoute = DashboardPracticeRouteImport.update({
   path: '/practice',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProgressRoute = DashboardProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
+    | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/dashboard/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
+    | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/dashboard'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
+    | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/dashboard/'
@@ -210,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPracticeRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/progress': {
       id: '/dashboard/progress'
       path: '/progress'
@@ -231,6 +250,7 @@ interface DashboardRouteChildren {
   DashboardMistakesRoute: typeof DashboardMistakesRoute
   DashboardPlanRoute: typeof DashboardPlanRoute
   DashboardPracticeRoute: typeof DashboardPracticeRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardProgressRoute: typeof DashboardProgressRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -240,6 +260,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMistakesRoute: DashboardMistakesRoute,
   DashboardPlanRoute: DashboardPlanRoute,
   DashboardPracticeRoute: DashboardPracticeRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
   DashboardProgressRoute: DashboardProgressRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,

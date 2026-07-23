@@ -47,10 +47,16 @@ export const settingsDashboardNavigation = {
   exact: false,
 } as const
 
+const profileDashboardPage = {
+  label: 'Профиль',
+  to: '/dashboard/profile',
+} as const
+
 export function getDashboardPageTitle(pathname: string) {
   const navigationItem = [
     ...primaryDashboardNavigation,
     settingsDashboardNavigation,
+    profileDashboardPage,
   ].find((item) => item.to === pathname)
 
   return navigationItem?.label ?? 'Панель управления'

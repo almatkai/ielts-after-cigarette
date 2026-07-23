@@ -70,7 +70,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 360px;
+  min-width: 0;
   background: #fafaf8;
   color: #111111;
   font-family: 'Manrope Variable', Arial, sans-serif;

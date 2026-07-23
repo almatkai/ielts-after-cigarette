@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/')({
-  component: EmptyDashboardPage,
-})
+import { OverviewPage } from '@/pages/overview/ui/overview-page'
 
-function EmptyDashboardPage() {
-  return null
-}
+export const Route = createFileRoute('/dashboard/')({
+  head: () => ({
+    meta: [
+      { title: 'Обзор — IAC' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
+  component: OverviewPage,
+})

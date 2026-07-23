@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Bell, Menu, UserRound } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
@@ -52,17 +53,22 @@ export function DashboardHeader({
         </Button>
         <span className="mx-1 hidden h-7 w-px bg-[#e7e7e4] sm:block" />
         <Button
-          type="button"
+          asChild
           variant="ghost"
           className="h-11 gap-2 rounded-[10px] px-2.5 text-[#111111] sm:px-3"
-          aria-label="Открыть меню аккаунта"
         >
-          <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
-            <UserRound className="size-[17px]" strokeWidth={1.8} aria-hidden />
-          </span>
-          <span className="hidden text-sm font-semibold sm:inline">
-            Аккаунт
-          </span>
+          <Link to="/dashboard/profile" aria-label="Открыть профиль">
+            <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
+              <UserRound
+                className="size-[17px]"
+                strokeWidth={1.8}
+                aria-hidden
+              />
+            </span>
+            <span className="hidden text-sm font-semibold sm:inline">
+              Аккаунт
+            </span>
+          </Link>
         </Button>
       </div>
     </header>

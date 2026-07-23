@@ -2,6 +2,17 @@ import { Link } from '@tanstack/react-router'
 import { LogOut, X } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -110,18 +121,46 @@ export function DashboardSidebar({
             />
             <span>{settingsDashboardNavigation.label}</span>
           </Link>
-          <Link
-            to="/login"
-            onClick={onNavigate}
-            className="flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm font-medium text-[#69696d] no-underline transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
-          >
-            <LogOut
-              className="size-[19px] shrink-0 text-[#8b8b8e]"
-              strokeWidth={1.8}
-              aria-hidden
-            />
-            <span>Выйти</span>
-          </Link>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                className="flex min-h-11 w-full items-center gap-3 rounded-[10px] px-4 text-sm font-medium text-[#69696d] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
+              >
+                <LogOut
+                  className="size-[19px] shrink-0 text-[#8b8b8e]"
+                  strokeWidth={1.8}
+                  aria-hidden
+                />
+                <span>Выйти</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#fff0f0] text-[#e23b3b]">
+                  <LogOut className="size-5" strokeWidth={1.8} aria-hidden />
+                </span>
+                <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Чтобы продолжить подготовку, потребуется войти в аккаунт
+                  снова.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="h-10 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none">
+                  Отмена
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  asChild
+                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 text-white shadow-none hover:bg-[#c92f2f]"
+                >
+                  <Link to="/login" onClick={onNavigate}>
+                    Выйти
+                  </Link>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </aside>

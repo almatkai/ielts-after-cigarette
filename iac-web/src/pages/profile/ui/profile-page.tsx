@@ -1,4 +1,5 @@
-import { useRef } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
 import {
   BellRing,
   CalendarDays,
@@ -28,6 +29,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { authStore } from '@/features/auth/auth-store'
+import {
+  getProfile,
+  patchProfile,
+  profileToForm,
+  putGoal,
+  queryKeys,
+  validateGoal,
+} from '@/features/ielts/api'
+import { getErrorMessage } from '@/lib/api/client'
+
+import type { ProfileForm } from '@/features/ielts/api'
 
 const fieldClassName =
   'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
@@ -39,8 +52,124 @@ function preventSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault()
 }
 
+const emptyProfileForm: ProfileForm = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  targetScore: '',
+  examDate: '',
+  examFormat: '',
+}
+
+function todayDateValue() {
+  const today = new Date()
+  return [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
 export function ProfilePage() {
   const photoInputRef = useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
+  const [form, setForm] = useState<ProfileForm>(emptyProfileForm)
+  const [profileMessage, setProfileMessage] = useState<string | null>(null)
+  const [goalMessage, setGoalMessage] = useState<string | null>(null)
+  const [goalErrors, setGoalErrors] = useState<Record<string, string>>({})
+  const profileQuery = useQuery({
+    queryKey: queryKeys.profile,
+    queryFn: ({ signal }) => getProfile(signal),
+  })
+  const profileMutation = useMutation({
+    mutationFn: () => patchProfile(form.firstName, form.lastName),
+    onSuccess: (profile) => {
+      authStore.updateUser(profile)
+      queryClient.setQueryData(queryKeys.profile, profile)
+      setProfileMessage('Личные данные сохранены.')
+    },
+  })
+  const goalMutation = useMutation({
+    mutationFn: () => putGoal(form),
+    onSuccess: async (profile) => {
+      authStore.updateUser(profile)
+      queryClient.setQueryData(queryKeys.profile, profile)
+      await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
+      setGoalMessage('Цель обновлена — dashboard уже получил новые данные.')
+    },
+  })
+
+  useEffect(() => {
+    if (profileQuery.data) {
+      setForm(profileToForm(profileQuery.data))
+    }
+  }, [profileQuery.data])
+
+  const updateForm = <TKey extends keyof ProfileForm>(
+    key: TKey,
+    value: ProfileForm[TKey],
+  ) => {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  const handleProfileSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
+    setProfileMessage(null)
+    if (`${form.firstName} ${form.lastName}`.trim().length < 2) {
+      setProfileMessage('Укажите имя длиной не менее двух символов.')
+      return
+    }
+    try {
+      await profileMutation.mutateAsync()
+    } catch (error) {
+      setProfileMessage(getErrorMessage(error))
+    }
+  }
+
+  const handleGoalSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setGoalMessage(null)
+    const errors = validateGoal(form)
+    setGoalErrors(errors)
+    if (Object.keys(errors).length > 0) return
+    try {
+      await goalMutation.mutateAsync()
+    } catch (error) {
+      setGoalMessage(getErrorMessage(error))
+    }
+  }
+
+  if (profileQuery.isPending) {
+    return (
+      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
+        <CardContent className="p-8 text-center text-sm text-[#69696d]">
+          Загружаем профиль…
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (profileQuery.isError) {
+    return (
+      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
+        <CardContent className="flex flex-col items-center p-8 text-center">
+          <p className="text-sm font-semibold text-[#111111]">
+            Не удалось загрузить профиль
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-4"
+            onClick={() => void profileQuery.refetch()}
+          >
+            Повторить
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <div className="mx-auto w-full min-w-0 max-w-[1120px]">
@@ -103,7 +232,7 @@ export function ProfilePage() {
               </div>
             </CardHeader>
 
-            <form className="min-w-0" onSubmit={preventSubmit}>
+            <form className="min-w-0" onSubmit={handleProfileSubmit}>
               <CardContent className="grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
                 <div className="grid gap-2">
                   <Label htmlFor="first-name">Имя</Label>
@@ -112,6 +241,10 @@ export function ProfilePage() {
                     name="firstName"
                     autoComplete="given-name"
                     placeholder="Введите имя"
+                    value={form.firstName}
+                    onChange={(event) =>
+                      updateForm('firstName', event.target.value)
+                    }
                     className={fieldClassName}
                   />
                 </div>
@@ -122,6 +255,10 @@ export function ProfilePage() {
                     name="lastName"
                     autoComplete="family-name"
                     placeholder="Введите фамилию"
+                    value={form.lastName}
+                    onChange={(event) =>
+                      updateForm('lastName', event.target.value)
+                    }
                     className={fieldClassName}
                   />
                 </div>
@@ -139,17 +276,33 @@ export function ProfilePage() {
                       autoComplete="email"
                       inputMode="email"
                       placeholder="Введите электронную почту"
+                      value={form.email}
+                      disabled
                       className={`${fieldClassName} pl-10`}
                     />
                   </div>
+                  <p className="text-xs text-[#808084]">
+                    Изменение email пока не поддерживается backend.
+                  </p>
                 </div>
+                {profileMessage ? (
+                  <p
+                    className="text-sm text-[#69696d] sm:col-span-2"
+                    role="status"
+                  >
+                    {profileMessage}
+                  </p>
+                ) : null}
               </CardContent>
               <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
                 <Button
                   type="submit"
+                  disabled={profileMutation.isPending}
                   className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
                 >
-                  Сохранить изменения
+                  {profileMutation.isPending
+                    ? 'Сохраняем…'
+                    : 'Сохранить изменения'}
                 </Button>
               </CardFooter>
             </form>
@@ -172,11 +325,20 @@ export function ProfilePage() {
               </div>
             </CardHeader>
 
-            <form className="min-w-0" onSubmit={preventSubmit}>
+            <form className="min-w-0" onSubmit={handleGoalSubmit}>
               <CardContent className="grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
                 <div className="grid gap-2">
                   <Label htmlFor="exam-format">Формат IELTS</Label>
-                  <Select name="examFormat">
+                  <Select
+                    name="examFormat"
+                    value={form.examFormat}
+                    onValueChange={(value) =>
+                      updateForm(
+                        'examFormat',
+                        value as ProfileForm['examFormat'],
+                      )
+                    }
+                  >
                     <SelectTrigger id="exam-format" className={selectClassName}>
                       <SelectValue placeholder="Выберите формат" />
                     </SelectTrigger>
@@ -185,11 +347,20 @@ export function ProfilePage() {
                       <SelectItem value="general">General Training</SelectItem>
                     </SelectContent>
                   </Select>
+                  {goalErrors.examFormat ? (
+                    <p className="text-xs text-[#c92f2f]" role="alert">
+                      {goalErrors.examFormat}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="grid gap-2">
                   <Label htmlFor="target-score">Целевой балл</Label>
-                  <Select name="targetScore">
+                  <Select
+                    name="targetScore"
+                    value={form.targetScore}
+                    onValueChange={(value) => updateForm('targetScore', value)}
+                  >
                     <SelectTrigger
                       id="target-score"
                       className={selectClassName}
@@ -206,6 +377,11 @@ export function ProfilePage() {
                       )}
                     </SelectContent>
                   </Select>
+                  {goalErrors.targetScore ? (
+                    <p className="text-xs text-[#c92f2f]" role="alert">
+                      {goalErrors.targetScore}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="grid gap-2 sm:col-span-2">
@@ -219,17 +395,38 @@ export function ProfilePage() {
                       id="exam-date"
                       name="examDate"
                       type="date"
+                      min={todayDateValue()}
+                      value={form.examDate}
+                      onChange={(event) =>
+                        updateForm('examDate', event.target.value)
+                      }
                       className={`${fieldClassName} pl-10`}
                     />
                   </div>
+                  {goalErrors.examDate ? (
+                    <p className="text-xs text-[#c92f2f]" role="alert">
+                      {goalErrors.examDate}
+                    </p>
+                  ) : null}
                 </div>
+                {goalMessage ? (
+                  <p
+                    className="text-sm text-[#69696d] sm:col-span-2"
+                    role="status"
+                  >
+                    {goalMessage}
+                  </p>
+                ) : null}
               </CardContent>
               <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
                 <Button
                   type="submit"
+                  disabled={goalMutation.isPending}
                   className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
                 >
-                  Сохранить параметры
+                  {goalMutation.isPending
+                    ? 'Сохраняем…'
+                    : 'Сохранить параметры'}
                 </Button>
               </CardFooter>
             </form>

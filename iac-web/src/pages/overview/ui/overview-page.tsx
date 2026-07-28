@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import {
   ArrowRight,
   BarChart3,
@@ -21,24 +22,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { getDashboard, queryKeys } from '@/features/ielts/api'
 
-const overviewMetrics = [
-  {
-    label: 'Текущий уровень',
-    hint: 'Появится после диагностики',
-    icon: Gauge,
-  },
-  {
-    label: 'Целевой балл',
-    hint: 'Укажите цель в профиле',
-    icon: Target,
-  },
-  {
-    label: 'Дата экзамена',
-    hint: 'Добавьте дату в профиле',
-    icon: CalendarDays,
-  },
-] as const
+import type { SkillId } from '@/features/ielts/api'
 
 const quickActions = [
   {
@@ -64,7 +50,100 @@ const quickActions = [
 const cardClassName =
   'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
 
+const skillLabels: Record<SkillId, string> = {
+  listening: 'Listening',
+  reading: 'Reading',
+  writing: 'Writing',
+  speaking: 'Speaking',
+}
+
+function formatExamDate(value: string | null) {
+  if (!value) return '—'
+  const [year, month, day] = value.split('-')
+  return `${day}.${month}.${year}`
+}
+
 export function OverviewPage() {
+  const dashboardQuery = useQuery({
+    queryKey: queryKeys.dashboard,
+    queryFn: ({ signal }) => getDashboard(signal),
+  })
+
+  if (dashboardQuery.isPending) {
+    return (
+      <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
+        <CardContent className="p-8 text-center text-sm text-[#69696d]">
+          Загружаем ваш dashboard…
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (dashboardQuery.isError) {
+    return (
+      <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
+        <CardContent className="flex flex-col items-center p-8 text-center">
+          <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+          <p className="mt-3 text-sm font-semibold text-[#111111]">
+            Не удалось загрузить dashboard
+          </p>
+          <p className="mt-1 text-sm text-[#69696d]">
+            Проверьте соединение с сервером и попробуйте ещё раз.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-5"
+            onClick={() => void dashboardQuery.refetch()}
+          >
+            Повторить
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const dashboard = dashboardQuery.data
+  const overviewMetrics = [
+    {
+      label: 'Текущий уровень',
+      value:
+        dashboard.profile.currentBand === null
+          ? '—'
+          : dashboard.profile.currentBand.toFixed(1),
+      hint:
+        dashboard.profile.currentBand === null
+          ? 'Появится после диагностики'
+          : 'Расчётный IELTS Band',
+      icon: Gauge,
+    },
+    {
+      label: 'Целевой балл',
+      value:
+        dashboard.profile.targetBand === null
+          ? '—'
+          : dashboard.profile.targetBand.toFixed(1),
+      hint:
+        dashboard.profile.targetBand === null
+          ? 'Укажите цель в профиле'
+          : 'Ваша текущая цель',
+      icon: Target,
+    },
+    {
+      label: 'Дата экзамена',
+      value: formatExamDate(dashboard.profile.examDate),
+      hint:
+        dashboard.profile.examDate === null
+          ? 'Добавьте дату в профиле'
+          : 'Запланированная дата',
+      icon: CalendarDays,
+    },
+  ] as const
+  const recommendedTarget =
+    dashboard.recommendedAction.target === '/dashboard/profile'
+      ? '/dashboard/profile'
+      : '/dashboard/practice'
+
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <section
@@ -86,9 +165,9 @@ export function OverviewPage() {
                   </p>
                   <p
                     className="mt-1 text-2xl leading-none font-semibold tracking-[-0.04em] text-[#111111]"
-                    aria-label={`${metric.label} пока не указан`}
+                    aria-label={`${metric.label}: ${metric.value}`}
                   >
-                    —
+                    {metric.value}
                   </p>
                   <p className="mt-2 text-xs leading-5 text-[#8b8b8e]">
                     {metric.hint}
@@ -113,19 +192,18 @@ export function OverviewPage() {
                   Рекомендуемый шаг
                 </Badge>
                 <h2 className="mt-5 text-[clamp(1.65rem,3vw,2.35rem)] leading-[1.08] font-semibold tracking-[-0.045em] text-[#111111]">
-                  Определите стартовый уровень
+                  {dashboard.recommendedAction.title}
                 </h2>
                 <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#69696d] sm:text-[15px]">
-                  Короткая диагностика поможет подобрать подходящую сложность и
-                  построить первый план подготовки.
+                  {dashboard.recommendedAction.description}
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <Button
                     asChild
                     className="h-11 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
                   >
-                    <Link to="/dashboard/practice">
-                      Начать диагностику
+                    <Link to={recommendedTarget}>
+                      Перейти к следующему шагу
                       <ArrowRight aria-hidden />
                     </Link>
                   </Button>
@@ -157,20 +235,33 @@ export function OverviewPage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col items-center px-5 py-9 text-center sm:px-6 sm:py-10">
-              <span className="grid size-12 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
-                <BarChart3 className="size-5" strokeWidth={1.8} aria-hidden />
-              </span>
-              <h3 className="mt-4 text-sm font-semibold text-[#111111]">
-                Пока недостаточно данных
-              </h3>
-              <p className="mt-1 max-w-sm text-sm leading-6 text-[#69696d]">
-                Результаты появятся здесь после первых выполненных заданий.
-              </p>
+            <CardContent className="grid gap-3 p-5 sm:grid-cols-2 sm:p-6">
+              {dashboard.skillProgress.map((progress) => (
+                <div
+                  key={progress.skill}
+                  className="rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-[#111111]">
+                      {skillLabels[progress.skill]}
+                    </p>
+                    <span className="text-sm font-semibold text-[#e23b3b]">
+                      {progress.estimatedBand === null
+                        ? '—'
+                        : progress.estimatedBand.toFixed(1)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-[#808084]">
+                    {progress.completedTasks === 0
+                      ? 'Нет выполненных заданий'
+                      : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
+                  </p>
+                </div>
+              ))}
               <Button
                 asChild
                 variant="outline"
-                className="mt-5 h-10 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none"
+                className="h-10 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none sm:col-span-2"
               >
                 <Link to="/dashboard/progress">Открыть прогресс</Link>
               </Button>
@@ -196,19 +287,37 @@ export function OverviewPage() {
               </div>
             </CardHeader>
             <CardContent className="p-5">
-              <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-6 text-center">
-                <ClipboardCheck
-                  className="mx-auto size-5 text-[#9a9a9d]"
-                  strokeWidth={1.8}
-                  aria-hidden
-                />
-                <p className="mt-3 text-sm font-semibold text-[#111111]">
-                  Заданий пока нет
-                </p>
-                <p className="mt-1 text-xs leading-5 text-[#808084]">
-                  Добавьте первое занятие в план.
-                </p>
-              </div>
+              {dashboard.todayPlan.length === 0 ? (
+                <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-6 text-center">
+                  <ClipboardCheck
+                    className="mx-auto size-5 text-[#9a9a9d]"
+                    strokeWidth={1.8}
+                    aria-hidden
+                  />
+                  <p className="mt-3 text-sm font-semibold text-[#111111]">
+                    Заданий пока нет
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                    Добавьте первое занятие в план.
+                  </p>
+                </div>
+              ) : (
+                <ul className="grid gap-3">
+                  {dashboard.todayPlan.map((item) => (
+                    <li
+                      key={item.id}
+                      className="rounded-[10px] border border-[#ededeb] p-3"
+                    >
+                      <p className="text-sm font-semibold text-[#111111]">
+                        {item.title}
+                      </p>
+                      <p className="mt-1 text-xs text-[#808084]">
+                        {skillLabels[item.skill]} · {item.durationMinutes} мин.
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <Button
                 asChild
                 variant="outline"

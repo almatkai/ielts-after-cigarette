@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { LogOut, X } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
@@ -14,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/features/auth/auth-store'
 import { cn } from '@/lib/utils'
 
 import {
@@ -39,6 +41,21 @@ export function DashboardSidebar({
   className,
   mobile = false,
 }: DashboardSidebarProps) {
+  const navigate = useNavigate()
+  const auth = useAuth()
+  const [logoutIsPending, setLogoutIsPending] = useState(false)
+
+  const handleLogout = async () => {
+    setLogoutIsPending(true)
+    try {
+      await auth.logout()
+      onNavigate?.()
+      await navigate({ to: '/login' })
+    } finally {
+      setLogoutIsPending(false)
+    }
+  }
+
   return (
     <aside
       id={id}
@@ -151,12 +168,11 @@ export function DashboardSidebar({
                   Отмена
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  asChild
+                  disabled={logoutIsPending}
+                  onClick={() => void handleLogout()}
                   className="h-10 rounded-[9px] bg-[#e23b3b] px-5 text-white shadow-none hover:bg-[#c92f2f]"
                 >
-                  <Link to="/login" onClick={onNavigate}>
-                    Выйти
-                  </Link>
+                  {logoutIsPending ? 'Выходим…' : 'Выйти'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

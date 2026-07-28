@@ -1,5 +1,21 @@
 Welcome to your new TanStack Start app!
 
+# Backend connection
+
+Copy `.env.example` to `.env.local` and keep the local API URL:
+
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+Start the Go backend from the sibling `ielts-after-cigarette-back` repository
+with `docker compose up --build`, then start this app with `npm run dev`.
+The frontend runs at `http://localhost:3000`.
+
+Authentication uses an in-memory access token and a backend-owned HttpOnly
+refresh cookie. Both frontend and backend should use the same hostname
+(`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
+
 # Getting Started
 
 To run this application:
@@ -32,7 +48,6 @@ If you prefer not to use Tailwind CSS:
 
 ## Linting & Formatting
 
-
 This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
 
 ```bash
@@ -41,7 +56,6 @@ npm run format
 npm run check
 ```
 
-
 ## Shadcn
 
 Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
@@ -49,8 +63,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpm dlx shadcn@latest add button
 ```
-
-
 
 ## Routing
 
@@ -69,7 +81,7 @@ Now that you have two routes you can use a `Link` component to navigate between 
 To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
 
 ```tsx
-import { Link } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router'
 ```
 
 Then anywhere in your JSX you can use it like so:
@@ -137,11 +149,11 @@ const getServerTime = createServerFn({
 // Use in a component
 function MyComponent() {
   const [time, setTime] = useState('')
-  
+
   useEffect(() => {
     getServerTime().then(setTime)
   }, [])
-  
+
   return <div>Server time: {time}</div>
 }
 ```
@@ -193,8 +205,6 @@ function PeopleComponent() {
 ```
 
 Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
 
 # Learn More
 

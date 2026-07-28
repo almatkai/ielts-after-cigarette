@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
 
@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useAuth } from '@/features/auth/auth-store'
+import { getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput, getFieldError } from './auth-input'
 
@@ -29,7 +31,9 @@ function validatePassword(value: string) {
 }
 
 export function LoginForm() {
-  const [submissionIsReady, setSubmissionIsReady] = useState(false)
+  const navigate = useNavigate()
+  const auth = useAuth()
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [recoveryIsVisible, setRecoveryIsVisible] = useState(false)
   const form = useForm({
     defaultValues: {
@@ -37,8 +41,14 @@ export function LoginForm() {
       password: '',
       remember: false,
     },
-    onSubmit: () => {
-      setSubmissionIsReady(true)
+    onSubmit: async ({ value }) => {
+      setSubmissionError(null)
+      try {
+        await auth.login(value)
+        await navigate({ to: '/dashboard' })
+      } catch (error) {
+        setSubmissionError(getErrorMessage(error))
+      }
     },
   })
 
@@ -152,12 +162,12 @@ export function LoginForm() {
             )}
           </form.Subscribe>
 
-          {submissionIsReady ? (
+          {submissionError ? (
             <p
-              className="mt-4 text-center text-sm leading-6 text-[#69696d]"
-              role="status"
+              className="mt-4 text-center text-sm leading-6 text-[#c92f2f]"
+              role="alert"
             >
-              Форма готова. Для входа нужно подключить серверную часть.
+              {submissionError}
             </p>
           ) : null}
         </form>

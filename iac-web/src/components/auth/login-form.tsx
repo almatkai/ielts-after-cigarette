@@ -13,7 +13,8 @@ import {
 import { useAuth } from '@/features/auth/auth-store'
 import { getErrorMessage } from '@/lib/api/client'
 
-import { AuthInput, getFieldError } from './auth-input'
+import { AuthInput } from './auth-input'
+import { getFieldError } from './auth-input-utils'
 
 function validateEmail(value: string) {
   const normalizedValue = value.trim()

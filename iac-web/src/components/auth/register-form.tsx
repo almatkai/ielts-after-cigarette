@@ -11,9 +11,13 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/features/auth/auth-store'
+import type { VerifiedPhone } from '@/features/auth/phone-verification'
 import { getErrorMessage } from '@/lib/api/client'
 
-import { AuthInput, getFieldError } from './auth-input'
+import { AuthInput } from './auth-input'
+import { getFieldError } from './auth-input-utils'
+import { validatePhone } from './phone-validation'
+import { RegistrationPhoneVerification } from './registration-phone-verification'
 
 function validateName(value: string) {
   if (!value.trim()) return 'Введите имя'
@@ -40,18 +44,28 @@ export function RegisterForm() {
   const navigate = useNavigate()
   const auth = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
+  const [verifiedPhone, setVerifiedPhone] = useState<VerifiedPhone | null>(null)
+
   const form = useForm({
     defaultValues: {
       name: '',
       email: '',
+      phone: '',
       password: '',
       confirmPassword: '',
       acceptedTerms: false,
     },
     onSubmit: async ({ value }) => {
       setSubmissionError(null)
+      if (!verifiedPhone || verifiedPhone.phone !== value.phone) {
+        setSubmissionError('Сначала подтвердите номер кодом из WhatsApp.')
+        return
+      }
       try {
-        await auth.register(value)
+        await auth.register({
+          ...value,
+          verificationToken: verifiedPhone.verificationToken,
+        })
         await navigate({ to: '/dashboard' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
@@ -121,6 +135,38 @@ export function RegisterForm() {
               />
             )}
           </form.Field>
+
+          <form.Field
+            name="phone"
+            validators={{
+              onBlur: ({ value }) => validatePhone(value),
+              onSubmit: ({ value }) => validatePhone(value),
+            }}
+          >
+            {(field) => (
+              <AuthInput
+                id={field.name}
+                label="Номер WhatsApp"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="+7 700 123 45 67"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                error={getFieldError(field.state.meta.errors)}
+              />
+            )}
+          </form.Field>
+
+          <form.Subscribe selector={(state) => state.values.phone}>
+            {(phone) => (
+              <RegistrationPhoneVerification
+                phone={phone}
+                onVerified={setVerifiedPhone}
+              />
+            )}
+          </form.Subscribe>
 
           <div className="grid gap-x-3 sm:grid-cols-2">
             <form.Field

@@ -12,10 +12,12 @@ type AuthInputProps = {
   value: string
   onChange: (value: string) => void
   onBlur: () => void
-  type?: 'email' | 'password' | 'text'
+  type?: 'email' | 'password' | 'tel' | 'text'
   autoComplete: string
   placeholder: string
   error?: string
+  inputMode?: 'email' | 'numeric' | 'search' | 'tel' | 'text' | 'url'
+  maxLength?: number
 }
 
 export function AuthInput({
@@ -28,6 +30,8 @@ export function AuthInput({
   autoComplete,
   placeholder,
   error,
+  inputMode,
+  maxLength,
 }: AuthInputProps) {
   const [passwordIsVisible, setPasswordIsVisible] = useState(false)
   const isPassword = type === 'password'
@@ -52,6 +56,8 @@ export function AuthInput({
           onBlur={onBlur}
           autoComplete={autoComplete}
           placeholder={placeholder}
+          inputMode={inputMode}
+          maxLength={maxLength}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
@@ -101,18 +107,4 @@ export function AuthInput({
       </div>
     </div>
   )
-}
-
-export function getFieldError(errors: unknown[]) {
-  const firstError = errors[0]
-  if (typeof firstError === 'string') return firstError
-  if (
-    firstError &&
-    typeof firstError === 'object' &&
-    'message' in firstError &&
-    typeof firstError.message === 'string'
-  ) {
-    return firstError.message
-  }
-  return undefined
 }

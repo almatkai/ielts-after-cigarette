@@ -139,6 +139,16 @@ export function getErrorMessage(error: unknown) {
       return 'Неверная электронная почта или пароль.'
     case 'EMAIL_ALREADY_EXISTS':
       return 'Аккаунт с такой электронной почтой уже существует.'
+    case 'PHONE_ALREADY_EXISTS':
+      return 'Аккаунт с таким номером телефона уже существует.'
+    case 'PHONE_NOT_VERIFIED':
+      return 'Подтверждение номера истекло. Запросите новый код.'
+    case 'INVALID_VERIFICATION_CODE':
+      return 'Неверный или просроченный код WhatsApp.'
+    case 'VERIFICATION_RESEND_TOO_SOON':
+      return 'Код уже отправлен. Подождите минуту перед повторной отправкой.'
+    case 'WHATSAPP_NOT_CONFIGURED':
+      return 'Подтверждение через WhatsApp скоро будет доступно.'
     case 'RATE_LIMITED':
       return 'Слишком много попыток. Подождите минуту и попробуйте снова.'
     case 'NETWORK_ERROR':

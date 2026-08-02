@@ -5,6 +5,7 @@ import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 export type UserDto = {
   id: string
   email: string
+  phone: string | null
   displayName: string
   role: 'STUDENT'
   currentBand: number | null
@@ -32,9 +33,11 @@ type LoginInput = {
 type RegisterInput = {
   name: string
   email: string
+  phone: string
   password: string
   confirmPassword: string
   acceptedTerms: boolean
+  verificationToken: string
 }
 
 type AuthSnapshot = {

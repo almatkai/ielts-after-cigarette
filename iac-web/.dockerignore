@@ -1,0 +1,7 @@
+.git
+.env
+.output
+dist
+node_modules
+npm-debug.log*
+pnpm-debug.log*

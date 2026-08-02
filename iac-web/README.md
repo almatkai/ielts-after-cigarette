@@ -9,11 +9,12 @@ VITE_API_BASE_URL=http://localhost:8080
 ```
 
 Start the Go backend from the sibling `ielts-after-cigarette-back` repository
-with `docker compose up --build`, then start this app with `npm run dev`.
+with `docker compose up --build`, then start this app with `pnpm dev`.
 The frontend runs at `http://localhost:3000`.
 
-Authentication uses an in-memory access token and a backend-owned HttpOnly
-refresh cookie. Both frontend and backend should use the same hostname
+Registration verifies the user's phone through the backend's WhatsApp challenge
+before creating the account. Authentication uses an in-memory access token and
+a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
 (`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
 
 # Getting Started
@@ -21,8 +22,8 @@ refresh cookie. Both frontend and backend should use the same hostname
 To run this application:
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 # Building For Production
@@ -30,7 +31,7 @@ npm run dev
 To build this application for production:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Styling
@@ -51,10 +52,16 @@ If you prefer not to use Tailwind CSS:
 This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
 
 ```bash
-npm run lint
-npm run format
-npm run check
+pnpm lint
+pnpm format
+pnpm check
 ```
+
+## Production deployment
+
+Pushes to `main` run formatting, type, lint, and production-build checks, publish
+the Node/Nitro image to GHCR, and deploy it through the GitHub `production`
+Environment. `VITE_API_BASE_URL` is compiled into the browser bundle.
 
 ## Shadcn
 

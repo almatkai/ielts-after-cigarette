@@ -17,6 +17,17 @@ before creating the account. Authentication uses an in-memory access token and
 a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
 (`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
 
+Users with the backend role `EDITOR` or `ADMIN` can open `/admin`. The route has
+a client guard for navigation, and the data request is independently protected
+by `GET /api/v1/admin/access`. Assign the first administrator through the
+backend container as documented in the backend README; there is no public role
+management endpoint.
+
+The first Reading administration slice is available at
+`/admin/reading/materials`: staff can create and version passage drafts, while
+only `ADMIN` can publish the current version. Question groups, the constructor,
+and the student catalog are intentionally the next separate slice.
+
 # Getting Started
 
 To run this application:

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { LogOut, X } from 'lucide-react'
+import { LogOut, ShieldCheck, X } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
 import {
@@ -117,6 +117,24 @@ export function DashboardSidebar({
         </nav>
 
         <div className="mt-auto space-y-1 border-t border-[#eeeeeb] pt-4">
+          {auth.hasAnyRole(['EDITOR', 'ADMIN']) ? (
+            <Link
+              to="/admin"
+              onClick={onNavigate}
+              className={navigationLinkClassName}
+              inactiveProps={{
+                className:
+                  'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+              }}
+            >
+              <ShieldCheck
+                className="size-[19px] shrink-0 text-[#8b8b8e] transition-colors"
+                strokeWidth={1.8}
+                aria-hidden
+              />
+              <span>Администрирование</span>
+            </Link>
+          ) : null}
           <Link
             to={settingsDashboardNavigation.to}
             activeOptions={{ exact: settingsDashboardNavigation.exact }}

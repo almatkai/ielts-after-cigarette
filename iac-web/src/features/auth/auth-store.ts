@@ -2,12 +2,14 @@ import { useSyncExternalStore } from 'react'
 
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 
+export type UserRole = 'STUDENT' | 'EDITOR' | 'ADMIN'
+
 export type UserDto = {
   id: string
   email: string
   phone: string | null
   displayName: string
-  role: 'STUDENT'
+  role: UserRole
   currentBand: number | null
   targetBand: number | null
   examDate: string | null
@@ -80,6 +82,11 @@ export class AuthStore {
 
   isAuthenticated = () =>
     Boolean(this.snapshot.accessToken && this.snapshot.user)
+
+  hasAnyRole = (roles: readonly UserRole[]) => {
+    const role = this.snapshot.user?.role
+    return role !== undefined && roles.includes(role)
+  }
 
   initialize = async () => {
     if (this.snapshot.initialized) return this.isAuthenticated()
@@ -216,5 +223,6 @@ export function useAuth() {
     login: authStore.login,
     register: authStore.register,
     logout: authStore.logout,
+    hasAnyRole: authStore.hasAnyRole,
   }
 }

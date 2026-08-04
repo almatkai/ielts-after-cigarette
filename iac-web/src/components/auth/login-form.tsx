@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
 
@@ -33,6 +33,7 @@ function validatePassword(value: string) {
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const search = useSearch({ from: '/login' })
   const auth = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [recoveryIsVisible, setRecoveryIsVisible] = useState(false)
@@ -46,7 +47,7 @@ export function LoginForm() {
       setSubmissionError(null)
       try {
         await auth.login(value)
-        await navigate({ to: '/dashboard' })
+        await navigate({ to: search.redirect ?? '/dashboard' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
       }

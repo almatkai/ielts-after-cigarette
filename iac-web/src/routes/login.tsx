@@ -5,10 +5,18 @@ import { LoginForm } from '#/components/auth/login-form'
 
 export const Route = createFileRoute('/login')({
   ssr: false,
-  beforeLoad: async ({ context }) => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { redirect?: '/admin' | '/dashboard' } => {
+    if (search.redirect === '/admin' || search.redirect === '/dashboard') {
+      return { redirect: search.redirect }
+    }
+    return {}
+  },
+  beforeLoad: async ({ context, search }) => {
     await context.auth.initialize()
     if (context.auth.isAuthenticated()) {
-      throw redirect({ to: '/dashboard' })
+      throw redirect({ to: search.redirect ?? '/dashboard' })
     }
   },
   head: () => ({

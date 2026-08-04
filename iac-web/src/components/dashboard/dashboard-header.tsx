@@ -3,6 +3,7 @@ import { Bell, BellOff, Menu, UserRound } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/features/auth/auth-store'
 import {
   Popover,
   PopoverContent,
@@ -18,6 +19,9 @@ export function DashboardHeader({
   pageTitle,
   onOpenNavigation,
 }: DashboardHeaderProps) {
+  const { user } = useAuth()
+  const accountName = user?.displayName.trim() || 'Аккаунт'
+
   return (
     <header className="sticky top-0 z-30 flex h-[72px] items-center border-b border-[#e7e7e4] bg-[rgba(255,255,255,0.92)] px-4 backdrop-blur-xl sm:px-6 lg:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -33,7 +37,7 @@ export function DashboardHeader({
           <Menu aria-hidden />
         </Button>
         <div className="lg:hidden">
-          <Brand />
+          <Brand to="/dashboard" />
         </div>
         <span className="hidden h-7 w-px bg-[#e7e7e4] sm:block lg:hidden" />
         <div className="min-w-0">
@@ -97,7 +101,7 @@ export function DashboardHeader({
               />
             </span>
             <span className="hidden text-sm font-semibold sm:inline">
-              Аккаунт
+              {accountName}
             </span>
           </Link>
         </Button>

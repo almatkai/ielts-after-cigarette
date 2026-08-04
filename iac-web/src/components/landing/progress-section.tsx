@@ -41,7 +41,7 @@ export function ProgressSection() {
               Больше, чем просто итоговый балл.
             </h2>
           </div>
-          <p className="max-w-md text-base leading-7 text-[#69696d] lg:col-span-5 lg:justify-self-end">
+          <p className="max-w-md text-base leading-7 text-[#475569] lg:col-span-5 lg:justify-self-end">
             Следите за динамикой каждого навыка, регулярностью занятий и
             повторяющимися ошибками.
           </p>
@@ -49,7 +49,7 @@ export function ProgressSection() {
 
         <RevealInView delay={0.08} className="mt-12">
           <div className="product-panel overflow-hidden">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e7e7e4] px-5 py-4 sm:px-7">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e2e8f0] px-5 py-4 sm:px-7">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <Chart
                   size={19}
@@ -59,9 +59,9 @@ export function ProgressSection() {
                 />
                 Аналитика прогресса
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#69696d]">
+              <div className="flex items-center gap-2 text-xs text-[#475569]">
                 <span
-                  className="size-2 rounded-full bg-[#e23b3b]"
+                  className="size-2 rounded-full bg-[#3b82f6]"
                   aria-hidden
                 />
                 Демонстрационные данные
@@ -69,7 +69,7 @@ export function ProgressSection() {
             </div>
 
             <div className="grid lg:grid-cols-[1.35fr_0.65fr]">
-              <div className="border-b border-[#e7e7e4] p-5 sm:p-8 lg:border-r lg:border-b-0">
+              <div className="border-b border-[#e2e8f0] p-5 sm:p-8 lg:border-r lg:border-b-0">
                 <div className="flex flex-wrap items-start justify-between gap-5">
                   <div>
                     <p className="preview-label">Динамика балла</p>
@@ -77,7 +77,7 @@ export function ProgressSection() {
                       <span className="text-5xl font-semibold tracking-[-0.07em]">
                         6,0
                       </span>
-                      <span className="flex items-center gap-1 text-sm font-semibold text-[#111111]">
+                      <span className="flex items-center gap-1 text-sm font-semibold text-[#0f172a]">
                         <TrendUp
                           size={17}
                           color="currentColor"
@@ -88,13 +88,13 @@ export function ProgressSection() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-5 text-xs text-[#69696d]">
+                  <div className="flex gap-5 text-xs text-[#475569]">
                     <span className="flex items-center gap-2">
-                      <span className="h-0.5 w-5 bg-[#e23b3b]" />
+                      <span className="h-0.5 w-5 bg-[#3b82f6]" />
                       Текущая неделя
                     </span>
                     <span className="flex items-center gap-2">
-                      <span className="h-0.5 w-5 bg-[#bdbdb8]" />
+                      <span className="h-0.5 w-5 bg-[#cbd5e1]" />
                       Предыдущая неделя
                     </span>
                   </div>
@@ -110,14 +110,14 @@ export function ProgressSection() {
                     role="img"
                     aria-label="График постепенного роста демонстрационного балла с 5,5 до 6,0 за восемь недель"
                   >
-                    <g stroke="#e7e7e4" strokeWidth="1">
+                    <g stroke="#e2e8f0" strokeWidth="1">
                       <path d="M38 30H700" />
                       <path d="M38 95H700" />
                       <path d="M38 160H700" />
                       <path d="M38 225H700" />
                     </g>
                     <g
-                      fill="#8b8b8e"
+                      fill="#64748b"
                       fontSize="11"
                       fontFamily="Manrope Variable"
                     >
@@ -137,14 +137,14 @@ export function ProgressSection() {
                     <path
                       d="M42 216 C115 210 135 197 204 198 S294 177 366 180 S461 155 530 151 S635 126 696 102"
                       fill="none"
-                      stroke="#bdbdb8"
+                      stroke="#cbd5e1"
                       strokeWidth="2"
                       strokeDasharray="5 7"
                     />
                     <path
                       d="M42 216 C106 215 145 202 204 190 S296 182 366 166 S468 151 530 134 S638 104 696 80"
                       fill="none"
-                      stroke="#e23b3b"
+                      stroke="#3b82f6"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     />
@@ -155,12 +155,12 @@ export function ProgressSection() {
                         cy={[216, 190, 166, 134, 80][index]}
                         r="4"
                         fill="#fff"
-                        stroke="#e23b3b"
+                        stroke="#3b82f6"
                         strokeWidth="2"
                       />
                     ))}
                     <g
-                      fill="#8b8b8e"
+                      fill="#64748b"
                       fontSize="11"
                       fontFamily="Manrope Variable"
                     >
@@ -182,10 +182,10 @@ export function ProgressSection() {
                   </figcaption>
                 </figure>
 
-                <div className="mt-9 border-t border-[#e7e7e4] pt-7">
+                <div className="mt-9 border-t border-[#e2e8f0] pt-7">
                   <div className="mb-5 flex items-center justify-between">
                     <p className="text-sm font-semibold">Баланс навыков</p>
-                    <span className="text-xs text-[#8b8b8e]">
+                    <span className="text-xs text-[#64748b]">
                       Последние 30 дней
                     </span>
                   </div>
@@ -193,7 +193,7 @@ export function ProgressSection() {
                     {skillProgress.map((skill) => (
                       <div key={skill.label}>
                         <div className="mb-2 flex justify-between text-xs">
-                          <span className="text-[#69696d]">{skill.label}</span>
+                          <span className="text-[#475569]">{skill.label}</span>
                           <span className="font-semibold">{skill.score}</span>
                         </div>
                         <AnimatedProgress
@@ -201,7 +201,7 @@ export function ProgressSection() {
                           label={`${skill.label}: демонстрационный прогресс ${skill.value}%`}
                           indicatorClassName={
                             skill.label === 'Письмо'
-                              ? 'bg-[#e23b3b]'
+                              ? 'bg-[#3b82f6]'
                               : undefined
                           }
                         />
@@ -212,7 +212,7 @@ export function ProgressSection() {
               </div>
 
               <div>
-                <div className="border-b border-[#e7e7e4] p-5 sm:p-7">
+                <div className="border-b border-[#e2e8f0] p-5 sm:p-7">
                   <div className="flex items-center gap-2 text-sm font-semibold">
                     <Calendar
                       size={18}
@@ -222,7 +222,7 @@ export function ProgressSection() {
                     />
                     Последние занятия
                   </div>
-                  <div className="mt-5 divide-y divide-[#e7e7e4]">
+                  <div className="mt-5 divide-y divide-[#e2e8f0]">
                     {recentSessions.map((session) => (
                       <div
                         key={`${session.skill}-${session.date}`}
@@ -230,11 +230,11 @@ export function ProgressSection() {
                       >
                         <div className="flex items-center justify-between gap-3 text-sm">
                           <span className="font-semibold">{session.skill}</span>
-                          <span className="text-xs text-[#8b8b8e]">
+                          <span className="text-xs text-[#64748b]">
                             {session.date}
                           </span>
                         </div>
-                        <div className="mt-1 flex justify-between gap-3 text-xs text-[#69696d]">
+                        <div className="mt-1 flex justify-between gap-3 text-xs text-[#475569]">
                           <span>{session.focus}</span>
                           <span>{session.duration}</span>
                         </div>
@@ -242,7 +242,7 @@ export function ProgressSection() {
                     ))}
                   </div>
                 </div>
-                <div className="border-b border-[#e7e7e4] p-5 sm:p-7">
+                <div className="border-b border-[#e2e8f0] p-5 sm:p-7">
                   <div className="flex items-center gap-2 text-sm font-semibold">
                     <Note1
                       size={18}
@@ -254,19 +254,19 @@ export function ProgressSection() {
                   </div>
                   <div className="mt-5 space-y-3 text-sm">
                     <div className="flex justify-between gap-4">
-                      <span className="text-[#69696d]">
+                      <span className="text-[#475569]">
                         Похожие формулировки
                       </span>
                       <span className="font-semibold">5</span>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <span className="text-[#69696d]">
+                      <span className="text-[#475569]">
                         Связность аргумента
                       </span>
                       <span className="font-semibold">3</span>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <span className="text-[#69696d]">Детали в аудио</span>
+                      <span className="text-[#475569]">Детали в аудио</span>
                       <span className="font-semibold">2</span>
                     </div>
                   </div>
@@ -281,9 +281,9 @@ export function ProgressSection() {
                       (day, index) => (
                         <div key={day} className="text-center">
                           <span
-                            className={`mx-auto block size-6 rounded-[6px] ${[0, 2, 3, 5].includes(index) ? 'bg-[#111111]' : 'bg-[#e7e7e4]'}`}
+                            className={`mx-auto block size-6 rounded-[6px] ${[0, 2, 3, 5].includes(index) ? 'bg-[#0f172a]' : 'bg-[#e2e8f0]'}`}
                           />
-                          <span className="mt-2 block text-[10px] text-[#8b8b8e]">
+                          <span className="mt-2 block text-[10px] text-[#64748b]">
                             {day}
                           </span>
                         </div>

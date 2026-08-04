@@ -12,7 +12,7 @@ export function HeroBackground() {
         className="absolute inset-0 opacity-45"
         style={{
           backgroundImage:
-            'radial-gradient(circle, rgba(17, 17, 17, 0.16) 0.8px, transparent 0.9px)',
+            'radial-gradient(circle, rgba(15, 23, 42, 0.16) 0.8px, transparent 0.9px)',
           backgroundSize: '26px 26px',
           maskImage:
             'radial-gradient(ellipse 54% 66% at 19% 49%, black 0%, rgba(0, 0, 0, 0.72) 42%, transparent 78%)',

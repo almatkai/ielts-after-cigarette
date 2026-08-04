@@ -12,7 +12,7 @@ export function ValueOrbitBackground() {
     >
       <div className="absolute top-1/2 left-[-220px] size-[680px] -translate-y-1/2 opacity-55 sm:left-[-160px] lg:left-[-80px] lg:size-[760px]">
         <svg className="size-full" viewBox="0 0 880 880">
-          <g fill="none" stroke="#d8d8d4" strokeWidth="1">
+          <g fill="none" stroke="#cbd5e1" strokeWidth="1">
             <circle cx="440" cy="440" r="106" opacity="0.44" />
             <circle cx="440" cy="440" r="204" opacity="0.3" />
             <circle cx="440" cy="440" r="302" opacity="0.18" />
@@ -24,7 +24,7 @@ export function ValueOrbitBackground() {
               cx="440"
               cy="440"
               fill="none"
-              stroke="#111111"
+              stroke="#0f172a"
               strokeWidth="1"
               initial={false}
               animate={
@@ -63,7 +63,7 @@ export function ValueOrbitBackground() {
               cy="440"
               r="252"
               fill="none"
-              stroke="#e23b3b"
+              stroke="#3b82f6"
               strokeWidth="1.4"
               strokeLinecap="round"
               strokeDasharray="3 48 72 380"
@@ -75,7 +75,7 @@ export function ValueOrbitBackground() {
             cx="440"
             cy="440"
             r="3.5"
-            fill="#e23b3b"
+            fill="#3b82f6"
             animate={{ opacity: shouldReduceMotion ? 0.7 : [0.38, 0.9, 0.38] }}
             transition={
               shouldReduceMotion

@@ -42,7 +42,7 @@ export function AuthInput({
     <div>
       <Label
         htmlFor={id}
-        className="mb-2 block text-sm font-semibold text-[#111111]"
+        className="mb-2 block text-sm font-semibold text-[#0f172a]"
       >
         {label}
       </Label>
@@ -61,9 +61,9 @@ export function AuthInput({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-12 w-full rounded-[10px] border bg-white px-4 text-[15px] text-[#111111] outline-none transition-colors placeholder:text-[#aaa9a6] focus-visible:border-[#111111] focus-visible:ring-0 focus-visible:outline-none aria-invalid:ring-0',
+            'h-12 w-full rounded-[10px] border bg-white px-4 text-[15px] text-[#0f172a] outline-none transition-colors placeholder:text-[#94a3b8] focus-visible:border-[#3b82f6] focus-visible:ring-0 focus-visible:outline-none aria-invalid:ring-0',
             isPassword && 'pr-12',
-            error ? 'border-[#e23b3b]' : 'border-[#dededb]',
+            error ? 'border-[#dc2626]' : 'border-[#cbd5e1]',
           )}
         />
         {isPassword ? (
@@ -72,7 +72,7 @@ export function AuthInput({
             variant="ghost"
             size="icon"
             onClick={() => setPasswordIsVisible((visible) => !visible)}
-            className="absolute top-1/2 right-1.5 grid size-10 -translate-y-1/2 place-items-center rounded-[9px] text-[#69696d] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
+            className="absolute top-1/2 right-1.5 grid size-10 -translate-y-1/2 place-items-center rounded-[9px] text-[#475569] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
             aria-label={passwordIsVisible ? 'Скрыть пароль' : 'Показать пароль'}
             aria-pressed={passwordIsVisible}
           >
@@ -98,7 +98,7 @@ export function AuthInput({
         {error ? (
           <p
             id={errorId}
-            className="text-xs leading-4 text-[#c92f2f]"
+            className="text-xs leading-4 text-[#dc2626]"
             role="alert"
           >
             {error}

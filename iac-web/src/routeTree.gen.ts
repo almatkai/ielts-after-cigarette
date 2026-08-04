@@ -20,6 +20,7 @@ import { Route as DashboardPracticeRouteImport } from './routes/dashboard.practi
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,30 +77,37 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => RegisterRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/register/verify': typeof RegisterVerifyRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/register/verify': typeof RegisterVerifyRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -107,13 +115,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/register/verify': typeof RegisterVerifyRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
+    | '/register/verify'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
+    | '/register/verify'
     | '/dashboard'
   id:
     | '__root__'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/progress'
     | '/dashboard/settings'
+    | '/register/verify'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -161,7 +173,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   LoginRoute: typeof LoginRoute
-  RegisterRoute: typeof RegisterRoute
+  RegisterRoute: typeof RegisterRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -243,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/register/verify': {
+      id: '/register/verify'
+      path: '/verify'
+      fullPath: '/register/verify'
+      preLoaderRoute: typeof RegisterVerifyRouteImport
+      parentRoute: typeof RegisterRoute
+    }
   }
 }
 
@@ -270,11 +289,23 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface RegisterRouteChildren {
+  RegisterVerifyRoute: typeof RegisterVerifyRoute
+}
+
+const RegisterRouteChildren: RegisterRouteChildren = {
+  RegisterVerifyRoute: RegisterVerifyRoute,
+}
+
+const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
+  RegisterRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
+  RegisterRoute: RegisterRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

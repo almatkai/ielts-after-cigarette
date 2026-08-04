@@ -20,19 +20,19 @@ export function HeroSection() {
         SPLAT_FORCE={3600}
         COLOR_UPDATE_SPEED={4}
         RAINBOW_MODE={false}
-        COLOR="#e23b3b"
+        COLOR="#3b82f6"
       />
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(250,250,248,0.34),rgba(250,250,248,0.08)_58%,rgba(250,250,248,0.28))]"
+        className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08)_58%,rgba(255,255,255,0.28))]"
         aria-hidden
       />
       <div className="container-shell relative z-10">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-8">
           <div className="lg:col-span-7">
             <Reveal delay={0.04}>
-              <div className="inline-flex flex-col items-start gap-2 text-xs font-semibold tracking-[0.09em] text-[#69696d] uppercase">
+              <div className="inline-flex flex-col items-start gap-2 text-xs font-semibold tracking-[0.09em] text-[#475569] uppercase">
                 <span>{heroContent.eyebrow}</span>
-                <span className="h-px w-9 bg-[#e23b3b]" aria-hidden />
+                <span className="h-px w-9 bg-[#3b82f6]" aria-hidden />
               </div>
             </Reveal>
             <Reveal delay={0.11}>
@@ -47,7 +47,7 @@ export function HeroSection() {
             <Reveal
               as="p"
               delay={0.18}
-              className="mt-7 max-w-[610px] text-lg leading-8 text-[#69696d] sm:text-xl"
+              className="mt-7 max-w-[610px] text-lg leading-8 text-[#475569] sm:text-xl"
             >
               {heroContent.description}
             </Reveal>

@@ -7,7 +7,7 @@ export function DifferentiationSection() {
 
   return (
     <section
-      className="relative isolate overflow-hidden border-y border-[#e7e7e4] bg-white py-24 sm:py-32"
+      className="relative isolate overflow-hidden border-y border-[#e2e8f0] bg-white py-24 sm:py-32"
       aria-labelledby="focus-heading"
     >
       <div
@@ -23,14 +23,14 @@ export function DifferentiationSection() {
         <path
           d="M-80 310 C170 112 360 362 590 206 S980 88 1280 278"
           fill="none"
-          stroke="#d8d8d4"
+          stroke="#cbd5e1"
           strokeWidth="1"
           opacity="0.32"
         />
         <motion.path
           d="M-80 310 C170 112 360 362 590 206 S980 88 1280 278"
           fill="none"
-          stroke="#e23b3b"
+          stroke="#3b82f6"
           strokeWidth="1.35"
           strokeLinecap="round"
           pathLength="1"
@@ -56,7 +56,7 @@ export function DifferentiationSection() {
           >
             Меньше шума. Больше осознанной практики.
           </h2>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-[#69696d]">
+          <p className="mt-8 max-w-xl text-lg leading-8 text-[#475569]">
             Спокойное рабочее пространство, которое помогает сосредоточиться на
             следующем полезном шаге.
           </p>

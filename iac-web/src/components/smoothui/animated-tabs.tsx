@@ -48,7 +48,7 @@ export function AnimatedTabs<T extends string>({
   return (
     <div
       className={cn(
-        'scrollbar-none flex max-w-full gap-1 overflow-x-auto border-b border-[#e7e7e4]',
+        'scrollbar-none flex max-w-full gap-1 overflow-x-auto border-b border-[#e2e8f0]',
         className,
       )}
       role="tablist"
@@ -71,15 +71,15 @@ export function AnimatedTabs<T extends string>({
             onClick={() => onChange(item.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
             className={cn(
-              'relative min-h-12 shrink-0 px-4 text-sm font-medium text-[#69696d] transition-colors hover:text-[#111111]',
-              isActive && 'text-[#111111]',
+              'relative min-h-12 shrink-0 px-4 text-sm font-medium text-[#475569] transition-colors hover:text-[#0f172a]',
+              isActive && 'text-[#0f172a]',
             )}
           >
             {item.label}
             {isActive ? (
               <motion.span
                 layoutId="active-skill-tab"
-                className="absolute right-3 bottom-[-1px] left-3 h-0.5 bg-[#e23b3b]"
+                className="absolute right-3 bottom-[-1px] left-3 h-0.5 bg-[#3b82f6]"
                 transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
               />
             ) : null}

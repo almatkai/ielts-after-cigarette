@@ -1,20 +1,25 @@
 import { Link } from '@tanstack/react-router'
 
-export function Brand() {
+type BrandProps = {
+  to?: '/' | '/dashboard'
+}
+
+export function Brand({ to = '/' }: BrandProps) {
+  const isDashboardLink = to === '/dashboard'
+
   return (
     <Link
-      to="/"
-      hash="top"
-      className="group inline-flex min-h-11 flex-col items-start justify-center gap-1 text-[#111111] no-underline"
-      aria-label="IAC — к началу страницы"
+      to={to}
+      hash={isDashboardLink ? undefined : 'top'}
+      className="inline-flex min-h-11 items-center gap-1 text-lg font-bold tracking-tight no-underline"
+      aria-label={
+        isDashboardLink
+          ? 'Daiyndyq IELTS — к обзору'
+          : 'Daiyndyq IELTS — к началу страницы'
+      }
     >
-      <span className="text-[17px] leading-none font-bold tracking-[-0.04em]">
-        IAC
-      </span>
-      <span
-        className="h-px w-7 origin-left bg-[#e23b3b] transition-transform duration-300 group-hover:scale-x-75"
-        aria-hidden
-      />
+      <span className="text-[#3b82f6]">Daiyndyq</span>
+      <span className="text-[#0f172a]">IELTS</span>
     </Link>
   )
 }

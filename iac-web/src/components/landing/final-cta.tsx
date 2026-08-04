@@ -12,13 +12,13 @@ export function FinalCta() {
     >
       <div className="container-shell">
         <RevealInView>
-          <div className="relative overflow-hidden rounded-[18px] border border-[#e7e7e4] bg-white px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-12">
+          <div className="relative overflow-hidden rounded-[18px] border border-[#e2e8f0] bg-white px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-12">
             <div
-              className="absolute top-0 right-0 left-0 h-px bg-[#e7e7e4]"
+              className="absolute top-0 right-0 left-0 h-px bg-[#e2e8f0]"
               aria-hidden
             >
               <motion.span
-                className="block h-px bg-[#e23b3b]"
+                className="block h-px bg-[#3b82f6]"
                 initial={{ width: '0%' }}
                 whileInView={{ width: '100%' }}
                 viewport={{ once: true }}
@@ -27,7 +27,7 @@ export function FinalCta() {
             </div>
             <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-4">
               <div className="lg:col-span-7">
-                <p className="text-xs font-semibold tracking-[0.09em] text-[#69696d] uppercase">
+                <p className="text-xs font-semibold tracking-[0.09em] text-[#475569] uppercase">
                   Следующий шаг
                 </p>
                 <h2
@@ -36,7 +36,7 @@ export function FinalCta() {
                 >
                   Следующая тренировка — шаг к целевому баллу.
                 </h2>
-                <p className="mt-5 max-w-[580px] text-base leading-7 text-[#69696d] sm:text-lg">
+                <p className="mt-5 max-w-[580px] text-base leading-7 text-[#475569] sm:text-lg">
                   Соберите подготовку вокруг своей цели и практикуйтесь в
                   удобном темпе.
                 </p>

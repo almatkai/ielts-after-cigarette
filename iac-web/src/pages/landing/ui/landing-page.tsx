@@ -15,11 +15,11 @@ export function LandingPage() {
     <MotionConfig reducedMotion="user">
       <div
         id="top"
-        className="min-h-screen overflow-clip bg-[#fafaf8] text-[#111111]"
+        className="landing-page min-h-screen overflow-clip bg-[#ffffff] text-[#0f172a]"
       >
         <a
           href="#main-content"
-          className="sr-only z-[100] rounded-[10px] bg-[#111111] px-4 py-3 text-white focus:fixed focus:top-3 focus:left-3 focus:inline-flex focus:min-h-11 focus:items-center focus:not-sr-only"
+          className="sr-only z-[100] rounded-[10px] bg-[#0f172a] px-4 py-3 text-white focus:fixed focus:top-3 focus:left-3 focus:inline-flex focus:min-h-11 focus:items-center focus:not-sr-only"
         >
           Перейти к содержанию
         </a>

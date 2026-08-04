@@ -66,7 +66,7 @@ export function DashboardSidebar({
       aria-label="Боковая навигация"
     >
       <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-[#eeeeeb] px-6">
-        <Brand />
+        <Brand to="/dashboard" />
         {mobile ? (
           <Button
             type="button"

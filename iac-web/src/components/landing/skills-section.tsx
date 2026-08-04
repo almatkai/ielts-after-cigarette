@@ -28,7 +28,7 @@ export function SkillsSection() {
               Одна система. Четыре навыка.
             </h2>
           </div>
-          <p className="max-w-md text-base leading-7 text-[#69696d] lg:col-span-4 lg:justify-self-end">
+          <p className="max-w-md text-base leading-7 text-[#475569] lg:col-span-4 lg:justify-self-end">
             Меняется не только содержание — каждый навык получает подходящий
             рабочий формат.
           </p>
@@ -44,18 +44,18 @@ export function SkillsSection() {
 
           <div className="mt-7 grid gap-7 lg:grid-cols-[0.3fr_0.7fr] lg:items-start">
             <div className="lg:pt-8">
-              <p className="text-xs font-semibold tracking-[0.08em] text-[#69696d] uppercase">
+              <p className="text-xs font-semibold tracking-[0.08em] text-[#475569] uppercase">
                 Активный навык
               </p>
               <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em]">
                 {activeContent.label}
               </h3>
-              <p className="mt-4 max-w-sm text-base leading-7 text-[#69696d]">
+              <p className="mt-4 max-w-sm text-base leading-7 text-[#475569]">
                 {activeContent.description}
               </p>
-              <div className="mt-8 flex items-center gap-3 text-xs text-[#8b8b8e]">
+              <div className="mt-8 flex items-center gap-3 text-xs text-[#64748b]">
                 <span
-                  className="size-2 rounded-full bg-[#e23b3b]"
+                  className="size-2 rounded-full bg-[#3b82f6]"
                   aria-hidden
                 />
                 Демонстрация интерфейса

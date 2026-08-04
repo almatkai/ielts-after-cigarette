@@ -140,7 +140,7 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #69696d;
+  color: #475569;
   font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.09em;
@@ -149,10 +149,10 @@ button {
 
 .product-panel,
 .skill-interface {
-  border: 1px solid #e7e7e4;
+  border: 1px solid #e2e8f0;
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 24px 70px rgba(17, 17, 17, 0.055);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.055);
 }
 
 .skill-interface {
@@ -164,11 +164,11 @@ button {
   width: 100%;
   min-width: 2px;
   border-radius: 999px;
-  background: #d8d8d4;
+  background: #cbd5e1;
 }
 
 .wave-bar--active {
-  background: #e23b3b;
+  background: #3b82f6;
 }
 
 .editor-lines {
@@ -176,7 +176,7 @@ button {
   min-height: 180px;
   flex-direction: column;
   gap: 14px;
-  border-left: 2px solid #e23b3b;
+  border-left: 2px solid #3b82f6;
   padding: 8px 0 8px 18px;
 }
 
@@ -184,13 +184,13 @@ button {
   display: block;
   height: 7px;
   border-radius: 999px;
-  background: #e7e7e4;
+  background: #e2e8f0;
 }
 
 .editorial-grid {
   background-image:
-    linear-gradient(to right, rgba(17, 17, 17, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17, 17, 17, 0.035) 1px, transparent 1px);
+    linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: linear-gradient(
     to right,
@@ -199,6 +199,22 @@ button {
     black 80%,
     transparent
   );
+}
+
+.landing-page ::selection {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.landing-page
+  :where(
+    a,
+    button,
+    textarea,
+    select,
+    input:not([data-slot='input'])
+  ):focus-visible {
+  outline-color: rgba(59, 130, 246, 0.28);
 }
 
 .scrollbar-none {

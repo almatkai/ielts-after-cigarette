@@ -20,7 +20,7 @@ export function AnimatedProgress({
   return (
     <div
       className={cn(
-        'h-1.5 overflow-hidden rounded-full bg-[#e7e7e4]',
+        'h-1.5 overflow-hidden rounded-full bg-[#e2e8f0]',
         className,
       )}
       role="progressbar"
@@ -30,7 +30,7 @@ export function AnimatedProgress({
       aria-valuenow={safeValue}
     >
       <motion.div
-        className={cn('h-full rounded-full bg-[#111111]', indicatorClassName)}
+        className={cn('h-full rounded-full bg-[#0f172a]', indicatorClassName)}
         initial={{ width: 0 }}
         whileInView={{ width: `${safeValue}%` }}
         viewport={{ once: true }}

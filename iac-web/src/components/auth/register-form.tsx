@@ -10,14 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useAuth } from '@/features/auth/auth-store'
-import type { VerifiedPhone } from '@/features/auth/phone-verification'
+import {
+  getPendingRegistration,
+  setPendingRegistration,
+} from '@/features/auth/registration-flow'
+import { requestPhoneVerification } from '@/features/auth/phone-verification'
 import { getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput } from './auth-input'
 import { getFieldError } from './auth-input-utils'
 import { validatePhone } from './phone-validation'
-import { RegistrationPhoneVerification } from './registration-phone-verification'
 
 function validateName(value: string) {
   if (!value.trim()) return 'Введите имя'
@@ -42,31 +44,31 @@ function validatePassword(value: string) {
 
 export function RegisterForm() {
   const navigate = useNavigate()
-  const auth = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
-  const [verifiedPhone, setVerifiedPhone] = useState<VerifiedPhone | null>(null)
+  const pendingRegistration = getPendingRegistration()
 
   const form = useForm({
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-      acceptedTerms: false,
+      name: pendingRegistration?.name ?? '',
+      email: pendingRegistration?.email ?? '',
+      phone: pendingRegistration?.phone ?? '',
+      password: pendingRegistration?.password ?? '',
+      confirmPassword: pendingRegistration?.confirmPassword ?? '',
+      acceptedTerms: pendingRegistration?.acceptedTerms ?? false,
     },
     onSubmit: async ({ value }) => {
       setSubmissionError(null)
-      if (!verifiedPhone || verifiedPhone.phone !== value.phone) {
-        setSubmissionError('Сначала подтвердите номер кодом из WhatsApp.')
-        return
-      }
       try {
-        await auth.register({
+        const phone = value.phone.trim()
+        const challenge = await requestPhoneVerification(phone, 'registration')
+        setPendingRegistration({
           ...value,
-          verificationToken: verifiedPhone.verificationToken,
+          name: value.name.trim(),
+          email: value.email.trim(),
+          phone,
+          verificationId: challenge.verificationId,
         })
-        await navigate({ to: '/dashboard' })
+        await navigate({ to: '/register/verify' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
       }
@@ -76,11 +78,11 @@ export function RegisterForm() {
   return (
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
-        <CardTitle className="text-3xl tracking-[-0.04em]">
+        <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
           Создать аккаунт
         </CardTitle>
-        <CardDescription className="sr-only">
-          Заполните поля для создания аккаунта.
+        <CardDescription className="mt-2 text-[#475569]">
+          Заполните данные, затем подтвердите номер в WhatsApp.
         </CardDescription>
       </CardHeader>
 
@@ -159,15 +161,6 @@ export function RegisterForm() {
             )}
           </form.Field>
 
-          <form.Subscribe selector={(state) => state.values.phone}>
-            {(phone) => (
-              <RegistrationPhoneVerification
-                phone={phone}
-                onVerified={setVerifiedPhone}
-              />
-            )}
-          </form.Subscribe>
-
           <div className="grid gap-x-3 sm:grid-cols-2">
             <form.Field
               name="password"
@@ -232,14 +225,14 @@ export function RegisterForm() {
           >
             {(field) => (
               <div className="mb-5">
-                <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-[#69696d]">
+                <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-[#475569]">
                   <input
                     type="checkbox"
                     checked={field.state.value}
                     onChange={(event) =>
                       field.handleChange(event.target.checked)
                     }
-                    className="mt-1 size-4 shrink-0 rounded border-[#c9c9c5] accent-[#e23b3b]"
+                    className="mt-1 size-4 shrink-0 rounded border-[#cbd5e1] accent-[#3b82f6]"
                     aria-invalid={Boolean(
                       getFieldError(field.state.meta.errors),
                     )}
@@ -250,7 +243,7 @@ export function RegisterForm() {
                   </span>
                 </label>
                 {getFieldError(field.state.meta.errors) ? (
-                  <p className="mt-1 text-xs text-[#c92f2f]" role="alert">
+                  <p className="mt-1 text-xs text-[#dc2626]" role="alert">
                     {getFieldError(field.state.meta.errors)}
                   </p>
                 ) : null}
@@ -266,16 +259,16 @@ export function RegisterForm() {
                 type="submit"
                 size="lg"
                 disabled={!canSubmit || isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#e23b3b] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#c92f2f] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {isSubmitting ? 'Проверяем…' : 'Создать аккаунт'}
+                {isSubmitting ? 'Отправляем код…' : 'Продолжить'}
               </Button>
             )}
           </form.Subscribe>
 
           {submissionError ? (
             <p
-              className="mt-4 text-center text-sm leading-6 text-[#c92f2f]"
+              className="mt-4 text-center text-sm leading-6 text-[#dc2626]"
               role="alert"
             >
               {submissionError}
@@ -285,11 +278,11 @@ export function RegisterForm() {
       </CardContent>
 
       <CardFooter className="justify-center px-6 pt-7 pb-8 sm:px-8">
-        <p className="text-center text-sm text-[#69696d]">
+        <p className="text-center text-sm text-[#475569]">
           Уже есть аккаунт?{' '}
           <Link
             to="/login"
-            className="font-semibold text-[#111111] underline decoration-[#c9c9c5] underline-offset-4 hover:decoration-[#e23b3b]"
+            className="font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
           >
             Войти
           </Link>

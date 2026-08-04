@@ -2,11 +2,6 @@ import { apiClient } from '@/lib/api/client'
 
 type VerificationPurpose = 'registration' | 'waitlist'
 
-export type VerifiedPhone = {
-  phone: string
-  verificationToken: string
-}
-
 type VerificationChallenge = {
   verificationId: string
   expiresAt: string

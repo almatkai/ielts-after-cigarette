@@ -56,8 +56,10 @@ export function LoginForm() {
   return (
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
-        <CardTitle className="text-3xl tracking-[-0.04em]">Войти</CardTitle>
-        <CardDescription className="sr-only">
+        <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
+          Войти
+        </CardTitle>
+        <CardDescription className="sr-only text-[#475569]">
           Введите электронную почту и пароль для входа.
         </CardDescription>
       </CardHeader>
@@ -118,14 +120,14 @@ export function LoginForm() {
           <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
             <form.Field name="remember">
               {(field) => (
-                <label className="inline-flex min-h-11 cursor-pointer items-center gap-3 text-sm text-[#69696d]">
+                <label className="inline-flex min-h-11 cursor-pointer items-center gap-3 text-sm text-[#475569]">
                   <input
                     type="checkbox"
                     checked={field.state.value}
                     onChange={(event) =>
                       field.handleChange(event.target.checked)
                     }
-                    className="size-4 rounded border-[#c9c9c5] accent-[#e23b3b]"
+                    className="size-4 rounded border-[#cbd5e1] accent-[#3b82f6]"
                   />
                   Запомнить меня
                 </label>
@@ -135,14 +137,14 @@ export function LoginForm() {
               type="button"
               variant="link"
               onClick={() => setRecoveryIsVisible((visible) => !visible)}
-              className="h-auto min-h-11 p-0 text-sm font-semibold text-[#111111] underline decoration-[#c9c9c5] underline-offset-4 hover:decoration-[#e23b3b]"
+              className="h-auto min-h-11 p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
             >
               Не помню пароль
             </Button>
           </div>
 
           {recoveryIsVisible ? (
-            <p className="mb-4 text-sm leading-6 text-[#69696d]" role="status">
+            <p className="mb-4 text-sm leading-6 text-[#475569]" role="status">
               Восстановление пароля появится после подключения почтового
               сервиса.
             </p>
@@ -156,7 +158,7 @@ export function LoginForm() {
                 type="submit"
                 size="lg"
                 disabled={!canSubmit || isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#e23b3b] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#c92f2f] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {isSubmitting ? 'Проверяем…' : 'Войти'}
               </Button>
@@ -165,7 +167,7 @@ export function LoginForm() {
 
           {submissionError ? (
             <p
-              className="mt-4 text-center text-sm leading-6 text-[#c92f2f]"
+              className="mt-4 text-center text-sm leading-6 text-[#dc2626]"
               role="alert"
             >
               {submissionError}
@@ -175,11 +177,11 @@ export function LoginForm() {
       </CardContent>
 
       <CardFooter className="justify-center px-6 pt-7 pb-8 sm:px-8">
-        <p className="text-center text-sm text-[#69696d]">
+        <p className="text-center text-sm text-[#475569]">
           Впервые здесь?{' '}
           <Link
             to="/register"
-            className="font-semibold text-[#111111] underline decoration-[#c9c9c5] underline-offset-4 hover:decoration-[#e23b3b]"
+            className="font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
           >
             Создать аккаунт
           </Link>

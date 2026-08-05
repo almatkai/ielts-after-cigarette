@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardMistakesRouteImport } from './routes/dashboard.mistakes'
 import { Route as DashboardPlanRouteImport } from './routes/dashboard.plan'
@@ -21,15 +24,28 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
+import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as AdminReadingMaterialsMaterialIdRouteImport } from './routes/admin.reading.materials.$materialId'
+import { Route as AdminReadingMaterialsNewRouteImport } from './routes/admin.reading.materials.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForbiddenRoute = ForbiddenRouteImport.update({
+  id: '/forbidden',
+  path: '/forbidden',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -41,6 +57,11 @@ const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
@@ -82,10 +103,29 @@ const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => RegisterRoute,
 } as any)
+const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
+  id: '/reading/materials',
+  path: '/reading/materials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReadingMaterialsMaterialIdRoute =
+  AdminReadingMaterialsMaterialIdRouteImport.update({
+    id: '/$materialId',
+    path: '/$materialId',
+    getParentRoute: () => AdminReadingMaterialsRoute,
+  } as any)
+const AdminReadingMaterialsNewRoute =
+  AdminReadingMaterialsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AdminReadingMaterialsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
@@ -95,10 +135,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
+  '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
@@ -108,12 +153,18 @@ export interface FileRoutesByTo {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
+  '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
@@ -123,13 +174,19 @@ export interface FileRoutesById {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
+  '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
+    | '/forbidden'
     | '/login'
     | '/register'
     | '/dashboard/mistakes'
@@ -139,10 +196,15 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/register/verify'
+    | '/admin/'
     | '/dashboard/'
+    | '/admin/reading/materials'
+    | '/admin/reading/materials/$materialId'
+    | '/admin/reading/materials/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forbidden'
     | '/login'
     | '/register'
     | '/dashboard/mistakes'
@@ -152,11 +214,17 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/register/verify'
+    | '/admin'
     | '/dashboard'
+    | '/admin/reading/materials'
+    | '/admin/reading/materials/$materialId'
+    | '/admin/reading/materials/new'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/dashboard'
+    | '/forbidden'
     | '/login'
     | '/register'
     | '/dashboard/mistakes'
@@ -166,12 +234,18 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/settings'
     | '/register/verify'
+    | '/admin/'
     | '/dashboard/'
+    | '/admin/reading/materials'
+    | '/admin/reading/materials/$materialId'
+    | '/admin/reading/materials/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
+  ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRouteWithChildren
 }
@@ -185,11 +259,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forbidden': {
+      id: '/forbidden'
+      path: '/forbidden'
+      fullPath: '/forbidden'
+      preLoaderRoute: typeof ForbiddenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -205,6 +293,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -262,8 +357,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterVerifyRouteImport
       parentRoute: typeof RegisterRoute
     }
+    '/admin/reading/materials': {
+      id: '/admin/reading/materials'
+      path: '/reading/materials'
+      fullPath: '/admin/reading/materials'
+      preLoaderRoute: typeof AdminReadingMaterialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reading/materials/$materialId': {
+      id: '/admin/reading/materials/$materialId'
+      path: '/$materialId'
+      fullPath: '/admin/reading/materials/$materialId'
+      preLoaderRoute: typeof AdminReadingMaterialsMaterialIdRouteImport
+      parentRoute: typeof AdminReadingMaterialsRoute
+    }
+    '/admin/reading/materials/new': {
+      id: '/admin/reading/materials/new'
+      path: '/new'
+      fullPath: '/admin/reading/materials/new'
+      preLoaderRoute: typeof AdminReadingMaterialsNewRouteImport
+      parentRoute: typeof AdminReadingMaterialsRoute
+    }
   }
 }
+
+interface AdminReadingMaterialsRouteChildren {
+  AdminReadingMaterialsMaterialIdRoute: typeof AdminReadingMaterialsMaterialIdRoute
+  AdminReadingMaterialsNewRoute: typeof AdminReadingMaterialsNewRoute
+}
+
+const AdminReadingMaterialsRouteChildren: AdminReadingMaterialsRouteChildren = {
+  AdminReadingMaterialsMaterialIdRoute: AdminReadingMaterialsMaterialIdRoute,
+  AdminReadingMaterialsNewRoute: AdminReadingMaterialsNewRoute,
+}
+
+const AdminReadingMaterialsRouteWithChildren =
+  AdminReadingMaterialsRoute._addFileChildren(
+    AdminReadingMaterialsRouteChildren,
+  )
+
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
   DashboardMistakesRoute: typeof DashboardMistakesRoute
@@ -303,19 +446,12 @@ const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
+  ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

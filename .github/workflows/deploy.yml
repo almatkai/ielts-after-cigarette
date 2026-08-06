@@ -82,6 +82,7 @@ jobs:
     env:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '9865' }}
       WEB_PORT: ${{ vars.WEB_PORT }}
     steps:
       - uses: actions/checkout@v7
@@ -93,7 +94,7 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/ielts_web_deploy
           chmod 600 ~/.ssh/ielts_web_deploy
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" | awk -v host="$DEPLOY_HOST" -v port="$DEPLOY_PORT" '/^#/ || /^$/ || /^\[/ { print; next } { $1 = "[" host "]:" port; print }' > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
       - name: Prepare deployment files
         run: |
@@ -102,11 +103,11 @@ jobs:
           tar -czf deployment.tar.gz docker-compose.production.yml scripts/deploy-production.sh production.env
       - name: Upload deployment files
         run: |
-          ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'install -d -m 700 ~/ielts-web'
-          scp -i ~/.ssh/ielts_web_deploy deployment.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:ielts-web/deployment.tar.gz"
+          ssh -p "$DEPLOY_PORT" -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'install -d -m 700 ~/ielts-web'
+          scp -P "$DEPLOY_PORT" -i ~/.ssh/ielts_web_deploy deployment.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:ielts-web/deployment.tar.gz"
       - name: Deploy
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          printf '%s' "$GHCR_TOKEN" | ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 700 ~/ielts-web/.docker && DOCKER_CONFIG=~/ielts-web/.docker docker login ghcr.io -u '$GITHUB_ACTOR' --password-stdin"
-          ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'cd ~/ielts-web && tar -xzf deployment.tar.gz && bash scripts/deploy-production.sh' </dev/null
+          printf '%s' "$GHCR_TOKEN" | ssh -p "$DEPLOY_PORT" -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 700 ~/ielts-web/.docker && DOCKER_CONFIG=~/ielts-web/.docker docker login ghcr.io -u '$GITHUB_ACTOR' --password-stdin"
+          ssh -p "$DEPLOY_PORT" -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'cd ~/ielts-web && tar -xzf deployment.tar.gz && bash scripts/deploy-production.sh' </dev/null

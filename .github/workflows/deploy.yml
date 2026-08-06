@@ -1,4 +1,4 @@
-name: Test, build, and deploy
+name: Test
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 concurrency:
   group: development
@@ -39,66 +38,3 @@ jobs:
       - run: pnpm exec vite build
         env:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    environment: development
-    steps:
-      - uses: actions/checkout@v7
-      - uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/setup-buildx-action@v4
-      - name: Set image name
-        id: image
-        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-      - uses: docker/build-push-action@v7
-        with:
-          context: ./iac-web
-          push: true
-          build-args: |
-            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
-          tags: |
-            ${{ steps.image.outputs.name }}:dev
-            ${{ steps.image.outputs.name }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: development
-    env:
-      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-      WEB_PORT: ${{ vars.WEB_PORT }}
-    steps:
-      - uses: actions/checkout@v7
-      - name: Configure SSH
-        env:
-          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-        run: |
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/ielts_web_deploy
-          chmod 600 ~/.ssh/ielts_web_deploy
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-      - name: Prepare deployment files
-        run: |
-          image_name="ghcr.io/${GITHUB_REPOSITORY,,}:dev"
-          printf 'WEB_IMAGE=%s\nWEB_PORT=%s\n' "$image_name" "$WEB_PORT" > production.env
-          tar -czf deployment.tar.gz docker-compose.production.yml scripts/deploy-production.sh production.env
-      - name: Upload deployment files
-        run: |
-          ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'install -d -m 700 ~/ielts-web-dev'
-          scp -i ~/.ssh/ielts_web_deploy deployment.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:ielts-web-dev/deployment.tar.gz"
-      - name: Deploy
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "$GHCR_TOKEN" | ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 700 ~/ielts-web-dev/.docker && DOCKER_CONFIG=~/ielts-web-dev/.docker docker login ghcr.io -u '$GITHUB_ACTOR' --password-stdin"
-          ssh -i ~/.ssh/ielts_web_deploy "$DEPLOY_USER@$DEPLOY_HOST" 'cd ~/ielts-web-dev && tar -xzf deployment.tar.gz && bash scripts/deploy-production.sh' </dev/null

@@ -58,7 +58,7 @@ export function NotFoundPage() {
             aria-hidden
           />
           <img
-            src="/fox_404_transparent.png"
+            src={`${import.meta.env.BASE_URL}fox_404_transparent.png`}
             alt="Растерянная красная лиса"
             width={1600}
             height={1600}

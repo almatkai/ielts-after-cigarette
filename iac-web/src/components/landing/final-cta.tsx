@@ -60,7 +60,7 @@ export function FinalCta() {
                   }}
                 >
                   <img
-                    src="/fox_focused_training.png"
+                    src={`${import.meta.env.BASE_URL}fox_focused_training.png`}
                     alt="Лиса сосредоточенно выполняет тренировочное задание"
                     width={1600}
                     height={1600}

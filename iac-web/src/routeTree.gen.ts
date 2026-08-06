@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as WaitlistAdminRouteImport } from './routes/waitlist-admin'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardMistakesRouteImport } from './routes/dashboard.mistakes'
@@ -56,6 +57,11 @@ const LoginRoute = LoginRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WaitlistAdminRoute = WaitlistAdminRouteImport.update({
+  id: '/waitlist-admin',
+  path: '/waitlist-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
+  '/waitlist-admin': typeof WaitlistAdminRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
+  '/waitlist-admin': typeof WaitlistAdminRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
+  '/waitlist-admin': typeof WaitlistAdminRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/forbidden'
     | '/login'
     | '/register'
+    | '/waitlist-admin'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/forbidden'
     | '/login'
     | '/register'
+    | '/waitlist-admin'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/forbidden'
     | '/login'
     | '/register'
+    | '/waitlist-admin'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRouteWithChildren
+  WaitlistAdminRoute: typeof WaitlistAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/waitlist-admin': {
+      id: '/waitlist-admin'
+      path: '/waitlist-admin'
+      fullPath: '/waitlist-admin'
+      preLoaderRoute: typeof WaitlistAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -451,6 +471,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRouteWithChildren,
+  WaitlistAdminRoute: WaitlistAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

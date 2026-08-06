@@ -28,6 +28,15 @@ type WaitlistResponse = {
   total: number
 }
 
+type AdminEntry = {
+  email: string
+  source: 'env' | 'db'
+}
+
+type AdminsResponse = {
+  admins: AdminEntry[]
+}
+
 declare global {
   interface Window {
     google?: {
@@ -75,8 +84,98 @@ function WaitlistAdminPage() {
   const [entries, setEntries] = useState<WaitlistEntry[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [admins, setAdmins] = useState<AdminEntry[]>([])
+  const [adminsError, setAdminsError] = useState<string | null>(null)
+  const [newAdminEmail, setNewAdminEmail] = useState('')
+  const [adminBusy, setAdminBusy] = useState(false)
 
   const email = credential ? decodeEmail(credential) : null
+
+  const loadAdmins = useCallback(async (token: string) => {
+    if (!apiBaseUrl) return
+    setAdminsError(null)
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/api/v1/admin/super-admins`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const body = (await response.json()) as AdminsResponse
+      setAdmins(body.admins)
+    } catch {
+      setAdminsError('Не удалось загрузить список администраторов.')
+    }
+  }, [])
+
+  const addAdmin = useCallback(async () => {
+    if (!apiBaseUrl || !credential) return
+    const value = newAdminEmail.trim()
+    if (!value) return
+    setAdminBusy(true)
+    setAdminsError(null)
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/api/v1/admin/super-admins`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${credential}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: value }),
+        },
+      )
+      if (response.status === 422) {
+        setAdminsError('Некорректный email.')
+        return
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      setNewAdminEmail('')
+      void loadAdmins(credential)
+    } catch {
+      setAdminsError('Не удалось добавить администратора.')
+    } finally {
+      setAdminBusy(false)
+    }
+  }, [credential, newAdminEmail, loadAdmins])
+
+  const removeAdmin = useCallback(
+    async (target: AdminEntry) => {
+      if (!apiBaseUrl || !credential) return
+      setAdminBusy(true)
+      setAdminsError(null)
+      try {
+        const response = await fetch(
+          `${apiBaseUrl}/api/v1/admin/super-admins/${encodeURIComponent(
+            target.email,
+          )}`,
+          {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${credential}` },
+          },
+        )
+        if (response.status === 409) {
+          setAdminsError(
+            'Этого администратора нельзя удалить — он задан в переменных окружения.',
+          )
+          return
+        }
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+        void loadAdmins(credential)
+      } catch {
+        setAdminsError('Не удалось удалить администратора.')
+      } finally {
+        setAdminBusy(false)
+      }
+    },
+    [credential, loadAdmins],
+  )
 
   const load = useCallback(async (token: string) => {
     if (!apiBaseUrl) {
@@ -124,6 +223,7 @@ function WaitlistAdminPage() {
           if (!response.credential) return
           setCredential(response.credential)
           void load(response.credential)
+          void loadAdmins(response.credential)
         },
       })
       window.google.accounts.id.renderButton(buttonRef.current, {
@@ -142,7 +242,7 @@ function WaitlistAdminPage() {
     script.async = true
     script.onload = init
     document.head.appendChild(script)
-  }, [credential, load])
+  }, [credential, load, loadAdmins])
 
   if (!credential) {
     return (
@@ -253,6 +353,100 @@ function WaitlistAdminPage() {
             </tbody>
           </table>
         </div>
+
+        <section className="mt-10">
+          <h2 className="text-xl font-semibold tracking-[-0.04em]">
+            Администраторы
+          </h2>
+          <p className="mt-1 text-sm text-[#69696d]">
+            Эти Google-аккаунты имеют доступ к waitlist. Администратор из
+            переменных окружения (env) не удаляется через интерфейс.
+          </p>
+
+          <form
+            className="mt-4 flex flex-wrap items-center gap-2"
+            onSubmit={(event) => {
+              event.preventDefault()
+              void addAdmin()
+            }}
+          >
+            <input
+              type="email"
+              required
+              value={newAdminEmail}
+              onChange={(event) => setNewAdminEmail(event.target.value)}
+              placeholder="email нового администратора"
+              className="w-full max-w-xs rounded-[10px] border border-[#e7e7e4] bg-white px-3 py-2 text-sm outline-none focus:border-[#c9c9c4]"
+            />
+            <Button
+              type="submit"
+              className="bg-[#e23b3b] text-white hover:bg-[#c92f2f]"
+              disabled={adminBusy}
+            >
+              Добавить
+            </Button>
+          </form>
+
+          {adminsError && (
+            <p className="mt-3 text-sm text-[#e23b3b]" role="alert">
+              {adminsError}
+            </p>
+          )}
+
+          <div className="mt-4 overflow-x-auto rounded-[16px] border border-[#e7e7e4] bg-white">
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Источник</th>
+                  <th className="px-4 py-3 font-medium" />
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map((admin) => (
+                  <tr
+                    key={admin.email}
+                    className="border-b border-[#f0f0ed] last:border-0"
+                  >
+                    <td className="px-4 py-3">{admin.email}</td>
+                    <td className="px-4 py-3">
+                      {admin.source === 'env' ? 'env' : 'добавлен вручную'}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {admin.source === 'env' ? (
+                        <span
+                          className="text-xs text-[#a1a1a6]"
+                          title="Задан в переменных окружения, удалить можно только правкой env"
+                        >
+                          недоступно
+                        </span>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="border-[#e7e7e4] text-[#e23b3b] hover:text-[#c92f2f]"
+                          disabled={adminBusy}
+                          onClick={() => void removeAdmin(admin)}
+                        >
+                          Удалить
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {admins.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="px-4 py-8 text-center text-[#69696d]"
+                    >
+                      Список администраторов пуст.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </main>
   )

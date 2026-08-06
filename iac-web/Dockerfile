@@ -12,6 +12,7 @@ COPY . .
 
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV NITRO_APP_BASE_URL=/app/
 RUN test -n "$VITE_API_BASE_URL" && pnpm exec vite build
 
 FROM node:22-alpine AS runtime

@@ -16,7 +16,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://127.0.0.1:3000/",
+          "http://127.0.0.1:3000/app/",
         ]
       interval: 10s
       timeout: 3s

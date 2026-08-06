@@ -86,7 +86,7 @@ function WaitlistAdminPage() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${apiBaseUrl}/admin/waitlist`, {
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/waitlist`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (response.status === 401) {

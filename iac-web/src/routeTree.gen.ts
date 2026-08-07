@@ -17,6 +17,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as WaitlistAdminRouteImport } from './routes/waitlist-admin'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardMistakesRouteImport } from './routes/dashboard.mistakes'
 import { Route as DashboardPlanRouteImport } from './routes/dashboard.plan'
@@ -67,6 +69,16 @@ const WaitlistAdminRoute = WaitlistAdminRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminsRoute = AdminAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
   getParentRoute: () => AdminRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -135,6 +147,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/waitlist-admin': typeof WaitlistAdminRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -154,6 +168,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/waitlist-admin': typeof WaitlistAdminRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -176,6 +192,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
   '/waitlist-admin': typeof WaitlistAdminRoute
+  '/admin/admins': typeof AdminAdminsRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -199,6 +217,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/waitlist-admin'
+    | '/admin/admins'
+    | '/admin/waitlist'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -218,6 +238,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/waitlist-admin'
+    | '/admin/admins'
+    | '/admin/waitlist'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -239,6 +261,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/waitlist-admin'
+    | '/admin/admins'
+    | '/admin/waitlist'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -319,6 +343,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/admins': {
+      id: '/admin/admins'
+      path: '/admins'
+      fullPath: '/admin/admins'
+      preLoaderRoute: typeof AdminAdminsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/waitlist': {
+      id: '/admin/waitlist'
+      path: '/waitlist'
+      fullPath: '/admin/waitlist'
+      preLoaderRoute: typeof AdminWaitlistRouteImport
       parentRoute: typeof AdminRoute
     }
     '/dashboard/': {
@@ -417,11 +455,15 @@ const AdminReadingMaterialsRouteWithChildren =
   )
 
 interface AdminRouteChildren {
+  AdminAdminsRoute: typeof AdminAdminsRoute
+  AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminsRoute: AdminAdminsRoute,
+  AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
 }

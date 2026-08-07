@@ -12,6 +12,8 @@ export const adminQueryKeys = {
   readingMaterials: ['admin', 'reading', 'materials'] as const,
   readingMaterial: (id: string) =>
     ['admin', 'reading', 'materials', id] as const,
+  waitlist: ['admin', 'waitlist'] as const,
+  superAdmins: ['admin', 'super-admins'] as const,
 }
 
 export function getAdminAccess(signal?: AbortSignal) {
@@ -82,5 +84,52 @@ export function publishReadingMaterial(id: string, revision: number) {
   return apiClient.request<ReadingMaterial>(
     `/api/v1/admin/reading/materials/${id}/publish`,
     { method: 'POST', body: { revision } },
+  )
+}
+
+export type WaitlistEntry = {
+  id: string
+  phone: string
+  email: string | null
+  firstName: string | null
+  lastName: string | null
+  source: string | null
+  status: string
+  createdAt: string
+  referralCode: string
+  referredByCode: string | null
+  referrals: number
+}
+
+export function listWaitlistEntries(signal?: AbortSignal) {
+  return apiClient.request<{ entries: WaitlistEntry[]; total: number }>(
+    '/api/v1/admin/waitlist',
+    { signal },
+  )
+}
+
+export type SuperAdminEntry = {
+  email: string
+  source: 'env' | 'db'
+}
+
+export function listSuperAdmins(signal?: AbortSignal) {
+  return apiClient.request<{ admins: SuperAdminEntry[] }>(
+    '/api/v1/admin/super-admins',
+    { signal },
+  )
+}
+
+export function addSuperAdmin(email: string) {
+  return apiClient.request<void>('/api/v1/admin/super-admins', {
+    method: 'POST',
+    body: { email },
+  })
+}
+
+export function removeSuperAdmin(email: string) {
+  return apiClient.request<void>(
+    `/api/v1/admin/super-admins/${encodeURIComponent(email)}`,
+    { method: 'DELETE' },
   )
 }

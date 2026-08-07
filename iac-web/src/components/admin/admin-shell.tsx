@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   LogOut,
   ShieldCheck,
+  UserCog,
+  Users,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -89,6 +91,36 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <BookOpenText className="size-[18px]" aria-hidden />
             Reading материалы
           </Link>
+          {auth.user?.role === 'ADMIN' ? (
+            <>
+              <Link
+                to="/admin/waitlist"
+                activeProps={{
+                  className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <Users className="size-[18px]" aria-hidden />
+                Waitlist
+              </Link>
+              <Link
+                to="/admin/admins"
+                activeProps={{
+                  className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <UserCog className="size-[18px]" aria-hidden />
+                Администраторы
+              </Link>
+            </>
+          ) : null}
         </nav>
 
         <main className="min-w-0">{children}</main>

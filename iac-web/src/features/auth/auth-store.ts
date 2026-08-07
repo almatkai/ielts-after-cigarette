@@ -118,6 +118,26 @@ export class AuthStore {
     }
   }
 
+  loginWithGoogle = async (googleToken: string) => {
+    this.patch({ loading: true, error: null })
+    try {
+      const response = await apiClient.request<AuthResponse>(
+        '/api/v1/auth/google',
+        {
+          method: 'POST',
+          body: { googleToken },
+          authenticated: false,
+          retryAuthentication: false,
+        },
+      )
+      this.accept(response)
+      return response.user
+    } catch (error) {
+      this.patch({ loading: false, error: getErrorMessage(error) })
+      throw error
+    }
+  }
+
   register = async (input: RegisterInput) => {
     this.patch({ loading: true, error: null })
     try {
@@ -221,6 +241,7 @@ export function useAuth() {
   return {
     ...snapshot,
     login: authStore.login,
+    loginWithGoogle: authStore.loginWithGoogle,
     register: authStore.register,
     logout: authStore.logout,
     hasAnyRole: authStore.hasAnyRole,

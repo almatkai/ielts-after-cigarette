@@ -137,6 +137,10 @@ export function getErrorMessage(error: unknown) {
   switch (error.code) {
     case 'INVALID_CREDENTIALS':
       return 'Неверная электронная почта или пароль.'
+    case 'GOOGLE_TOKEN_INVALID':
+      return 'Не удалось подтвердить Google-аккаунт. Попробуйте снова.'
+    case 'ACCOUNT_NOT_FOUND':
+      return 'Аккаунт с такой Google-почтой не найден. Сначала зарегистрируйтесь.'
     case 'EMAIL_ALREADY_EXISTS':
       return 'Аккаунт с такой электронной почтой уже существует.'
     case 'PHONE_ALREADY_EXISTS':

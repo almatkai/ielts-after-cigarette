@@ -4,11 +4,7 @@ import { RefreshCw, ShieldCheck } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-
-// Public OAuth client ID — identifies the app to Google, safe to ship in
-// client-side code. The client secret must never be shipped.
-const GOOGLE_CLIENT_ID =
-  '525971866611-vk1derapc3opreb82i2ba2edeldsev8l.apps.googleusercontent.com'
+import { GOOGLE_CLIENT_ID } from '@/features/auth/google-identity'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '')
 
@@ -35,25 +31,6 @@ type AdminEntry = {
 
 type AdminsResponse = {
   admins: AdminEntry[]
-}
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (options: {
-            client_id: string
-            callback: (response: { credential?: string }) => void
-          }) => void
-          renderButton: (
-            element: HTMLElement,
-            options: Record<string, unknown>,
-          ) => void
-        }
-      }
-    }
-  }
 }
 
 export const Route = createFileRoute('/waitlist-admin')({

@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -11,6 +11,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/features/auth/auth-store'
+import {
+  GOOGLE_CLIENT_ID,
+  loadGoogleIdentityScript,
+} from '@/features/auth/google-identity'
 import { getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput } from './auth-input'
@@ -34,9 +38,10 @@ function validatePassword(value: string) {
 export function LoginForm() {
   const navigate = useNavigate()
   const search = useSearch({ from: '/login' })
-  const auth = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [recoveryIsVisible, setRecoveryIsVisible] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
   const form = useForm({
     defaultValues: {
       email: '',
@@ -46,13 +51,52 @@ export function LoginForm() {
     onSubmit: async ({ value }) => {
       setSubmissionError(null)
       try {
-        await auth.login(value)
+        await login(value)
         await navigate({ to: search.redirect ?? '/dashboard' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
       }
     },
   })
+
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setSubmissionError(null)
+      try {
+        await loginWithGoogle(credential)
+        await navigate({ to: search.redirect ?? '/dashboard' })
+      } catch (error) {
+        setSubmissionError(getErrorMessage(error))
+      }
+    },
+    [loginWithGoogle, navigate, search.redirect],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    loadGoogleIdentityScript()
+      .then(() => {
+        if (cancelled || !window.google || !googleButtonRef.current) return
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response) => {
+            if (response.credential) {
+              void handleGoogleCredential(response.credential)
+            }
+          },
+        })
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: 'outline',
+          size: 'large',
+          width: 340,
+        })
+      })
+      // A blocked GSI script (ad blocker, offline) must not break password login.
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [handleGoogleCredential])
 
   return (
     <>
@@ -66,6 +110,18 @@ export function LoginForm() {
       </CardHeader>
 
       <CardContent className="px-6 pt-8 sm:px-8">
+        <div
+          ref={googleButtonRef}
+          className="flex min-h-10 w-full items-center justify-center"
+        />
+        <div className="my-6 flex items-center gap-3" aria-hidden>
+          <span className="h-px flex-1 bg-[#e2e8f0]" />
+          <span className="text-xs font-medium uppercase tracking-wide text-[#94a3b8]">
+            или
+          </span>
+          <span className="h-px flex-1 bg-[#e2e8f0]" />
+        </div>
+
         <form
           noValidate
           onSubmit={(event) => {

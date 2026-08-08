@@ -26,6 +26,7 @@ import {
   createReadingMaterial,
   getReadingMaterial,
   publishReadingMaterial,
+  readingQuestionTypes,
   updateReadingMaterial,
 } from '@/features/admin/api'
 import { useAuth } from '@/features/auth/auth-store'
@@ -34,6 +35,8 @@ import { getErrorMessage } from '@/lib/api/client'
 import type {
   ReadingMaterial,
   ReadingMaterialInput,
+  ReadingQuestion,
+  ReadingQuestionGroup,
 } from '@/features/admin/api'
 
 type EditorForm = ReadingMaterialInput & { revision: number }
@@ -47,6 +50,7 @@ const emptyForm: EditorForm = {
   body: '',
   sourceTitle: null,
   sourceUrl: null,
+  questionGroups: [],
   revision: 0,
 }
 
@@ -63,6 +67,7 @@ function materialToForm(material: ReadingMaterial): EditorForm {
     body: material.body,
     sourceTitle: material.sourceTitle,
     sourceUrl: material.sourceUrl,
+    questionGroups: material.questionGroups ?? [],
     revision: material.revision,
   }
 }
@@ -132,6 +137,56 @@ export function ReadingMaterialEditorPage({
     value: EditorForm[TKey],
   ) => setForm((current) => ({ ...current, [key]: value }))
 
+  const addGroup = () =>
+    update('questionGroups', [
+      ...form.questionGroups,
+      {
+        position: form.questionGroups.length + 1,
+        type: 'multiple_choice',
+        instructions: '',
+        questions: [
+          {
+            position: 1,
+            prompt: '',
+            content: {},
+            answer: {},
+            explanation: '',
+            points: 1,
+          },
+        ],
+      },
+    ])
+
+  const updateGroup = (index: number, patch: Partial<ReadingQuestionGroup>) =>
+    update(
+      'questionGroups',
+      form.questionGroups.map((group, groupIndex) =>
+        groupIndex === index ? { ...group, ...patch } : group,
+      ),
+    )
+
+  const updateQuestion = (
+    groupIndex: number,
+    questionIndex: number,
+    patch: Partial<ReadingQuestion>,
+  ) =>
+    updateGroup(groupIndex, {
+      questions: form.questionGroups[groupIndex].questions.map(
+        (question, currentIndex) =>
+          currentIndex === questionIndex ? { ...question, ...patch } : question,
+      ),
+    })
+
+  const parseQuestionJSON = (groups: ReadingQuestionGroup[]) =>
+    groups.map((group) => ({
+      ...group,
+      questions: group.questions.map((question) => ({
+        ...question,
+        content: question.content,
+        answer: question.answer,
+      })),
+    }))
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage(null)
@@ -144,6 +199,7 @@ export function ReadingMaterialEditorPage({
         ...form,
         sourceTitle: form.sourceTitle?.trim() || null,
         sourceUrl: form.sourceUrl?.trim() || null,
+        questionGroups: parseQuestionJSON(form.questionGroups),
         revision: editing ? form.revision : undefined,
       })
     } catch (error) {
@@ -236,6 +292,195 @@ export function ReadingMaterialEditorPage({
           {message}
         </div>
       ) : null}
+
+      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-[#ededeb] p-5">
+          <div>
+            <CardTitle className="text-base">Группы вопросов</CardTitle>
+            <p className="mt-1 text-xs text-[#808084]">
+              Все официальные типы IELTS Reading доступны в списке. Ответы
+              хранятся отдельно от текста.
+            </p>
+          </div>
+          <Button type="button" variant="outline" onClick={addGroup}>
+            Добавить группу
+          </Button>
+        </CardHeader>
+        <CardContent className="grid gap-4 p-5">
+          {form.questionGroups.length === 0 ? (
+            <p className="text-sm text-[#69696d]">
+              Вопросы можно добавить сейчас или позже.
+            </p>
+          ) : null}
+          {form.questionGroups.map((group, groupIndex) => (
+            <div
+              key={`${group.position}-${groupIndex}`}
+              className="grid gap-4 rounded-[12px] border border-[#e7e7e4] p-4"
+            >
+              <div className="flex items-end gap-3">
+                <div className="grid flex-1 gap-2">
+                  <Label>Тип вопросов</Label>
+                  <select
+                    value={group.type}
+                    onChange={(event) =>
+                      updateGroup(groupIndex, {
+                        type: event.target
+                          .value as ReadingQuestionGroup['type'],
+                      })
+                    }
+                    className={fieldClassName}
+                  >
+                    {readingQuestionTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type.replaceAll('_', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    update(
+                      'questionGroups',
+                      form.questionGroups.filter(
+                        (_, index) => index !== groupIndex,
+                      ),
+                    )
+                  }
+                >
+                  Удалить
+                </Button>
+              </div>
+              <div className="grid gap-2">
+                <Label>Инструкция</Label>
+                <Input
+                  value={group.instructions}
+                  onChange={(event) =>
+                    updateGroup(groupIndex, {
+                      instructions: event.target.value,
+                    })
+                  }
+                  className={fieldClassName}
+                  placeholder="Choose the correct heading..."
+                />
+              </div>
+              {group.questions.map((question, questionIndex) => (
+                <div
+                  key={`${question.position}-${questionIndex}`}
+                  className="grid gap-3 rounded-[10px] bg-[#f7f7f5] p-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">
+                      Вопрос {questionIndex + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        updateGroup(groupIndex, {
+                          questions: group.questions.filter(
+                            (_, index) => index !== questionIndex,
+                          ),
+                        })
+                      }
+                    >
+                      Удалить
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={question.prompt}
+                    onChange={(event) =>
+                      updateQuestion(groupIndex, questionIndex, {
+                        prompt: event.target.value,
+                      })
+                    }
+                    rows={2}
+                    placeholder="Текст вопроса"
+                  />
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Textarea
+                      value={JSON.stringify(question.content)}
+                      onChange={(event) => {
+                        try {
+                          updateQuestion(groupIndex, questionIndex, {
+                            content: JSON.parse(event.target.value),
+                          })
+                        } catch {
+                          /* wait for valid JSON */
+                        }
+                      }}
+                      rows={3}
+                      placeholder='Content JSON, например {"options":[...]}'
+                    />
+                    <Textarea
+                      value={JSON.stringify(question.answer)}
+                      onChange={(event) => {
+                        try {
+                          updateQuestion(groupIndex, questionIndex, {
+                            answer: JSON.parse(event.target.value),
+                          })
+                        } catch {
+                          /* wait for valid JSON */
+                        }
+                      }}
+                      rows={3}
+                      placeholder='Answer JSON, например {"optionId":"a"}'
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Explanation after answer</Label>
+                    <Textarea
+                      value={question.explanation}
+                      onChange={(event) =>
+                        updateQuestion(groupIndex, questionIndex, {
+                          explanation: event.target.value,
+                        })
+                      }
+                      rows={3}
+                      placeholder="Почему этот ответ правильный (необязательно)"
+                    />
+                  </div>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={question.points}
+                    onChange={(event) =>
+                      updateQuestion(groupIndex, questionIndex, {
+                        points: Number(event.target.value),
+                      })
+                    }
+                    className={fieldClassName}
+                  />
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  updateGroup(groupIndex, {
+                    questions: [
+                      ...group.questions,
+                      {
+                        position: group.questions.length + 1,
+                        prompt: '',
+                        content: {},
+                        answer: {},
+                        explanation: '',
+                        points: 1,
+                      },
+                    ],
+                  })
+                }
+              >
+                Добавить вопрос
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="border-b border-[#ededeb] p-5">

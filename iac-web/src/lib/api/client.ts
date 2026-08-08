@@ -134,6 +134,11 @@ export function getErrorMessage(error: unknown) {
   if (!(error instanceof ApiError)) {
     return 'Произошла непредвиденная ошибка. Попробуйте ещё раз.'
   }
+  const details = error.details
+    ? Object.entries(error.details)
+        .map(([field, message]) => `${field}: ${message}`)
+        .join(' · ')
+    : ''
   switch (error.code) {
     case 'INVALID_CREDENTIALS':
       return 'Неверная электронная почта или пароль.'
@@ -146,7 +151,9 @@ export function getErrorMessage(error: unknown) {
     case 'PHONE_ALREADY_EXISTS':
       return 'Аккаунт с таким номером телефона уже существует.'
     case 'VALIDATION_ERROR':
-      return 'Проверьте правильность заполнения полей.'
+      return details
+        ? `Проверьте поля: ${details}`
+        : 'Проверьте правильность заполнения полей.'
     case 'PHONE_NOT_VERIFIED':
       return 'Подтверждение номера истекло. Запросите новый код.'
     case 'INVALID_VERIFICATION_CODE':
@@ -166,7 +173,7 @@ export function getErrorMessage(error: unknown) {
     default:
       return error.status >= 500
         ? 'Сервер не смог обработать запрос. Попробуйте позже.'
-        : error.message
+        : details || error.message
   }
 }
 

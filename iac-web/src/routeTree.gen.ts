@@ -27,7 +27,9 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
+import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.import'
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as AdminReadingMaterialsIndexRouteImport } from './routes/admin.reading.materials.index'
 import { Route as AdminReadingMaterialsMaterialIdRouteImport } from './routes/admin.reading.materials.$materialId'
 import { Route as AdminReadingMaterialsNewRouteImport } from './routes/admin.reading.materials.new'
 
@@ -121,11 +123,22 @@ const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => RegisterRoute,
 } as any)
+const AdminReadingImportRoute = AdminReadingImportRouteImport.update({
+  id: '/reading/import',
+  path: '/reading/import',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
   id: '/reading/materials',
   path: '/reading/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminReadingMaterialsIndexRoute =
+  AdminReadingMaterialsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminReadingMaterialsRoute,
+  } as any)
 const AdminReadingMaterialsMaterialIdRoute =
   AdminReadingMaterialsMaterialIdRouteImport.update({
     id: '/$materialId',
@@ -158,9 +171,11 @@ export interface FileRoutesByFullPath {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,9 +194,10 @@ export interface FileRoutesByTo {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,9 +219,11 @@ export interface FileRoutesById {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -228,9 +246,11 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/reading/import'
     | '/admin/reading/materials'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/reading/materials/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -249,9 +269,10 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin'
     | '/dashboard'
-    | '/admin/reading/materials'
+    | '/admin/reading/import'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/reading/materials'
   id:
     | '__root__'
     | '/'
@@ -272,9 +293,11 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/reading/import'
     | '/admin/reading/materials'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/reading/materials/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -415,12 +438,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterVerifyRouteImport
       parentRoute: typeof RegisterRoute
     }
+    '/admin/reading/import': {
+      id: '/admin/reading/import'
+      path: '/reading/import'
+      fullPath: '/admin/reading/import'
+      preLoaderRoute: typeof AdminReadingImportRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reading/materials': {
       id: '/admin/reading/materials'
       path: '/reading/materials'
       fullPath: '/admin/reading/materials'
       preLoaderRoute: typeof AdminReadingMaterialsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin/reading/materials/': {
+      id: '/admin/reading/materials/'
+      path: '/'
+      fullPath: '/admin/reading/materials/'
+      preLoaderRoute: typeof AdminReadingMaterialsIndexRouteImport
+      parentRoute: typeof AdminReadingMaterialsRoute
     }
     '/admin/reading/materials/$materialId': {
       id: '/admin/reading/materials/$materialId'
@@ -442,11 +479,13 @@ declare module '@tanstack/react-router' {
 interface AdminReadingMaterialsRouteChildren {
   AdminReadingMaterialsMaterialIdRoute: typeof AdminReadingMaterialsMaterialIdRoute
   AdminReadingMaterialsNewRoute: typeof AdminReadingMaterialsNewRoute
+  AdminReadingMaterialsIndexRoute: typeof AdminReadingMaterialsIndexRoute
 }
 
 const AdminReadingMaterialsRouteChildren: AdminReadingMaterialsRouteChildren = {
   AdminReadingMaterialsMaterialIdRoute: AdminReadingMaterialsMaterialIdRoute,
   AdminReadingMaterialsNewRoute: AdminReadingMaterialsNewRoute,
+  AdminReadingMaterialsIndexRoute: AdminReadingMaterialsIndexRoute,
 }
 
 const AdminReadingMaterialsRouteWithChildren =
@@ -458,6 +497,7 @@ interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminReadingImportRoute: typeof AdminReadingImportRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
 }
 
@@ -465,6 +505,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminsRoute: AdminAdminsRoute,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminReadingImportRoute: AdminReadingImportRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
 }
 

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   BookOpenText,
+  FileInput,
   FilePlus2,
   PencilLine,
   TriangleAlert,
@@ -19,6 +20,7 @@ const difficultyLabels = {
 } as const
 
 export function ReadingMaterialsPage() {
+  const navigate = useNavigate()
   const materialsQuery = useQuery({
     queryKey: adminQueryKeys.readingMaterials,
     queryFn: ({ signal }) => listReadingMaterials(signal),
@@ -38,12 +40,24 @@ export function ReadingMaterialsPage() {
             Тексты, на основе которых будут собираться задания.
           </p>
         </div>
-        <Button asChild className="bg-[#e23b3b] hover:bg-[#c92f2f]">
-          <Link to="/admin/reading/materials/new">
-            <FilePlus2 aria-hidden />
-            Новый материал
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => void navigate({ to: '/admin/reading/import' })}
+          >
+            <FileInput aria-hidden /> Импортировать текст
+          </Button>
+          <Button
+            type="button"
+            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            onClick={() =>
+              void navigate({ to: '/admin/reading/materials/new' })
+            }
+          >
+            <FilePlus2 aria-hidden /> Создать вручную
+          </Button>
+        </div>
       </div>
 
       {materialsQuery.isPending ? (

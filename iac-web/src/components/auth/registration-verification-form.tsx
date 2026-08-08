@@ -23,6 +23,7 @@ import {
 import { getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput } from './auth-input'
+import { formatPhoneInput } from './phone-validation'
 
 export function RegistrationVerificationForm() {
   const navigate = useNavigate()
@@ -96,7 +97,8 @@ export function RegistrationVerificationForm() {
           Подтвердите номер
         </CardTitle>
         <CardDescription className="mt-2 text-[#475569]">
-          Мы отправили код из 6 цифр в WhatsApp на {registration.phone}.
+          Мы отправили код из 6 цифр в WhatsApp на{' '}
+          {formatPhoneInput(registration.phone)}.
         </CardDescription>
       </CardHeader>
 

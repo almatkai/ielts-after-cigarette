@@ -140,11 +140,13 @@ export function getErrorMessage(error: unknown) {
     case 'GOOGLE_TOKEN_INVALID':
       return 'Не удалось подтвердить Google-аккаунт. Попробуйте снова.'
     case 'ACCOUNT_NOT_FOUND':
-      return 'Аккаунт с такой Google-почтой не найден. Сначала зарегистрируйтесь.'
+      return 'Аккаунт не найден. Проверьте данные и попробуйте снова.'
     case 'EMAIL_ALREADY_EXISTS':
       return 'Аккаунт с такой электронной почтой уже существует.'
     case 'PHONE_ALREADY_EXISTS':
       return 'Аккаунт с таким номером телефона уже существует.'
+    case 'VALIDATION_ERROR':
+      return 'Проверьте правильность заполнения полей.'
     case 'PHONE_NOT_VERIFIED':
       return 'Подтверждение номера истекло. Запросите новый код.'
     case 'INVALID_VERIFICATION_CODE':

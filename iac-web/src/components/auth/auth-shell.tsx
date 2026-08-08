@@ -10,7 +10,7 @@ export function AuthShell({ children }: AuthShellProps) {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
       <header>
-        <div className="container-shell flex h-20 items-center justify-center">
+        <div className="container-shell flex h-20 items-center justify-start">
           <Brand />
         </div>
       </header>

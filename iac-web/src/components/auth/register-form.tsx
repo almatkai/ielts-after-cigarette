@@ -19,7 +19,11 @@ import { getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput } from './auth-input'
 import { getFieldError } from './auth-input-utils'
-import { validatePhone } from './phone-validation'
+import {
+  formatPhoneInput,
+  normalizePhone,
+  validatePhone,
+} from './phone-validation'
 
 function validateName(value: string) {
   if (!value.trim()) return 'Введите имя'
@@ -59,7 +63,7 @@ export function RegisterForm() {
     onSubmit: async ({ value }) => {
       setSubmissionError(null)
       try {
-        const phone = value.phone.trim()
+        const phone = normalizePhone(value.phone)
         const challenge = await requestPhoneVerification(phone, 'registration')
         setPendingRegistration({
           ...value,
@@ -154,7 +158,9 @@ export function RegisterForm() {
                 autoComplete="tel"
                 placeholder="+7 700 123 45 67"
                 value={field.state.value}
-                onChange={field.handleChange}
+                onChange={(value) =>
+                  field.handleChange(formatPhoneInput(value))
+                }
                 onBlur={field.handleBlur}
                 error={getFieldError(field.state.meta.errors)}
               />

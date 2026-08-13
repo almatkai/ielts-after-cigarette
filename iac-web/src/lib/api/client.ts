@@ -59,7 +59,9 @@ class ApiClient {
       ...requestInit
     } = options
     const headers = new Headers(initialHeaders)
-    if (body !== undefined) {
+    const isFormData =
+      typeof FormData !== 'undefined' && body instanceof FormData
+    if (body !== undefined && !isFormData) {
       headers.set('Content-Type', 'application/json')
     }
     if (authenticated) {
@@ -74,7 +76,12 @@ class ApiClient {
       response = await fetch(`${apiBaseUrl}${path}`, {
         ...requestInit,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body:
+          body === undefined
+            ? undefined
+            : isFormData
+              ? body
+              : JSON.stringify(body),
         credentials: 'include',
       })
     } catch {
@@ -107,6 +114,22 @@ class ApiClient {
       return undefined as T
     }
     return (await response.json()) as T
+  }
+
+  async upload<T>(path: string, form: FormData): Promise<T> {
+    return this.request<T>(path, { method: 'POST', body: form })
+  }
+
+  async blob(path: string): Promise<Blob> {
+    const headers = new Headers()
+    const accessToken = this.auth?.getAccessToken()
+    if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+      headers,
+      credentials: 'include',
+    })
+    if (!response.ok) throw await parseApiError(response)
+    return response.blob()
   }
 
   private refreshOnce() {

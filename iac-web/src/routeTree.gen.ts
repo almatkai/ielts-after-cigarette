@@ -20,6 +20,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardListeningRouteImport } from './routes/dashboard.listening'
 import { Route as DashboardMistakesRouteImport } from './routes/dashboard.mistakes'
 import { Route as DashboardPlanRouteImport } from './routes/dashboard.plan'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard.practice'
@@ -27,8 +28,14 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
+import { Route as AdminListeningImportRouteImport } from './routes/admin.listening.import'
+import { Route as AdminListeningTestsRouteImport } from './routes/admin.listening.tests'
 import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.import'
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as DashboardListeningTestIdRouteImport } from './routes/dashboard.listening.$testId'
+import { Route as AdminListeningTestsIndexRouteImport } from './routes/admin.listening.tests.index'
+import { Route as AdminListeningTestsTestIdRouteImport } from './routes/admin.listening.tests.$testId'
+import { Route as AdminListeningTestsNewRouteImport } from './routes/admin.listening.tests.new'
 import { Route as AdminReadingMaterialsIndexRouteImport } from './routes/admin.reading.materials.index'
 import { Route as AdminReadingMaterialsMaterialIdRouteImport } from './routes/admin.reading.materials.$materialId'
 import { Route as AdminReadingMaterialsNewRouteImport } from './routes/admin.reading.materials.new'
@@ -88,6 +95,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardListeningRoute = DashboardListeningRouteImport.update({
+  id: '/listening',
+  path: '/listening',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardMistakesRoute = DashboardMistakesRouteImport.update({
   id: '/mistakes',
   path: '/mistakes',
@@ -123,6 +135,16 @@ const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => RegisterRoute,
 } as any)
+const AdminListeningImportRoute = AdminListeningImportRouteImport.update({
+  id: '/listening/import',
+  path: '/listening/import',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminListeningTestsRoute = AdminListeningTestsRouteImport.update({
+  id: '/listening/tests',
+  path: '/listening/tests',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReadingImportRoute = AdminReadingImportRouteImport.update({
   id: '/reading/import',
   path: '/reading/import',
@@ -132,6 +154,29 @@ const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
   id: '/reading/materials',
   path: '/reading/materials',
   getParentRoute: () => AdminRoute,
+} as any)
+const DashboardListeningTestIdRoute =
+  DashboardListeningTestIdRouteImport.update({
+    id: '/$testId',
+    path: '/$testId',
+    getParentRoute: () => DashboardListeningRoute,
+  } as any)
+const AdminListeningTestsIndexRoute =
+  AdminListeningTestsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminListeningTestsRoute,
+  } as any)
+const AdminListeningTestsTestIdRoute =
+  AdminListeningTestsTestIdRouteImport.update({
+    id: '/$testId',
+    path: '/$testId',
+    getParentRoute: () => AdminListeningTestsRoute,
+  } as any)
+const AdminListeningTestsNewRoute = AdminListeningTestsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminListeningTestsRoute,
 } as any)
 const AdminReadingMaterialsIndexRoute =
   AdminReadingMaterialsIndexRouteImport.update({
@@ -162,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/dashboard/listening': typeof DashboardListeningRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -171,10 +217,16 @@ export interface FileRoutesByFullPath {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/listening/import': typeof AdminListeningImportRoute
+  '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
+  '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -185,6 +237,7 @@ export interface FileRoutesByTo {
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/dashboard/listening': typeof DashboardListeningRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -194,9 +247,14 @@ export interface FileRoutesByTo {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
+  '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
+  '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/listening/tests': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRoutesById {
@@ -210,6 +268,7 @@ export interface FileRoutesById {
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/dashboard/listening': typeof DashboardListeningRouteWithChildren
   '/dashboard/mistakes': typeof DashboardMistakesRoute
   '/dashboard/plan': typeof DashboardPlanRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
@@ -219,10 +278,16 @@ export interface FileRoutesById {
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/listening/import': typeof AdminListeningImportRoute
+  '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
+  '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
 }
 export interface FileRouteTypes {
@@ -237,6 +302,7 @@ export interface FileRouteTypes {
     | '/waitlist-admin'
     | '/admin/admins'
     | '/admin/waitlist'
+    | '/dashboard/listening'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -246,10 +312,16 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/listening/import'
+    | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/dashboard/listening/$testId'
+    | '/admin/listening/tests/$testId'
+    | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/listening/tests/'
     | '/admin/reading/materials/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -260,6 +332,7 @@ export interface FileRouteTypes {
     | '/waitlist-admin'
     | '/admin/admins'
     | '/admin/waitlist'
+    | '/dashboard/listening'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -269,9 +342,14 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin'
     | '/dashboard'
+    | '/admin/listening/import'
     | '/admin/reading/import'
+    | '/dashboard/listening/$testId'
+    | '/admin/listening/tests/$testId'
+    | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/listening/tests'
     | '/admin/reading/materials'
   id:
     | '__root__'
@@ -284,6 +362,7 @@ export interface FileRouteTypes {
     | '/waitlist-admin'
     | '/admin/admins'
     | '/admin/waitlist'
+    | '/dashboard/listening'
     | '/dashboard/mistakes'
     | '/dashboard/plan'
     | '/dashboard/practice'
@@ -293,10 +372,16 @@ export interface FileRouteTypes {
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/listening/import'
+    | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/dashboard/listening/$testId'
+    | '/admin/listening/tests/$testId'
+    | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/listening/tests/'
     | '/admin/reading/materials/'
   fileRoutesById: FileRoutesById
 }
@@ -389,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/listening': {
+      id: '/dashboard/listening'
+      path: '/listening'
+      fullPath: '/dashboard/listening'
+      preLoaderRoute: typeof DashboardListeningRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/mistakes': {
       id: '/dashboard/mistakes'
       path: '/mistakes'
@@ -438,6 +530,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterVerifyRouteImport
       parentRoute: typeof RegisterRoute
     }
+    '/admin/listening/import': {
+      id: '/admin/listening/import'
+      path: '/listening/import'
+      fullPath: '/admin/listening/import'
+      preLoaderRoute: typeof AdminListeningImportRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/listening/tests': {
+      id: '/admin/listening/tests'
+      path: '/listening/tests'
+      fullPath: '/admin/listening/tests'
+      preLoaderRoute: typeof AdminListeningTestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reading/import': {
       id: '/admin/reading/import'
       path: '/reading/import'
@@ -451,6 +557,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/reading/materials'
       preLoaderRoute: typeof AdminReadingMaterialsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/dashboard/listening/$testId': {
+      id: '/dashboard/listening/$testId'
+      path: '/$testId'
+      fullPath: '/dashboard/listening/$testId'
+      preLoaderRoute: typeof DashboardListeningTestIdRouteImport
+      parentRoute: typeof DashboardListeningRoute
+    }
+    '/admin/listening/tests/': {
+      id: '/admin/listening/tests/'
+      path: '/'
+      fullPath: '/admin/listening/tests/'
+      preLoaderRoute: typeof AdminListeningTestsIndexRouteImport
+      parentRoute: typeof AdminListeningTestsRoute
+    }
+    '/admin/listening/tests/$testId': {
+      id: '/admin/listening/tests/$testId'
+      path: '/$testId'
+      fullPath: '/admin/listening/tests/$testId'
+      preLoaderRoute: typeof AdminListeningTestsTestIdRouteImport
+      parentRoute: typeof AdminListeningTestsRoute
+    }
+    '/admin/listening/tests/new': {
+      id: '/admin/listening/tests/new'
+      path: '/new'
+      fullPath: '/admin/listening/tests/new'
+      preLoaderRoute: typeof AdminListeningTestsNewRouteImport
+      parentRoute: typeof AdminListeningTestsRoute
     }
     '/admin/reading/materials/': {
       id: '/admin/reading/materials/'
@@ -476,6 +610,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminListeningTestsRouteChildren {
+  AdminListeningTestsTestIdRoute: typeof AdminListeningTestsTestIdRoute
+  AdminListeningTestsNewRoute: typeof AdminListeningTestsNewRoute
+  AdminListeningTestsIndexRoute: typeof AdminListeningTestsIndexRoute
+}
+
+const AdminListeningTestsRouteChildren: AdminListeningTestsRouteChildren = {
+  AdminListeningTestsTestIdRoute: AdminListeningTestsTestIdRoute,
+  AdminListeningTestsNewRoute: AdminListeningTestsNewRoute,
+  AdminListeningTestsIndexRoute: AdminListeningTestsIndexRoute,
+}
+
+const AdminListeningTestsRouteWithChildren =
+  AdminListeningTestsRoute._addFileChildren(AdminListeningTestsRouteChildren)
+
 interface AdminReadingMaterialsRouteChildren {
   AdminReadingMaterialsMaterialIdRoute: typeof AdminReadingMaterialsMaterialIdRoute
   AdminReadingMaterialsNewRoute: typeof AdminReadingMaterialsNewRoute
@@ -497,6 +646,8 @@ interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminListeningImportRoute: typeof AdminListeningImportRoute
+  AdminListeningTestsRoute: typeof AdminListeningTestsRouteWithChildren
   AdminReadingImportRoute: typeof AdminReadingImportRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
 }
@@ -505,13 +656,27 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminsRoute: AdminAdminsRoute,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminListeningImportRoute: AdminListeningImportRoute,
+  AdminListeningTestsRoute: AdminListeningTestsRouteWithChildren,
   AdminReadingImportRoute: AdminReadingImportRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardListeningRouteChildren {
+  DashboardListeningTestIdRoute: typeof DashboardListeningTestIdRoute
+}
+
+const DashboardListeningRouteChildren: DashboardListeningRouteChildren = {
+  DashboardListeningTestIdRoute: DashboardListeningTestIdRoute,
+}
+
+const DashboardListeningRouteWithChildren =
+  DashboardListeningRoute._addFileChildren(DashboardListeningRouteChildren)
+
 interface DashboardRouteChildren {
+  DashboardListeningRoute: typeof DashboardListeningRouteWithChildren
   DashboardMistakesRoute: typeof DashboardMistakesRoute
   DashboardPlanRoute: typeof DashboardPlanRoute
   DashboardPracticeRoute: typeof DashboardPracticeRoute
@@ -522,6 +687,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardListeningRoute: DashboardListeningRouteWithChildren,
   DashboardMistakesRoute: DashboardMistakesRoute,
   DashboardPlanRoute: DashboardPlanRoute,
   DashboardPracticeRoute: DashboardPracticeRoute,

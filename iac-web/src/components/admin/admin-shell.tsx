@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   BookOpenText,
+  Headphones,
   LayoutDashboard,
   LogOut,
   ShieldCheck,
@@ -90,6 +91,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <BookOpenText className="size-[18px]" aria-hidden />
             Reading материалы
+          </Link>
+          <Link
+            to="/admin/listening/tests"
+            activeProps={{
+              className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+            }}
+            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
+            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+          >
+            <Headphones className="size-[18px]" aria-hidden />
+            Listening тесты
           </Link>
           {auth.user?.role === 'ADMIN' ? (
             <>

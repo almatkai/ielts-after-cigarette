@@ -2,6 +2,7 @@ import {
   BarChart3,
   CalendarRange,
   Dumbbell,
+  Headphones,
   LayoutDashboard,
   Settings2,
   TriangleAlert,
@@ -24,6 +25,12 @@ export const primaryDashboardNavigation = [
     label: 'Практика',
     to: '/dashboard/practice',
     icon: Dumbbell,
+    exact: false,
+  },
+  {
+    label: 'Listening',
+    to: '/dashboard/listening',
+    icon: Headphones,
     exact: false,
   },
   {

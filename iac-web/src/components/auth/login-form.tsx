@@ -1,5 +1,4 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearch } from '@tanstack/react-router'
 
 import {
   CardContent,
@@ -7,87 +6,25 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useAuth } from '@/features/auth/auth-store'
-import { isGoogleRegistrationRequired } from '@/features/auth/google-auth'
-import {
-  GOOGLE_CLIENT_ID,
-  loadGoogleIdentityScript,
-} from '@/features/auth/google-identity'
-import { getErrorMessage } from '@/lib/api/client'
+import { parseOAuthRegistrationToken } from '@/features/auth/oauth-auth'
 
-import { GoogleCompleteForm } from './google-complete-form'
-import type { PendingGoogleRegistration } from './google-complete-form'
+import { OAuthButtons } from './oauth-buttons'
+import { OAuthCompleteForm } from './oauth-complete-form'
 
 export function LoginForm() {
-  const navigate = useNavigate()
   const search = useSearch({ from: '/login' })
-  const { loginWithGoogle } = useAuth()
-  const [submissionError, setSubmissionError] = useState<string | null>(null)
-  const [pendingGoogle, setPendingGoogle] =
-    useState<PendingGoogleRegistration | null>(null)
-  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const submissionError = search.oauth_error
+    ? oauthErrorMessage(search.oauth_error)
+    : null
 
-  const handleGoogleCredential = useCallback(
-    async (credential: string) => {
-      setSubmissionError(null)
-      try {
-        const response = await loginWithGoogle(credential)
-        if (isGoogleRegistrationRequired(response)) {
-          setPendingGoogle({
-            registrationToken: response.registrationToken,
-            profile: response.profile,
-          })
-          return
-        }
-        await navigate({ to: search.redirect ?? '/dashboard' })
-      } catch (error) {
-        setSubmissionError(getErrorMessage(error))
-      }
-    },
-    [loginWithGoogle, navigate, search.redirect],
-  )
+  const pendingOAuth = search.registration
+    ? parseOAuthRegistrationToken(search.registration)
+    : null
+  const invalidOAuthLink = Boolean(search.registration) && !pendingOAuth
 
-  useEffect(() => {
-    let cancelled = false
-    loadGoogleIdentityScript()
-      .then(() => {
-        if (cancelled || !window.google || !googleButtonRef.current) return
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => {
-            if (response.credential) {
-              void handleGoogleCredential(response.credential)
-            }
-          },
-        })
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          width: 340,
-        })
-      })
-      // Google is the only sign-in option here, so surface script failures.
-      .catch(() => {
-        if (cancelled) return
-        setSubmissionError(
-          'Не удалось загрузить вход через Google. Проверьте соединение или блокировщик рекламы.',
-        )
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [handleGoogleCredential])
-
-  if (pendingGoogle) {
+  if (pendingOAuth) {
     return (
-      <GoogleCompleteForm
-        pending={pendingGoogle}
-        onBack={() => {
-          setPendingGoogle(null)
-          setSubmissionError(null)
-        }}
-        redirect={search.redirect}
-      />
+      <OAuthCompleteForm pending={pendingOAuth} redirect={search.redirect} />
     )
   }
 
@@ -98,16 +35,20 @@ export function LoginForm() {
           Войти
         </CardTitle>
         <CardDescription className="sr-only text-[#475569]">
-          Войдите через аккаунт Google.
+          Войдите через Google, GitHub или Яндекс.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="px-6 pt-8 pb-8 sm:px-8">
-        <div
-          ref={googleButtonRef}
-          className="flex min-h-10 w-full items-center justify-center"
-        />
-        {submissionError ? (
+        <OAuthButtons redirect={search.redirect} />
+        {invalidOAuthLink ? (
+          <p
+            className="mt-4 text-center text-sm leading-6 text-[#dc2626]"
+            role="alert"
+          >
+            Ссылка для завершения регистрации недействительна. Войдите ещё раз.
+          </p>
+        ) : submissionError ? (
           <p
             className="mt-4 text-center text-sm leading-6 text-[#dc2626]"
             role="alert"
@@ -118,4 +59,19 @@ export function LoginForm() {
       </CardContent>
     </>
   )
+}
+
+function oauthErrorMessage(code: string) {
+  switch (code) {
+    case 'access_denied':
+      return 'Вход через внешний сервис был отменён. Попробуйте снова.'
+    case 'invalid_state':
+      return 'Сессия входа истекла или повторилась. Начните вход заново.'
+    case 'email_required':
+      return 'Сервис не передал вашу электронную почту. Разрешите доступ к почте или войдите через Google.'
+    case 'exchange_failed':
+      return 'Не удалось подтвердить вход через внешний сервис. Попробуйте ещё раз.'
+    default:
+      return 'Не удалось войти через внешний сервис. Попробуйте ещё раз.'
+  }
 }

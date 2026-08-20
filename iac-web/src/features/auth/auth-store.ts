@@ -1,11 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
-import {
-  isGoogleRegistrationRequired,
-  requestCompleteGoogleRegistration,
-  requestGoogleLogin,
-} from '@/features/auth/google-auth'
-import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-auth'
+import { requestCompleteOAuthRegistration } from '@/features/auth/oauth-auth'
+import type { CompleteOAuthRegistrationInput } from '@/features/auth/oauth-auth'
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 
 export type UserRole = 'STUDENT' | 'EDITOR' | 'ADMIN'
@@ -124,28 +120,10 @@ export class AuthStore {
     }
   }
 
-  loginWithGoogle = async (googleToken: string) => {
+  completeOAuthRegistration = async (input: CompleteOAuthRegistrationInput) => {
     this.patch({ loading: true, error: null })
     try {
-      const response = await requestGoogleLogin(googleToken)
-      if (isGoogleRegistrationRequired(response)) {
-        this.patch({ loading: false })
-        return response
-      }
-      this.accept(response)
-      return response
-    } catch (error) {
-      this.patch({ loading: false, error: getErrorMessage(error) })
-      throw error
-    }
-  }
-
-  completeGoogleRegistration = async (
-    input: CompleteGoogleRegistrationInput,
-  ) => {
-    this.patch({ loading: true, error: null })
-    try {
-      const response = await requestCompleteGoogleRegistration(input)
+      const response = await requestCompleteOAuthRegistration(input)
       this.accept(response)
       return response.user
     } catch (error) {
@@ -257,8 +235,7 @@ export function useAuth() {
   return {
     ...snapshot,
     login: authStore.login,
-    loginWithGoogle: authStore.loginWithGoogle,
-    completeGoogleRegistration: authStore.completeGoogleRegistration,
+    completeOAuthRegistration: authStore.completeOAuthRegistration,
     register: authStore.register,
     logout: authStore.logout,
     hasAnyRole: authStore.hasAnyRole,

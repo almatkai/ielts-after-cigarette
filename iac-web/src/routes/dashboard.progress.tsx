@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/progress')({
-  component: EmptyProgressPage,
-})
+import { ProgressPage } from '@/pages/progress/ui/progress-page'
 
-function EmptyProgressPage() {
-  return null
-}
+export const Route = createFileRoute('/dashboard/progress')({
+  head: () => ({
+    meta: [
+      { title: 'Прогресс — IAC' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
+  component: ProgressPage,
+})

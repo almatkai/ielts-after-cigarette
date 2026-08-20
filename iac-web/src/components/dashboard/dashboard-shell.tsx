@@ -1,6 +1,8 @@
 import { useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { useDashboardTheme } from '@/features/theme/theme'
+
 import { DashboardHeader } from './dashboard-header'
 import { getDashboardPageTitle } from './dashboard-navigation'
 import { DashboardSidebar } from './dashboard-sidebar'
@@ -15,6 +17,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
     select: (state) => state.location.pathname,
   })
   const pageTitle = getDashboardPageTitle(pathname)
+
+  useDashboardTheme()
 
   useEffect(() => {
     if (!navigationIsOpen) return
@@ -34,7 +38,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   }, [navigationIsOpen])
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5] text-[#111111]">
+    <div className="min-h-screen bg-[#f7f7f5] text-[#111111] dark:bg-slate-950 dark:text-slate-100">
       <DashboardSidebar className="fixed inset-y-0 left-0 z-40 hidden lg:flex" />
 
       {navigationIsOpen ? (

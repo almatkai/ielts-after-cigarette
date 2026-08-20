@@ -10,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useAuth } from '@/features/auth/auth-store'
-import type { GoogleRegistrationRequired } from '@/features/auth/google-auth'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
 
 import { AuthInput } from './auth-input'
@@ -22,13 +20,28 @@ import {
   validatePhone,
 } from './phone-validation'
 
-export type PendingGoogleRegistration = Pick<
-  GoogleRegistrationRequired,
-  'registrationToken' | 'profile'
->
+export type CompleteRegistrationInput = {
+  registrationToken: string
+  name: string
+  phone: string
+  password: string
+  acceptedTerms: boolean
+}
 
-type GoogleCompleteFormProps = {
-  pending: PendingGoogleRegistration
+type PendingRegistration = {
+  registrationToken: string
+  profile: {
+    email: string
+    name: string
+    phone?: string
+  }
+}
+
+type CompleteRegistrationFormProps = {
+  pending: PendingRegistration
+  providerLabel: string
+  invalidTokenErrorCodes: readonly string[]
+  submit: (input: CompleteRegistrationInput) => Promise<unknown>
   onBack: () => void
   redirect?: '/admin' | '/dashboard'
 }
@@ -47,13 +60,15 @@ function validatePassword(value: string) {
   return undefined
 }
 
-export function GoogleCompleteForm({
+export function CompleteRegistrationForm({
   pending,
+  providerLabel,
+  invalidTokenErrorCodes,
+  submit,
   onBack,
   redirect,
-}: GoogleCompleteFormProps) {
+}: CompleteRegistrationFormProps) {
   const navigate = useNavigate()
-  const { completeGoogleRegistration } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<string, string>>
@@ -74,7 +89,7 @@ export function GoogleCompleteForm({
       setFieldErrors({})
       setSessionExpired(false)
       try {
-        await completeGoogleRegistration({
+        await submit({
           registrationToken: pending.registrationToken,
           name: value.name.trim(),
           phone: normalizePhone(value.phone),
@@ -87,11 +102,11 @@ export function GoogleCompleteForm({
           setFieldErrors(error.details)
         } else if (
           error instanceof ApiError &&
-          error.code === 'GOOGLE_TOKEN_INVALID'
+          invalidTokenErrorCodes.includes(error.code)
         ) {
           setSessionExpired(true)
           setSubmissionError(
-            'Сессия регистрации истекла. Войдите через Google ещё раз.',
+            `Сессия регистрации истекла. Войдите через ${providerLabel} ещё раз.`,
           )
         } else if (
           error instanceof ApiError &&
@@ -121,8 +136,8 @@ export function GoogleCompleteForm({
           Давайте создадим вам аккаунт
         </CardTitle>
         <CardDescription className="mt-2 text-[#475569]">
-          Вход через Google выполнен: {pending.profile.email}. Заполните данные
-          ниже, чтобы завершить регистрацию.
+          Вход через {providerLabel} выполнен: {pending.profile.email}.
+          Заполните данные ниже, чтобы завершить регистрацию.
         </CardDescription>
       </CardHeader>
 

@@ -58,6 +58,27 @@
   --radius: 0.625rem;
 }
 
+.dark {
+  --color-background: #020617;
+  --color-foreground: #f1f5f9;
+  --color-card: #0f172a;
+  --color-card-foreground: #f1f5f9;
+  --color-popover: #0f172a;
+  --color-popover-foreground: #f1f5f9;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #f1f5f9;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-accent: #1e293b;
+  --color-accent-foreground: #f1f5f9;
+  --color-destructive: #ef4444;
+  --color-border: #1e293b;
+  --color-input: #1e293b;
+  --color-ring: rgba(59, 130, 246, 0.45);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -66,6 +87,10 @@ html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
   background: #fafaf8;
+}
+
+html.dark {
+  background: #020617;
 }
 
 body {
@@ -77,6 +102,11 @@ body {
   font-size-adjust: 0.515;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+html.dark body {
+  background: #020617;
+  color: #f1f5f9;
 }
 
 button,
@@ -97,6 +127,17 @@ button {
 ):focus-visible {
   outline: 3px solid rgba(226, 59, 59, 0.28);
   outline-offset: 3px;
+}
+
+html.dark
+  :where(
+    a,
+    button,
+    textarea,
+    select,
+    input:not([data-slot='input'])
+  ):focus-visible {
+  outline-color: rgba(59, 130, 246, 0.45);
 }
 
 ::selection {

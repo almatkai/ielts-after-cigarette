@@ -7,11 +7,26 @@ export const Route = createFileRoute('/login')({
   ssr: false,
   validateSearch: (
     search: Record<string, unknown>,
-  ): { redirect?: '/admin' | '/dashboard' } => {
+  ): {
+    redirect?: '/admin' | '/dashboard'
+    registration?: string
+    oauth_error?: string
+  } => {
+    const validated: {
+      redirect?: '/admin' | '/dashboard'
+      registration?: string
+      oauth_error?: string
+    } = {}
     if (search.redirect === '/admin' || search.redirect === '/dashboard') {
-      return { redirect: search.redirect }
+      validated.redirect = search.redirect
     }
-    return {}
+    if (typeof search.registration === 'string' && search.registration) {
+      validated.registration = search.registration
+    }
+    if (typeof search.oauth_error === 'string' && search.oauth_error) {
+      validated.oauth_error = search.oauth_error
+    }
+    return validated
   },
   beforeLoad: async ({ context, search }) => {
     await context.auth.initialize()

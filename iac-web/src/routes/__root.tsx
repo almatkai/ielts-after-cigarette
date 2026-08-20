@@ -20,6 +20,22 @@ interface MyRouterContext {
   auth: AuthStore
 }
 
+const themeInitScript = `(function () {
+  try {
+    var preference = window.localStorage.getItem('iac-theme') || 'system'
+    var isDark =
+      preference === 'dark' ||
+      (preference !== 'light' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    var isAppRoute = /(?:^|\\/)(dashboard|admin)(\\/|$)/.test(
+      window.location.pathname,
+    )
+    if (isDark && isAppRoute) {
+      document.documentElement.classList.add('dark')
+    }
+  } catch (error) {}
+})()`
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
@@ -44,6 +60,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: appCss,
       },
     ],
+    scripts: [{ children: themeInitScript }],
   }),
   notFoundComponent: NotFoundPage,
   shellComponent: RootDocument,

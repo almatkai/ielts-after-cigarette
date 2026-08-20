@@ -38,6 +38,26 @@ import type {
 
 type EditorForm = ReadingMaterialInput & { revision: number }
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
+const cardClassName =
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
+
+const cardTitleClassName =
+  'text-base font-bold tracking-tight text-slate-900 dark:text-slate-100'
+
+const fieldClassName =
+  'h-11 rounded-lg border-slate-300 bg-white shadow-none focus-visible:border-blue-500 focus-visible:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900'
+
+const textareaFieldClassName =
+  'rounded-lg border-slate-300 bg-white shadow-none focus-visible:border-blue-500 focus-visible:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900'
+
+const outlineButtonClassName =
+  'rounded-lg border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+
 const emptyForm: EditorForm = {
   slug: '',
   examType: 'academic',
@@ -49,9 +69,6 @@ const emptyForm: EditorForm = {
   sourceUrl: null,
   revision: 0,
 }
-
-const fieldClassName =
-  'h-11 rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
 
 function materialToForm(material: ReadingMaterial): EditorForm {
   return {
@@ -161,15 +178,31 @@ export function ReadingMaterialEditorPage({
   }
 
   if (editing && materialQuery.isPending) {
-    return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
+    return (
+      <p
+        style={interFont}
+        className="text-sm text-slate-500 dark:text-slate-400"
+      >
+        Загружаем материал…
+      </p>
+    )
   }
   if (editing && materialQuery.isError) {
     return (
-      <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+      <Card className={cardClassName}>
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
-          <p className="mt-3 text-sm">Материал не удалось загрузить.</p>
-          <Button asChild variant="outline" className="mt-4">
+          <TriangleAlert
+            className="size-6 text-red-500 dark:text-red-400"
+            aria-hidden
+          />
+          <p className="mt-3 text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            Материал не удалось загрузить.
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            className={`mt-4 ${outlineButtonClassName}`}
+          >
             <Link to="/admin/reading/materials">Вернуться в библиотеку</Link>
           </Button>
         </CardContent>
@@ -181,24 +214,37 @@ export function ReadingMaterialEditorPage({
   const pending = saveMutation.isPending || publishMutation.isPending
 
   return (
-    <form className="grid gap-5" onSubmit={(event) => void handleSubmit(event)}>
+    <form
+      style={interFont}
+      className="grid gap-5"
+      onSubmit={(event) => void handleSubmit(event)}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+          >
             <Link to="/admin/reading/materials">
               <ArrowLeft aria-hidden />К библиотеке
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
               {editing ? 'Редактор материала' : 'Новый Reading материал'}
             </h1>
             {material ? (
-              <Badge variant="outline">{material.status}</Badge>
+              <Badge
+                variant="outline"
+                className="border-slate-200 bg-white text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+              >
+                {material.status}
+              </Badge>
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
+            <p className="mt-2 text-xs text-slate-400 tabular-nums dark:text-slate-500">
               Версия текста {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
@@ -209,6 +255,7 @@ export function ReadingMaterialEditorPage({
             <Button
               type="button"
               variant="outline"
+              className={outlineButtonClassName}
               disabled={pending}
               onClick={() => void handlePublish()}
             >
@@ -219,7 +266,7 @@ export function ReadingMaterialEditorPage({
           <Button
             type="submit"
             disabled={pending}
-            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            className="rounded-lg bg-blue-500 font-bold text-white shadow-sm hover:bg-blue-600"
           >
             <Save aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
@@ -229,17 +276,20 @@ export function ReadingMaterialEditorPage({
 
       {message ? (
         <div
-          className="flex items-center gap-2 rounded-[10px] border border-[#e7e7e4] bg-white px-4 py-3 text-sm"
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
           role="status"
         >
-          <CheckCircle2 className="size-4 text-[#69696d]" aria-hidden />
+          <CheckCircle2
+            className="size-4 text-slate-500 dark:text-slate-400"
+            aria-hidden
+          />
           {message}
         </div>
       ) : null}
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Метаданные</CardTitle>
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+          <CardTitle className={cardTitleClassName}>Метаданные</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
           <div className="grid gap-2 sm:col-span-2">
@@ -300,14 +350,15 @@ export function ReadingMaterialEditorPage({
               value={form.description}
               onChange={(event) => update('description', event.target.value)}
               rows={3}
+              className={textareaFieldClassName}
             />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Passage</CardTitle>
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+          <CardTitle className={cardTitleClassName}>Passage</CardTitle>
         </CardHeader>
         <CardContent className="p-5">
           <Label htmlFor="material-body" className="sr-only">
@@ -318,18 +369,18 @@ export function ReadingMaterialEditorPage({
             value={form.body}
             onChange={(event) => update('body', event.target.value)}
             rows={22}
-            className="font-serif text-base leading-7"
+            className={`${textareaFieldClassName} font-serif text-base leading-7`}
             placeholder="Вставьте текст Reading passage…"
           />
-          <p className="mt-2 text-right text-xs text-[#808084]">
+          <p className="mt-2 text-right text-xs text-slate-400 tabular-nums dark:text-slate-500">
             {form.body.trim().length} символов
           </p>
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Источник и права</CardTitle>
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+          <CardTitle className={cardTitleClassName}>Источник и права</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
           <div className="grid gap-2">
@@ -352,7 +403,7 @@ export function ReadingMaterialEditorPage({
             />
           </div>
         </CardContent>
-        <CardFooter className="border-t border-[#ededeb] px-5 py-4 text-xs leading-5 text-[#808084]">
+        <CardFooter className="border-t border-slate-100 px-5 py-4 text-xs leading-5 text-slate-400 dark:border-slate-800 dark:text-slate-500">
           Добавляйте только собственные или лицензированные материалы и
           фиксируйте источник.
         </CardFooter>

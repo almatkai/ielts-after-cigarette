@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/settings')({
-  component: EmptySettingsPage,
-})
+import { SettingsPage } from '@/pages/settings/ui/settings-page'
 
-function EmptySettingsPage() {
-  return null
-}
+export const Route = createFileRoute('/dashboard/settings')({
+  head: () => ({
+    meta: [
+      { title: 'Настройки — IAC' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
+  component: SettingsPage,
+})

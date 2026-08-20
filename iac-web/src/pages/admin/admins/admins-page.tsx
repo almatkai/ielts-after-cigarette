@@ -15,6 +15,20 @@ import { ApiError, getErrorMessage } from '@/lib/api/client'
 
 import type { SuperAdminEntry } from '@/features/admin/api'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
+const cardClassName =
+  'rounded-xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900'
+
+const primaryButtonClassName =
+  'rounded-lg bg-blue-500 font-bold text-white shadow-sm hover:bg-blue-600'
+
+const outlineButtonClassName =
+  'rounded-lg border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+
 export function AdminsPage() {
   const queryClient = useQueryClient()
   const [newAdminEmail, setNewAdminEmail] = useState('')
@@ -76,15 +90,15 @@ export function AdminsPage() {
   }
 
   return (
-    <div className="grid gap-5">
+    <div style={interFont} className="grid gap-5">
       <div>
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-500 dark:text-blue-400">
           Администрирование
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Администраторы
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
           Эти аккаунты имеют доступ к waitlist и другим инструментам
           администрирования. Администратор из переменных окружения (env) не
           удаляется через интерфейс.
@@ -101,11 +115,11 @@ export function AdminsPage() {
           value={newAdminEmail}
           onChange={(event) => setNewAdminEmail(event.target.value)}
           placeholder="email нового администратора"
-          className="h-11 w-full max-w-xs rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0"
+          className="h-11 w-full max-w-xs rounded-lg border-slate-300 bg-white shadow-none focus-visible:border-blue-500 focus-visible:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900"
         />
         <Button
           type="submit"
-          className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+          className={primaryButtonClassName}
           disabled={busy}
         >
           <UserPlus aria-hidden />
@@ -114,22 +128,25 @@ export function AdminsPage() {
       </form>
 
       {actionError ? (
-        <p className="text-sm text-[#c92f2f]" role="alert">
+        <p className="text-sm text-red-500 dark:text-red-400" role="alert">
           {actionError}
         </p>
       ) : null}
 
       {adminsQuery.isPending ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
-          <CardContent className="p-8 text-center text-sm text-[#69696d]">
+        <Card className={cardClassName}>
+          <CardContent className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
             Загружаем список администраторов…
           </CardContent>
         </Card>
       ) : adminsQuery.isError ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+        <Card className={cardClassName}>
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
-            <p className="mt-3 text-sm">
+            <TriangleAlert
+              className="size-6 text-red-500 dark:text-red-400"
+              aria-hidden
+            />
+            <p className="mt-3 text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {adminsQuery.error instanceof ApiError &&
               adminsQuery.error.status === 403
                 ? 'Нет доступа: управление администраторами доступно только роли ADMIN.'
@@ -138,7 +155,7 @@ export function AdminsPage() {
             <Button
               type="button"
               variant="outline"
-              className="mt-4"
+              className={`mt-4 ${outlineButtonClassName}`}
               onClick={() => void adminsQuery.refetch()}
             >
               Повторить
@@ -146,10 +163,10 @@ export function AdminsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto rounded-[16px] border border-[#e7e7e4] bg-white">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <table className="w-full min-w-[480px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
+              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Источник</th>
                 <th className="px-4 py-3 font-medium" />
@@ -159,24 +176,24 @@ export function AdminsPage() {
               {adminsQuery.data.admins.map((admin) => (
                 <tr
                   key={admin.email}
-                  className="border-b border-[#f0f0ed] last:border-0"
+                  className="border-b border-slate-100 last:border-0 dark:border-slate-800"
                 >
                   <td className="px-4 py-3">
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2 font-medium text-slate-900 dark:text-slate-100">
                       <ShieldCheck
-                        className="size-4 text-[#a1a1a6]"
+                        className="size-4 text-slate-400 dark:text-slate-500"
                         aria-hidden
                       />
                       {admin.email}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                     {admin.source === 'env' ? 'env' : 'добавлен вручную'}
                   </td>
                   <td className="px-4 py-3 text-right">
                     {admin.source === 'env' ? (
                       <span
-                        className="text-xs text-[#a1a1a6]"
+                        className="text-xs text-slate-400 dark:text-slate-500"
                         title="Задан в переменных окружения, удалить можно только правкой env"
                       >
                         недоступно
@@ -185,7 +202,7 @@ export function AdminsPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="text-[#e23b3b] hover:text-[#c92f2f]"
+                        className="rounded-lg border-slate-300 bg-white text-red-500 shadow-sm hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-slate-700 dark:bg-slate-900 dark:text-red-400 dark:hover:border-red-500/20 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                         disabled={busy}
                         onClick={() => void handleRemove(admin)}
                       >
@@ -200,7 +217,7 @@ export function AdminsPage() {
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-8 text-center text-[#69696d]"
+                    className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
                   >
                     Список администраторов пуст.
                   </td>

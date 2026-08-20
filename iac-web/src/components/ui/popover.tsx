@@ -26,7 +26,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          'z-[60] w-72 origin-(--radix-popover-content-transform-origin) rounded-[14px] border border-[#e7e7e4] bg-white text-[#111111] shadow-[0_18px_60px_rgba(17,17,17,0.12)] outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+          'z-[60] w-72 origin-(--radix-popover-content-transform-origin) rounded-[14px] border border-[#e7e7e4] bg-white text-[#111111] shadow-[0_18px_60px_rgba(17,17,17,0.12)] outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:shadow-[0_18px_60px_rgba(0,0,0,0.5)]',
           className,
         )}
         {...props}

@@ -4,6 +4,17 @@ import { BookOpenText, CheckCircle2, Database, ShieldCheck } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adminQueryKeys, getAdminAccess } from '@/features/admin/api'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
+const cardClassName =
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
+
+const cardTitleClassName =
+  'text-base font-bold tracking-tight text-slate-900 dark:text-slate-100'
+
 const milestones = [
   'Роли STUDENT, EDITOR и ADMIN',
   'Защита admin API на backend',
@@ -17,40 +28,51 @@ export function AdminOverviewPage() {
   })
 
   return (
-    <div className="grid gap-5">
+    <div style={interFont} className="grid gap-5">
       <div>
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-500 dark:text-blue-400">
           Администрирование
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Основа для управления контентом
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69696d]">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
           Ролевой доступ готовит безопасный контур, внутри которого появятся
           библиотека материалов и конструктор Reading.
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
-                <ShieldCheck className="size-[18px]" aria-hidden />
+              <span className="grid size-9 place-items-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+                <ShieldCheck
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                  aria-hidden
+                />
               </span>
-              <CardTitle className="text-base">Проверка доступа</CardTitle>
+              <CardTitle className={cardTitleClassName}>
+                Проверка доступа
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {accessQuery.isPending ? (
-              <p className="text-sm text-[#69696d]">Проверяем backend…</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Проверяем backend…
+              </p>
             ) : accessQuery.isError ? (
-              <p className="text-sm text-[#c92f2f]">
+              <p className="text-sm text-red-500 dark:text-red-400">
                 Backend не подтвердил административный доступ.
               </p>
             ) : (
-              <div className="flex items-center gap-3 text-sm">
-                <CheckCircle2 className="size-5 text-emerald-600" aria-hidden />
+              <div className="flex items-center gap-3 text-sm text-slate-900 dark:text-slate-100">
+                <CheckCircle2
+                  className="size-5 text-emerald-600 dark:text-emerald-400"
+                  aria-hidden
+                />
                 <span>
                   Доступ подтверждён сервером: <b>{accessQuery.data.role}</b>
                 </span>
@@ -59,34 +81,51 @@ export function AdminOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                <BookOpenText className="size-[18px]" aria-hidden />
+              <span className="grid size-9 place-items-center rounded-xl bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <BookOpenText
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                  aria-hidden
+                />
               </span>
-              <CardTitle className="text-base">Далее: Reading</CardTitle>
+              <CardTitle className={cardTitleClassName}>
+                Далее: Reading
+              </CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="p-5 text-sm leading-6 text-[#69696d]">
+          <CardContent className="p-5 text-sm leading-6 text-slate-500 dark:text-slate-400">
             Следующий слой — миграции материалов, версии черновиков и первый
             конструктор True / False / Not Given.
           </CardContent>
         </Card>
       </div>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <Database className="size-5 text-[#69696d]" aria-hidden />
-            <CardTitle className="text-base">Готово на этом этапе</CardTitle>
+            <Database
+              className="size-5 text-slate-500 dark:text-slate-400"
+              aria-hidden
+            />
+            <CardTitle className={cardTitleClassName}>
+              Готово на этом этапе
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-5">
           <ul className="grid gap-3">
             {milestones.map((milestone) => (
-              <li key={milestone} className="flex items-center gap-3 text-sm">
-                <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
+              <li
+                key={milestone}
+                className="flex items-center gap-3 text-sm text-slate-900 dark:text-slate-100"
+              >
+                <CheckCircle2
+                  className="size-4 text-emerald-600 dark:text-emerald-400"
+                  aria-hidden
+                />
                 {milestone}
               </li>
             ))}

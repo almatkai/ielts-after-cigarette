@@ -42,11 +42,44 @@ import { getErrorMessage } from '@/lib/api/client'
 
 import type { ProfileForm } from '@/features/ielts/api'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
+const cardClassName =
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
+
+const cardHeaderClassName =
+  'border-b border-slate-100 p-5 sm:p-6 dark:border-slate-800'
+
+const cardTitleClassName =
+  'text-base font-bold tracking-tight text-slate-900 dark:text-slate-100'
+
+const cardDescriptionClassName =
+  'mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400'
+
+const iconChipClassName =
+  'grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400'
+
+const neutralIconChipClassName =
+  'grid size-9 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-lg border-slate-300 bg-white shadow-none focus-visible:border-blue-500 focus-visible:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500'
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-lg border-slate-300 bg-white shadow-none focus-visible:border-blue-500 focus-visible:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'
+
+const outlineButtonClassName =
+  'h-10 rounded-lg border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+
+const primaryButtonClassName =
+  'h-10 rounded-lg bg-blue-500 px-5 font-semibold text-white shadow-sm hover:bg-blue-600'
+
+const errorTextClassName = 'text-xs text-red-600 dark:text-red-400'
+
+const messageTextClassName = 'text-sm text-slate-500 dark:text-slate-400'
 
 function preventSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault()
@@ -143,39 +176,56 @@ export function ProfilePage() {
 
   if (profileQuery.isPending) {
     return (
-      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
-        <CardContent className="p-8 text-center text-sm text-[#69696d]">
-          Загружаем профиль…
-        </CardContent>
-      </Card>
+      <div style={interFont} className="mx-auto w-full max-w-[1120px]">
+        <Card className={cardClassName}>
+          <CardContent className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+            Загружаем профиль…
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   if (profileQuery.isError) {
     return (
-      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
-        <CardContent className="flex flex-col items-center p-8 text-center">
-          <p className="text-sm font-semibold text-[#111111]">
-            Не удалось загрузить профиль
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-4"
-            onClick={() => void profileQuery.refetch()}
-          >
-            Повторить
-          </Button>
-        </CardContent>
-      </Card>
+      <div style={interFont} className="mx-auto w-full max-w-[1120px]">
+        <Card className={cardClassName}>
+          <CardContent className="flex flex-col items-center p-8 text-center">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Не удалось загрузить профиль
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className={`mt-4 ${outlineButtonClassName}`}
+              onClick={() => void profileQuery.refetch()}
+            >
+              Повторить
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <div className="mx-auto w-full min-w-0 max-w-[1120px]">
-      <Card className="mb-5 gap-0 overflow-hidden rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+    <div style={interFont} className="mx-auto w-full min-w-0 max-w-[1120px]">
+      <div className="mb-7">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-500 dark:text-blue-400">
+          Профиль
+        </p>
+        <h1 className="mt-2.5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-100">
+          Личные данные и цели
+        </h1>
+        <p className="mt-2.5 max-w-2xl text-[15px] leading-relaxed text-slate-500 dark:text-slate-400">
+          Расскажите о себе и зафиксируйте цель — план подготовки подстроится
+          под неё.
+        </p>
+      </div>
+
+      <Card className={`mb-5 overflow-hidden ${cardClassName}`}>
         <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
-          <div className="grid size-20 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#8d8d90] sm:size-24">
+          <div className="grid size-20 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-100 text-slate-400 sm:size-24 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500">
             <UserRound
               className="size-9 sm:size-11"
               strokeWidth={1.45}
@@ -184,10 +234,10 @@ export function ProfilePage() {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+            <h3 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Фото профиля
             </h3>
-            <p className="mt-1 max-w-lg text-sm leading-6 text-[#69696d]">
+            <p className="mt-1 max-w-lg text-sm leading-6 text-slate-500 dark:text-slate-400">
               Загрузите JPG, PNG или WebP. Рекомендуемый размер — от 400 × 400
               пикселей.
             </p>
@@ -205,7 +255,7 @@ export function ProfilePage() {
             type="button"
             variant="outline"
             onClick={() => photoInputRef.current?.click()}
-            className="h-10 shrink-0 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none"
+            className={`shrink-0 px-4 ${outlineButtonClassName}`}
           >
             <Camera aria-hidden />
             Загрузить фото
@@ -215,17 +265,17 @@ export function ProfilePage() {
 
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
         <div className="grid min-w-0 gap-5 [&>*]:min-w-0">
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
-            <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <Card className={cardClassName}>
+            <CardHeader className={cardHeaderClassName}>
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className={iconChipClassName}>
                   <UserRound className="size-[18px]" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className={cardTitleClassName}>
                     Личные данные
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className={cardDescriptionClassName}>
                     Основная информация вашего аккаунта.
                   </CardDescription>
                 </div>
@@ -266,7 +316,7 @@ export function ProfilePage() {
                   <Label htmlFor="email">Электронная почта</Label>
                   <div className="relative">
                     <Mail
-                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d]"
+                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                       aria-hidden
                     />
                     <Input
@@ -281,24 +331,24 @@ export function ProfilePage() {
                       className={`${fieldClassName} pl-10`}
                     />
                   </div>
-                  <p className="text-xs text-[#808084]">
+                  <p className="text-xs text-slate-400 dark:text-slate-500">
                     Изменение email пока не поддерживается backend.
                   </p>
                 </div>
                 {profileMessage ? (
                   <p
-                    className="text-sm text-[#69696d] sm:col-span-2"
+                    className={`${messageTextClassName} sm:col-span-2`}
                     role="status"
                   >
                     {profileMessage}
                   </p>
                 ) : null}
               </CardContent>
-              <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+              <CardFooter className="justify-end border-t border-slate-100 px-5 py-4 sm:px-6 dark:border-slate-800">
                 <Button
                   type="submit"
                   disabled={profileMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className={primaryButtonClassName}
                 >
                   {profileMutation.isPending
                     ? 'Сохраняем…'
@@ -308,17 +358,17 @@ export function ProfilePage() {
             </form>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
-            <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <Card className={cardClassName}>
+            <CardHeader className={cardHeaderClassName}>
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className={iconChipClassName}>
                   <Target className="size-[18px]" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className={cardTitleClassName}>
                     Параметры подготовки
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className={cardDescriptionClassName}>
                     Цель и формат, под которые будет строиться план.
                   </CardDescription>
                 </div>
@@ -348,7 +398,7 @@ export function ProfilePage() {
                     </SelectContent>
                   </Select>
                   {goalErrors.examFormat ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className={errorTextClassName} role="alert">
                       {goalErrors.examFormat}
                     </p>
                   ) : null}
@@ -378,7 +428,7 @@ export function ProfilePage() {
                     </SelectContent>
                   </Select>
                   {goalErrors.targetScore ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className={errorTextClassName} role="alert">
                       {goalErrors.targetScore}
                     </p>
                   ) : null}
@@ -388,7 +438,7 @@ export function ProfilePage() {
                   <Label htmlFor="exam-date">Планируемая дата экзамена</Label>
                   <div className="relative">
                     <CalendarDays
-                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d]"
+                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                       aria-hidden
                     />
                     <Input
@@ -404,25 +454,25 @@ export function ProfilePage() {
                     />
                   </div>
                   {goalErrors.examDate ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className={errorTextClassName} role="alert">
                       {goalErrors.examDate}
                     </p>
                   ) : null}
                 </div>
                 {goalMessage ? (
                   <p
-                    className="text-sm text-[#69696d] sm:col-span-2"
+                    className={`${messageTextClassName} sm:col-span-2`}
                     role="status"
                   >
                     {goalMessage}
                   </p>
                 ) : null}
               </CardContent>
-              <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+              <CardFooter className="justify-end border-t border-slate-100 px-5 py-4 sm:px-6 dark:border-slate-800">
                 <Button
                   type="submit"
                   disabled={goalMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className={primaryButtonClassName}
                 >
                   {goalMutation.isPending
                     ? 'Сохраняем…'
@@ -434,73 +484,73 @@ export function ProfilePage() {
         </div>
 
         <aside className="grid min-w-0 gap-5 [&>*]:min-w-0">
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
-            <CardHeader className="border-b border-[#ededeb] p-5">
+          <Card className={cardClassName}>
+            <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
+                <span className={neutralIconChipClassName}>
                   <BellRing className="size-[18px]" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className={cardTitleClassName}>
                     Уведомления
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className={cardDescriptionClassName}>
                     Выберите полезные напоминания.
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="divide-y divide-[#ededeb] p-0">
+            <CardContent className="divide-y divide-slate-100 p-0 dark:divide-slate-800">
               <div className="flex items-start justify-between gap-4 px-5 py-4">
                 <div>
                   <Label
                     htmlFor="lesson-reminders"
-                    className="leading-5 text-[#111111]"
+                    className="leading-5 text-slate-900 dark:text-slate-100"
                   >
                     Напоминания о занятиях
                   </Label>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-slate-500">
                     Перед запланированной практикой.
                   </p>
                 </div>
                 <Switch
                   id="lesson-reminders"
                   aria-label="Напоминания о занятиях"
-                  className="mt-0.5 data-[state=checked]:bg-[#e23b3b]"
+                  className="mt-0.5 data-[state=checked]:bg-blue-500"
                 />
               </div>
               <div className="flex items-start justify-between gap-4 px-5 py-4">
                 <div>
                   <Label
                     htmlFor="weekly-report"
-                    className="leading-5 text-[#111111]"
+                    className="leading-5 text-slate-900 dark:text-slate-100"
                   >
                     Еженедельный отчёт
                   </Label>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-slate-500">
                     Краткая сводка прогресса за неделю.
                   </p>
                 </div>
                 <Switch
                   id="weekly-report"
                   aria-label="Еженедельный отчёт"
-                  className="mt-0.5 data-[state=checked]:bg-[#e23b3b]"
+                  className="mt-0.5 data-[state=checked]:bg-blue-500"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
-            <CardHeader className="border-b border-[#ededeb] p-5">
+          <Card className={cardClassName}>
+            <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
+                <span className={neutralIconChipClassName}>
                   <LockKeyhole className="size-[18px]" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className={cardTitleClassName}>
                     Безопасность
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className={cardDescriptionClassName}>
                     Измените пароль аккаунта.
                   </CardDescription>
                 </div>
@@ -533,11 +583,11 @@ export function ProfilePage() {
                   />
                 </div>
               </CardContent>
-              <CardFooter className="border-t border-[#ededeb] px-5 py-4">
+              <CardFooter className="border-t border-slate-100 px-5 py-4 dark:border-slate-800">
                 <Button
                   type="submit"
                   variant="outline"
-                  className="h-10 w-full rounded-[9px] border-[#deded9] bg-white shadow-none"
+                  className={`w-full ${outlineButtonClassName}`}
                 >
                   Обновить пароль
                 </Button>

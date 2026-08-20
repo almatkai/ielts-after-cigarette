@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/mistakes')({
-  component: EmptyMistakesPage,
-})
+import { MistakesPage } from '@/pages/mistakes/ui/mistakes-page'
 
-function EmptyMistakesPage() {
-  return null
-}
+export const Route = createFileRoute('/dashboard/mistakes')({
+  head: () => ({
+    meta: [
+      { title: 'Ошибки — IAC' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
+  component: MistakesPage,
+})

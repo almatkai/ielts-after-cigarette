@@ -9,6 +9,20 @@ import { ApiError } from '@/lib/api/client'
 
 import type { WaitlistEntry } from '@/features/admin/api'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
+const cardClassName =
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
+
+const cardTitleClassName =
+  'text-base font-bold tracking-tight text-slate-900 dark:text-slate-100'
+
+const badgeClassName =
+  'border-slate-200 bg-white text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+
 function displayName(entry: WaitlistEntry) {
   const name = [entry.firstName, entry.lastName]
     .filter(Boolean)
@@ -44,16 +58,16 @@ export function WaitlistPage() {
   })
 
   return (
-    <div className="grid gap-5">
+    <div style={interFont} className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-500 dark:text-blue-400">
             Waitlist
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             Заявки в waitlist
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
             {waitlistQuery.data
               ? `Всего заявок: ${waitlistQuery.data.total}`
               : 'Заявки с лендинга и реферальная статистика.'}
@@ -62,6 +76,7 @@ export function WaitlistPage() {
         <Button
           type="button"
           variant="outline"
+          className="rounded-lg border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-100"
           disabled={waitlistQuery.isFetching}
           onClick={() => void waitlistQuery.refetch()}
         >
@@ -74,16 +89,19 @@ export function WaitlistPage() {
       </div>
 
       {waitlistQuery.isPending ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
-          <CardContent className="p-8 text-center text-sm text-[#69696d]">
+        <Card className="rounded-xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <CardContent className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
             Загружаем заявки…
           </CardContent>
         </Card>
       ) : waitlistQuery.isError ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+        <Card className="rounded-xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
-            <p className="mt-3 text-sm">
+            <TriangleAlert
+              className="size-6 text-red-500 dark:text-red-400"
+              aria-hidden
+            />
+            <p className="mt-3 text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {waitlistQuery.error instanceof ApiError &&
               waitlistQuery.error.status === 403
                 ? 'Нет доступа: waitlist доступен только администраторам (роль ADMIN).'
@@ -92,7 +110,7 @@ export function WaitlistPage() {
             <Button
               type="button"
               variant="outline"
-              className="mt-4"
+              className="mt-4 rounded-lg border-slate-300 bg-white text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-100"
               onClick={() => void waitlistQuery.refetch()}
             >
               Повторить
@@ -100,11 +118,16 @@ export function WaitlistPage() {
           </CardContent>
         </Card>
       ) : waitlistQuery.data.entries.length === 0 ? (
-        <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
+        <Card className="rounded-xl border-dashed border-slate-300 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <Inbox className="size-8 text-[#9a9a9d]" aria-hidden />
-            <h2 className="mt-4 text-lg font-semibold">Заявок пока нет</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
+            <Inbox
+              className="size-8 text-slate-400 dark:text-slate-500"
+              aria-hidden
+            />
+            <h2 className="mt-4 text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Заявок пока нет
+            </h2>
+            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
               Как только посетители начнут оставлять контакты, они появятся
               здесь вместе с реферальной статистикой.
             </p>
@@ -124,18 +147,20 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
-                <Users className="size-[18px]" aria-hidden />
+              <span className="grid size-9 place-items-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+                <Users className="size-[18px]" strokeWidth={1.8} aria-hidden />
               </span>
-              <CardTitle className="text-base">Топ приглашающих</CardTitle>
+              <CardTitle className={cardTitleClassName}>
+                Топ приглашающих
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {referrers.length === 0 ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Пока никто никого не пригласил.
               </p>
             ) : (
@@ -145,16 +170,16 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
                     key={entry.id}
                     className="flex items-center gap-3 text-sm"
                   >
-                    <span className="w-5 text-xs font-semibold text-[#a1a1a6]">
+                    <span className="w-5 text-xs font-semibold text-slate-400 tabular-nums dark:text-slate-500">
                       {index + 1}
                     </span>
-                    <span className="min-w-0 flex-1 truncate font-medium">
+                    <span className="min-w-0 flex-1 truncate font-medium text-slate-900 dark:text-slate-100">
                       {displayName(entry)}
                     </span>
-                    <span className="text-xs text-[#808084]">
+                    <span className="font-mono text-xs text-slate-400 dark:text-slate-500">
                       {entry.referralCode}
                     </span>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className={badgeClassName}>
                       {entry.referrals} {pluralizeInvites(entry.referrals)}
                     </Badge>
                   </li>
@@ -164,32 +189,35 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           </CardContent>
         </Card>
 
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                <Tags className="size-[18px]" aria-hidden />
+              <span className="grid size-9 place-items-center rounded-xl bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <Tags className="size-[18px]" strokeWidth={1.8} aria-hidden />
               </span>
-              <CardTitle className="text-base">Внешние метки</CardTitle>
+              <CardTitle className={cardTitleClassName}>
+                Внешние метки
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {tags.length === 0 ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Переходов по кодам, не принадлежащим пользователям waitlist,
                 нет.
               </p>
             ) : (
               <>
-                <p className="text-sm leading-6 text-[#69696d]">
+                <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
                   Коды «приглашён по», которые не совпадают ни с одним кодом из
                   waitlist — так помечены внешние источники трафика.
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <li key={tag.code}>
-                      <Badge variant="outline">
-                        {tag.code} · {tag.count}
+                      <Badge variant="outline" className={badgeClassName}>
+                        <span className="font-mono">{tag.code}</span> ·{' '}
+                        {tag.count}
                       </Badge>
                     </li>
                   ))}
@@ -200,10 +228,10 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
         </Card>
       </div>
 
-      <div className="overflow-x-auto rounded-[16px] border border-[#e7e7e4] bg-white">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <table className="w-full min-w-[1080px] text-left text-sm">
           <thead>
-            <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
+            <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
               <th className="px-4 py-3 font-medium">Имя</th>
               <th className="px-4 py-3 font-medium">Фамилия</th>
               <th className="px-4 py-3 font-medium">Email</th>
@@ -219,21 +247,33 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
             {entries.map((entry) => (
               <tr
                 key={entry.id}
-                className="border-b border-[#f0f0ed] last:border-0"
+                className="border-b border-slate-100 last:border-0 dark:border-slate-800"
               >
-                <td className="px-4 py-3">{entry.firstName ?? '—'}</td>
-                <td className="px-4 py-3">{entry.lastName ?? '—'}</td>
-                <td className="px-4 py-3">{entry.email ?? '—'}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{entry.phone}</td>
-                <td className="px-4 py-3">{entry.source ?? '—'}</td>
-                <td className="px-4 py-3 font-mono text-xs">
+                <td className="px-4 py-3 text-slate-900 dark:text-slate-100">
+                  {entry.firstName ?? '—'}
+                </td>
+                <td className="px-4 py-3 text-slate-900 dark:text-slate-100">
+                  {entry.lastName ?? '—'}
+                </td>
+                <td className="px-4 py-3 text-slate-900 dark:text-slate-100">
+                  {entry.email ?? '—'}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-slate-500 dark:text-slate-400">
+                  {entry.phone}
+                </td>
+                <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                  {entry.source ?? '—'}
+                </td>
+                <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
                   {entry.referralCode}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs">
+                <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
                   {entry.referredByCode ?? '—'}
                 </td>
-                <td className="px-4 py-3">{entry.referrals}</td>
-                <td className="px-4 py-3 whitespace-nowrap">
+                <td className="px-4 py-3 text-slate-900 tabular-nums dark:text-slate-100">
+                  {entry.referrals}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-slate-500 tabular-nums dark:text-slate-400">
                   {new Date(entry.createdAt).toLocaleString('ru-RU')}
                 </td>
               </tr>

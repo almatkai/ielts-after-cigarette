@@ -22,6 +22,11 @@ import { cn } from '@/lib/utils'
 
 import type { SkillId } from '@/content/landing-content'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
 const skillIcons = {
   listening: Headphones,
   reading: BookOpenText,
@@ -48,7 +53,7 @@ const practiceSteps = [
 ] as const
 
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
 
 export function PracticePage() {
   const [selectedSkill, setSelectedSkill] = useState<SkillId | null>(null)
@@ -60,23 +65,26 @@ export function PracticePage() {
     : LibraryBig
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div
+      style={interFont}
+      className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5"
+    >
       <section aria-labelledby="skill-selection-heading">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2
               id="skill-selection-heading"
-              className="text-lg font-semibold tracking-[-0.025em] text-[#111111]"
+              className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100"
             >
               Выберите навык
             </h2>
-            <p className="mt-1 text-sm leading-6 text-[#69696d]">
+            <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
               Сосредоточьтесь на одном направлении текущей тренировки.
             </p>
           </div>
           <Badge
             variant="outline"
-            className="border-[#deded9] bg-white px-2.5 py-1 text-[#69696d]"
+            className="border-slate-300 bg-white px-2.5 py-1 text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
           >
             4 направления IELTS
           </Badge>
@@ -92,9 +100,8 @@ export function PracticePage() {
                 key={skill.id}
                 className={cn(
                   cardClassName,
-                  'transition-[border-color,box-shadow,transform] duration-200 has-[button:focus-visible]:border-[#e23b3b] hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]',
-                  isSelected &&
-                    'border-[#e23b3b] shadow-[0_14px_40px_rgba(226,59,59,0.08)]',
+                  'transition-[border-color,box-shadow,transform] duration-200 has-[button:focus-visible]:border-blue-500 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:hover:border-slate-700',
+                  isSelected && 'border-blue-500 shadow-md',
                 )}
               >
                 <button
@@ -105,8 +112,9 @@ export function PracticePage() {
                 >
                   <span
                     className={cn(
-                      'grid size-10 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-colors',
-                      isSelected && 'bg-[#fff0f0] text-[#e23b3b]',
+                      'grid size-10 place-items-center rounded-lg bg-slate-50 text-slate-500 transition-colors dark:bg-slate-800 dark:text-slate-400',
+                      isSelected &&
+                        'bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400',
                     )}
                   >
                     <Icon
@@ -116,12 +124,12 @@ export function PracticePage() {
                     />
                   </span>
                   <span className="mt-5 flex w-full items-center justify-between gap-3">
-                    <span className="text-sm font-semibold text-[#111111]">
+                    <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
                       {skill.label}
                     </span>
                     {isSelected ? (
                       <span
-                        className="grid size-5 shrink-0 place-items-center rounded-full bg-[#e23b3b] text-white"
+                        className="grid size-5 shrink-0 place-items-center rounded-full bg-blue-500 text-white"
                         aria-label="Выбрано"
                       >
                         <Check
@@ -132,7 +140,7 @@ export function PracticePage() {
                       </span>
                     ) : null}
                   </span>
-                  <span className="mt-2 line-clamp-3 text-xs leading-5 text-[#808084]">
+                  <span className="mt-2 line-clamp-3 text-xs leading-5 text-slate-400 dark:text-slate-500">
                     {skill.description}
                   </span>
                 </button>
@@ -144,18 +152,18 @@ export function PracticePage() {
 
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <Card className={cardClassName}>
-          <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <CardHeader className="border-b border-slate-100 p-5 sm:p-6 dark:border-slate-800">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <CardTitle className="text-base tracking-[-0.02em]">
+                <CardTitle className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                   Каталог тренировок
                 </CardTitle>
-                <CardDescription className="mt-1 leading-5">
+                <CardDescription className="mt-1 leading-5 text-slate-500 dark:text-slate-400">
                   Задания для сфокусированной практики.
                 </CardDescription>
               </div>
               {selectedSkillData ? (
-                <Badge className="border border-[#f2d4d4] bg-[#fff0f0] text-[#b82f2f] shadow-none hover:bg-[#fff0f0]">
+                <Badge className="border border-blue-100 bg-blue-50 text-blue-600 shadow-none hover:bg-blue-50 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/10">
                   {selectedSkillData.label}
                 </Badge>
               ) : null}
@@ -166,19 +174,19 @@ export function PracticePage() {
             className="flex min-h-[330px] flex-col items-center justify-center px-5 py-10 text-center sm:px-8"
             aria-live="polite"
           >
-            <span className="grid size-14 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
+            <span className="grid size-14 place-items-center rounded-full bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
               <SelectedSkillIcon
                 className="size-6"
                 strokeWidth={1.7}
                 aria-hidden
               />
             </span>
-            <h3 className="mt-5 text-base font-semibold tracking-[-0.02em] text-[#111111]">
+            <h3 className="mt-5 text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {selectedSkillData
                 ? `Заданий по направлению «${selectedSkillData.label}» пока нет`
                 : 'Сначала выберите навык'}
             </h3>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
+            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
               {selectedSkillData
                 ? 'Новые тренировки появятся здесь после добавления учебных материалов.'
                 : 'После выбора здесь появятся доступные форматы и задания для практики.'}
@@ -188,16 +196,16 @@ export function PracticePage() {
 
         <aside>
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-5">
+            <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
                   <ClipboardList className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0">
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                     Как устроена практика
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className="mt-1 leading-5 text-slate-500 dark:text-slate-400">
                     Один понятный цикл работы.
                   </CardDescription>
                 </div>
@@ -207,14 +215,14 @@ export function PracticePage() {
               <ol className="grid gap-5">
                 {practiceSteps.map((step) => (
                   <li key={step.number} className="flex gap-3">
-                    <span className="mt-0.5 text-[11px] leading-5 font-semibold tracking-[0.08em] text-[#e23b3b]">
+                    <span className="mt-0.5 text-[11px] leading-5 font-bold tracking-[0.08em] text-blue-500 dark:text-blue-400">
                       {step.number}
                     </span>
                     <span>
-                      <span className="block text-sm font-semibold text-[#111111]">
+                      <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
                         {step.title}
                       </span>
-                      <span className="mt-1 block text-xs leading-5 text-[#808084]">
+                      <span className="mt-1 block text-xs leading-5 text-slate-400 dark:text-slate-500">
                         {step.description}
                       </span>
                     </span>

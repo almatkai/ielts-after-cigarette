@@ -26,6 +26,11 @@ import { getDashboard, queryKeys } from '@/features/ielts/api'
 
 import type { SkillId } from '@/features/ielts/api'
 
+const interFont = {
+  fontFamily:
+    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+} as const
+
 const quickActions = [
   {
     label: 'Перейти к практике',
@@ -48,7 +53,7 @@ const quickActions = [
 ] as const
 
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
+  'gap-0 rounded-xl border-slate-200 bg-white py-0 shadow-sm dark:border-slate-800 dark:bg-slate-900'
 
 const skillLabels: Record<SkillId, string> = {
   listening: 'Listening',
@@ -71,35 +76,41 @@ export function OverviewPage() {
 
   if (dashboardQuery.isPending) {
     return (
-      <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
-        <CardContent className="p-8 text-center text-sm text-[#69696d]">
-          Загружаем ваш dashboard…
-        </CardContent>
-      </Card>
+      <div style={interFont} className="mx-auto w-full max-w-[1120px]">
+        <Card className={cardClassName}>
+          <CardContent className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+            Загружаем ваш dashboard…
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
   if (dashboardQuery.isError) {
     return (
-      <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
-        <CardContent className="flex flex-col items-center p-8 text-center">
-          <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
-          <p className="mt-3 text-sm font-semibold text-[#111111]">
-            Не удалось загрузить dashboard
-          </p>
-          <p className="mt-1 text-sm text-[#69696d]">
-            Проверьте соединение с сервером и попробуйте ещё раз.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-5"
-            onClick={() => void dashboardQuery.refetch()}
-          >
-            Повторить
-          </Button>
-        </CardContent>
-      </Card>
+      <div style={interFont} className="mx-auto w-full max-w-[1120px]">
+        <Card className={cardClassName}>
+          <CardContent className="flex flex-col items-center p-8 text-center">
+            <TriangleAlert
+              className="size-6 text-slate-400 dark:text-slate-500"
+              aria-hidden
+            />
+            <p className="mt-3 text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Не удалось загрузить dashboard
+            </p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Проверьте соединение с сервером и попробуйте ещё раз.
+            </p>
+            <Button
+              type="button"
+              className="mt-5 h-11 rounded-lg bg-blue-500 px-6 font-bold text-white shadow-sm hover:bg-blue-600"
+              onClick={() => void dashboardQuery.refetch()}
+            >
+              Повторить
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
@@ -145,7 +156,10 @@ export function OverviewPage() {
       : '/dashboard/practice'
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div
+      style={interFont}
+      className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5"
+    >
       <section
         className="grid min-w-0 gap-4 sm:grid-cols-3"
         aria-label="Основные показатели"
@@ -156,20 +170,20 @@ export function OverviewPage() {
           return (
             <Card key={metric.label} className={cardClassName}>
               <CardContent className="flex min-w-0 items-start gap-4 p-5">
-                <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
                   <Icon className="size-[19px]" strokeWidth={1.8} aria-hidden />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold tracking-[0.03em] text-[#69696d]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
                     {metric.label}
                   </p>
                   <p
-                    className="mt-1 text-2xl leading-none font-semibold tracking-[-0.04em] text-[#111111]"
+                    className="mt-1.5 text-2xl leading-none font-extrabold tracking-tight text-slate-900 tabular-nums dark:text-slate-100"
                     aria-label={`${metric.label}: ${metric.value}`}
                   >
                     {metric.value}
                   </p>
-                  <p className="mt-2 text-xs leading-5 text-[#8b8b8e]">
+                  <p className="mt-2 text-xs leading-5 text-slate-400 dark:text-slate-500">
                     {metric.hint}
                   </p>
                 </div>
@@ -184,23 +198,23 @@ export function OverviewPage() {
           <Card className={cardClassName}>
             <CardContent className="relative overflow-hidden p-6 sm:p-8">
               <div
-                className="pointer-events-none absolute top-0 right-0 size-56 translate-x-16 -translate-y-16 rounded-full bg-[#fff0f0] opacity-70 blur-3xl"
+                className="pointer-events-none absolute top-0 right-0 size-56 translate-x-16 -translate-y-16 rounded-full bg-blue-50 opacity-70 blur-3xl dark:bg-blue-500/10"
                 aria-hidden
               />
               <div className="relative max-w-[620px]">
-                <Badge className="border border-[#f2d4d4] bg-[#fff0f0] text-[#b82f2f] shadow-none hover:bg-[#fff0f0]">
+                <Badge className="border border-blue-100 bg-blue-50 text-blue-600 shadow-none hover:bg-blue-50 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/10">
                   Рекомендуемый шаг
                 </Badge>
-                <h2 className="mt-5 text-[clamp(1.65rem,3vw,2.35rem)] leading-[1.08] font-semibold tracking-[-0.045em] text-[#111111]">
+                <h2 className="mt-5 text-[clamp(1.65rem,3vw,2.35rem)] leading-[1.08] font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
                   {dashboard.recommendedAction.title}
                 </h2>
-                <p className="mt-3 max-w-[560px] text-sm leading-6 text-[#69696d] sm:text-[15px]">
+                <p className="mt-3 max-w-[560px] text-sm leading-6 text-slate-500 sm:text-[15px] dark:text-slate-400">
                   {dashboard.recommendedAction.description}
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <Button
                     asChild
-                    className="h-11 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                    className="h-11 rounded-lg bg-blue-500 px-5 font-bold text-white shadow-sm hover:bg-blue-600"
                   >
                     <Link to={recommendedTarget}>
                       Перейти к следующему шагу
@@ -210,7 +224,7 @@ export function OverviewPage() {
                   <Button
                     asChild
                     variant="outline"
-                    className="h-11 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none"
+                    className="h-11 rounded-lg border-slate-300 bg-white px-5 font-bold text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900"
                   >
                     <Link to="/dashboard/profile">Настроить цель</Link>
                   </Button>
@@ -220,16 +234,16 @@ export function OverviewPage() {
           </Card>
 
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+            <CardHeader className="border-b border-slate-100 p-5 sm:p-6 dark:border-slate-800">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                   <BarChart3 className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0">
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                     Прогресс по навыкам
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className="mt-1 leading-5 text-slate-500 dark:text-slate-400">
                     Общая картина по Listening, Reading, Writing и Speaking.
                   </CardDescription>
                 </div>
@@ -239,19 +253,19 @@ export function OverviewPage() {
               {dashboard.skillProgress.map((progress) => (
                 <div
                   key={progress.skill}
-                  className="rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4"
+                  className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-[#111111]">
+                    <p className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
                       {skillLabels[progress.skill]}
                     </p>
-                    <span className="text-sm font-semibold text-[#e23b3b]">
+                    <span className="text-sm font-bold text-blue-500 tabular-nums dark:text-blue-400">
                       {progress.estimatedBand === null
                         ? '—'
                         : progress.estimatedBand.toFixed(1)}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-[#808084]">
+                  <p className="mt-2 text-xs leading-5 text-slate-400 tabular-nums dark:text-slate-500">
                     {progress.completedTasks === 0
                       ? 'Нет выполненных заданий'
                       : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
@@ -261,7 +275,7 @@ export function OverviewPage() {
               <Button
                 asChild
                 variant="outline"
-                className="h-10 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none sm:col-span-2"
+                className="h-10 rounded-lg border-slate-300 bg-white px-4 font-bold text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white sm:col-span-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900"
               >
                 <Link to="/dashboard/progress">Открыть прогресс</Link>
               </Button>
@@ -271,16 +285,16 @@ export function OverviewPage() {
 
         <aside className="grid min-w-0 gap-5 [&>*]:min-w-0">
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-5">
+            <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
                   <CalendarCheck2 className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0">
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                     План на сегодня
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className="mt-1 leading-5 text-slate-500 dark:text-slate-400">
                     Текущие задачи подготовки.
                   </CardDescription>
                 </div>
@@ -288,16 +302,16 @@ export function OverviewPage() {
             </CardHeader>
             <CardContent className="p-5">
               {dashboard.todayPlan.length === 0 ? (
-                <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-6 text-center">
+                <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center dark:border-slate-700 dark:bg-slate-800">
                   <ClipboardCheck
-                    className="mx-auto size-5 text-[#9a9a9d]"
+                    className="mx-auto size-5 text-slate-400 dark:text-slate-500"
                     strokeWidth={1.8}
                     aria-hidden
                   />
-                  <p className="mt-3 text-sm font-semibold text-[#111111]">
+                  <p className="mt-3 text-sm font-bold text-slate-900 dark:text-slate-100">
                     Заданий пока нет
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-slate-500">
                     Добавьте первое занятие в план.
                   </p>
                 </div>
@@ -306,12 +320,12 @@ export function OverviewPage() {
                   {dashboard.todayPlan.map((item) => (
                     <li
                       key={item.id}
-                      className="rounded-[10px] border border-[#ededeb] p-3"
+                      className="rounded-lg border border-slate-100 p-3 dark:border-slate-800"
                     >
-                      <p className="text-sm font-semibold text-[#111111]">
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                         {item.title}
                       </p>
-                      <p className="mt-1 text-xs text-[#808084]">
+                      <p className="mt-1 text-xs text-slate-400 tabular-nums dark:text-slate-500">
                         {skillLabels[item.skill]} · {item.durationMinutes} мин.
                       </p>
                     </li>
@@ -321,7 +335,7 @@ export function OverviewPage() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-4 h-10 w-full rounded-[9px] border-[#deded9] bg-white shadow-none"
+                className="mt-4 h-10 w-full rounded-lg border-slate-300 bg-white font-bold text-slate-900 shadow-sm hover:border-slate-400 hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-900"
               >
                 <Link to="/dashboard/plan">Настроить план</Link>
               </Button>
@@ -329,12 +343,12 @@ export function OverviewPage() {
           </Card>
 
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-5">
-              <CardTitle className="text-base tracking-[-0.02em]">
+            <CardHeader className="border-b border-slate-100 p-5 dark:border-slate-800">
+              <CardTitle className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 Быстрые действия
               </CardTitle>
             </CardHeader>
-            <CardContent className="divide-y divide-[#ededeb] p-0">
+            <CardContent className="divide-y divide-slate-100 p-0 dark:divide-slate-800">
               {quickActions.map((action) => {
                 const Icon = action.icon
 
@@ -342,21 +356,21 @@ export function OverviewPage() {
                   <Link
                     key={action.to}
                     to={action.to}
-                    className="group flex min-h-[72px] items-center gap-3 px-5 py-3 text-[#111111] no-underline transition-colors hover:bg-[#fafaf8]"
+                    className="group flex min-h-[72px] items-center gap-3 px-5 py-3 text-slate-900 no-underline transition-colors hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#fff0f0] group-hover:text-[#e23b3b]">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-50 text-slate-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-500 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-blue-500/10 dark:group-hover:text-blue-400">
                       <Icon className="size-[18px]" aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">
+                      <span className="block text-sm font-bold">
                         {action.label}
                       </span>
-                      <span className="mt-0.5 block text-xs leading-5 text-[#808084]">
+                      <span className="mt-0.5 block text-xs leading-5 text-slate-400 dark:text-slate-500">
                         {action.description}
                       </span>
                     </span>
                     <ArrowRight
-                      className="size-4 shrink-0 text-[#a0a0a3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#e23b3b]"
+                      className="size-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-500 dark:text-slate-500 dark:group-hover:text-blue-400"
                       aria-hidden
                     />
                   </Link>

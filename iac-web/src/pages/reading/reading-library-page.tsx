@@ -17,16 +17,14 @@ export function ReadingLibraryPage() {
     queryFn: ({ signal }) => listPublicReadingMaterials(signal),
   })
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
-          Practice
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Reading
-        </h1>
-        <p className="mt-2 text-sm text-[#69696d]">
-          Опубликованные тексты для тренировки.
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          Выберите текст для тренировки
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          Пройдите reading в формате, близком к экзамену, и сразу получите
+          band-оценку.
         </p>
       </div>
       {query.isPending ? <LoadingState label="Загружаем материалы…" /> : null}
@@ -41,7 +39,7 @@ export function ReadingLibraryPage() {
         {query.data?.items.map((material) => (
           <Card key={material.id} className="shadow-none">
             <CardContent className="grid gap-3 p-5">
-              <BookOpen className="size-6 text-[#e23b3b]" aria-hidden />
+              <BookOpen className="size-6 text-[#3b82f6]" aria-hidden />
               <div>
                 <h2 className="font-semibold">{material.title}</h2>
                 <p className="mt-1 text-sm text-[#69696d]">

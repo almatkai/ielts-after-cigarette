@@ -184,11 +184,11 @@ export function OverviewPage() {
           <Card className={cardClassName}>
             <CardContent className="relative overflow-hidden p-6 sm:p-8">
               <div
-                className="pointer-events-none absolute top-0 right-0 size-56 translate-x-16 -translate-y-16 rounded-full bg-[#fff0f0] opacity-70 blur-3xl"
+                className="pointer-events-none absolute top-0 right-0 size-56 translate-x-16 -translate-y-16 rounded-full bg-[#eff6ff] opacity-70 blur-3xl"
                 aria-hidden
               />
               <div className="relative max-w-[620px]">
-                <Badge className="border border-[#f2d4d4] bg-[#fff0f0] text-[#b82f2f] shadow-none hover:bg-[#fff0f0]">
+                <Badge className="border border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8] shadow-none hover:bg-[#eff6ff]">
                   Рекомендуемый шаг
                 </Badge>
                 <h2 className="mt-5 text-[clamp(1.65rem,3vw,2.35rem)] leading-[1.08] font-semibold tracking-[-0.045em] text-[#111111]">
@@ -200,7 +200,7 @@ export function OverviewPage() {
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <Button
                     asChild
-                    className="h-11 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                    className="h-11 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                   >
                     <Link to={recommendedTarget}>
                       Перейти к следующему шагу
@@ -245,7 +245,7 @@ export function OverviewPage() {
                     <p className="text-sm font-semibold text-[#111111]">
                       {skillLabels[progress.skill]}
                     </p>
-                    <span className="text-sm font-semibold text-[#e23b3b]">
+                    <span className="text-sm font-semibold text-[#3b82f6]">
                       {progress.estimatedBand === null
                         ? '—'
                         : progress.estimatedBand.toFixed(1)}
@@ -273,7 +273,7 @@ export function OverviewPage() {
           <Card className={cardClassName}>
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                   <CalendarCheck2 className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0">
@@ -344,7 +344,7 @@ export function OverviewPage() {
                     to={action.to}
                     className="group flex min-h-[72px] items-center gap-3 px-5 py-3 text-[#111111] no-underline transition-colors hover:bg-[#fafaf8]"
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#fff0f0] group-hover:text-[#e23b3b]">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6]">
                       <Icon className="size-[18px]" aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -356,7 +356,7 @@ export function OverviewPage() {
                       </span>
                     </span>
                     <ArrowRight
-                      className="size-4 shrink-0 text-[#a0a0a3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#e23b3b]"
+                      className="size-4 shrink-0 text-[#a0a0a3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#3b82f6]"
                       aria-hidden
                     />
                   </Link>

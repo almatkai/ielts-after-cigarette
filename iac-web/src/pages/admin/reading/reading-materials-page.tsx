@@ -30,7 +30,7 @@ export function ReadingMaterialsPage() {
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+          <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
             Reading
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
@@ -50,7 +50,7 @@ export function ReadingMaterialsPage() {
           </Button>
           <Button
             type="button"
-            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            className="bg-[#3b82f6] hover:bg-[#2563eb]"
             onClick={() =>
               void navigate({ to: '/admin/reading/materials/new' })
             }

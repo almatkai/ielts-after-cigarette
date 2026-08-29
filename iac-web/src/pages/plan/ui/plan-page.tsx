@@ -73,23 +73,20 @@ export function PlanPage() {
   const weakestLink = weakest ? skillLibraryLinks[weakest.skill] : undefined
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
-          Dashboard
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          План подготовки
-        </h1>
-        <p className="mt-2 text-sm text-[#69696d]">
-          Простые правила на основе вашей цели и текущих результатов.
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          Следуйте плану подготовки
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          Ваша цель, самый слабый навык и рекомендуемые следующие шаги.
         </p>
       </div>
 
       {targetBand === null || examDate === null ? (
         <Card className={cardClassName}>
           <CardContent className="grid justify-items-center gap-3 p-10 text-center">
-            <Target className="size-6 text-[#e23b3b]" aria-hidden />
+            <Target className="size-6 text-[#3b82f6]" aria-hidden />
             <p className="font-semibold">Цель ещё не задана</p>
             <p className="max-w-md text-sm text-[#69696d]">
               Укажите целевой балл и дату экзамена — тогда план покажет, сколько
@@ -112,7 +109,7 @@ export function PlanPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
                 Целевой балл
               </p>
-              <p className="mt-1 text-2xl font-semibold text-[#e23b3b]">
+              <p className="mt-1 text-2xl font-semibold text-[#3b82f6]">
                 {targetBand.toFixed(1)}
               </p>
             </div>

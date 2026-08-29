@@ -14,7 +14,7 @@
   --color-card-foreground: #111111;
   --color-popover: #ffffff;
   --color-popover-foreground: #111111;
-  --color-primary: #e23b3b;
+  --color-primary: #3b82f6;
   --color-primary-foreground: #ffffff;
   --color-secondary: #f4f4f1;
   --color-secondary-foreground: #111111;
@@ -25,7 +25,7 @@
   --color-destructive: #e23b3b;
   --color-border: #e7e7e4;
   --color-input: #e7e7e4;
-  --color-ring: rgba(226, 59, 59, 0.28);
+  --color-ring: rgba(59, 130, 246, 0.28);
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 12px;
@@ -43,7 +43,7 @@
   --card-foreground: #111111;
   --popover: #ffffff;
   --popover-foreground: #111111;
-  --primary: #e23b3b;
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
   --secondary: #f4f4f1;
   --secondary-foreground: #111111;
@@ -54,7 +54,7 @@
   --destructive: #e23b3b;
   --border: #e7e7e4;
   --input: #e7e7e4;
-  --ring: rgba(226, 59, 59, 0.28);
+  --ring: rgba(59, 130, 246, 0.28);
   --radius: 0.625rem;
 }
 
@@ -95,7 +95,7 @@ button {
   select,
   input:not([data-slot='input'])
 ):focus-visible {
-  outline: 3px solid rgba(226, 59, 59, 0.28);
+  outline: 3px solid rgba(59, 130, 246, 0.28);
   outline-offset: 3px;
 }
 

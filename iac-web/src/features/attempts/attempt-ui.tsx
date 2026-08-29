@@ -267,7 +267,7 @@ export function AttemptResultSummary({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
             Band
           </p>
-          <p className="mt-1 text-5xl font-semibold tracking-[-0.04em] text-[#e23b3b]">
+          <p className="mt-1 text-5xl font-semibold tracking-[-0.04em] text-[#3b82f6]">
             {attempt.band !== null ? attempt.band.toFixed(1) : '—'}
           </p>
         </div>
@@ -304,7 +304,7 @@ export function ReviewQuestion({
   return (
     <div className="grid gap-2 rounded-lg border p-3 text-sm">
       <p className="font-medium">
-        <span className="mr-2 text-[#e23b3b]">{item.number}.</span>
+        <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
         {item.prompt.replace('{{answer}}', '_____')}
       </p>
       <p className="flex items-center gap-2">
@@ -315,7 +315,7 @@ export function ReviewQuestion({
           />
         ) : (
           <XCircle
-            className="size-4 shrink-0 text-[#e23b3b]"
+            className="size-4 shrink-0 text-[#3b82f6]"
             aria-label="Неверно"
           />
         )}

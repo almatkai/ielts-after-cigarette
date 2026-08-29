@@ -70,7 +70,7 @@ function RootErrorComponent({ reset }: { reset: () => void }) {
         <button
           type="button"
           onClick={reset}
-          className="rounded-[10px] bg-[#e23b3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c92f2f]"
+          className="rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb]"
         >
           Повторить
         </button>

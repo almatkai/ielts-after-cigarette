@@ -34,10 +34,10 @@ import { getErrorMessage } from '@/lib/api/client'
 const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
 
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(2, 'Укажите имя не короче 2 символов'),
@@ -180,16 +180,14 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
-          Dashboard
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Настройки
-        </h1>
-        <p className="mt-2 text-sm text-[#69696d]">
-          Профиль и цель подготовки.
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          Настройте профиль и цель
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          Укажите целевой балл и дату экзамена — по ним строится ваш план
+          подготовки.
         </p>
       </div>
 
@@ -263,7 +261,7 @@ export function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
                   {isSubmitting ? 'Сохраняем…' : 'Сохранить профиль'}
                 </Button>
@@ -385,7 +383,7 @@ export function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
                   {isSubmitting ? 'Сохраняем…' : 'Сохранить цель'}
                 </Button>

@@ -19,7 +19,7 @@ export function AdminOverviewPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+        <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
           Администрирование
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
@@ -35,7 +35,7 @@ export function AdminOverviewPage() {
         <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
           <CardHeader className="border-b border-[#ededeb] p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+              <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                 <ShieldCheck className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Проверка доступа</CardTitle>

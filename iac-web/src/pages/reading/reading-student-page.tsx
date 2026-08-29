@@ -101,7 +101,7 @@ function ReadingAttemptRunner({
   const answeredCount = Object.keys(answers).length
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
           <Link to="/dashboard/reading">
@@ -191,7 +191,7 @@ function ReadingAttemptResult({
   )
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
           <Link to="/dashboard/reading">
@@ -220,7 +220,7 @@ function ReadingAttemptResult({
                 className="grid gap-3 rounded-xl border p-4"
               >
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#e23b3b]">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
                     {group.type.replaceAll('_', ' ')}
                   </p>
                   <p className="mt-1 whitespace-pre-wrap text-sm">
@@ -294,7 +294,7 @@ function StudentGroup({
   return (
     <section className="grid gap-3 rounded-xl border p-4">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#e23b3b]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
           {group.type.replaceAll('_', ' ')}
         </p>
         <p className="mt-1 whitespace-pre-wrap text-sm">{group.instructions}</p>
@@ -337,7 +337,7 @@ function StudentQuestion({
 
   const prompt = (
     <p className="font-medium">
-      <span className="mr-2 text-[#e23b3b]">{question.position}.</span>
+      <span className="mr-2 text-[#3b82f6]">{question.position}.</span>
       {question.prompt.replace('{{answer}}', '_____')}
     </p>
   )

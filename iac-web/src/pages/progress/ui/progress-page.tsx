@@ -59,16 +59,13 @@ export function ProgressPage() {
   ].sort((a, b) => bySubmittedAtDesc(a, b))
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
-          Dashboard
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Прогресс
-        </h1>
-        <p className="mt-2 text-sm text-[#69696d]">
-          Текущие band по навыкам и история попыток.
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          Отслеживайте свою динамику
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          Band-оценки по навыкам и история всех попыток с разборами.
         </p>
       </div>
 
@@ -88,7 +85,7 @@ export function ProgressPage() {
                 <p className="text-sm font-semibold text-[#111111]">
                   {skillLabels[progress.skill]}
                 </p>
-                <span className="text-sm font-semibold text-[#e23b3b]">
+                <span className="text-sm font-semibold text-[#3b82f6]">
                   {progress.estimatedBand === null
                     ? '—'
                     : progress.estimatedBand.toFixed(1)}
@@ -168,7 +165,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             {item.score ?? '—'}/{item.maxScore ?? '—'}
           </span>
           {' · band '}
-          <span className="font-semibold text-[#e23b3b]">
+          <span className="font-semibold text-[#3b82f6]">
             {item.band !== null ? item.band.toFixed(1) : '—'}
           </span>
         </p>

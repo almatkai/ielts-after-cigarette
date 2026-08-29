@@ -28,7 +28,7 @@ function ForbiddenPage() {
           <p className="mt-3 text-sm leading-6 text-[#69696d]">
             Этот раздел доступен редакторам и администраторам платформы.
           </p>
-          <Button asChild className="mt-6 bg-[#e23b3b] hover:bg-[#c92f2f]">
+          <Button asChild className="mt-6 bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/dashboard">Вернуться в кабинет</Link>
           </Button>
         </CardContent>

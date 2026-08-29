@@ -98,9 +98,9 @@ export function PracticePage() {
                 key={skill.id}
                 className={cn(
                   cardClassName,
-                  'transition-[border-color,box-shadow,transform] duration-200 has-[button:focus-visible]:border-[#e23b3b] hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]',
+                  'transition-[border-color,box-shadow,transform] duration-200 has-[button:focus-visible]:border-[#3b82f6] hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]',
                   isSelected &&
-                    'border-[#e23b3b] shadow-[0_14px_40px_rgba(226,59,59,0.08)]',
+                    'border-[#3b82f6] shadow-[0_14px_40px_rgba(59,130,246,0.08)]',
                 )}
               >
                 <button
@@ -112,7 +112,7 @@ export function PracticePage() {
                   <span
                     className={cn(
                       'grid size-10 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-colors',
-                      isSelected && 'bg-[#fff0f0] text-[#e23b3b]',
+                      isSelected && 'bg-[#eff6ff] text-[#3b82f6]',
                     )}
                   >
                     <Icon
@@ -127,7 +127,7 @@ export function PracticePage() {
                     </span>
                     {isSelected ? (
                       <span
-                        className="grid size-5 shrink-0 place-items-center rounded-full bg-[#e23b3b] text-white"
+                        className="grid size-5 shrink-0 place-items-center rounded-full bg-[#3b82f6] text-white"
                         aria-label="Выбрано"
                       >
                         <Check
@@ -161,7 +161,7 @@ export function PracticePage() {
                 </CardDescription>
               </div>
               {selectedSkillData ? (
-                <Badge className="border border-[#f2d4d4] bg-[#fff0f0] text-[#b82f2f] shadow-none hover:bg-[#fff0f0]">
+                <Badge className="border border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8] shadow-none hover:bg-[#eff6ff]">
                   {selectedSkillData.label}
                 </Badge>
               ) : null}
@@ -196,7 +196,7 @@ export function PracticePage() {
             {selectedSkillData && skillLibraryHref[selectedSkillData.id] ? (
               <Link
                 to={skillLibraryHref[selectedSkillData.id]}
-                className="mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#e23b3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c92f2f]"
+                className="mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb]"
               >
                 Перейти к материалам
               </Link>
@@ -208,7 +208,7 @@ export function PracticePage() {
           <Card className={cardClassName}>
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                   <ClipboardList className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0">
@@ -225,7 +225,7 @@ export function PracticePage() {
               <ol className="grid gap-5">
                 {practiceSteps.map((step) => (
                   <li key={step.number} className="flex gap-3">
-                    <span className="mt-0.5 text-[11px] leading-5 font-semibold tracking-[0.08em] text-[#e23b3b]">
+                    <span className="mt-0.5 text-[11px] leading-5 font-semibold tracking-[0.08em] text-[#3b82f6]">
                       {step.number}
                     </span>
                     <span>

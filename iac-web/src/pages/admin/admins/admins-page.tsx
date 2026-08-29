@@ -78,7 +78,7 @@ export function AdminsPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#e23b3b] uppercase">
+        <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
           Администрирование
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
@@ -101,11 +101,11 @@ export function AdminsPage() {
           value={newAdminEmail}
           onChange={(event) => setNewAdminEmail(event.target.value)}
           placeholder="email нового администратора"
-          className="h-11 w-full max-w-xs rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0"
+          className="h-11 w-full max-w-xs rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0"
         />
         <Button
           type="submit"
-          className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+          className="bg-[#3b82f6] hover:bg-[#2563eb]"
           disabled={busy}
         >
           <UserPlus aria-hidden />

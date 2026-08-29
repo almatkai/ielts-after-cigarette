@@ -74,7 +74,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/admin"
             activeOptions={{ exact: true }}
-            className="flex min-h-11 items-center gap-3 rounded-[10px] bg-[#fff0f0] px-4 text-sm font-semibold text-[#b82f2f] no-underline"
+            className="flex min-h-11 items-center gap-3 rounded-[10px] bg-[#eff6ff] px-4 text-sm font-semibold text-[#1d4ed8] no-underline"
           >
             <ShieldCheck className="size-[18px]" aria-hidden />
             Обзор
@@ -82,7 +82,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/admin/reading/materials"
             activeProps={{
-              className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
             }}
             inactiveProps={{
               className: 'text-[#69696d] hover:bg-[#f4f4f1]',
@@ -95,7 +95,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/admin/listening/tests"
             activeProps={{
-              className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
             }}
             inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
@@ -108,7 +108,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 to="/admin/waitlist"
                 activeProps={{
-                  className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
                 }}
                 inactiveProps={{
                   className: 'text-[#69696d] hover:bg-[#f4f4f1]',
@@ -121,7 +121,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 to="/admin/admins"
                 activeProps={{
-                  className: 'bg-[#fff0f0] font-semibold text-[#b82f2f]',
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
                 }}
                 inactiveProps={{
                   className: 'text-[#69696d] hover:bg-[#f4f4f1]',

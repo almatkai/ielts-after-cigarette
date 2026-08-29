@@ -19,7 +19,7 @@ export function ListeningTestsPage() {
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#3b82f6]">
             Listening
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
@@ -35,7 +35,7 @@ export function ListeningTestsPage() {
               <FileInput aria-hidden /> Импортировать
             </Link>
           </Button>
-          <Button asChild className="bg-[#e23b3b] hover:bg-[#c92f2f]">
+          <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/admin/listening/tests/new">
               <Plus aria-hidden /> Создать вручную
             </Link>

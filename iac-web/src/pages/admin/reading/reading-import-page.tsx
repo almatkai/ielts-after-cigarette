@@ -305,7 +305,7 @@ export function ReadingImportPage() {
               type="button"
               disabled={parseMutation.isPending}
               onClick={() => void parse()}
-              className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+              className="bg-[#3b82f6] hover:bg-[#2563eb]"
             >
               <FileInput aria-hidden />
               {parseMutation.isPending ? 'Распознаём…' : 'Распознать'}
@@ -389,7 +389,7 @@ function ImportPreview({
             type="button"
             disabled={fatal || pending || result.passages.length === 0}
             onClick={onConfirm}
-            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            className="bg-[#3b82f6] hover:bg-[#2563eb]"
           >
             {pending
               ? 'Импортируем…'

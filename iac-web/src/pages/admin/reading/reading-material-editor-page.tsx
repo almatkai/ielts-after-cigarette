@@ -55,7 +55,7 @@ const emptyForm: EditorForm = {
 }
 
 const fieldClassName =
-  'h-11 rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 function materialToForm(material: ReadingMaterial): EditorForm {
   return {
@@ -275,7 +275,7 @@ export function ReadingMaterialEditorPage({
           <Button
             type="submit"
             disabled={pending}
-            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            className="bg-[#3b82f6] hover:bg-[#2563eb]"
           >
             <Save aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}

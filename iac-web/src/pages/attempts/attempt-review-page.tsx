@@ -60,7 +60,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
     attempt.status === 'SUBMITTED' ? (attempt.review ?? []) : null
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
           <Link to="/dashboard/progress">
@@ -146,7 +146,7 @@ function StructuredReview({
                   className="grid gap-3 rounded-xl border p-4"
                 >
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#e23b3b]">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
                       {group.type.replaceAll('_', ' ')}
                     </p>
                     <p className="mt-1 whitespace-pre-wrap text-sm">
@@ -188,7 +188,7 @@ function StructuredReview({
             className="grid gap-3 rounded-xl border p-4"
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#e23b3b]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
                 {group.type.replaceAll('_', ' ')}
               </p>
               <p className="mt-1 whitespace-pre-wrap text-sm">

@@ -213,7 +213,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               <Send aria-hidden /> Опубликовать
             </Button>
           ) : null}
-          <Button type="submit" className="bg-[#e23b3b] hover:bg-[#c92f2f]">
+          <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Save aria-hidden /> Сохранить
           </Button>
         </div>
@@ -309,7 +309,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             </Field>
             <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
               <Upload className="size-5" aria-hidden />
-              <label className="cursor-pointer text-sm font-semibold text-[#b82f2f]">
+              <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
                 Загрузить аудио
                 <input
                   className="sr-only"
@@ -401,7 +401,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 </Field>
                 <div className="flex items-center gap-3 rounded-lg border p-3">
                   <Image className="size-5" aria-hidden />
-                  <label className="cursor-pointer text-sm font-semibold text-[#b82f2f]">
+                  <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
                     Загрузить карту/схему
                     <input
                       className="sr-only"

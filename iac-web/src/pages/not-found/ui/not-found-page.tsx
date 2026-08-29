@@ -13,7 +13,7 @@ export function NotFoundPage() {
 
       <main className="container-shell grid min-h-[calc(100vh-80px)] items-center gap-8 py-10 lg:grid-cols-12 lg:gap-14 lg:py-14">
         <div className="relative z-10 lg:col-span-6">
-          <p className="text-xs font-semibold tracking-[0.1em] text-[#e23b3b] uppercase">
+          <p className="text-xs font-semibold tracking-[0.1em] text-[#3b82f6] uppercase">
             Ошибка 404
           </p>
           <h1 className="mt-5 max-w-[650px] text-[clamp(3.25rem,7vw,6.8rem)] leading-[0.92] font-medium tracking-[-0.07em] text-balance">
@@ -28,7 +28,7 @@ export function NotFoundPage() {
             <Button
               asChild
               size="lg"
-              className="h-12 rounded-[10px] bg-[#e23b3b] px-5 text-sm font-semibold text-white hover:bg-[#c92f2f]"
+              className="h-12 rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white hover:bg-[#2563eb]"
             >
               <Link to="/">
                 <ArrowLeft aria-hidden />

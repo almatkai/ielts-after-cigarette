@@ -43,10 +43,10 @@ import { getErrorMessage } from '@/lib/api/client'
 import type { ProfileForm } from '@/features/ielts/api'
 
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#e23b3b] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 function preventSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault()
@@ -218,7 +218,7 @@ export function ProfilePage() {
           <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                   <UserRound className="size-[18px]" aria-hidden />
                 </span>
                 <div>
@@ -298,7 +298,7 @@ export function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={profileMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
                   {profileMutation.isPending
                     ? 'Сохраняем…'
@@ -311,7 +311,7 @@ export function ProfilePage() {
           <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                   <Target className="size-[18px]" aria-hidden />
                 </span>
                 <div>
@@ -422,7 +422,7 @@ export function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={goalMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 shadow-none hover:bg-[#c92f2f]"
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
                   {goalMutation.isPending
                     ? 'Сохраняем…'
@@ -466,7 +466,7 @@ export function ProfilePage() {
                 <Switch
                   id="lesson-reminders"
                   aria-label="Напоминания о занятиях"
-                  className="mt-0.5 data-[state=checked]:bg-[#e23b3b]"
+                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>
               <div className="flex items-start justify-between gap-4 px-5 py-4">
@@ -484,7 +484,7 @@ export function ProfilePage() {
                 <Switch
                   id="weekly-report"
                   aria-label="Еженедельный отчёт"
-                  className="mt-0.5 data-[state=checked]:bg-[#e23b3b]"
+                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>
             </CardContent>

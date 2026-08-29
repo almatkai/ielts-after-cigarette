@@ -180,7 +180,7 @@ export function ListeningImportPage() {
           />
           <div className="flex justify-end">
             <Button
-              className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+              className="bg-[#3b82f6] hover:bg-[#2563eb]"
               onClick={() => void parse()}
               disabled={!source.trim() || parseMutation.isPending}
             >
@@ -262,7 +262,7 @@ function Preview({
         <Issues title="Информация" items={result.info} tone="blue" />
         <div className="flex justify-end">
           <Button
-            className="bg-[#e23b3b] hover:bg-[#c92f2f]"
+            className="bg-[#3b82f6] hover:bg-[#2563eb]"
             disabled={result.errors.length > 0 || pending}
             onClick={onImport}
           >

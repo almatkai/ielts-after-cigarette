@@ -98,7 +98,7 @@ export function DashboardSidebar({
                 className={navigationLinkClassName}
                 activeProps={{
                   className:
-                    'border-l-[#e23b3b] bg-[#fff0f0] text-[#111111] [&_svg]:text-[#e23b3b]',
+                    'border-l-[#3b82f6] bg-[#eff6ff] text-[#111111] [&_svg]:text-[#3b82f6]',
                 }}
                 inactiveProps={{
                   className:
@@ -142,7 +142,7 @@ export function DashboardSidebar({
             className={navigationLinkClassName}
             activeProps={{
               className:
-                'border-l-[#e23b3b] bg-[#fff0f0] text-[#111111] [&_svg]:text-[#e23b3b]',
+                'border-l-[#3b82f6] bg-[#eff6ff] text-[#111111] [&_svg]:text-[#3b82f6]',
             }}
             inactiveProps={{
               className:
@@ -172,7 +172,7 @@ export function DashboardSidebar({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#fff0f0] text-[#e23b3b]">
+                <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#eff6ff] text-[#3b82f6]">
                   <LogOut className="size-5" strokeWidth={1.8} aria-hidden />
                 </span>
                 <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
@@ -188,7 +188,7 @@ export function DashboardSidebar({
                 <AlertDialogAction
                   disabled={logoutIsPending}
                   onClick={() => void handleLogout()}
-                  className="h-10 rounded-[9px] bg-[#e23b3b] px-5 text-white shadow-none hover:bg-[#c92f2f]"
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 text-white shadow-none hover:bg-[#2563eb]"
                 >
                   {logoutIsPending ? 'Выходим…' : 'Выйти'}
                 </AlertDialogAction>

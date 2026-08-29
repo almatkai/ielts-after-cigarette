@@ -102,16 +102,14 @@ export function MistakesPage() {
     submittedAttempts.length > 0 && loadedReviews < submittedAttempts.length
 
   return (
-    <div className="grid gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#e23b3b]">
-          Dashboard
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Ошибки
-        </h1>
-        <p className="mt-2 text-sm text-[#69696d]">
-          Неправильные ответы из завершённых попыток с разбором.
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          Разберите свои ошибки
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          Неверные ответы из завершённых попыток — с пояснениями, чтобы не
+          повторить их на экзамене.
         </p>
       </div>
       {reviewsPending ? (
@@ -189,7 +187,7 @@ function MistakeRow({ item }: { item: AttemptReviewItem }) {
   return (
     <div className="grid gap-2 rounded-lg border border-[#ededeb] p-3 text-sm">
       <p className="font-medium">
-        <span className="mr-2 text-[#e23b3b]">{item.number}.</span>
+        <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
         {item.prompt.replace('{{answer}}', '_____')}
       </p>
       <p>

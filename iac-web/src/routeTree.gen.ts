@@ -26,13 +26,16 @@ import { Route as DashboardPlanRouteImport } from './routes/dashboard.plan'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard.practice'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
+import { Route as DashboardReadingRouteImport } from './routes/dashboard.reading'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AdminListeningImportRouteImport } from './routes/admin.listening.import'
 import { Route as AdminListeningTestsRouteImport } from './routes/admin.listening.tests'
 import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.import'
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as DashboardAttemptsAttemptIdRouteImport } from './routes/dashboard.attempts.$attemptId'
 import { Route as DashboardListeningTestIdRouteImport } from './routes/dashboard.listening.$testId'
+import { Route as DashboardReadingMaterialIdRouteImport } from './routes/dashboard.reading.$materialId'
 import { Route as AdminListeningTestsIndexRouteImport } from './routes/admin.listening.tests.index'
 import { Route as AdminListeningTestsTestIdRouteImport } from './routes/admin.listening.tests.$testId'
 import { Route as AdminListeningTestsNewRouteImport } from './routes/admin.listening.tests.new'
@@ -125,6 +128,11 @@ const DashboardProgressRoute = DashboardProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardReadingRoute = DashboardReadingRouteImport.update({
+  id: '/reading',
+  path: '/reading',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -155,11 +163,23 @@ const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
   path: '/reading/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const DashboardAttemptsAttemptIdRoute =
+  DashboardAttemptsAttemptIdRouteImport.update({
+    id: '/attempts/$attemptId',
+    path: '/attempts/$attemptId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardListeningTestIdRoute =
   DashboardListeningTestIdRouteImport.update({
     id: '/$testId',
     path: '/$testId',
     getParentRoute: () => DashboardListeningRoute,
+  } as any)
+const DashboardReadingMaterialIdRoute =
+  DashboardReadingMaterialIdRouteImport.update({
+    id: '/$materialId',
+    path: '/$materialId',
+    getParentRoute: () => DashboardReadingRoute,
   } as any)
 const AdminListeningTestsIndexRoute =
   AdminListeningTestsIndexRouteImport.update({
@@ -213,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
+  '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
@@ -221,7 +242,9 @@ export interface FileRoutesByFullPath {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -243,13 +266,16 @@ export interface FileRoutesByTo {
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
+  '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
+  '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -274,6 +300,7 @@ export interface FileRoutesById {
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/progress': typeof DashboardProgressRoute
+  '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
@@ -282,7 +309,9 @@ export interface FileRoutesById {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
+  '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -308,6 +337,7 @@ export interface FileRouteTypes {
     | '/dashboard/practice'
     | '/dashboard/profile'
     | '/dashboard/progress'
+    | '/dashboard/reading'
     | '/dashboard/settings'
     | '/register/verify'
     | '/admin/'
@@ -316,7 +346,9 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
+    | '/dashboard/reading/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -338,13 +370,16 @@ export interface FileRouteTypes {
     | '/dashboard/practice'
     | '/dashboard/profile'
     | '/dashboard/progress'
+    | '/dashboard/reading'
     | '/dashboard/settings'
     | '/register/verify'
     | '/admin'
     | '/dashboard'
     | '/admin/listening/import'
     | '/admin/reading/import'
+    | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
+    | '/dashboard/reading/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -368,6 +403,7 @@ export interface FileRouteTypes {
     | '/dashboard/practice'
     | '/dashboard/profile'
     | '/dashboard/progress'
+    | '/dashboard/reading'
     | '/dashboard/settings'
     | '/register/verify'
     | '/admin/'
@@ -376,7 +412,9 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
+    | '/dashboard/reading/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -516,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProgressRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/reading': {
+      id: '/dashboard/reading'
+      path: '/reading'
+      fullPath: '/dashboard/reading'
+      preLoaderRoute: typeof DashboardReadingRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/settings': {
       id: '/dashboard/settings'
       path: '/settings'
@@ -558,12 +603,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReadingMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/dashboard/attempts/$attemptId': {
+      id: '/dashboard/attempts/$attemptId'
+      path: '/attempts/$attemptId'
+      fullPath: '/dashboard/attempts/$attemptId'
+      preLoaderRoute: typeof DashboardAttemptsAttemptIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/listening/$testId': {
       id: '/dashboard/listening/$testId'
       path: '/$testId'
       fullPath: '/dashboard/listening/$testId'
       preLoaderRoute: typeof DashboardListeningTestIdRouteImport
       parentRoute: typeof DashboardListeningRoute
+    }
+    '/dashboard/reading/$materialId': {
+      id: '/dashboard/reading/$materialId'
+      path: '/$materialId'
+      fullPath: '/dashboard/reading/$materialId'
+      preLoaderRoute: typeof DashboardReadingMaterialIdRouteImport
+      parentRoute: typeof DashboardReadingRoute
     }
     '/admin/listening/tests/': {
       id: '/admin/listening/tests/'
@@ -675,6 +734,17 @@ const DashboardListeningRouteChildren: DashboardListeningRouteChildren = {
 const DashboardListeningRouteWithChildren =
   DashboardListeningRoute._addFileChildren(DashboardListeningRouteChildren)
 
+interface DashboardReadingRouteChildren {
+  DashboardReadingMaterialIdRoute: typeof DashboardReadingMaterialIdRoute
+}
+
+const DashboardReadingRouteChildren: DashboardReadingRouteChildren = {
+  DashboardReadingMaterialIdRoute: DashboardReadingMaterialIdRoute,
+}
+
+const DashboardReadingRouteWithChildren =
+  DashboardReadingRoute._addFileChildren(DashboardReadingRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardListeningRoute: typeof DashboardListeningRouteWithChildren
   DashboardMistakesRoute: typeof DashboardMistakesRoute
@@ -682,8 +752,10 @@ interface DashboardRouteChildren {
   DashboardPracticeRoute: typeof DashboardPracticeRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardProgressRoute: typeof DashboardProgressRoute
+  DashboardReadingRoute: typeof DashboardReadingRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAttemptsAttemptIdRoute: typeof DashboardAttemptsAttemptIdRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -693,8 +765,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPracticeRoute: DashboardPracticeRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardProgressRoute: DashboardProgressRoute,
+  DashboardReadingRoute: DashboardReadingRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAttemptsAttemptIdRoute: DashboardAttemptsAttemptIdRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

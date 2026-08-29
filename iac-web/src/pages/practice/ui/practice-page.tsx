@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import {
   BookOpenText,
   Check,
@@ -46,6 +47,11 @@ const practiceSteps = [
     description: 'Используйте ошибки для следующей тренировки.',
   },
 ] as const
+
+const skillLibraryHref: Partial<Record<SkillId, string>> = {
+  listening: '/dashboard/listening',
+  reading: '/dashboard/reading',
+}
 
 const cardClassName =
   'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
@@ -175,14 +181,26 @@ export function PracticePage() {
             </span>
             <h3 className="mt-5 text-base font-semibold tracking-[-0.02em] text-[#111111]">
               {selectedSkillData
-                ? `Заданий по направлению «${selectedSkillData.label}» пока нет`
+                ? skillLibraryHref[selectedSkillData.id]
+                  ? `Тренировки по направлению «${selectedSkillData.label}»`
+                  : `Заданий по направлению «${selectedSkillData.label}» пока нет`
                 : 'Сначала выберите навык'}
             </h3>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
               {selectedSkillData
-                ? 'Новые тренировки появятся здесь после добавления учебных материалов.'
+                ? skillLibraryHref[selectedSkillData.id]
+                  ? 'Откройте библиотеку материалов и пройдите тест в формате, близком к экзамену.'
+                  : 'Тренажёр для этого навыка в разработке и появится позже.'
                 : 'После выбора здесь появятся доступные форматы и задания для практики.'}
             </p>
+            {selectedSkillData && skillLibraryHref[selectedSkillData.id] ? (
+              <Link
+                to={skillLibraryHref[selectedSkillData.id]}
+                className="mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#e23b3b] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c92f2f]"
+              >
+                Перейти к материалам
+              </Link>
+            ) : null}
           </CardContent>
         </Card>
 

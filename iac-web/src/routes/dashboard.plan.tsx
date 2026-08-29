@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/plan')({
-  component: EmptyPlanPage,
-})
+import { PlanPage } from '@/pages/plan/ui/plan-page'
 
-function EmptyPlanPage() {
-  return null
-}
+export const Route = createFileRoute('/dashboard/plan')({
+  component: PlanPage,
+})

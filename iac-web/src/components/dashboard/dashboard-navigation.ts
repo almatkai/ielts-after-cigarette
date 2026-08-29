@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpen,
   CalendarRange,
   Dumbbell,
   Headphones,
@@ -31,6 +32,12 @@ export const primaryDashboardNavigation = [
     label: 'Listening',
     to: '/dashboard/listening',
     icon: Headphones,
+    exact: false,
+  },
+  {
+    label: 'Reading',
+    to: '/dashboard/reading',
+    icon: BookOpen,
     exact: false,
   },
   {

@@ -63,14 +63,32 @@ export function patchProfile(firstName: string, lastName: string) {
   })
 }
 
+export function updateProfile(input: {
+  displayName?: string
+  timezone?: string
+}) {
+  return apiClient.request<UserDto>('/api/v1/profile', {
+    method: 'PATCH',
+    body: input,
+  })
+}
+
 export function putGoal(form: ProfileForm) {
+  return updateGoal({
+    targetBand: Number(form.targetScore),
+    examDate: form.examDate,
+    examType: form.examFormat as 'academic' | 'general',
+  })
+}
+
+export function updateGoal(input: {
+  targetBand: number
+  examDate: string
+  examType: 'academic' | 'general'
+}) {
   return apiClient.request<UserDto>('/api/v1/profile/goal', {
     method: 'PUT',
-    body: {
-      targetBand: Number(form.targetScore),
-      examDate: form.examDate,
-      examType: form.examFormat,
-    },
+    body: input,
   })
 }
 

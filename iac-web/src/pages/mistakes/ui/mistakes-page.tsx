@@ -21,6 +21,8 @@ const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
 const materialTypeLabels: Record<AttemptMaterialType, string> = {
   listening: 'Listening',
   reading: 'Reading',
+  writing: 'Writing',
+  speaking: 'Speaking',
 }
 
 export function MistakesPage() {

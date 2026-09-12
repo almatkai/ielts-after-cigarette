@@ -1,9 +1,11 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   BookOpenText,
+  ClipboardCheck,
   Headphones,
   LayoutDashboard,
   LogOut,
+  MicVocal,
   ShieldCheck,
   PenLine,
   UserCog,
@@ -114,6 +116,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <PenLine className="size-[18px]" aria-hidden />
             Writing материалы
+          </Link>
+          <Link
+            to="/admin/speaking/materials"
+            activeProps={{
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+            }}
+            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
+            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+          >
+            <MicVocal className="size-[18px]" aria-hidden />
+            Speaking материалы
+          </Link>
+          <Link
+            to="/admin/full-mocks"
+            activeProps={{
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+            }}
+            inactiveProps={{
+              className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+            }}
+            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+          >
+            <ClipboardCheck className="size-[18px]" aria-hidden />
+            Full Mock
           </Link>
           {auth.user?.role === 'ADMIN' ? (
             <>

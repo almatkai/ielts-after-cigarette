@@ -195,6 +195,11 @@ export function getErrorMessage(error: unknown) {
       return 'Сервис временно недоступен. Попробуйте немного позже.'
     case 'WRITING_INCOMPLETE':
       return 'Заполните ответы для Task 1 и Task 2 перед отправкой.'
+    case 'SPEAKING_INCOMPLETE':
+      return 'Запишите или введите расшифровку для каждой из трёх частей Speaking.'
+    case 'SPEAKING_RECORDING_TOO_LARGE':
+    case 'MEDIA_TOO_LARGE':
+      return 'Запись слишком большая. Сократите её и попробуйте снова.'
     case 'AI_NOT_CONFIGURED':
       return 'AI-проверка пока не настроена. Обратитесь к администратору.'
     case 'AI_EVALUATION_FAILED':

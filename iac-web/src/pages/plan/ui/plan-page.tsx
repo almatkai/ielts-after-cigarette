@@ -22,7 +22,11 @@ const skillLibraryLinks: Partial<
   Record<
     SkillId,
     {
-      to: '/dashboard/listening' | '/dashboard/reading' | '/dashboard/writing'
+      to:
+        | '/dashboard/listening'
+        | '/dashboard/reading'
+        | '/dashboard/writing'
+        | '/dashboard/speaking'
       label: string
     }
   >
@@ -30,6 +34,7 @@ const skillLibraryLinks: Partial<
   listening: { to: '/dashboard/listening', label: 'Открыть тесты Listening' },
   reading: { to: '/dashboard/reading', label: 'Открыть материалы Reading' },
   writing: { to: '/dashboard/writing', label: 'Открыть задания Writing' },
+  speaking: { to: '/dashboard/speaking', label: 'Открыть задания Speaking' },
 }
 
 export function PlanPage() {

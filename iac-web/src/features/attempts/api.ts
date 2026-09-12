@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api/client'
 
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
+import type { PublicSpeakingMaterial } from '@/features/speaking/api'
 import type { PublicWritingMaterial } from '@/features/writing/api'
 
 export type AttemptStatus = 'IN_PROGRESS' | 'SUBMITTED'
@@ -44,6 +45,8 @@ export type AttemptDetail = Attempt & {
   answers?: AttemptAnswer[]
   review?: AttemptReviewItem[]
   writingEvaluation?: WritingEvaluation
+  speakingEvaluation?: SpeakingEvaluation
+  recordings?: SpeakingRecording[]
 }
 
 export type WritingCriterion = { band: number; feedback: string }
@@ -67,6 +70,38 @@ export type WritingEvaluation = {
   evaluatedAt: string
 }
 
+export type SpeakingCriterion = { band: number; feedback: string }
+
+export type SpeakingRecording = {
+  id: string
+  partId: string
+  originalName: string
+  mimeType: string
+  byteSize: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type SpeakingEvaluation = {
+  model: string
+  overallBand: number
+  criteria: {
+    fluency: SpeakingCriterion
+    lexicalResource: SpeakingCriterion
+    grammar: SpeakingCriterion
+    pronunciation: SpeakingCriterion
+  }
+  summary: string
+  parts: {
+    partId: string
+    transcript: string
+    feedback: string
+    strengths: string[]
+    improvements: string[]
+  }[]
+  evaluatedAt: string
+}
+
 export type StartListeningAttemptResponse = {
   attempt: Attempt
   test: PublicListeningTest
@@ -82,13 +117,19 @@ export type StartWritingAttemptResponse = {
   material: PublicWritingMaterial
 }
 
+export type StartSpeakingAttemptResponse = {
+  attempt: Attempt
+  material: PublicSpeakingMaterial
+}
+
 export type AttemptListItem = Omit<Attempt, 'materialType'> & {
   materialType: AttemptMaterialType
   testTitle: string
   testSlug: string
 }
 
-export type AttemptMaterialType = 'listening' | 'reading' | 'writing'
+export type AttemptMaterialType =
+  'listening' | 'reading' | 'writing' | 'speaking'
 
 export const attemptKeys = {
   detail: (id: string) => ['attempts', id] as const,
@@ -120,6 +161,29 @@ export const startWritingAttempt = (materialId: string, signal?: AbortSignal) =>
     `/api/v1/writing/materials/${materialId}/attempts`,
     { method: 'POST', signal },
   )
+export const startSpeakingAttempt = (
+  materialId: string,
+  signal?: AbortSignal,
+) =>
+  apiClient.request<StartSpeakingAttemptResponse>(
+    `/api/v1/speaking/materials/${materialId}/attempts`,
+    { method: 'POST', signal },
+  )
+export const uploadSpeakingRecording = (
+  attemptId: string,
+  partId: string,
+  recording: File,
+) => {
+  const form = new FormData()
+  form.append('partId', partId)
+  form.append('recording', recording)
+  return apiClient.upload<SpeakingRecording>(
+    `/api/v1/attempts/${attemptId}/recordings`,
+    form,
+  )
+}
+export const getSpeakingRecordingBlob = (attemptId: string, partId: string) =>
+  apiClient.blob(`/api/v1/attempts/${attemptId}/recordings/${partId}`)
 export const saveAttemptAnswers = (
   attemptId: string,
   answers: AttemptAnswer[],

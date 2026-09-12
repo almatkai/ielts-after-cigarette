@@ -109,9 +109,9 @@ export function WritingMaterialEditorPage({
     },
   })
 
-  const update = <K extends keyof WritingMaterialInput>(
-    key: K,
-    value: WritingMaterialInput[K],
+  const update = <TKey extends keyof WritingMaterialInput>(
+    key: TKey,
+    value: WritingMaterialInput[TKey],
   ) => setForm((current) => ({ ...current, [key]: value }))
   const updateTask = (index: number, patch: Partial<WritingTaskInput>) => {
     update(

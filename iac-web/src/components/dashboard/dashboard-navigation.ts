@@ -5,6 +5,7 @@ import {
   Dumbbell,
   Headphones,
   LayoutDashboard,
+  PenLine,
   Settings2,
   TriangleAlert,
 } from 'lucide-react'
@@ -38,6 +39,12 @@ export const primaryDashboardNavigation = [
     label: 'Reading',
     to: '/dashboard/reading',
     icon: BookOpen,
+    exact: false,
+  },
+  {
+    label: 'Writing',
+    to: '/dashboard/writing',
+    icon: PenLine,
     exact: false,
   },
   {

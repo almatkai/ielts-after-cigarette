@@ -51,6 +51,7 @@ const practiceSteps = [
 const skillLibraryHref: Partial<Record<SkillId, string>> = {
   listening: '/dashboard/listening',
   reading: '/dashboard/reading',
+  writing: '/dashboard/writing',
 }
 
 const cardClassName =

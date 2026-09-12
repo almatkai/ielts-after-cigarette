@@ -21,11 +21,15 @@ const skillLabels: Record<SkillId, string> = {
 const skillLibraryLinks: Partial<
   Record<
     SkillId,
-    { to: '/dashboard/listening' | '/dashboard/reading'; label: string }
+    {
+      to: '/dashboard/listening' | '/dashboard/reading' | '/dashboard/writing'
+      label: string
+    }
   >
 > = {
   listening: { to: '/dashboard/listening', label: 'Открыть тесты Listening' },
   reading: { to: '/dashboard/reading', label: 'Открыть материалы Reading' },
+  writing: { to: '/dashboard/writing', label: 'Открыть задания Writing' },
 }
 
 export function PlanPage() {
@@ -53,7 +57,8 @@ export function PlanPage() {
     ? Math.max(
         0,
         Math.ceil(
-          (new Date(`${examDate}T00:00:00`).getTime() - Date.now()) / 86_400_000,
+          (new Date(`${examDate}T00:00:00`).getTime() - Date.now()) /
+            86_400_000,
         ),
       )
     : null

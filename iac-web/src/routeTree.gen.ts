@@ -28,20 +28,27 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile
 import { Route as DashboardProgressRouteImport } from './routes/dashboard.progress'
 import { Route as DashboardReadingRouteImport } from './routes/dashboard.reading'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as DashboardWritingRouteImport } from './routes/dashboard.writing'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AdminListeningImportRouteImport } from './routes/admin.listening.import'
 import { Route as AdminListeningTestsRouteImport } from './routes/admin.listening.tests'
 import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.import'
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as AdminWritingImportRouteImport } from './routes/admin.writing.import'
+import { Route as AdminWritingMaterialsRouteImport } from './routes/admin.writing.materials'
 import { Route as DashboardAttemptsAttemptIdRouteImport } from './routes/dashboard.attempts.$attemptId'
 import { Route as DashboardListeningTestIdRouteImport } from './routes/dashboard.listening.$testId'
 import { Route as DashboardReadingMaterialIdRouteImport } from './routes/dashboard.reading.$materialId'
+import { Route as DashboardWritingMaterialIdRouteImport } from './routes/dashboard.writing.$materialId'
 import { Route as AdminListeningTestsIndexRouteImport } from './routes/admin.listening.tests.index'
 import { Route as AdminListeningTestsTestIdRouteImport } from './routes/admin.listening.tests.$testId'
 import { Route as AdminListeningTestsNewRouteImport } from './routes/admin.listening.tests.new'
 import { Route as AdminReadingMaterialsIndexRouteImport } from './routes/admin.reading.materials.index'
 import { Route as AdminReadingMaterialsMaterialIdRouteImport } from './routes/admin.reading.materials.$materialId'
 import { Route as AdminReadingMaterialsNewRouteImport } from './routes/admin.reading.materials.new'
+import { Route as AdminWritingMaterialsIndexRouteImport } from './routes/admin.writing.materials.index'
+import { Route as AdminWritingMaterialsMaterialIdRouteImport } from './routes/admin.writing.materials.$materialId'
+import { Route as AdminWritingMaterialsNewRouteImport } from './routes/admin.writing.materials.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -138,6 +145,11 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWritingRoute = DashboardWritingRouteImport.update({
+  id: '/writing',
+  path: '/writing',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
@@ -163,6 +175,16 @@ const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
   path: '/reading/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminWritingImportRoute = AdminWritingImportRouteImport.update({
+  id: '/writing/import',
+  path: '/writing/import',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWritingMaterialsRoute = AdminWritingMaterialsRouteImport.update({
+  id: '/writing/materials',
+  path: '/writing/materials',
+  getParentRoute: () => AdminRoute,
+} as any)
 const DashboardAttemptsAttemptIdRoute =
   DashboardAttemptsAttemptIdRouteImport.update({
     id: '/attempts/$attemptId',
@@ -180,6 +202,12 @@ const DashboardReadingMaterialIdRoute =
     id: '/$materialId',
     path: '/$materialId',
     getParentRoute: () => DashboardReadingRoute,
+  } as any)
+const DashboardWritingMaterialIdRoute =
+  DashboardWritingMaterialIdRouteImport.update({
+    id: '/$materialId',
+    path: '/$materialId',
+    getParentRoute: () => DashboardWritingRoute,
   } as any)
 const AdminListeningTestsIndexRoute =
   AdminListeningTestsIndexRouteImport.update({
@@ -216,6 +244,24 @@ const AdminReadingMaterialsNewRoute =
     path: '/new',
     getParentRoute: () => AdminReadingMaterialsRoute,
   } as any)
+const AdminWritingMaterialsIndexRoute =
+  AdminWritingMaterialsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminWritingMaterialsRoute,
+  } as any)
+const AdminWritingMaterialsMaterialIdRoute =
+  AdminWritingMaterialsMaterialIdRouteImport.update({
+    id: '/$materialId',
+    path: '/$materialId',
+    getParentRoute: () => AdminWritingMaterialsRoute,
+  } as any)
+const AdminWritingMaterialsNewRoute =
+  AdminWritingMaterialsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AdminWritingMaterialsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -235,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/writing': typeof DashboardWritingRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -242,15 +289,21 @@ export interface FileRoutesByFullPath {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/writing/import': typeof AdminWritingImportRoute
+  '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
   '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
+  '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
+  '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
+  '/admin/writing/materials/': typeof AdminWritingMaterialsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -268,20 +321,26 @@ export interface FileRoutesByTo {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/writing': typeof DashboardWritingRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
+  '/admin/writing/import': typeof AdminWritingImportRoute
   '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
+  '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
+  '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin/listening/tests': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
+  '/admin/writing/materials': typeof AdminWritingMaterialsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -302,6 +361,7 @@ export interface FileRoutesById {
   '/dashboard/progress': typeof DashboardProgressRoute
   '/dashboard/reading': typeof DashboardReadingRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/writing': typeof DashboardWritingRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -309,15 +369,21 @@ export interface FileRoutesById {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/writing/import': typeof AdminWritingImportRoute
+  '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
   '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/listening/$testId': typeof DashboardListeningTestIdRoute
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
+  '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
   '/admin/reading/materials/new': typeof AdminReadingMaterialsNewRoute
+  '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
+  '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
+  '/admin/writing/materials/': typeof AdminWritingMaterialsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -339,6 +405,7 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/reading'
     | '/dashboard/settings'
+    | '/dashboard/writing'
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
@@ -346,15 +413,21 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/admin/writing/import'
+    | '/admin/writing/materials'
     | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
     | '/dashboard/reading/$materialId'
+    | '/dashboard/writing/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/writing/materials/$materialId'
+    | '/admin/writing/materials/new'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
+    | '/admin/writing/materials/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -372,20 +445,26 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/reading'
     | '/dashboard/settings'
+    | '/dashboard/writing'
     | '/register/verify'
     | '/admin'
     | '/dashboard'
     | '/admin/listening/import'
     | '/admin/reading/import'
+    | '/admin/writing/import'
     | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
     | '/dashboard/reading/$materialId'
+    | '/dashboard/writing/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/writing/materials/$materialId'
+    | '/admin/writing/materials/new'
     | '/admin/listening/tests'
     | '/admin/reading/materials'
+    | '/admin/writing/materials'
   id:
     | '__root__'
     | '/'
@@ -405,6 +484,7 @@ export interface FileRouteTypes {
     | '/dashboard/progress'
     | '/dashboard/reading'
     | '/dashboard/settings'
+    | '/dashboard/writing'
     | '/register/verify'
     | '/admin/'
     | '/dashboard/'
@@ -412,15 +492,21 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/admin/writing/import'
+    | '/admin/writing/materials'
     | '/dashboard/attempts/$attemptId'
     | '/dashboard/listening/$testId'
     | '/dashboard/reading/$materialId'
+    | '/dashboard/writing/$materialId'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
     | '/admin/reading/materials/new'
+    | '/admin/writing/materials/$materialId'
+    | '/admin/writing/materials/new'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
+    | '/admin/writing/materials/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -568,6 +654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/writing': {
+      id: '/dashboard/writing'
+      path: '/writing'
+      fullPath: '/dashboard/writing'
+      preLoaderRoute: typeof DashboardWritingRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/register/verify': {
       id: '/register/verify'
       path: '/verify'
@@ -603,6 +696,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReadingMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/writing/import': {
+      id: '/admin/writing/import'
+      path: '/writing/import'
+      fullPath: '/admin/writing/import'
+      preLoaderRoute: typeof AdminWritingImportRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/writing/materials': {
+      id: '/admin/writing/materials'
+      path: '/writing/materials'
+      fullPath: '/admin/writing/materials'
+      preLoaderRoute: typeof AdminWritingMaterialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/dashboard/attempts/$attemptId': {
       id: '/dashboard/attempts/$attemptId'
       path: '/attempts/$attemptId'
@@ -623,6 +730,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/reading/$materialId'
       preLoaderRoute: typeof DashboardReadingMaterialIdRouteImport
       parentRoute: typeof DashboardReadingRoute
+    }
+    '/dashboard/writing/$materialId': {
+      id: '/dashboard/writing/$materialId'
+      path: '/$materialId'
+      fullPath: '/dashboard/writing/$materialId'
+      preLoaderRoute: typeof DashboardWritingMaterialIdRouteImport
+      parentRoute: typeof DashboardWritingRoute
     }
     '/admin/listening/tests/': {
       id: '/admin/listening/tests/'
@@ -666,6 +780,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReadingMaterialsNewRouteImport
       parentRoute: typeof AdminReadingMaterialsRoute
     }
+    '/admin/writing/materials/': {
+      id: '/admin/writing/materials/'
+      path: '/'
+      fullPath: '/admin/writing/materials/'
+      preLoaderRoute: typeof AdminWritingMaterialsIndexRouteImport
+      parentRoute: typeof AdminWritingMaterialsRoute
+    }
+    '/admin/writing/materials/$materialId': {
+      id: '/admin/writing/materials/$materialId'
+      path: '/$materialId'
+      fullPath: '/admin/writing/materials/$materialId'
+      preLoaderRoute: typeof AdminWritingMaterialsMaterialIdRouteImport
+      parentRoute: typeof AdminWritingMaterialsRoute
+    }
+    '/admin/writing/materials/new': {
+      id: '/admin/writing/materials/new'
+      path: '/new'
+      fullPath: '/admin/writing/materials/new'
+      preLoaderRoute: typeof AdminWritingMaterialsNewRouteImport
+      parentRoute: typeof AdminWritingMaterialsRoute
+    }
   }
 }
 
@@ -701,6 +836,23 @@ const AdminReadingMaterialsRouteWithChildren =
     AdminReadingMaterialsRouteChildren,
   )
 
+interface AdminWritingMaterialsRouteChildren {
+  AdminWritingMaterialsMaterialIdRoute: typeof AdminWritingMaterialsMaterialIdRoute
+  AdminWritingMaterialsNewRoute: typeof AdminWritingMaterialsNewRoute
+  AdminWritingMaterialsIndexRoute: typeof AdminWritingMaterialsIndexRoute
+}
+
+const AdminWritingMaterialsRouteChildren: AdminWritingMaterialsRouteChildren = {
+  AdminWritingMaterialsMaterialIdRoute: AdminWritingMaterialsMaterialIdRoute,
+  AdminWritingMaterialsNewRoute: AdminWritingMaterialsNewRoute,
+  AdminWritingMaterialsIndexRoute: AdminWritingMaterialsIndexRoute,
+}
+
+const AdminWritingMaterialsRouteWithChildren =
+  AdminWritingMaterialsRoute._addFileChildren(
+    AdminWritingMaterialsRouteChildren,
+  )
+
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
   AdminWaitlistRoute: typeof AdminWaitlistRoute
@@ -709,6 +861,8 @@ interface AdminRouteChildren {
   AdminListeningTestsRoute: typeof AdminListeningTestsRouteWithChildren
   AdminReadingImportRoute: typeof AdminReadingImportRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
+  AdminWritingImportRoute: typeof AdminWritingImportRoute
+  AdminWritingMaterialsRoute: typeof AdminWritingMaterialsRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -719,6 +873,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminListeningTestsRoute: AdminListeningTestsRouteWithChildren,
   AdminReadingImportRoute: AdminReadingImportRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
+  AdminWritingImportRoute: AdminWritingImportRoute,
+  AdminWritingMaterialsRoute: AdminWritingMaterialsRouteWithChildren,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -745,6 +901,17 @@ const DashboardReadingRouteChildren: DashboardReadingRouteChildren = {
 const DashboardReadingRouteWithChildren =
   DashboardReadingRoute._addFileChildren(DashboardReadingRouteChildren)
 
+interface DashboardWritingRouteChildren {
+  DashboardWritingMaterialIdRoute: typeof DashboardWritingMaterialIdRoute
+}
+
+const DashboardWritingRouteChildren: DashboardWritingRouteChildren = {
+  DashboardWritingMaterialIdRoute: DashboardWritingMaterialIdRoute,
+}
+
+const DashboardWritingRouteWithChildren =
+  DashboardWritingRoute._addFileChildren(DashboardWritingRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardListeningRoute: typeof DashboardListeningRouteWithChildren
   DashboardMistakesRoute: typeof DashboardMistakesRoute
@@ -754,6 +921,7 @@ interface DashboardRouteChildren {
   DashboardProgressRoute: typeof DashboardProgressRoute
   DashboardReadingRoute: typeof DashboardReadingRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardWritingRoute: typeof DashboardWritingRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardAttemptsAttemptIdRoute: typeof DashboardAttemptsAttemptIdRoute
 }
@@ -767,6 +935,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardProgressRoute: DashboardProgressRoute,
   DashboardReadingRoute: DashboardReadingRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardWritingRoute: DashboardWritingRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardAttemptsAttemptIdRoute: DashboardAttemptsAttemptIdRoute,
 }

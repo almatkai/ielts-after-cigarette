@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api/client'
 
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
+import type { PublicWritingMaterial } from '@/features/writing/api'
 
 export type AttemptStatus = 'IN_PROGRESS' | 'SUBMITTED'
 
@@ -42,6 +43,28 @@ export type AttemptReviewItem = {
 export type AttemptDetail = Attempt & {
   answers?: AttemptAnswer[]
   review?: AttemptReviewItem[]
+  writingEvaluation?: WritingEvaluation
+}
+
+export type WritingCriterion = { band: number; feedback: string }
+
+export type WritingEvaluation = {
+  model: string
+  overallBand: number
+  criteria: {
+    taskResponse: WritingCriterion
+    coherence: WritingCriterion
+    lexicalResource: WritingCriterion
+    grammar: WritingCriterion
+  }
+  summary: string
+  tasks: {
+    taskId: string
+    feedback: string
+    strengths: string[]
+    improvements: string[]
+  }[]
+  evaluatedAt: string
 }
 
 export type StartListeningAttemptResponse = {
@@ -54,13 +77,18 @@ export type StartReadingAttemptResponse = {
   material: PublicReadingMaterial
 }
 
+export type StartWritingAttemptResponse = {
+  attempt: Attempt
+  material: PublicWritingMaterial
+}
+
 export type AttemptListItem = Omit<Attempt, 'materialType'> & {
   materialType: AttemptMaterialType
   testTitle: string
   testSlug: string
 }
 
-export type AttemptMaterialType = 'listening' | 'reading'
+export type AttemptMaterialType = 'listening' | 'reading' | 'writing'
 
 export const attemptKeys = {
   detail: (id: string) => ['attempts', id] as const,
@@ -85,6 +113,11 @@ export const startListeningAttempt = (testId: string, signal?: AbortSignal) =>
 export const startReadingAttempt = (materialId: string, signal?: AbortSignal) =>
   apiClient.request<StartReadingAttemptResponse>(
     `/api/v1/reading/materials/${materialId}/attempts`,
+    { method: 'POST', signal },
+  )
+export const startWritingAttempt = (materialId: string, signal?: AbortSignal) =>
+  apiClient.request<StartWritingAttemptResponse>(
+    `/api/v1/writing/materials/${materialId}/attempts`,
     { method: 'POST', signal },
   )
 export const saveAttemptAnswers = (

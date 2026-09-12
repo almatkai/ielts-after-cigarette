@@ -193,6 +193,12 @@ export function getErrorMessage(error: unknown) {
       return 'Не настроен VITE_API_BASE_URL.'
     case 'DEPENDENCY_UNAVAILABLE':
       return 'Сервис временно недоступен. Попробуйте немного позже.'
+    case 'WRITING_INCOMPLETE':
+      return 'Заполните ответы для Task 1 и Task 2 перед отправкой.'
+    case 'AI_NOT_CONFIGURED':
+      return 'AI-проверка пока не настроена. Обратитесь к администратору.'
+    case 'AI_EVALUATION_FAILED':
+      return 'AI-проверка временно недоступна. Черновики сохранены — попробуйте отправить работу ещё раз.'
     default:
       return error.status >= 500
         ? 'Сервер не смог обработать запрос. Попробуйте позже.'

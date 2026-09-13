@@ -132,6 +132,11 @@ export const publishListeningTest = (id: string, revision: number) =>
     `/api/v1/admin/listening/tests/${id}/publish`,
     { method: 'POST', body: { revision } },
   )
+export const archiveListeningTest = (id: string, revision: number) =>
+  apiClient.request<ListeningTest>(
+    `/api/v1/admin/listening/tests/${id}/archive`,
+    { method: 'POST', body: { revision } },
+  )
 export const parseListeningImport = (source: string, examType: string) =>
   apiClient.request<ListeningImportResult>(
     '/api/v1/admin/listening/import/parse',

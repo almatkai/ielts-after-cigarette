@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { CheckCircle2, Clock3, LockKeyhole, PlayCircle } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  LockKeyhole,
+  PlayCircle,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import {
   advanceFullMockSession,
+  finishFullMockSession,
   fullMockKeys,
   getFullMockSession,
 } from '@/features/fullmock/api'
@@ -31,6 +38,11 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
   })
   const advance = useMutation({
     mutationFn: () => advanceFullMockSession(sessionId),
+    onSuccess: (session) =>
+      queryClient.setQueryData(fullMockKeys.session(sessionId), session),
+  })
+  const finish = useMutation({
+    mutationFn: () => finishFullMockSession(sessionId),
     onSuccess: (session) =>
       queryClient.setQueryData(fullMockKeys.session(sessionId), session),
   })
@@ -77,6 +89,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
                 key={section.position}
                 section={section}
                 currentSection={session.currentSection}
+                sessionId={session.id}
               />
             ))}
           </div>
@@ -99,9 +112,37 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               </CardContent>
             </Card>
           ) : null}
+          <Card className="border-[#f1e2c7] bg-[#fffaf0] shadow-none">
+            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+              <p className="text-sm text-[#69696d]">
+                Можно завершить Full Mock сейчас. Пустые секции останутся без
+                band и не попадут в общий результат.
+              </p>
+              <Button
+                variant="outline"
+                disabled={finish.isPending}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      'Завершить Full Mock с незаполненными секциями?',
+                    )
+                  ) {
+                    finish.mutate()
+                  }
+                }}
+              >
+                {finish.isPending ? 'Завершаем…' : 'Завершить досрочно'}
+              </Button>
+            </CardContent>
+          </Card>
           {advance.isError ? (
             <p className="text-sm text-[#e23b3b]">
               {getErrorMessage(advance.error)}
+            </p>
+          ) : null}
+          {finish.isError ? (
+            <p className="text-sm text-[#e23b3b]">
+              {getErrorMessage(finish.error)}
             </p>
           ) : null}
         </>
@@ -113,9 +154,11 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
 function SectionCard({
   section,
   currentSection,
+  sessionId,
 }: {
   section: FullMockSession['sections'][number]
   currentSection: number
+  sessionId: string
 }) {
   const isCurrent = section.position === currentSection
   const completed = section.attempt.status === 'SUBMITTED'
@@ -146,7 +189,7 @@ function SectionCard({
       </CardHeader>
       <CardContent>
         {isCurrent && !completed ? (
-          <SectionLink section={section} />
+          <SectionLink section={section} sessionId={sessionId} />
         ) : (
           <p className="text-sm text-[#69696d]">
             {completed
@@ -161,8 +204,10 @@ function SectionCard({
 
 function SectionLink({
   section,
+  sessionId,
 }: {
   section: FullMockSession['sections'][number]
+  sessionId: string
 }) {
   const content = (
     <>
@@ -170,44 +215,11 @@ function SectionLink({
       Открыть секцию
     </>
   )
-  if (section.skill === 'listening')
-    return (
-      <Button asChild>
-        <Link
-          to="/dashboard/listening/$testId"
-          params={{ testId: section.attempt.materialId }}
-        >
-          {content}
-        </Link>
-      </Button>
-    )
-  if (section.skill === 'reading')
-    return (
-      <Button asChild>
-        <Link
-          to="/dashboard/reading/$materialId"
-          params={{ materialId: section.attempt.materialId }}
-        >
-          {content}
-        </Link>
-      </Button>
-    )
-  if (section.skill === 'writing')
-    return (
-      <Button asChild>
-        <Link
-          to="/dashboard/writing/$materialId"
-          params={{ materialId: section.attempt.materialId }}
-        >
-          {content}
-        </Link>
-      </Button>
-    )
   return (
     <Button asChild>
       <Link
-        to="/dashboard/speaking/$materialId"
-        params={{ materialId: section.attempt.materialId }}
+        to="/exam/full-mock-sessions/$sessionId/sections/$sectionPosition"
+        params={{ sessionId, sectionPosition: String(section.position) }}
       >
         {content}
       </Link>
@@ -235,7 +247,16 @@ function FullMockReport({ session }: { session: FullMockSession }) {
         {session.sections.map((section) => (
           <Card key={section.position} className="shadow-none">
             <CardContent className="flex items-center justify-between p-5">
-              <p className="font-semibold">{labels[section.skill]}</p>
+              <div>
+                <p className="font-semibold">{labels[section.skill]}</p>
+                <Link
+                  to="/dashboard/attempts/$attemptId"
+                  params={{ attemptId: section.attempt.id }}
+                  className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
+                >
+                  Разбор попытки <ArrowRight className="size-3.5" aria-hidden />
+                </Link>
+              </div>
               <span className="text-2xl font-semibold text-[#3b82f6]">
                 {section.attempt.band?.toFixed(1) ?? '—'}
               </span>

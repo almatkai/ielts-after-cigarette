@@ -5,14 +5,19 @@ import { PenLine } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
+import { useAuth } from '@/features/auth/auth-store'
 import { listPublicWritingMaterials, writingKeys } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
 
 export function WritingLibraryPage() {
+  const { user } = useAuth()
   const query = useQuery({
     queryKey: writingKeys.publicMaterials,
     queryFn: ({ signal }) => listPublicWritingMaterials(signal),
   })
+  const materials = (query.data?.items ?? []).filter(
+    (material) => !user?.examType || material.examType === user.examType,
+  )
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -34,7 +39,7 @@ export function WritingLibraryPage() {
         />
       ) : null}
       <div className="grid gap-3 md:grid-cols-2">
-        {query.data?.items.map((material) => (
+        {materials.map((material) => (
           <Card key={material.id} className="shadow-none">
             <CardContent className="grid gap-3 p-5">
               <PenLine className="size-6 text-[#3b82f6]" aria-hidden />
@@ -54,7 +59,7 @@ export function WritingLibraryPage() {
               </div>
               <Button asChild>
                 <Link
-                  to="/dashboard/writing/$materialId"
+                  to="/exam/writing/$materialId"
                   params={{ materialId: material.id }}
                 >
                   Начать Writing
@@ -64,7 +69,7 @@ export function WritingLibraryPage() {
           </Card>
         ))}
       </div>
-      {query.data?.items.length === 0 ? (
+      {!query.isPending && materials.length === 0 ? (
         <p className="rounded-xl border border-dashed p-10 text-center text-sm text-[#69696d]">
           Опубликованных Writing-материалов пока нет.
         </p>

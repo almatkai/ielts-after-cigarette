@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { fullMockKeys, listPublicFullMocks } from '@/features/fullmock/api'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
+import { useAuth } from '@/features/auth/auth-store'
 import { getErrorMessage } from '@/lib/api/client'
 
 export function FullMockLibraryPage() {
+  const { user } = useAuth()
   const query = useQuery({
     queryKey: fullMockKeys.publicTests,
     queryFn: ({ signal }) => listPublicFullMocks(signal),
@@ -25,7 +27,9 @@ export function FullMockLibraryPage() {
       />
     )
   }
-  const items = query.data.items
+  const items = query.data.items.filter(
+    (item) => !user?.examType || item.examType === user.examType,
+  )
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-6">
       <div>
@@ -41,7 +45,7 @@ export function FullMockLibraryPage() {
       {items.length === 0 ? (
         <Card className="shadow-none">
           <CardContent className="p-8 text-sm text-[#69696d]">
-            Опубликованных пробных экзаменов пока нет.
+            Для выбранного формата экзамена пока нет опубликованных пробных экзаменов.
           </CardContent>
         </Card>
       ) : (

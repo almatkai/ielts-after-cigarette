@@ -72,6 +72,11 @@ export type SpeakingMaterialInput = Omit<
   revision?: number
 }
 
+export type SpeakingImportResult = {
+  materials: SpeakingMaterialInput[]
+  errors: { code: string; message: string; item?: number }[]
+}
+
 export const speakingKeys = {
   publicMaterials: ['speaking', 'materials'] as const,
   publicMaterial: (id: string) => ['speaking', 'materials', id] as const,
@@ -131,6 +136,27 @@ export function updateSpeakingMaterial(
 export function publishSpeakingMaterial(id: string, revision: number) {
   return apiClient.request<SpeakingMaterial>(
     `/api/v1/admin/speaking/materials/${id}/publish`,
+    { method: 'POST', body: { revision } },
+  )
+}
+
+export function parseSpeakingImport(source: string) {
+  return apiClient.request<SpeakingImportResult>(
+    '/api/v1/admin/speaking/import/parse',
+    { method: 'POST', body: { source } },
+  )
+}
+
+export function confirmSpeakingImport(materials: SpeakingMaterialInput[]) {
+  return apiClient.request<{ items: SpeakingMaterial[] }>(
+    '/api/v1/admin/speaking/import',
+    { method: 'POST', body: { materials } },
+  )
+}
+
+export function archiveSpeakingMaterial(id: string, revision: number) {
+  return apiClient.request<SpeakingMaterial>(
+    `/api/v1/admin/speaking/materials/${id}/archive`,
     { method: 'POST', body: { revision } },
   )
 }

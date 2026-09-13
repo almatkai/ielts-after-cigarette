@@ -59,18 +59,21 @@ export function SpeakingStudentPage({ materialId }: { materialId: string }) {
   }
   return (
     <SpeakingAttemptRunner
+      key={startQuery.data.attempt.id}
       attempt={startQuery.data.attempt}
       material={startQuery.data.material}
     />
   )
 }
 
-function SpeakingAttemptRunner({
+export function SpeakingAttemptRunner({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicSpeakingMaterial
+  fullMockSessionId?: string
 }) {
   const session = useAttemptSession(attempt.id)
   const detailQuery = useQuery({
@@ -81,7 +84,11 @@ function SpeakingAttemptRunner({
 
   if (session.submitted) {
     return (
-      <SpeakingAttemptResult attempt={session.submitted} material={material} />
+      <SpeakingAttemptResult
+        attempt={session.submitted}
+        material={material}
+        fullMockSessionId={fullMockSessionId}
+      />
     )
   }
   if (session.answers === null) {
@@ -94,18 +101,16 @@ function SpeakingAttemptRunner({
   ).length
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[920px] gap-5">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
+        <Button asChild variant="link" className="sr-only">
           <Link to="/dashboard/speaking">
             <ArrowLeft aria-hidden />К Speaking
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-              {material.title}
-            </h1>
+            <h1 className="sr-only">{material.title}</h1>
             <p className="mt-1 text-sm text-[#69696d]">
               {material.examType === 'academic'
                 ? 'Academic'
@@ -431,9 +436,11 @@ function PartPrompt({ part }: { part: SpeakingPart }) {
 function SpeakingAttemptResult({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicSpeakingMaterial
+  fullMockSessionId?: string
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -444,9 +451,18 @@ function SpeakingAttemptResult({
     <div className="mx-auto grid w-full min-w-0 max-w-[920px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/dashboard/speaking">
-            <ArrowLeft aria-hidden />К Speaking
-          </Link>
+          {fullMockSessionId ? (
+            <Link
+              to="/exam/full-mock-sessions/$sessionId"
+              params={{ sessionId: fullMockSessionId }}
+            >
+              <ArrowLeft aria-hidden />К Full Mock
+            </Link>
+          ) : (
+            <Link to="/dashboard/speaking">
+              <ArrowLeft aria-hidden />К Speaking
+            </Link>
+          )}
         </Button>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
           {material.title}: разбор

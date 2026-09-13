@@ -42,24 +42,32 @@ export function WritingStudentPage({ materialId }: { materialId: string }) {
   }
   return (
     <WritingAttemptRunner
+      key={startQuery.data.attempt.id}
       attempt={startQuery.data.attempt}
       material={startQuery.data.material}
     />
   )
 }
 
-function WritingAttemptRunner({
+export function WritingAttemptRunner({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
+  fullMockSessionId?: string
 }) {
   const session = useAttemptSession(attempt.id)
+  const [activeTaskIndex, setActiveTaskIndex] = useState(0)
 
   if (session.submitted) {
     return (
-      <WritingAttemptResult attempt={session.submitted} material={material} />
+      <WritingAttemptResult
+        attempt={session.submitted}
+        material={material}
+        fullMockSessionId={fullMockSessionId}
+      />
     )
   }
   if (session.answers === null) {
@@ -69,25 +77,34 @@ function WritingAttemptRunner({
     const value = session.answers?.[task.id]?.value
     return typeof value === 'string' && value.trim().length > 0
   }).length
+  const activeTask = material.tasks[activeTaskIndex]
+  const activeTaskValue = session.answers[activeTask.id].value
+  const activeTaskText =
+    typeof activeTaskValue === 'string' ? activeTaskValue : ''
+  const minimumWordsMet = material.tasks.every((task) => {
+    const value = session.answers?.[task.id]?.value
+    return typeof value === 'string' && countWords(value) >= task.minimumWords
+  })
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[920px] gap-5">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
+        <Button asChild variant="link" className="sr-only">
           <Link to="/dashboard/writing">
             <ArrowLeft aria-hidden />К Writing
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-            {material.title}
-          </h1>
+          <h1 className="sr-only">{material.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
-            <WritingClock startedAt={attempt.startedAt} />
+            <WritingClock
+              startedAt={attempt.startedAt}
+              durationMinutes={material.durationMinutes}
+            />
           </div>
         </div>
-        <p className="mt-2 text-sm text-[#69696d]">
+        <p className="sr-only">
           {material.examType === 'academic' ? 'Academic' : 'General Training'}
           {' · '}Task 1 — 20 минут, Task 2 — 40 минут. Черновики сохраняются
           автоматически.
@@ -101,29 +118,58 @@ function WritingAttemptRunner({
           Не удалось отправить работу: {session.submitError}
         </p>
       ) : null}
-      {material.tasks.map((task) => {
-        const value = session.answers?.[task.id]?.value
-        const text = typeof value === 'string' ? value : ''
-        return (
-          <WritingTaskEditor
-            key={task.id}
-            task={task}
-            text={text}
-            onChange={(next) => session.updateAnswer(task.id, { value: next })}
-          />
-        )
-      })}
+      <div className="min-h-0 flex-1">
+        <WritingTaskEditor
+          task={activeTask}
+          text={activeTaskText}
+          onChange={(next) =>
+            session.updateAnswer(activeTask.id, { value: next })
+          }
+        />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={activeTaskIndex === 0}
+          onClick={() => setActiveTaskIndex((index) => index - 1)}
+        >
+          Назад
+        </Button>
+        <p className="text-sm text-[#69696d]">
+          Задание {activeTaskIndex + 1} из {material.tasks.length}
+        </p>
+        <Button
+          type="button"
+          disabled={activeTaskIndex === material.tasks.length - 1}
+          onClick={() => setActiveTaskIndex((index) => index + 1)}
+        >
+          Далее
+        </Button>
+      </div>
       <AttemptSubmitBar
         answeredCount={answeredCount}
         totalQuestions={material.tasks.length}
         isSubmitting={session.isSubmitting}
+        disabled={!minimumWordsMet}
+        disabledMessage={
+          minimumWordsMet
+            ? undefined
+            : 'Доведите каждый ответ до минимального числа слов перед сдачей.'
+        }
         onSubmit={session.submit}
       />
     </div>
   )
 }
 
-function WritingClock({ startedAt }: { startedAt: string }) {
+function WritingClock({
+  startedAt,
+  durationMinutes,
+}: {
+  startedAt: string
+  durationMinutes: number
+}) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 1000)
@@ -131,13 +177,14 @@ function WritingClock({ startedAt }: { startedAt: string }) {
   }, [])
   const secondsRemaining = Math.max(
     0,
-    60 * 60 - Math.floor((now - new Date(startedAt).getTime()) / 1000),
+    durationMinutes * 60 -
+      Math.floor((now - new Date(startedAt).getTime()) / 1000),
   )
   return (
     <TimeBadge
       seconds={secondsRemaining}
       danger={secondsRemaining < 5 * 60}
-      label="Осталось 60 минут на Writing"
+      label={`Осталось ${durationMinutes} минут на Writing`}
     />
   )
 }
@@ -210,9 +257,11 @@ function WritingTaskEditor({
 function WritingAttemptResult({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
+  fullMockSessionId?: string
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -223,9 +272,18 @@ function WritingAttemptResult({
     <div className="mx-auto grid w-full min-w-0 max-w-[920px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/dashboard/writing">
-            <ArrowLeft aria-hidden />К Writing
-          </Link>
+          {fullMockSessionId ? (
+            <Link
+              to="/exam/full-mock-sessions/$sessionId"
+              params={{ sessionId: fullMockSessionId }}
+            >
+              <ArrowLeft aria-hidden />К Full Mock
+            </Link>
+          ) : (
+            <Link to="/dashboard/writing">
+              <ArrowLeft aria-hidden />К Writing
+            </Link>
+          )}
         </Button>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
           {material.title}: разбор

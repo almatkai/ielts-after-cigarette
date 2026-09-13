@@ -19,10 +19,10 @@ export function FullMockStartPage({ mockId }: { mockId: string }) {
     queryFn: ({ signal }) => getPublicFullMock(mockId, signal),
   })
   const start = useMutation({
-    mutationFn: () => startFullMockSession(mockId),
+    mutationFn: (restart: boolean) => startFullMockSession(mockId, restart),
     onSuccess: (session) =>
       navigate({
-        to: '/dashboard/full-mock-sessions/$sessionId',
+        to: '/exam/full-mock-sessions/$sessionId',
         params: { sessionId: session.id },
       }),
   })
@@ -58,9 +58,24 @@ export function FullMockStartPage({ mockId }: { mockId: string }) {
               {getErrorMessage(start.error)}
             </p>
           ) : null}
-          <Button disabled={start.isPending} onClick={() => start.mutate()}>
+          <Button disabled={start.isPending} onClick={() => start.mutate(false)}>
             <PlayCircle aria-hidden />
-            {start.isPending ? 'Создаём сессию…' : 'Начать Full Mock'}
+            {start.isPending ? 'Открываем сессию…' : 'Начать или продолжить'}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={start.isPending}
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Начать заново? Незавершённая сессия будет закрыта, а новая начнётся с Listening.',
+                )
+              ) {
+                start.mutate(true)
+              }
+            }}
+          >
+            Начать заново
           </Button>
         </CardContent>
       </Card>

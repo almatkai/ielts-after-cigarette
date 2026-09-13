@@ -1,12 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import { SpeakingStudentPage } from '@/pages/speaking/speaking-student-page'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/dashboard/speaking/$materialId')({
-  component: SpeakingRoute,
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/exam/speaking/$materialId',
+      params: { materialId: params.materialId },
+    })
+  },
 })
-
-function SpeakingRoute() {
-  const { materialId } = Route.useParams()
-  return <SpeakingStudentPage materialId={materialId} />
-}

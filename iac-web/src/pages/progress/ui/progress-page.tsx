@@ -27,13 +27,9 @@ export function ProgressPage() {
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
   })
-  const listeningAttemptsQuery = useQuery({
-    queryKey: attemptKeys.list('listening'),
-    queryFn: ({ signal }) => listAttempts('listening', signal),
-  })
-  const readingAttemptsQuery = useQuery({
-    queryKey: attemptKeys.list('reading'),
-    queryFn: ({ signal }) => listAttempts('reading', signal),
+  const attemptsQuery = useQuery({
+    queryKey: attemptKeys.listAll,
+    queryFn: ({ signal }) => listAttempts(undefined, signal),
   })
 
   if (dashboardQuery.isPending) {
@@ -50,13 +46,9 @@ export function ProgressPage() {
   }
 
   const dashboard = dashboardQuery.data
-  const attemptsPending =
-    listeningAttemptsQuery.isPending || readingAttemptsQuery.isPending
-  const attemptsError = listeningAttemptsQuery.error ?? readingAttemptsQuery.error
-  const attempts = [
-    ...(listeningAttemptsQuery.data?.items ?? []),
-    ...(readingAttemptsQuery.data?.items ?? []),
-  ].sort((a, b) => bySubmittedAtDesc(a, b))
+  const attemptsPending = attemptsQuery.isPending
+  const attemptsError = attemptsQuery.error
+  const attempts = [...(attemptsQuery.data?.items ?? [])].sort(bySubmittedAtDesc)
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -115,8 +107,7 @@ export function ProgressPage() {
               title="Не удалось загрузить историю"
               message={getErrorMessage(attemptsError)}
               onRetry={() => {
-                void listeningAttemptsQuery.refetch()
-                void readingAttemptsQuery.refetch()
+                void attemptsQuery.refetch()
               }}
             />
           ) : attempts.length === 0 ? (
@@ -154,7 +145,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
           {item.testTitle}
         </p>
         <p className="mt-1 text-xs text-[#808084]">
-          {item.materialType === 'listening' ? 'Listening' : 'Reading'} ·{' '}
+          {skillLabel(item.materialType)} ·{' '}
           {formatDateTime(item.submittedAt ?? item.startedAt)}
           {submitted ? '' : ' · не завершена'}
         </p>
@@ -172,7 +163,10 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       ) : null}
       {submitted ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
-          <Link to="/dashboard/attempts/$attemptId" params={{ attemptId: item.id }}>
+          <Link
+            to="/dashboard/attempts/$attemptId"
+            params={{ attemptId: item.id }}
+          >
             Разбор
             <ArrowRight aria-hidden />
           </Link>
@@ -180,8 +174,28 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       ) : item.materialType === 'listening' ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
           <Link
-            to="/dashboard/listening/$testId"
+            to="/exam/listening/$testId"
             params={{ testId: item.materialId }}
+          >
+            Продолжить
+            <ArrowRight aria-hidden />
+          </Link>
+        </Button>
+      ) : item.materialType === 'reading' ? (
+        <Button asChild variant="outline" size="sm" className="shadow-none">
+          <Link
+            to="/exam/reading/$materialId"
+            params={{ materialId: item.materialId }}
+          >
+            Продолжить
+            <ArrowRight aria-hidden />
+          </Link>
+        </Button>
+      ) : item.materialType === 'writing' ? (
+        <Button asChild variant="outline" size="sm" className="shadow-none">
+          <Link
+            to="/exam/writing/$materialId"
+            params={{ materialId: item.materialId }}
           >
             Продолжить
             <ArrowRight aria-hidden />
@@ -190,7 +204,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       ) : (
         <Button asChild variant="outline" size="sm" className="shadow-none">
           <Link
-            to="/dashboard/reading/$materialId"
+            to="/exam/speaking/$materialId"
             params={{ materialId: item.materialId }}
           >
             Продолжить
@@ -200,6 +214,16 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       )}
     </div>
   )
+}
+
+function skillLabel(materialType: AttemptListItem['materialType']) {
+  return materialType === 'listening'
+    ? 'Listening'
+    : materialType === 'reading'
+      ? 'Reading'
+      : materialType === 'writing'
+        ? 'Writing'
+        : 'Speaking'
 }
 
 function bySubmittedAtDesc(a: AttemptListItem, b: AttemptListItem) {

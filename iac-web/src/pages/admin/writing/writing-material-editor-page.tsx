@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/features/auth/auth-store'
 import {
+  archiveWritingMaterial,
   createWritingMaterial,
   getWritingMaterial,
   publishWritingMaterial,
@@ -31,6 +32,7 @@ const emptyForm: WritingMaterialInput = {
   difficulty: 'intermediate',
   title: '',
   description: '',
+  durationMinutes: 60,
   tasks: [
     {
       position: 1,
@@ -69,6 +71,7 @@ export function WritingMaterialEditorPage({
       difficulty: material.difficulty,
       title: material.title,
       description: material.description,
+      durationMinutes: material.durationMinutes,
       tasks: material.tasks,
       revision: material.revision,
     })
@@ -106,6 +109,20 @@ export function WritingMaterialEditorPage({
       })
       setForm((current) => ({ ...current, revision: material.revision }))
       setMessage('Материал опубликован.')
+    },
+  })
+  const archiveMutation = useMutation({
+    mutationFn: () =>
+      archiveWritingMaterial(materialId ?? '', form.revision ?? 0),
+    onSuccess: async (material) => {
+      await queryClient.invalidateQueries({
+        queryKey: writingKeys.adminMaterials,
+      })
+      await queryClient.invalidateQueries({
+        queryKey: writingKeys.adminMaterial(material.id),
+      })
+      setForm((current) => ({ ...current, revision: material.revision }))
+      setMessage('Материал перенесён в архив.')
     },
   })
 
@@ -147,7 +164,8 @@ export function WritingMaterialEditorPage({
     )
   }
   const material = materialQuery.data
-  const pending = saveMutation.isPending || publishMutation.isPending
+  const pending =
+    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending
   const taskOne = form.tasks[0]
   const taskTwo = form.tasks[1]
 
@@ -196,6 +214,20 @@ export function WritingMaterialEditorPage({
               <Send aria-hidden /> Опубликовать
             </Button>
           ) : null}
+          {materialId && auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => {
+                if (window.confirm('Архивировать этот Writing-материал?')) {
+                  archiveMutation.mutate()
+                }
+              }}
+            >
+              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
+            </Button>
+          ) : null}
           <Button type="submit" disabled={pending}>
             <Save aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
@@ -211,12 +243,14 @@ export function WritingMaterialEditorPage({
           {message}
         </p>
       ) : null}
-      {saveMutation.isError || publishMutation.isError ? (
+      {saveMutation.isError || publishMutation.isError || archiveMutation.isError ? (
         <p
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
           role="alert"
         >
-          {getErrorMessage(saveMutation.error ?? publishMutation.error)}
+          {getErrorMessage(
+            saveMutation.error ?? publishMutation.error ?? archiveMutation.error,
+          )}
         </p>
       ) : null}
       <Card className="shadow-none">
@@ -268,6 +302,18 @@ export function WritingMaterialEditorPage({
               <option value="intermediate">Intermediate</option>
               <option value="advanced">Advanced</option>
             </select>
+          </Field>
+          <Field label="Лимит времени, минуты">
+            <Input
+              type="number"
+              min={5}
+              max={180}
+              value={form.durationMinutes}
+              onChange={(event) =>
+                update('durationMinutes', Number(event.target.value))
+              }
+              className={fieldClassName}
+            />
           </Field>
           <Field label="Краткое описание" className="sm:col-span-2">
             <Textarea

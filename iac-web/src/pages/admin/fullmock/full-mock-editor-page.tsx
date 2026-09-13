@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import {
+  archiveFullMock,
   createFullMock,
   fullMockKeys,
   getFullMock,
@@ -88,6 +89,14 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
   const publish = useMutation({
     mutationFn: () =>
       publishFullMock(mockId ?? '', mockQuery.data?.revision ?? 0),
+    onSuccess: (mock) => {
+      queryClient.setQueryData(fullMockKeys.adminTest(mock.id), mock)
+      void queryClient.invalidateQueries({ queryKey: fullMockKeys.adminTests })
+    },
+  })
+  const archive = useMutation({
+    mutationFn: () =>
+      archiveFullMock(mockId ?? '', mockQuery.data?.revision ?? 0),
     onSuccess: (mock) => {
       queryClient.setQueryData(fullMockKeys.adminTest(mock.id), mock)
       void queryClient.invalidateQueries({ queryKey: fullMockKeys.adminTests })
@@ -184,10 +193,12 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
               onChange={(value) =>
                 setForm({ ...form, listeningMaterialId: value })
               }
-              items={materials.listening.map((item) => ({
-                id: item.id,
-                title: item.title,
-              }))}
+              items={materials.listening
+                .filter((item) => item.examType === form.examType)
+                .map((item) => ({
+                  id: item.id,
+                  title: item.title,
+                }))}
             />
             <MaterialSelect
               label="Reading"
@@ -195,10 +206,12 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
               onChange={(value) =>
                 setForm({ ...form, readingMaterialId: value })
               }
-              items={materials.reading.map((item) => ({
-                id: item.id,
-                title: item.title,
-              }))}
+              items={materials.reading
+                .filter((item) => item.examType === form.examType)
+                .map((item) => ({
+                  id: item.id,
+                  title: item.title,
+                }))}
             />
             <MaterialSelect
               label="Writing"
@@ -206,10 +219,12 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
               onChange={(value) =>
                 setForm({ ...form, writingMaterialId: value })
               }
-              items={materials.writing.map((item) => ({
-                id: item.id,
-                title: item.title,
-              }))}
+              items={materials.writing
+                .filter((item) => item.examType === form.examType)
+                .map((item) => ({
+                  id: item.id,
+                  title: item.title,
+                }))}
             />
             <MaterialSelect
               label="Speaking"
@@ -217,15 +232,17 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
               onChange={(value) =>
                 setForm({ ...form, speakingMaterialId: value })
               }
-              items={materials.speaking.map((item) => ({
-                id: item.id,
-                title: item.title,
-              }))}
+              items={materials.speaking
+                .filter((item) => item.examType === form.examType)
+                .map((item) => ({
+                  id: item.id,
+                  title: item.title,
+                }))}
             />
           </div>
-          {save.isError || publish.isError ? (
+          {save.isError || publish.isError || archive.isError ? (
             <p className="text-sm text-[#e23b3b]">
-              {getErrorMessage(save.error ?? publish.error)}
+              {getErrorMessage(save.error ?? publish.error ?? archive.error)}
             </p>
           ) : null}
           <div className="flex flex-wrap gap-3">
@@ -239,6 +256,19 @@ export function FullMockEditorPage({ mockId }: { mockId?: string }) {
                 onClick={() => publish.mutate()}
               >
                 {publish.isPending ? 'Публикуем…' : 'Опубликовать'}
+              </Button>
+            ) : null}
+            {editing ? (
+              <Button
+                variant="outline"
+                disabled={archive.isPending}
+                onClick={() => {
+                  if (window.confirm('Архивировать этот Full Mock?')) {
+                    archive.mutate()
+                  }
+                }}
+              >
+                {archive.isPending ? 'Архивируем…' : 'Архивировать'}
               </Button>
             ) : null}
           </div>

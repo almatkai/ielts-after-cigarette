@@ -128,6 +128,13 @@ export type AttemptListItem = Omit<Attempt, 'materialType'> & {
   testSlug: string
 }
 
+export type MistakeReport = {
+  attempt: AttemptListItem
+  review?: AttemptReviewItem[]
+  writingEvaluation?: WritingEvaluation
+  speakingEvaluation?: SpeakingEvaluation
+}
+
 export type AttemptMaterialType =
   'listening' | 'reading' | 'writing' | 'speaking'
 
@@ -135,16 +142,23 @@ export const attemptKeys = {
   detail: (id: string) => ['attempts', id] as const,
   list: (materialType: AttemptMaterialType) =>
     ['attempts', 'list', materialType] as const,
+  listAll: ['attempts', 'list'] as const,
+  mistakes: ['attempts', 'mistakes'] as const,
 }
 
 export const listAttempts = (
-  materialType: AttemptMaterialType,
+  materialType?: AttemptMaterialType,
   signal?: AbortSignal,
 ) =>
   apiClient.request<{ items: AttemptListItem[] }>(
-    `/api/v1/attempts?materialType=${materialType}`,
+    materialType ? `/api/v1/attempts?materialType=${materialType}` : '/api/v1/attempts',
     { signal },
   )
+
+export const getMistakes = (signal?: AbortSignal) =>
+  apiClient.request<{ items: MistakeReport[] }>('/api/v1/attempts/mistakes', {
+    signal,
+  })
 
 export const startListeningAttempt = (testId: string, signal?: AbortSignal) =>
   apiClient.request<StartListeningAttemptResponse>(

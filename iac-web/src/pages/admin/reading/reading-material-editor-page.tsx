@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
   adminQueryKeys,
+  archiveReadingMaterial,
   createReadingMaterial,
   getReadingMaterial,
   publishReadingMaterial,
@@ -131,6 +132,20 @@ export function ReadingMaterialEditorPage({
       setMessage('Текущая версия опубликована.')
     },
   })
+  const archiveMutation = useMutation({
+    mutationFn: () => archiveReadingMaterial(materialId!, form.revision),
+    onSuccess: async (material) => {
+      setForm(materialToForm(material))
+      queryClient.setQueryData(
+        adminQueryKeys.readingMaterial(material.id),
+        material,
+      )
+      await queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.readingMaterials,
+      })
+      setMessage('Материал перенесён в архив.')
+    },
+  })
 
   const update = <TKey extends keyof EditorForm>(
     key: TKey,
@@ -234,7 +249,8 @@ export function ReadingMaterialEditorPage({
   }
 
   const material = materialQuery.data
-  const pending = saveMutation.isPending || publishMutation.isPending
+  const pending =
+    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending
 
   return (
     <form className="grid gap-5" onSubmit={(event) => void handleSubmit(event)}>
@@ -270,6 +286,20 @@ export function ReadingMaterialEditorPage({
             >
               <Send aria-hidden />
               Опубликовать текущую версию
+            </Button>
+          ) : null}
+          {materialId && auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => {
+                if (window.confirm('Архивировать этот Reading-материал?')) {
+                  archiveMutation.mutate()
+                }
+              }}
+            >
+              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
           <Button

@@ -26,6 +26,7 @@ export type PublicWritingMaterial = {
   difficulty: 'foundation' | 'intermediate' | 'advanced'
   title: string
   description: string
+  durationMinutes: number
   tasks: WritingTask[]
 }
 
@@ -123,6 +124,13 @@ export function updateWritingMaterial(id: string, input: WritingMaterialInput) {
 export function publishWritingMaterial(id: string, revision: number) {
   return apiClient.request<WritingMaterial>(
     `/api/v1/admin/writing/materials/${id}/publish`,
+    { method: 'POST', body: { revision } },
+  )
+}
+
+export function archiveWritingMaterial(id: string, revision: number) {
+  return apiClient.request<WritingMaterial>(
+    `/api/v1/admin/writing/materials/${id}/archive`,
     { method: 'POST', body: { revision } },
   )
 }

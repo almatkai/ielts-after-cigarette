@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ExamRouteImport } from './routes/exam'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -40,6 +41,7 @@ import { Route as AdminListeningImportRouteImport } from './routes/admin.listeni
 import { Route as AdminListeningTestsRouteImport } from './routes/admin.listening.tests'
 import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.import'
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
+import { Route as AdminSpeakingImportRouteImport } from './routes/admin.speaking.import'
 import { Route as AdminSpeakingMaterialsRouteImport } from './routes/admin.speaking.materials'
 import { Route as AdminWritingImportRouteImport } from './routes/admin.writing.import'
 import { Route as AdminWritingMaterialsRouteImport } from './routes/admin.writing.materials'
@@ -50,6 +52,11 @@ import { Route as DashboardListeningTestIdRouteImport } from './routes/dashboard
 import { Route as DashboardReadingMaterialIdRouteImport } from './routes/dashboard.reading.$materialId'
 import { Route as DashboardSpeakingMaterialIdRouteImport } from './routes/dashboard.speaking.$materialId'
 import { Route as DashboardWritingMaterialIdRouteImport } from './routes/dashboard.writing.$materialId'
+import { Route as ExamFullMockSessionsSessionIdRouteImport } from './routes/exam.full-mock-sessions.$sessionId'
+import { Route as ExamListeningTestIdRouteImport } from './routes/exam.listening.$testId'
+import { Route as ExamReadingMaterialIdRouteImport } from './routes/exam.reading.$materialId'
+import { Route as ExamSpeakingMaterialIdRouteImport } from './routes/exam.speaking.$materialId'
+import { Route as ExamWritingMaterialIdRouteImport } from './routes/exam.writing.$materialId'
 import { Route as AdminListeningTestsIndexRouteImport } from './routes/admin.listening.tests.index'
 import { Route as AdminListeningTestsTestIdRouteImport } from './routes/admin.listening.tests.$testId'
 import { Route as AdminListeningTestsNewRouteImport } from './routes/admin.listening.tests.new'
@@ -62,6 +69,7 @@ import { Route as AdminSpeakingMaterialsNewRouteImport } from './routes/admin.sp
 import { Route as AdminWritingMaterialsIndexRouteImport } from './routes/admin.writing.materials.index'
 import { Route as AdminWritingMaterialsMaterialIdRouteImport } from './routes/admin.writing.materials.$materialId'
 import { Route as AdminWritingMaterialsNewRouteImport } from './routes/admin.writing.materials.new'
+import { Route as ExamFullMockSessionsSessionIdSectionsSectionPositionRouteImport } from './routes/exam.full-mock-sessions.$sessionId.sections.$sectionPosition'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +84,11 @@ const AdminRoute = AdminRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamRoute = ExamRouteImport.update({
+  id: '/exam',
+  path: '/exam',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForbiddenRoute = ForbiddenRouteImport.update({
@@ -218,6 +231,11 @@ const AdminReadingMaterialsRoute = AdminReadingMaterialsRouteImport.update({
   path: '/reading/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSpeakingImportRoute = AdminSpeakingImportRouteImport.update({
+  id: '/speaking/import',
+  path: '/speaking/import',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSpeakingMaterialsRoute = AdminSpeakingMaterialsRouteImport.update({
   id: '/speaking/materials',
   path: '/speaking/materials',
@@ -275,6 +293,32 @@ const DashboardWritingMaterialIdRoute =
     path: '/$materialId',
     getParentRoute: () => DashboardWritingRoute,
   } as any)
+const ExamFullMockSessionsSessionIdRoute =
+  ExamFullMockSessionsSessionIdRouteImport.update({
+    id: '/full-mock-sessions/$sessionId',
+    path: '/full-mock-sessions/$sessionId',
+    getParentRoute: () => ExamRoute,
+  } as any)
+const ExamListeningTestIdRoute = ExamListeningTestIdRouteImport.update({
+  id: '/listening/$testId',
+  path: '/listening/$testId',
+  getParentRoute: () => ExamRoute,
+} as any)
+const ExamReadingMaterialIdRoute = ExamReadingMaterialIdRouteImport.update({
+  id: '/reading/$materialId',
+  path: '/reading/$materialId',
+  getParentRoute: () => ExamRoute,
+} as any)
+const ExamSpeakingMaterialIdRoute = ExamSpeakingMaterialIdRouteImport.update({
+  id: '/speaking/$materialId',
+  path: '/speaking/$materialId',
+  getParentRoute: () => ExamRoute,
+} as any)
+const ExamWritingMaterialIdRoute = ExamWritingMaterialIdRouteImport.update({
+  id: '/writing/$materialId',
+  path: '/writing/$materialId',
+  getParentRoute: () => ExamRoute,
+} as any)
 const AdminListeningTestsIndexRoute =
   AdminListeningTestsIndexRouteImport.update({
     id: '/',
@@ -346,11 +390,18 @@ const AdminWritingMaterialsNewRoute =
     path: '/new',
     getParentRoute: () => AdminWritingMaterialsRoute,
   } as any)
+const ExamFullMockSessionsSessionIdSectionsSectionPositionRoute =
+  ExamFullMockSessionsSessionIdSectionsSectionPositionRouteImport.update({
+    id: '/sections/$sectionPosition',
+    path: '/sections/$sectionPosition',
+    getParentRoute: () => ExamFullMockSessionsSessionIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
@@ -378,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
@@ -388,6 +440,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/dashboard/speaking/$materialId': typeof DashboardSpeakingMaterialIdRoute
   '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
+  '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
+  '/exam/listening/$testId': typeof ExamListeningTestIdRoute
+  '/exam/reading/$materialId': typeof ExamReadingMaterialIdRoute
+  '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
+  '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
@@ -401,9 +458,11 @@ export interface FileRoutesByFullPath {
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
   '/admin/writing/materials/': typeof AdminWritingMaterialsIndexRoute
+  '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition': typeof ExamFullMockSessionsSessionIdSectionsSectionPositionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
@@ -428,6 +487,7 @@ export interface FileRoutesByTo {
   '/admin/full-mocks/new': typeof AdminFullMocksNewRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
+  '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/dashboard/attempts/$attemptId': typeof DashboardAttemptsAttemptIdRoute
   '/dashboard/full-mock-sessions/$sessionId': typeof DashboardFullMockSessionsSessionIdRoute
@@ -436,6 +496,11 @@ export interface FileRoutesByTo {
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/dashboard/speaking/$materialId': typeof DashboardSpeakingMaterialIdRoute
   '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
+  '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
+  '/exam/listening/$testId': typeof ExamListeningTestIdRoute
+  '/exam/reading/$materialId': typeof ExamReadingMaterialIdRoute
+  '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
+  '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks': typeof AdminFullMocksIndexRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
@@ -449,12 +514,14 @@ export interface FileRoutesByTo {
   '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsIndexRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsIndexRoute
+  '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition': typeof ExamFullMockSessionsSessionIdSectionsSectionPositionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRouteWithChildren
@@ -482,6 +549,7 @@ export interface FileRoutesById {
   '/admin/listening/tests': typeof AdminListeningTestsRouteWithChildren
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
+  '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
@@ -492,6 +560,11 @@ export interface FileRoutesById {
   '/dashboard/reading/$materialId': typeof DashboardReadingMaterialIdRoute
   '/dashboard/speaking/$materialId': typeof DashboardSpeakingMaterialIdRoute
   '/dashboard/writing/$materialId': typeof DashboardWritingMaterialIdRoute
+  '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
+  '/exam/listening/$testId': typeof ExamListeningTestIdRoute
+  '/exam/reading/$materialId': typeof ExamReadingMaterialIdRoute
+  '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
+  '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
@@ -505,6 +578,7 @@ export interface FileRoutesById {
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
   '/admin/writing/materials/': typeof AdminWritingMaterialsIndexRoute
+  '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition': typeof ExamFullMockSessionsSessionIdSectionsSectionPositionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -512,6 +586,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/dashboard'
+    | '/exam'
     | '/forbidden'
     | '/login'
     | '/register'
@@ -539,6 +614,7 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/admin/speaking/import'
     | '/admin/speaking/materials'
     | '/admin/writing/import'
     | '/admin/writing/materials'
@@ -549,6 +625,11 @@ export interface FileRouteTypes {
     | '/dashboard/reading/$materialId'
     | '/dashboard/speaking/$materialId'
     | '/dashboard/writing/$materialId'
+    | '/exam/full-mock-sessions/$sessionId'
+    | '/exam/listening/$testId'
+    | '/exam/reading/$materialId'
+    | '/exam/speaking/$materialId'
+    | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
@@ -562,9 +643,11 @@ export interface FileRouteTypes {
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
     | '/admin/writing/materials/'
+    | '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/exam'
     | '/forbidden'
     | '/login'
     | '/register'
@@ -589,6 +672,7 @@ export interface FileRouteTypes {
     | '/admin/full-mocks/new'
     | '/admin/listening/import'
     | '/admin/reading/import'
+    | '/admin/speaking/import'
     | '/admin/writing/import'
     | '/dashboard/attempts/$attemptId'
     | '/dashboard/full-mock-sessions/$sessionId'
@@ -597,6 +681,11 @@ export interface FileRouteTypes {
     | '/dashboard/reading/$materialId'
     | '/dashboard/speaking/$materialId'
     | '/dashboard/writing/$materialId'
+    | '/exam/full-mock-sessions/$sessionId'
+    | '/exam/listening/$testId'
+    | '/exam/reading/$materialId'
+    | '/exam/speaking/$materialId'
+    | '/exam/writing/$materialId'
     | '/admin/full-mocks'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
@@ -610,11 +699,13 @@ export interface FileRouteTypes {
     | '/admin/reading/materials'
     | '/admin/speaking/materials'
     | '/admin/writing/materials'
+    | '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/dashboard'
+    | '/exam'
     | '/forbidden'
     | '/login'
     | '/register'
@@ -642,6 +733,7 @@ export interface FileRouteTypes {
     | '/admin/listening/tests'
     | '/admin/reading/import'
     | '/admin/reading/materials'
+    | '/admin/speaking/import'
     | '/admin/speaking/materials'
     | '/admin/writing/import'
     | '/admin/writing/materials'
@@ -652,6 +744,11 @@ export interface FileRouteTypes {
     | '/dashboard/reading/$materialId'
     | '/dashboard/speaking/$materialId'
     | '/dashboard/writing/$materialId'
+    | '/exam/full-mock-sessions/$sessionId'
+    | '/exam/listening/$testId'
+    | '/exam/reading/$materialId'
+    | '/exam/speaking/$materialId'
+    | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
@@ -665,12 +762,14 @@ export interface FileRouteTypes {
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
     | '/admin/writing/materials/'
+    | '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
+  ExamRoute: typeof ExamRouteWithChildren
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRouteWithChildren
@@ -698,6 +797,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam': {
+      id: '/exam'
+      path: '/exam'
+      fullPath: '/exam'
+      preLoaderRoute: typeof ExamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forbidden': {
@@ -896,6 +1002,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReadingMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/speaking/import': {
+      id: '/admin/speaking/import'
+      path: '/speaking/import'
+      fullPath: '/admin/speaking/import'
+      preLoaderRoute: typeof AdminSpeakingImportRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/speaking/materials': {
       id: '/admin/speaking/materials'
       path: '/speaking/materials'
@@ -965,6 +1078,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/writing/$materialId'
       preLoaderRoute: typeof DashboardWritingMaterialIdRouteImport
       parentRoute: typeof DashboardWritingRoute
+    }
+    '/exam/full-mock-sessions/$sessionId': {
+      id: '/exam/full-mock-sessions/$sessionId'
+      path: '/full-mock-sessions/$sessionId'
+      fullPath: '/exam/full-mock-sessions/$sessionId'
+      preLoaderRoute: typeof ExamFullMockSessionsSessionIdRouteImport
+      parentRoute: typeof ExamRoute
+    }
+    '/exam/listening/$testId': {
+      id: '/exam/listening/$testId'
+      path: '/listening/$testId'
+      fullPath: '/exam/listening/$testId'
+      preLoaderRoute: typeof ExamListeningTestIdRouteImport
+      parentRoute: typeof ExamRoute
+    }
+    '/exam/reading/$materialId': {
+      id: '/exam/reading/$materialId'
+      path: '/reading/$materialId'
+      fullPath: '/exam/reading/$materialId'
+      preLoaderRoute: typeof ExamReadingMaterialIdRouteImport
+      parentRoute: typeof ExamRoute
+    }
+    '/exam/speaking/$materialId': {
+      id: '/exam/speaking/$materialId'
+      path: '/speaking/$materialId'
+      fullPath: '/exam/speaking/$materialId'
+      preLoaderRoute: typeof ExamSpeakingMaterialIdRouteImport
+      parentRoute: typeof ExamRoute
+    }
+    '/exam/writing/$materialId': {
+      id: '/exam/writing/$materialId'
+      path: '/writing/$materialId'
+      fullPath: '/exam/writing/$materialId'
+      preLoaderRoute: typeof ExamWritingMaterialIdRouteImport
+      parentRoute: typeof ExamRoute
     }
     '/admin/listening/tests/': {
       id: '/admin/listening/tests/'
@@ -1049,6 +1197,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/writing/materials/new'
       preLoaderRoute: typeof AdminWritingMaterialsNewRouteImport
       parentRoute: typeof AdminWritingMaterialsRoute
+    }
+    '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition': {
+      id: '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
+      path: '/sections/$sectionPosition'
+      fullPath: '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
+      preLoaderRoute: typeof ExamFullMockSessionsSessionIdSectionsSectionPositionRouteImport
+      parentRoute: typeof ExamFullMockSessionsSessionIdRoute
     }
   }
 }
@@ -1146,6 +1301,7 @@ interface AdminRouteChildren {
   AdminListeningTestsRoute: typeof AdminListeningTestsRouteWithChildren
   AdminReadingImportRoute: typeof AdminReadingImportRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
+  AdminSpeakingImportRoute: typeof AdminSpeakingImportRoute
   AdminSpeakingMaterialsRoute: typeof AdminSpeakingMaterialsRouteWithChildren
   AdminWritingImportRoute: typeof AdminWritingImportRoute
   AdminWritingMaterialsRoute: typeof AdminWritingMaterialsRouteWithChildren
@@ -1160,6 +1316,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminListeningTestsRoute: AdminListeningTestsRouteWithChildren,
   AdminReadingImportRoute: AdminReadingImportRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
+  AdminSpeakingImportRoute: AdminSpeakingImportRoute,
   AdminSpeakingMaterialsRoute: AdminSpeakingMaterialsRouteWithChildren,
   AdminWritingImportRoute: AdminWritingImportRoute,
   AdminWritingMaterialsRoute: AdminWritingMaterialsRouteWithChildren,
@@ -1261,6 +1418,40 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface ExamFullMockSessionsSessionIdRouteChildren {
+  ExamFullMockSessionsSessionIdSectionsSectionPositionRoute: typeof ExamFullMockSessionsSessionIdSectionsSectionPositionRoute
+}
+
+const ExamFullMockSessionsSessionIdRouteChildren: ExamFullMockSessionsSessionIdRouteChildren =
+  {
+    ExamFullMockSessionsSessionIdSectionsSectionPositionRoute:
+      ExamFullMockSessionsSessionIdSectionsSectionPositionRoute,
+  }
+
+const ExamFullMockSessionsSessionIdRouteWithChildren =
+  ExamFullMockSessionsSessionIdRoute._addFileChildren(
+    ExamFullMockSessionsSessionIdRouteChildren,
+  )
+
+interface ExamRouteChildren {
+  ExamFullMockSessionsSessionIdRoute: typeof ExamFullMockSessionsSessionIdRouteWithChildren
+  ExamListeningTestIdRoute: typeof ExamListeningTestIdRoute
+  ExamReadingMaterialIdRoute: typeof ExamReadingMaterialIdRoute
+  ExamSpeakingMaterialIdRoute: typeof ExamSpeakingMaterialIdRoute
+  ExamWritingMaterialIdRoute: typeof ExamWritingMaterialIdRoute
+}
+
+const ExamRouteChildren: ExamRouteChildren = {
+  ExamFullMockSessionsSessionIdRoute:
+    ExamFullMockSessionsSessionIdRouteWithChildren,
+  ExamListeningTestIdRoute: ExamListeningTestIdRoute,
+  ExamReadingMaterialIdRoute: ExamReadingMaterialIdRoute,
+  ExamSpeakingMaterialIdRoute: ExamSpeakingMaterialIdRoute,
+  ExamWritingMaterialIdRoute: ExamWritingMaterialIdRoute,
+}
+
+const ExamRouteWithChildren = ExamRoute._addFileChildren(ExamRouteChildren)
+
 interface RegisterRouteChildren {
   RegisterVerifyRoute: typeof RegisterVerifyRoute
 }
@@ -1277,6 +1468,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
+  ExamRoute: ExamRouteWithChildren,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRouteWithChildren,

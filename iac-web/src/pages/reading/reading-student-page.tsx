@@ -54,20 +54,24 @@ export function ReadingStudentPage({ materialId }: { materialId: string }) {
   }
   return (
     <ReadingAttemptRunner
+      key={startQuery.data.attempt.id}
       attempt={startQuery.data.attempt}
       material={startQuery.data.material}
     />
   )
 }
 
-function ReadingAttemptRunner({
+export function ReadingAttemptRunner({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicReadingMaterial
+  fullMockSessionId?: string
 }) {
   const session = useAttemptSession(attempt.id)
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
 
   // У reading нет лимита времени — показываем прошедшее время от startedAt.
   const startedAt = useMemo(
@@ -79,14 +83,20 @@ function ReadingAttemptRunner({
   )
   useEffect(() => {
     const interval = window.setInterval(() => {
-      setElapsedSeconds(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)))
+      setElapsedSeconds(
+        Math.max(0, Math.floor((Date.now() - startedAt) / 1000)),
+      )
     }, 1000)
     return () => window.clearInterval(interval)
   }, [startedAt])
 
   if (session.submitted) {
     return (
-      <ReadingAttemptResult attempt={session.submitted} material={material} />
+      <ReadingAttemptResult
+        attempt={session.submitted}
+        material={material}
+        fullMockSessionId={fullMockSessionId}
+      />
     )
   }
   if (session.answers === null) {
@@ -94,30 +104,29 @@ function ReadingAttemptRunner({
   }
   const answers = session.answers
 
-  const totalQuestions = material.questionGroups.reduce(
-    (sum, group) => sum + group.questions.length,
-    0,
+  const questions = material.questionGroups.flatMap((group) =>
+    group.questions.map((question) => ({ group, question })),
   )
+  const currentQuestion = questions[activeQuestionIndex]
+  const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
+        <Button asChild variant="link" className="sr-only">
           <Link to="/dashboard/reading">
             <ArrowLeft aria-hidden />К Reading
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-            {material.title}
-          </h1>
+          <h1 className="sr-only">{material.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
             <TimeBadge seconds={elapsedSeconds} label="Прошедшее время" />
           </div>
         </div>
-        <p className="mt-2 flex items-center gap-2 text-sm text-[#69696d]">
+        <p className="sr-only">
           <Clock3 className="size-4" aria-hidden />
           {material.examType} · {material.difficulty} · ответы сохраняются
           автоматически
@@ -131,8 +140,8 @@ function ReadingAttemptRunner({
           Не удалось отправить тест: {session.submitError}
         </p>
       ) : null}
-      <div className="grid items-start gap-5 lg:grid-cols-2">
-        <Card className="shadow-none lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <Card className="max-h-[28dvh] shrink-0 overflow-y-auto shadow-none">
           <CardHeader>
             <CardTitle>Текст</CardTitle>
           </CardHeader>
@@ -142,22 +151,40 @@ function ReadingAttemptRunner({
             </div>
           </CardContent>
         </Card>
-        <div className="grid gap-5">
-          <Card className="shadow-none">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          <Card className="min-h-0 flex-1 overflow-y-auto shadow-none">
             <CardHeader>
               <CardTitle>Вопросы</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-5">
-              {material.questionGroups.map((group) => (
-                <StudentGroup
-                  key={group.position}
-                  group={group}
-                  answers={answers}
-                  onAnswer={session.updateAnswer}
-                />
-              ))}
+              <StudentGroup
+                group={currentQuestion.group}
+                activeQuestionId={currentQuestion.question.id}
+                answers={answers}
+                onAnswer={session.updateAnswer}
+              />
             </CardContent>
           </Card>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={activeQuestionIndex === 0}
+              onClick={() => setActiveQuestionIndex((index) => index - 1)}
+            >
+              Назад
+            </Button>
+            <p className="text-sm text-[#69696d]">
+              Вопрос {activeQuestionIndex + 1} из {totalQuestions}
+            </p>
+            <Button
+              type="button"
+              disabled={activeQuestionIndex === totalQuestions - 1}
+              onClick={() => setActiveQuestionIndex((index) => index + 1)}
+            >
+              Далее
+            </Button>
+          </div>
           <AttemptSubmitBar
             answeredCount={answeredCount}
             totalQuestions={totalQuestions}
@@ -173,9 +200,11 @@ function ReadingAttemptRunner({
 function ReadingAttemptResult({
   attempt,
   material,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   material: PublicReadingMaterial
+  fullMockSessionId?: string
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -194,9 +223,18 @@ function ReadingAttemptResult({
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/dashboard/reading">
-            <ArrowLeft aria-hidden />К Reading
-          </Link>
+          {fullMockSessionId ? (
+            <Link
+              to="/exam/full-mock-sessions/$sessionId"
+              params={{ sessionId: fullMockSessionId }}
+            >
+              <ArrowLeft aria-hidden />К Full Mock
+            </Link>
+          ) : (
+            <Link to="/dashboard/reading">
+              <ArrowLeft aria-hidden />К Reading
+            </Link>
+          )}
         </Button>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
           {material.title}: результат
@@ -284,13 +322,19 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
 
 function StudentGroup({
   group,
+  activeQuestionId,
   answers,
   onAnswer,
 }: {
   group: PublicReadingGroup
+  activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
 }) {
+  const questions = activeQuestionId
+    ? group.questions.filter((question) => question.id === activeQuestionId)
+    : group.questions
+  if (questions.length === 0) return null
   return (
     <section className="grid gap-3 rounded-xl border p-4">
       <div>
@@ -301,7 +345,7 @@ function StudentGroup({
       </div>
       <GroupContexts group={group} />
       <div className="grid gap-4">
-        {group.questions.map((question) => (
+        {questions.map((question) => (
           <StudentQuestion
             key={question.id ?? question.position}
             group={group}

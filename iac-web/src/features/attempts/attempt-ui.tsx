@@ -213,21 +213,26 @@ export function AttemptSubmitBar({
   answeredCount,
   totalQuestions,
   isSubmitting,
+  disabled = false,
+  disabledMessage,
   onSubmit,
 }: {
   answeredCount: number
   totalQuestions: number
   isSubmitting: boolean
+  disabled?: boolean
+  disabledMessage?: string
   onSubmit: () => void
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
       <p className="text-sm text-[#69696d]">
         Отвечено на {answeredCount} из {totalQuestions} вопросов.
+        {disabledMessage ? ` ${disabledMessage}` : ''}
       </p>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button disabled={isSubmitting}>
+          <Button disabled={isSubmitting || disabled}>
             {isSubmitting ? 'Отправляем…' : 'Завершить тест'}
           </Button>
         </AlertDialogTrigger>

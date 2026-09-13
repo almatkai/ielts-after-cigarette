@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { FilePlus2, MicVocal, PencilLine, TriangleAlert } from 'lucide-react'
+import { FilePlus2, FileUp, MicVocal, PencilLine, TriangleAlert } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,12 +26,20 @@ export function SpeakingMaterialsPage() {
             Три части IELTS Speaking: вопросы Parts 1 и 3, cue-card для Part 2.
           </p>
         </div>
-        <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
-          <Link to="/admin/speaking/materials/new">
-            <FilePlus2 aria-hidden />
-            Создать материал
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to="/admin/speaking/import">
+              <FileUp aria-hidden />
+              Импорт JSON
+            </Link>
+          </Button>
+          <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+            <Link to="/admin/speaking/materials/new">
+              <FilePlus2 aria-hidden />
+              Создать материал
+            </Link>
+          </Button>
+        </div>
       </div>
       {materialsQuery.isPending ? (
         <Card className="shadow-none">

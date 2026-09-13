@@ -54,24 +54,27 @@ export function ListeningStudentPage({ testId }: { testId: string }) {
   }
   return (
     <ListeningAttemptRunner
+      key={startQuery.data.attempt.id}
       attempt={startQuery.data.attempt}
       test={startQuery.data.test}
     />
   )
 }
 
-function ListeningAttemptRunner({
+export function ListeningAttemptRunner({
   attempt,
   test,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   test: PublicListeningTest
+  fullMockSessionId?: string
 }) {
   const session = useAttemptSession(attempt.id)
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
 
   const deadline = useMemo(
-    () =>
-      new Date(attempt.startedAt).getTime() + test.durationMinutes * 60_000,
+    () => new Date(attempt.startedAt).getTime() + test.durationMinutes * 60_000,
     [attempt.startedAt, test.durationMinutes],
   )
   const [secondsLeft, setSecondsLeft] = useState(() =>
@@ -90,32 +93,38 @@ function ListeningAttemptRunner({
   }, [secondsLeft, session])
 
   if (session.submitted) {
-    return <ListeningAttemptResult attempt={session.submitted} test={test} />
+    return (
+      <ListeningAttemptResult
+        attempt={session.submitted}
+        test={test}
+        fullMockSessionId={fullMockSessionId}
+      />
+    )
   }
   if (session.answers === null) {
     return <LoadingState label="Восстанавливаем сохранённые ответы…" />
   }
   const answers = session.answers
 
-  const totalQuestions = test.parts.reduce(
-    (sum, part) =>
-      sum + part.groups.reduce((acc, group) => acc + group.questions.length, 0),
-    0,
+  const questions = test.parts.flatMap((part) =>
+    part.groups.flatMap((group) =>
+      group.questions.map((question) => ({ group, part, question })),
+    ),
   )
+  const currentQuestion = questions[activeQuestionIndex]
+  const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
+        <Button asChild variant="link" className="sr-only">
           <Link to="/dashboard/listening">
             <ArrowLeft aria-hidden />К Listening
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-            {test.title}
-          </h1>
+          <h1 className="sr-only">{test.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
             <TimeBadge
@@ -125,7 +134,7 @@ function ListeningAttemptRunner({
             />
           </div>
         </div>
-        <p className="mt-2 flex items-center gap-2 text-sm text-[#69696d]">
+        <p className="sr-only">
           <Clock3 className="size-4" aria-hidden />
           {test.durationMinutes} минут · ответы сохраняются автоматически
         </p>
@@ -139,7 +148,14 @@ function ListeningAttemptRunner({
         </p>
       ) : null}
       {test.parts.map((part) => (
-        <Card key={part.position} className="shadow-none">
+        <Card
+          key={part.position}
+          className={
+            part === currentQuestion.part
+              ? 'flex min-h-0 flex-1 flex-col overflow-hidden shadow-none'
+              : 'hidden'
+          }
+        >
           <CardHeader>
             <CardTitle>
               Part {part.position}: {part.title}
@@ -152,11 +168,12 @@ function ListeningAttemptRunner({
               </p>
             )}
           </CardHeader>
-          <CardContent className="grid gap-5">
+          <CardContent className="min-h-0 flex-1 overflow-y-auto">
             {part.groups.map((group) => (
               <StudentGroup
                 key={group.position}
                 group={group}
+                activeQuestionId={currentQuestion.question.id}
                 answers={answers}
                 onAnswer={session.updateAnswer}
               />
@@ -164,6 +181,26 @@ function ListeningAttemptRunner({
           </CardContent>
         </Card>
       ))}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={activeQuestionIndex === 0}
+          onClick={() => setActiveQuestionIndex((index) => index - 1)}
+        >
+          Назад
+        </Button>
+        <p className="text-sm text-[#69696d]">
+          Вопрос {activeQuestionIndex + 1} из {totalQuestions}
+        </p>
+        <Button
+          type="button"
+          disabled={activeQuestionIndex === totalQuestions - 1}
+          onClick={() => setActiveQuestionIndex((index) => index + 1)}
+        >
+          Далее
+        </Button>
+      </div>
       <AttemptSubmitBar
         answeredCount={answeredCount}
         totalQuestions={totalQuestions}
@@ -177,9 +214,11 @@ function ListeningAttemptRunner({
 function ListeningAttemptResult({
   attempt,
   test,
+  fullMockSessionId,
 }: {
   attempt: Attempt
   test: PublicListeningTest
+  fullMockSessionId?: string
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -198,9 +237,18 @@ function ListeningAttemptResult({
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/dashboard/listening">
-            <ArrowLeft aria-hidden />К Listening
-          </Link>
+          {fullMockSessionId ? (
+            <Link
+              to="/exam/full-mock-sessions/$sessionId"
+              params={{ sessionId: fullMockSessionId }}
+            >
+              <ArrowLeft aria-hidden />К Full Mock
+            </Link>
+          ) : (
+            <Link to="/dashboard/listening">
+              <ArrowLeft aria-hidden />К Listening
+            </Link>
+          )}
         </Button>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
           {test.title}: результат
@@ -322,13 +370,19 @@ function ProtectedImage({ assetId }: { assetId: string }) {
 
 function StudentGroup({
   group,
+  activeQuestionId,
   answers,
   onAnswer,
 }: {
   group: PublicListeningGroup
+  activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
 }) {
+  const questions = activeQuestionId
+    ? group.questions.filter((question) => question.id === activeQuestionId)
+    : group.questions
+  if (questions.length === 0) return null
   const shared = (group.config.options ?? []) as Option[]
   return (
     <section className="grid gap-3 rounded-xl border p-4">
@@ -347,7 +401,7 @@ function StudentGroup({
         </div>
       ) : null}
       <div className="grid gap-4">
-        {group.questions.map((question) => (
+        {questions.map((question) => (
           <StudentQuestion
             key={question.id ?? question.number}
             group={group}

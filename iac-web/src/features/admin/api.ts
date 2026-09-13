@@ -126,6 +126,13 @@ export function publishReadingMaterial(id: string, revision: number) {
   )
 }
 
+export function archiveReadingMaterial(id: string, revision: number) {
+  return apiClient.request<ReadingMaterial>(
+    `/api/v1/admin/reading/materials/${id}/archive`,
+    { method: 'POST', body: { revision } },
+  )
+}
+
 export type ReadingImportIssue = {
   code: string
   message: string

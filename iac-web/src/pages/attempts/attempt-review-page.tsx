@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,10 +12,15 @@ import {
   ReviewQuestion,
 } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
-import { attemptKeys, getAttempt } from '@/features/attempts/api'
+import {
+  attemptKeys,
+  getAttempt,
+  getSpeakingRecordingBlob,
+} from '@/features/attempts/api'
 import type {
   AttemptDetail,
   AttemptReviewItem,
+  SpeakingRecording,
   SpeakingCriterion,
   WritingCriterion,
 } from '@/features/attempts/api'
@@ -84,7 +90,16 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
       {attempt.status !== 'SUBMITTED' ? (
         <InProgressAttempt attempt={attempt} />
       ) : aiEvaluation ? (
-        <AIEvaluationReview evaluation={aiEvaluation} />
+        <>
+          <AIEvaluationReview evaluation={aiEvaluation} />
+          {attempt.materialType === 'speaking' &&
+          (attempt.recordings?.length ?? 0) > 0 ? (
+            <SpeakingRecordings
+              attemptId={attempt.id}
+              recordings={attempt.recordings ?? []}
+            />
+          ) : null}
+        </>
       ) : review === null ? (
         <LoadingState label="Загружаем разбор ответов…" />
       ) : (
@@ -112,28 +127,28 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
         <Button asChild>
           {attempt.materialType === 'listening' ? (
             <Link
-              to="/dashboard/listening/$testId"
+              to="/exam/listening/$testId"
               params={{ testId: attempt.materialId }}
             >
               Продолжить практику
             </Link>
           ) : attempt.materialType === 'reading' ? (
             <Link
-              to="/dashboard/reading/$materialId"
+              to="/exam/reading/$materialId"
               params={{ materialId: attempt.materialId }}
             >
               Продолжить практику
             </Link>
           ) : attempt.materialType === 'writing' ? (
             <Link
-              to="/dashboard/writing/$materialId"
+              to="/exam/writing/$materialId"
               params={{ materialId: attempt.materialId }}
             >
               Продолжить практику
             </Link>
           ) : (
             <Link
-              to="/dashboard/speaking/$materialId"
+              to="/exam/speaking/$materialId"
               params={{ materialId: attempt.materialId }}
             >
               Продолжить практику
@@ -268,6 +283,76 @@ function AIEvaluationReview({ evaluation }: { evaluation: AIEvaluation }) {
       ))}
     </>
   )
+}
+
+function SpeakingRecordings({
+  attemptId,
+  recordings,
+}: {
+  attemptId: string
+  recordings: SpeakingRecording[]
+}) {
+  return (
+    <Card className="shadow-none">
+      <CardHeader>
+        <CardTitle>Ваши аудиозаписи</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        {recordings.map((recording, index) => (
+          <SpeakingRecordingPlayer
+            key={recording.id}
+            attemptId={attemptId}
+            recording={recording}
+            label={`Part ${index + 1}`}
+          />
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function SpeakingRecordingPlayer({
+  attemptId,
+  recording,
+  label,
+}: {
+  attemptId: string
+  recording: SpeakingRecording
+  label: string
+}) {
+  const query = useQuery({
+    queryKey: ['attempts', attemptId, 'recordings', recording.partId],
+    queryFn: () => getSpeakingRecordingBlob(attemptId, recording.partId),
+  })
+  const source = useBlobUrl(query.data)
+  return (
+    <div className="grid gap-2 rounded-xl border border-[#ededeb] p-4">
+      <p className="text-sm font-medium">{label}</p>
+      {source ? <audio controls src={source} className="w-full" /> : null}
+      {query.isPending ? (
+        <p className="text-sm text-[#69696d]">Загружаем запись…</p>
+      ) : null}
+      {query.isError ? (
+        <p className="text-sm text-[#e23b3b]">
+          Не удалось загрузить аудиозапись.
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+function useBlobUrl(blob: Blob | undefined) {
+  const [url, setURL] = useState<string | null>(null)
+  useEffect(() => {
+    if (!blob) {
+      setURL(null)
+      return
+    }
+    const next = URL.createObjectURL(blob)
+    setURL(next)
+    return () => URL.revokeObjectURL(next)
+  }, [blob])
+  return url
 }
 
 function StructuredReview({

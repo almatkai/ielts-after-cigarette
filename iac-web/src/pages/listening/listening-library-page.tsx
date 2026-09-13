@@ -4,16 +4,21 @@ import { Headphones } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useAuth } from '@/features/auth/auth-store'
 import {
   listeningKeys,
   listPublicListeningTests,
 } from '@/features/listening/api'
 
 export function ListeningLibraryPage() {
+  const { user } = useAuth()
   const query = useQuery({
     queryKey: listeningKeys.publicTests,
     queryFn: ({ signal }) => listPublicListeningTests(signal),
   })
+  const tests = (query.data?.items ?? []).filter(
+    (test) => !user?.examType || test.examType === user.examType,
+  )
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
@@ -27,7 +32,7 @@ export function ListeningLibraryPage() {
       </div>
       {query.isPending ? <p>Загружаем…</p> : null}
       <div className="grid gap-3 md:grid-cols-2">
-        {query.data?.items.map((test) => (
+        {tests.map((test) => (
           <Card key={test.id} className="shadow-none">
             <CardContent className="grid gap-3 p-5">
               <Headphones className="size-6 text-[#3b82f6]" aria-hidden />
@@ -38,10 +43,7 @@ export function ListeningLibraryPage() {
                 </p>
               </div>
               <Button asChild>
-                <Link
-                  to="/dashboard/listening/$testId"
-                  params={{ testId: test.id }}
-                >
+                <Link to="/exam/listening/$testId" params={{ testId: test.id }}>
                   Открыть тест
                 </Link>
               </Button>
@@ -49,9 +51,9 @@ export function ListeningLibraryPage() {
           </Card>
         ))}
       </div>
-      {query.data?.items.length === 0 ? (
+      {!query.isPending && tests.length === 0 ? (
         <p className="rounded-xl border border-dashed p-10 text-center text-sm text-[#69696d]">
-          Опубликованных тестов пока нет.
+          Для выбранного формата экзамена пока нет опубликованных тестов.
         </p>
       ) : null}
     </div>

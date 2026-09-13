@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/features/auth/auth-store'
 import {
+  archiveListeningTest,
   createListeningTest,
   getAdminListeningTest,
   listeningKeys,
@@ -113,6 +114,14 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
       setMessage('Тест опубликован и доступен студентам.')
     },
   })
+  const archiveMutation = useMutation({
+    mutationFn: () => archiveListeningTest(testId!, form.revision),
+    onSuccess: async (test) => {
+      setForm(toForm(test))
+      await queryClient.invalidateQueries({ queryKey: listeningKeys.adminTests })
+      setMessage('Тест перенесён в архив.')
+    },
+  })
 
   const updatePart = (index: number, patch: Partial<ListeningPart>) =>
     setForm((current) => ({
@@ -211,6 +220,20 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               onClick={() => void publishMutation.mutateAsync()}
             >
               <Send aria-hidden /> Опубликовать
+            </Button>
+          ) : null}
+          {testId && auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={archiveMutation.isPending}
+              onClick={() => {
+                if (window.confirm('Архивировать этот Listening тест?')) {
+                  archiveMutation.mutate()
+                }
+              }}
+            >
+              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
           <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb]">

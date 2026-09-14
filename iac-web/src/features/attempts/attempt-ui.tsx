@@ -267,7 +267,7 @@ export function multiSelectLimit(
   sources: Record<string, unknown>[],
 ) {
   for (const source of sources) {
-    const raw = source.maxAnswers ?? source.selectCount
+    const raw = source.selectionLimit ?? source.maxAnswers ?? source.selectCount
     if (typeof raw === 'number' && raw > 1) return raw
   }
   const match = /\b(two|three|four|five|six)\s+letters/i.exec(instructions)
@@ -333,8 +333,7 @@ export function ChoiceOptions({
     )
   }
 
-  const selectedId =
-    typeof value?.optionId === 'string' ? value.optionId : null
+  const selectedId = typeof value?.optionId === 'string' ? value.optionId : null
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {options.map((option) => (

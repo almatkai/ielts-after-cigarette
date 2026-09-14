@@ -23,10 +23,13 @@ export type PublicReadingMaterial = {
   slug: string
   examType: 'academic' | 'general'
   difficulty: 'foundation' | 'intermediate' | 'advanced'
+  kind: 'PASSAGE' | 'TEST'
   title: string
   description: string
   body: string
+  durationMinutes: number | null
   questionGroups: PublicReadingGroup[]
+  passages?: PublicReadingMaterial[]
 }
 
 export type PublicReadingMaterialListItem = Omit<
@@ -47,7 +50,6 @@ export const listPublicReadingMaterials = (signal?: AbortSignal) =>
     { signal },
   )
 export const getPublicReadingMaterial = (id: string, signal?: AbortSignal) =>
-  apiClient.request<PublicReadingMaterial>(
-    `/api/v1/reading/materials/${id}`,
-    { signal },
-  )
+  apiClient.request<PublicReadingMaterial>(`/api/v1/reading/materials/${id}`, {
+    signal,
+  })

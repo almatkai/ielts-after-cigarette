@@ -425,42 +425,55 @@ function StructuredReview({
       </>
     )
   }
+  const passages =
+    material.passages && material.passages.length > 0
+      ? material.passages
+      : [material]
   return (
-    <Card className="shadow-none">
-      <CardContent className="grid gap-5 p-5">
-        {material.questionGroups.map((group) => (
-          <section
-            key={group.position}
-            className="grid gap-3 rounded-xl border p-4"
-          >
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                {group.type.replaceAll('_', ' ')}
-              </p>
-              <p className="mt-1 whitespace-pre-wrap text-sm">
-                {group.instructions}
-              </p>
-            </div>
-            <div className="grid gap-3">
-              {group.questions.map((question) => {
-                const item = question.id
-                  ? reviewByQuestionId.get(question.id)
-                  : undefined
-                if (!item || !question.id) return null
-                const options = (question.content.options ?? []) as Option[]
-                return (
-                  <ReviewQuestion
-                    key={question.id}
-                    item={item}
-                    options={options}
-                  />
-                )
-              })}
-            </div>
-          </section>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="grid gap-5">
+      {passages.map((passage, passageIndex) => (
+        <Card key={passage.id} className="shadow-none">
+          <CardHeader>
+            <CardTitle>
+              Passage {passageIndex + 1}: {passage.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-5 p-5">
+            {passage.questionGroups.map((group) => (
+              <section
+                key={`${passage.id}-${group.position}`}
+                className="grid gap-3 rounded-xl border p-4"
+              >
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+                    {group.type.replaceAll('_', ' ')}
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm">
+                    {group.instructions}
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  {group.questions.map((question) => {
+                    const item = question.id
+                      ? reviewByQuestionId.get(question.id)
+                      : undefined
+                    if (!item || !question.id) return null
+                    const options = (question.content.options ?? []) as Option[]
+                    return (
+                      <ReviewQuestion
+                        key={question.id}
+                        item={item}
+                        options={options}
+                      />
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 }
 

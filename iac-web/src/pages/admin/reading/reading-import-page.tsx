@@ -151,8 +151,7 @@ export function ReadingImportPage() {
     },
   })
   const confirmMutation = useMutation({
-    mutationFn: () =>
-      confirmReadingImport(result!.passages.map((passage) => passage.material)),
+    mutationFn: () => confirmReadingImport(result!),
     onSuccess: async ({ items }) => {
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.readingMaterials,
@@ -300,6 +299,13 @@ export function ReadingImportPage() {
             className="font-mono text-sm leading-6"
             placeholder="# IELTS_READING_IMPORT_V1&#10;title: ..."
           />
+          <p className="text-sm leading-6 text-[#69696d]">
+            Поддерживаются все типы Reading, банк слов через{' '}
+            <code>options:</code>, групповой выбор через{' '}
+            <code>MULTIPLE_SELECT</code>, изображения через <code>image:</code>{' '}
+            и пропуски вида <code>{'{{12}}'}</code>, <code>(12) …</code> или{' '}
+            <code>(12) ____</code>.
+          </p>
           <div className="flex justify-end">
             <Button
               type="button"
@@ -393,7 +399,7 @@ function ImportPreview({
           >
             {pending
               ? 'Импортируем…'
-              : `Импортировать ${result.passages.length} passage`}
+              : `Создать один тест из ${result.passages.length} passage`}
           </Button>
         </div>
       </CardContent>

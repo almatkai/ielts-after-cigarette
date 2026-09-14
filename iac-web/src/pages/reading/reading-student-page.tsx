@@ -6,7 +6,8 @@ import {
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, Clock3 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   AlertDialog,
@@ -93,7 +94,7 @@ export function ReadingAttemptRunner({
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
-  const [activeMobileTab, setActiveMobileTab] = useState<'passage' | 'questions'>('questions')
+  const autoSubmitStarted = useRef(false)
 
   const startedAt = useMemo(
     () => new Date(attempt.startedAt).getTime(),
@@ -110,6 +111,20 @@ export function ReadingAttemptRunner({
     }, 1000)
     return () => window.clearInterval(interval)
   }, [startedAt])
+  const durationSeconds = (material.durationMinutes ?? 0) * 60
+  const remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
+  useEffect(() => {
+    if (
+      durationSeconds > 0 &&
+      remainingSeconds === 0 &&
+      !session.submitted &&
+      !session.isSubmitting &&
+      !autoSubmitStarted.current
+    ) {
+      autoSubmitStarted.current = true
+      void session.submit()
+    }
+  }, [durationSeconds, remainingSeconds, session])
 
   if (session.submitted) {
     return (
@@ -131,47 +146,52 @@ export function ReadingAttemptRunner({
   }
   const answers = session.answers
 
-  const questions = material.questionGroups.flatMap((group) =>
-    group.questions.map((question) => ({ group, question })),
+  const passages =
+    material.passages && material.passages.length > 0
+      ? material.passages
+      : [material]
+  const questions = passages.flatMap((passage, passageIndex) =>
+    passage.questionGroups.flatMap((group) =>
+      group.questions.map((question) => ({
+        passage,
+        passageIndex,
+        group,
+        question,
+      })),
+    ),
   )
   const currentQuestion = questions[activeQuestionIndex]
-  const totalQuestions = questions.length
-  const answeredCount = Object.keys(answers).length
+  const totalQuestions = questions.reduce(
+    (total, item) => total + item.question.points,
+    0,
+  )
+  const answeredCount = questions.reduce((total, item) => {
+    if (!item.question.id) return total
+    const answer = answers[item.question.id] ?? {}
+    if (Array.isArray(answer.optionIds)) {
+      return total + Math.min(answer.optionIds.length, item.question.points)
+    }
+    if (answer.optionId || answer.value) return total + 1
+    return total
+  }, 0)
+  const currentNumber = questionNumberLabel(currentQuestion.question)
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col overflow-hidden px-3 py-3 sm:px-6 sm:py-4">
-      {/* Top Header Bar */}
-      <header className="mb-3 flex shrink-0 items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white px-4 py-2.5 shadow-xs">
-        <div className="flex min-w-0 items-center gap-3">
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
-          >
-            {fullMockSessionId ? (
-              <Link
-                to="/exam/full-mock-sessions/$sessionId"
-                params={{ sessionId: fullMockSessionId }}
-              >
-                <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К Full Mock</span>
-              </Link>
-            ) : (
-              <Link to="/dashboard/reading">
-                <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К каталогу</span>
-              </Link>
-            )}
-          </Button>
-          <div className="h-4 w-px bg-slate-200" />
-          <div className="min-w-0">
-            <h1 className="truncate text-sm font-semibold text-slate-900 sm:text-base">
-              {material.title}
-            </h1>
-            <p className="text-xs text-slate-500">
-              IELTS Reading · {material.examType === 'academic' ? 'Academic' : 'General Training'}
-            </p>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
+      <div>
+        <Button asChild variant="link" className="sr-only">
+          <Link to="/dashboard/reading">
+            <ArrowLeft aria-hidden />К Reading
+          </Link>
+        </Button>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="sr-only">{material.title}</h1>
+          <div className="flex items-center gap-3">
+            <SaveIndicator state={session.saveState} />
+            <TimeBadge
+              seconds={durationSeconds > 0 ? remainingSeconds : elapsedSeconds}
+              label={durationSeconds > 0 ? 'Осталось' : 'Прошедшее время'}
+            />
           </div>
         </div>
 
@@ -245,145 +265,72 @@ export function ReadingAttemptRunner({
           Не удалось отправить тест: {session.submitError}
         </p>
       ) : null}
-
-      {/* Main Split-View Workspace */}
-      <div className="flex min-h-0 flex-1 gap-4">
-        {/* Left Column: Reading Passage Text */}
-        <section
-          className={cn(
-            'flex flex-col rounded-2xl border border-slate-200/90 bg-white shadow-xs overflow-hidden',
-            'w-full lg:w-[54%] xl:w-[56%]',
-            activeMobileTab === 'questions' ? 'hidden lg:flex' : 'flex',
-          )}
-          aria-label="Текст для чтения"
-        >
-          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 px-5 py-3">
-            <div className="flex items-center gap-2">
-              <Book1 className="size-4 text-[#3b82f6]" aria-hidden />
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-                Reading Passage
-              </span>
-            </div>
-            <span className="text-xs text-slate-400 capitalize">
-              Уровень: {material.difficulty}
-            </span>
-          </div>
-          <div className="flex-1 overflow-y-auto p-6 sm:p-8 text-[15px] sm:text-base leading-relaxed text-slate-800 selection:bg-blue-100">
-            <div className="max-w-none space-y-4 whitespace-pre-wrap font-sans">
-              {material.body}
-            </div>
-          </div>
-        </section>
-
-        {/* Right Column: Clean Question & Right Control Panel */}
-        <section
-          className={cn(
-            'flex flex-col rounded-2xl border border-slate-200/90 bg-white shadow-xs overflow-hidden',
-            'w-full lg:w-[46%] xl:w-[44%]',
-            activeMobileTab === 'passage' ? 'hidden lg:flex' : 'flex',
-          )}
-          aria-label="Вопросы и управление"
-        >
-          {/* Question Group Header */}
-          <div className="shrink-0 border-b border-slate-100 bg-slate-50/50 px-5 py-3.5">
-            <div className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center rounded-md border border-blue-100 bg-blue-50/80 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-blue-700 uppercase">
-                {currentQuestion.group.type.replaceAll('_', ' ')}
-              </span>
-              <span className="text-xs font-medium text-slate-500">
-                Вопрос {activeQuestionIndex + 1} из {totalQuestions}
-              </span>
-            </div>
-            {currentQuestion.group.instructions ? (
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                {currentQuestion.group.instructions}
-              </p>
-            ) : null}
-          </div>
-
-          {/* Question Area - Clean, No Nested Boxes */}
-          <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5">
-            <GroupContexts group={currentQuestion.group} />
-
-            <CleanStudentQuestion
-              group={currentQuestion.group}
-              question={currentQuestion.question}
-              value={currentQuestion.question.id ? answers[currentQuestion.question.id] : undefined}
-              onAnswer={session.updateAnswer}
-            />
-          </div>
-
-          {/* Right Control Panel: Question Palette & Navigation */}
-          <div className="shrink-0 border-t border-slate-100 bg-slate-50/60 p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span className="font-medium text-slate-600">Навигация по вопросам:</span>
-              <span className="font-semibold text-slate-700">
-                Отвечено: {answeredCount} из {totalQuestions}
-              </span>
-            </div>
-
-            {/* Quick Jump Palette */}
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto py-0.5">
-              {questions.map((q, idx) => {
-                const isCurrent = idx === activeQuestionIndex
-                const isAnswered = Boolean(answers[q.question.id ?? ''])
-                return (
-                  <button
-                    key={q.question.id ?? idx}
-                    type="button"
-                    onClick={() => {
-                      setActiveQuestionIndex(idx)
-                      setActiveMobileTab('questions')
-                    }}
-                    aria-current={isCurrent ? 'true' : undefined}
-                    aria-label={`Вопрос ${q.question.position}${isAnswered ? ', отвечен' : ''}`}
-                    className={cn(
-                      'size-7 sm:size-8 rounded-lg text-xs font-semibold transition-all flex items-center justify-center select-none',
-                      isCurrent
-                        ? 'bg-[#3b82f6] text-white shadow-xs ring-2 ring-blue-300'
-                        : isAnswered
-                          ? 'border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'
-                          : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
-                    )}
-                  >
-                    {q.question.position}
-                  </button>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {passages.map((passage, passageIndex) => (
+            <Button
+              key={passage.id}
+              type="button"
+              size="sm"
+              variant={
+                currentQuestion.passageIndex === passageIndex
+                  ? 'default'
+                  : 'outline'
+              }
+              onClick={() => {
+                const index = questions.findIndex(
+                  (item) => item.passageIndex === passageIndex,
                 )
-              })}
+                if (index >= 0) setActiveQuestionIndex(index)
+              }}
+            >
+              Passage {passageIndex + 1}
+            </Button>
+          ))}
+        </div>
+        <Card className="max-h-[28dvh] shrink-0 overflow-y-auto shadow-none">
+          <CardHeader>
+            <CardTitle>{currentQuestion.passage.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="whitespace-pre-wrap text-sm leading-6">
+              {currentQuestion.passage.body}
             </div>
-
-            {/* Prev / Next Buttons */}
-            <div className="flex items-center justify-between gap-3 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={activeQuestionIndex === 0}
-                onClick={() => {
-                  setActiveQuestionIndex((idx) => idx - 1)
-                  setActiveMobileTab('questions')
-                }}
-                className="gap-1.5 rounded-xl text-xs font-medium"
-              >
-                <ArrowLeft className="size-3.5" aria-hidden />
-                <span>Назад</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={activeQuestionIndex === totalQuestions - 1}
-                onClick={() => {
-                  setActiveQuestionIndex((idx) => idx + 1)
-                  setActiveMobileTab('questions')
-                }}
-                className="gap-1.5 rounded-xl text-xs font-medium"
-              >
-                <span>Далее</span>
-                <ArrowRight className="size-3.5" aria-hidden />
-              </Button>
-            </div>
+          </CardContent>
+        </Card>
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          <Card className="min-h-0 flex-1 overflow-y-auto shadow-none">
+            <CardHeader>
+              <CardTitle>Вопросы</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-5">
+              <StudentGroup
+                group={currentQuestion.group}
+                activeQuestionId={currentQuestion.question.id}
+                answers={answers}
+                onAnswer={session.updateAnswer}
+              />
+            </CardContent>
+          </Card>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={activeQuestionIndex === 0}
+              onClick={() => setActiveQuestionIndex((index) => index - 1)}
+            >
+              Назад
+            </Button>
+            <p className="text-sm text-[#69696d]">
+              Вопрос {currentNumber} из {totalQuestions}
+            </p>
+            <Button
+              type="button"
+              disabled={activeQuestionIndex === totalQuestions - 1}
+              onClick={() => setActiveQuestionIndex((index) => index + 1)}
+            >
+              Далее
+            </Button>
           </div>
         </section>
       </div>
@@ -447,32 +394,48 @@ function ReadingAttemptResult({
         </p>
       ) : (
         <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle>Разбор ответов</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6">
-            {material.questionGroups.map((group) => (
-              <section key={group.position} className="grid gap-3">
-                <h2 className="font-semibold">{group.instructions}</h2>
-                <GroupContexts group={group} />
-                <div className="grid gap-4">
-                  {group.questions.map((question) => {
-                    const item = question.id
-                      ? reviewByQuestionId.get(question.id)
-                      : undefined
-                    if (!item || !question.id) return null
-                    const options = (question.content.options ?? []) as Option[]
-                    return (
-                      <ReviewQuestion
-                        key={question.id}
-                        item={item}
-                        options={options}
-                      />
-                    )
-                  })}
-                </div>
-              </section>
-            ))}
+          <CardContent className="grid gap-5 p-5">
+            {(material.passages && material.passages.length > 0
+              ? material.passages
+              : [material]
+            ).flatMap((passage, passageIndex) =>
+              passage.questionGroups.map((group) => (
+                <section
+                  key={`${passage.id}-${group.position}`}
+                  className="grid gap-3 rounded-xl border p-4"
+                >
+                  <div>
+                    <p className="mb-2 text-sm font-semibold">
+                      Passage {passageIndex + 1}: {passage.title}
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+                      {group.type.replaceAll('_', ' ')}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">
+                      {group.instructions}
+                    </p>
+                  </div>
+                  <GroupContexts group={group} />
+                  <div className="grid gap-3">
+                    {group.questions.map((question) => {
+                      const item = question.id
+                        ? reviewByQuestionId.get(question.id)
+                        : undefined
+                      if (!item || !question.id) return null
+                      const options = (question.content.options ??
+                        []) as Option[]
+                      return (
+                        <ReviewQuestion
+                          key={question.id}
+                          item={item}
+                          options={options}
+                        />
+                      )
+                    })}
+                  </div>
+                </section>
+              )),
+            )}
           </CardContent>
         </Card>
       )}
@@ -491,15 +454,35 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
         ),
     ),
   )
-  if (contexts.length === 0) return null
+  const images = Array.from(
+    new Set(
+      group.questions
+        .map((question) => question.content.imageUrl)
+        .filter(
+          (imageUrl): imageUrl is string =>
+            typeof imageUrl === 'string' && imageUrl.trim() !== '',
+        ),
+    ),
+  )
+  if (contexts.length === 0 && images.length === 0) return null
   return (
-    <div className="space-y-3">
+    <>
+      {images.map((imageUrl) => (
+        <img
+          key={imageUrl}
+          src={imageUrl}
+          alt="Diagram for the question group"
+          className="max-h-[420px] w-auto max-w-full rounded-lg border object-contain"
+        />
+      ))}
       {contexts.map((context) => (
         <div
           key={context}
           className="whitespace-pre-wrap rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 text-sm leading-relaxed text-slate-700"
         >
-          {context.replaceAll('{{answer}}', '_____')}
+          {context
+            .replaceAll('{{answer}}', '_____')
+            .replace(/\{\{(\d+)\}\}/g, '($1) _____')}
         </div>
       ))}
     </div>
@@ -528,9 +511,9 @@ function CleanStudentQuestion({
         : null
 
   const prompt = (
-    <div className="text-base font-semibold leading-relaxed text-slate-900">
-      <span className="mr-2 inline-flex size-7 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-[#3b82f6]">
-        {question.position}
+    <p className="font-medium">
+      <span className="mr-2 text-[#3b82f6]">
+        {questionNumberLabel(question)}.
       </span>
       {question.prompt.replace('{{answer}}', '_____')}
     </div>
@@ -679,4 +662,16 @@ function CleanStudentQuestion({
       </div>
     </div>
   )
+}
+
+function questionNumberLabel(question: PublicReadingQuestion) {
+  const start =
+    typeof question.content.number === 'number'
+      ? question.content.number
+      : question.position
+  const end =
+    typeof question.content.numberEnd === 'number'
+      ? question.content.numberEnd
+      : null
+  return end && end > start ? `${start}–${end}` : String(start)
 }

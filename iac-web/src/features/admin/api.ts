@@ -26,10 +26,12 @@ export type ReadingMaterial = {
   examType: 'academic' | 'general'
   difficulty: 'foundation' | 'intermediate' | 'advanced'
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+  kind: 'PASSAGE' | 'TEST'
   revision: number
   title: string
   description: string
   body: string
+  durationMinutes: number | null
   sourceTitle: string | null
   sourceUrl: string | null
   currentVersionNumber: number
@@ -39,6 +41,7 @@ export type ReadingMaterial = {
   createdAt: string
   updatedAt: string
   questionGroups?: ReadingQuestionGroup[]
+  passages?: ReadingMaterial[]
 }
 
 export const readingQuestionTypes = [
@@ -79,12 +82,14 @@ export type ReadingQuestionGroup = {
 }
 
 export type ReadingMaterialInput = {
+  kind?: ReadingMaterial['kind']
   slug: string
   examType: ReadingMaterial['examType']
   difficulty: ReadingMaterial['difficulty']
   title: string
   description: string
   body: string
+  durationMinutes?: number | null
   sourceTitle: string | null
   sourceUrl: string | null
   questionGroups: ReadingQuestionGroup[]
@@ -167,10 +172,17 @@ export function parseReadingImport(
   )
 }
 
-export function confirmReadingImport(passages: ReadingMaterialInput[]) {
+export function confirmReadingImport(result: ReadingImportResult) {
   return apiClient.request<{ items: ReadingMaterial[] }>(
     '/api/v1/admin/reading/import',
-    { method: 'POST', body: { passages } },
+    {
+      method: 'POST',
+      body: {
+        title: result.title,
+        durationMinutes: result.durationMinutes ?? 60,
+        passages: result.passages.map((passage) => passage.material),
+      },
+    },
   )
 }
 

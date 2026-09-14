@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, Clock3 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -72,6 +72,7 @@ export function ReadingAttemptRunner({
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const autoSubmitStarted = useRef(false)
 
   // У reading нет лимита времени — показываем прошедшее время от startedAt.
   const startedAt = useMemo(
@@ -89,6 +90,20 @@ export function ReadingAttemptRunner({
     }, 1000)
     return () => window.clearInterval(interval)
   }, [startedAt])
+  const durationSeconds = (material.durationMinutes ?? 0) * 60
+  const remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
+  useEffect(() => {
+    if (
+      durationSeconds > 0 &&
+      remainingSeconds === 0 &&
+      !session.submitted &&
+      !session.isSubmitting &&
+      !autoSubmitStarted.current
+    ) {
+      autoSubmitStarted.current = true
+      void session.submit()
+    }
+  }, [durationSeconds, remainingSeconds, session])
 
   if (session.submitted) {
     return (
@@ -104,8 +119,19 @@ export function ReadingAttemptRunner({
   }
   const answers = session.answers
 
-  const questions = material.questionGroups.flatMap((group) =>
-    group.questions.map((question) => ({ group, question })),
+  const passages =
+    material.passages && material.passages.length > 0
+      ? material.passages
+      : [material]
+  const questions = passages.flatMap((passage, passageIndex) =>
+    passage.questionGroups.flatMap((group) =>
+      group.questions.map((question) => ({
+        passage,
+        passageIndex,
+        group,
+        question,
+      })),
+    ),
   )
   const currentQuestion = questions[activeQuestionIndex]
   const totalQuestions = questions.reduce(
@@ -135,7 +161,10 @@ export function ReadingAttemptRunner({
           <h1 className="sr-only">{material.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
-            <TimeBadge seconds={elapsedSeconds} label="Прошедшее время" />
+            <TimeBadge
+              seconds={durationSeconds > 0 ? remainingSeconds : elapsedSeconds}
+              label={durationSeconds > 0 ? 'Осталось' : 'Прошедшее время'}
+            />
           </div>
         </div>
         <p className="sr-only">
@@ -153,13 +182,35 @@ export function ReadingAttemptRunner({
         </p>
       ) : null}
       <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {passages.map((passage, passageIndex) => (
+            <Button
+              key={passage.id}
+              type="button"
+              size="sm"
+              variant={
+                currentQuestion.passageIndex === passageIndex
+                  ? 'default'
+                  : 'outline'
+              }
+              onClick={() => {
+                const index = questions.findIndex(
+                  (item) => item.passageIndex === passageIndex,
+                )
+                if (index >= 0) setActiveQuestionIndex(index)
+              }}
+            >
+              Passage {passageIndex + 1}
+            </Button>
+          ))}
+        </div>
         <Card className="max-h-[28dvh] shrink-0 overflow-y-auto shadow-none">
           <CardHeader>
-            <CardTitle>Текст</CardTitle>
+            <CardTitle>{currentQuestion.passage.title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="whitespace-pre-wrap text-sm leading-6">
-              {material.body}
+              {currentQuestion.passage.body}
             </div>
           </CardContent>
         </Card>
@@ -264,38 +315,47 @@ function ReadingAttemptResult({
       ) : (
         <Card className="shadow-none">
           <CardContent className="grid gap-5 p-5">
-            {material.questionGroups.map((group) => (
-              <section
-                key={group.position}
-                className="grid gap-3 rounded-xl border p-4"
-              >
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                    {group.type.replaceAll('_', ' ')}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap text-sm">
-                    {group.instructions}
-                  </p>
-                </div>
-                <GroupContexts group={group} />
-                <div className="grid gap-3">
-                  {group.questions.map((question) => {
-                    const item = question.id
-                      ? reviewByQuestionId.get(question.id)
-                      : undefined
-                    if (!item || !question.id) return null
-                    const options = (question.content.options ?? []) as Option[]
-                    return (
-                      <ReviewQuestion
-                        key={question.id}
-                        item={item}
-                        options={options}
-                      />
-                    )
-                  })}
-                </div>
-              </section>
-            ))}
+            {(material.passages && material.passages.length > 0
+              ? material.passages
+              : [material]
+            ).flatMap((passage, passageIndex) =>
+              passage.questionGroups.map((group) => (
+                <section
+                  key={`${passage.id}-${group.position}`}
+                  className="grid gap-3 rounded-xl border p-4"
+                >
+                  <div>
+                    <p className="mb-2 text-sm font-semibold">
+                      Passage {passageIndex + 1}: {passage.title}
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+                      {group.type.replaceAll('_', ' ')}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">
+                      {group.instructions}
+                    </p>
+                  </div>
+                  <GroupContexts group={group} />
+                  <div className="grid gap-3">
+                    {group.questions.map((question) => {
+                      const item = question.id
+                        ? reviewByQuestionId.get(question.id)
+                        : undefined
+                      if (!item || !question.id) return null
+                      const options = (question.content.options ??
+                        []) as Option[]
+                      return (
+                        <ReviewQuestion
+                          key={question.id}
+                          item={item}
+                          options={options}
+                        />
+                      )
+                    })}
+                  </div>
+                </section>
+              )),
+            )}
           </CardContent>
         </Card>
       )}

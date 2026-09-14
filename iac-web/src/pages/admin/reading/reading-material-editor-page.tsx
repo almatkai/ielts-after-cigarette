@@ -43,12 +43,14 @@ import type {
 type EditorForm = ReadingMaterialInput & { revision: number }
 
 const emptyForm: EditorForm = {
+  kind: 'PASSAGE',
   slug: '',
   examType: 'academic',
   difficulty: 'intermediate',
   title: '',
   description: '',
   body: '',
+  durationMinutes: null,
   sourceTitle: null,
   sourceUrl: null,
   questionGroups: [],
@@ -60,12 +62,14 @@ const fieldClassName =
 
 function materialToForm(material: ReadingMaterial): EditorForm {
   return {
+    kind: material.kind,
     slug: material.slug,
     examType: material.examType,
     difficulty: material.difficulty,
     title: material.title,
     description: material.description,
     body: material.body,
+    durationMinutes: material.durationMinutes,
     sourceTitle: material.sourceTitle,
     sourceUrl: material.sourceUrl,
     questionGroups: material.questionGroups ?? [],
@@ -334,16 +338,47 @@ export function ReadingMaterialEditorPage({
               хранятся отдельно от текста.
             </p>
           </div>
-          <Button type="button" variant="outline" onClick={addGroup}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={form.kind === 'TEST'}
+            onClick={addGroup}
+          >
             Добавить группу
           </Button>
         </CardHeader>
         <CardContent className="grid gap-4 p-5">
           {form.questionGroups.length === 0 ? (
             <p className="text-sm text-[#69696d]">
-              Вопросы можно добавить сейчас или позже.
+              {form.kind === 'TEST'
+                ? `Это полный тест. Вопросы находятся внутри ${materialQuery.data?.passages?.length ?? 0} passage и публикуются вместе.`
+                : 'Вопросы можно добавить сейчас или позже.'}
             </p>
           ) : null}
+          {form.kind === 'TEST'
+            ? materialQuery.data?.passages?.map((passage, index) => (
+                <div
+                  key={passage.id}
+                  className="rounded-[12px] border border-[#e7e7e4] p-4"
+                >
+                  <p className="font-semibold">
+                    Passage {index + 1}: {passage.title}
+                  </p>
+                  <p className="mt-1 text-sm text-[#69696d]">
+                    {passage.questionGroups?.reduce(
+                      (total, group) =>
+                        total +
+                        group.questions.reduce(
+                          (points, question) => points + question.points,
+                          0,
+                        ),
+                      0,
+                    ) ?? 0}{' '}
+                    вопросов
+                  </p>
+                </div>
+              ))
+            : null}
           {form.questionGroups.map((group, groupIndex) => (
             <div
               key={`${group.position}-${groupIndex}`}

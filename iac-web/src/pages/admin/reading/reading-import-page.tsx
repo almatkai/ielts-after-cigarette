@@ -151,8 +151,7 @@ export function ReadingImportPage() {
     },
   })
   const confirmMutation = useMutation({
-    mutationFn: () =>
-      confirmReadingImport(result!.passages.map((passage) => passage.material)),
+    mutationFn: () => confirmReadingImport(result!),
     onSuccess: async ({ items }) => {
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.readingMaterials,
@@ -400,7 +399,7 @@ function ImportPreview({
           >
             {pending
               ? 'Импортируем…'
-              : `Импортировать ${result.passages.length} passage`}
+              : `Создать один тест из ${result.passages.length} passage`}
           </Button>
         </div>
       </CardContent>

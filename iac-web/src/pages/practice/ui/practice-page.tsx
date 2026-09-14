@@ -1,250 +1,164 @@
-import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
 import {
-  BookOpenText,
-  Check,
-  ClipboardList,
-  Headphones,
-  LibraryBig,
-  Mic2,
-  PenLine,
-} from 'lucide-react'
+  ArrowRight,
+  Book,
+  ClipboardTick,
+  Edit2,
+  Headphone,
+  Microphone,
+} from 'iconsax-react'
+import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
-import { skillData } from '@/content/landing-content'
 import { cn } from '@/lib/utils'
 
-import type { SkillId } from '@/content/landing-content'
-
-const skillIcons = {
-  listening: Headphones,
-  reading: BookOpenText,
-  writing: PenLine,
-  speaking: Mic2,
-} satisfies Record<SkillId, typeof Headphones>
-
-const practiceSteps = [
+const skills = [
   {
-    number: '01',
-    title: 'Выберите навык',
-    description: 'Сфокусируйтесь на одном направлении IELTS.',
+    id: 'listening',
+    title: 'Listening',
+    subtitle: 'Аудирование',
+    description:
+      '4 секции, 40 вопросов. Диалоги и академические лекции с таймингом и автоматической проверкой ответов.',
+    badge: '4 секции · 40 вопросов',
+    to: '/dashboard/listening',
+    icon: Headphone,
   },
   {
-    number: '02',
-    title: 'Выполните задание',
-    description: 'Работайте в формате, близком к экзамену.',
+    id: 'reading',
+    title: 'Reading',
+    subtitle: 'Чтение',
+    description:
+      '3 академических текста, 40 вопросов. Задания True/False/Not Given, множественный выбор и заполнение пропусков.',
+    badge: '3 текста · 40 вопросов',
+    to: '/dashboard/reading',
+    icon: Book,
   },
   {
-    number: '03',
-    title: 'Разберите результат',
-    description: 'Используйте ошибки для следующей тренировки.',
+    id: 'writing',
+    title: 'Writing',
+    subtitle: 'Письмо',
+    description:
+      'Task 1 (описание графиков/письма) и Task 2 (эссе). Детальный разбор по всем 4 официальным критериям IELTS.',
+    badge: 'Task 1 & Task 2',
+    to: '/dashboard/writing',
+    icon: Edit2,
+  },
+  {
+    id: 'speaking',
+    title: 'Speaking',
+    subtitle: 'Устная речь',
+    description:
+      'Интервью (Part 1), карточка монолога (Part 2) и обсуждение (Part 3) с записью аудио и подробной оценкой.',
+    badge: 'Part 1, 2, 3',
+    to: '/dashboard/speaking',
+    icon: Microphone,
   },
 ] as const
 
-const skillLibraryHref: Partial<Record<SkillId, string>> = {
-  listening: '/dashboard/listening',
-  reading: '/dashboard/reading',
-  writing: '/dashboard/writing',
-  speaking: '/dashboard/speaking',
-}
-
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
+  'gap-0 rounded-[16px] border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]'
 
 export function PracticePage() {
-  const [selectedSkill, setSelectedSkill] = useState<SkillId | null>(null)
-  const selectedSkillData = skillData.find(
-    (skill) => skill.id === selectedSkill,
-  )
-  const SelectedSkillIcon = selectedSkillData
-    ? skillIcons[selectedSkillData.id]
-    : LibraryBig
-
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
-      <section aria-labelledby="skill-selection-heading">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2
-              id="skill-selection-heading"
-              className="text-lg font-semibold tracking-[-0.025em] text-[#111111]"
-            >
-              Выберите навык
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-[#69696d]">
-              Сосредоточьтесь на одном направлении текущей тренировки.
-            </p>
-          </div>
-          <Badge
-            variant="outline"
-            className="border-[#deded9] bg-white px-2.5 py-1 text-[#69696d]"
-          >
-            4 направления IELTS
-          </Badge>
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-6">
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold tracking-[-0.025em] text-[#111111]">
+            Практика
+          </h1>
+          <p className="mt-1 text-sm leading-6 text-[#69696d]">
+            Выберите секцию для тренировки или пройдите полный пробный экзамен.
+          </p>
         </div>
+        <Badge
+          variant="outline"
+          className="w-fit border-[#deded9] bg-white px-2.5 py-1 text-xs text-[#69696d]"
+        >
+          4 секции + Full Mock
+        </Badge>
+      </header>
 
-        <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {skillData.map((skill) => {
-            const Icon = skillIcons[skill.id]
-            const isSelected = selectedSkill === skill.id
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+        {skills.map((skill) => {
+          const Icon = skill.icon
 
-            return (
-              <Card
-                key={skill.id}
-                className={cn(
-                  cardClassName,
-                  'transition-[border-color,box-shadow,transform] duration-200 has-[button:focus-visible]:border-[#3b82f6] hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]',
-                  isSelected &&
-                    'border-[#3b82f6] shadow-[0_14px_40px_rgba(59,130,246,0.08)]',
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => setSelectedSkill(skill.id)}
-                  className="flex min-h-[188px] w-full flex-col items-start p-5 text-left outline-none"
-                  aria-pressed={isSelected}
-                >
-                  <span
-                    className={cn(
-                      'grid size-10 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-colors',
-                      isSelected && 'bg-[#eff6ff] text-[#3b82f6]',
-                    )}
-                  >
-                    <Icon
-                      className="size-[19px]"
-                      strokeWidth={1.8}
-                      aria-hidden
-                    />
-                  </span>
-                  <span className="mt-5 flex w-full items-center justify-between gap-3">
-                    <span className="text-sm font-semibold text-[#111111]">
-                      {skill.label}
-                    </span>
-                    {isSelected ? (
-                      <span
-                        className="grid size-5 shrink-0 place-items-center rounded-full bg-[#3b82f6] text-white"
-                        aria-label="Выбрано"
-                      >
-                        <Check
-                          className="size-3"
-                          strokeWidth={2.5}
-                          aria-hidden
-                        />
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="mt-2 line-clamp-3 text-xs leading-5 text-[#808084]">
-                    {skill.description}
-                  </span>
-                </button>
-              </Card>
-            )
-          })}
-        </div>
-      </section>
-
-      <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <Card className={cardClassName}>
-          <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <CardTitle className="text-base tracking-[-0.02em]">
-                  Каталог тренировок
-                </CardTitle>
-                <CardDescription className="mt-1 leading-5">
-                  Задания для сфокусированной практики.
-                </CardDescription>
-              </div>
-              {selectedSkillData ? (
-                <Badge className="border border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8] shadow-none hover:bg-[#eff6ff]">
-                  {selectedSkillData.label}
-                </Badge>
-              ) : null}
-            </div>
-          </CardHeader>
-
-          <CardContent
-            className="flex min-h-[330px] flex-col items-center justify-center px-5 py-10 text-center sm:px-8"
-            aria-live="polite"
-          >
-            <span className="grid size-14 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
-              <SelectedSkillIcon
-                className="size-6"
-                strokeWidth={1.7}
-                aria-hidden
-              />
-            </span>
-            <h3 className="mt-5 text-base font-semibold tracking-[-0.02em] text-[#111111]">
-              {selectedSkillData
-                ? skillLibraryHref[selectedSkillData.id]
-                  ? `Тренировки по направлению «${selectedSkillData.label}»`
-                  : `Заданий по направлению «${selectedSkillData.label}» пока нет`
-                : 'Сначала выберите навык'}
-            </h3>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
-              {selectedSkillData
-                ? skillLibraryHref[selectedSkillData.id]
-                  ? 'Откройте библиотеку материалов и пройдите тест в формате, близком к экзамену.'
-                  : 'Тренажёр для этого навыка в разработке и появится позже.'
-                : 'После выбора здесь появятся доступные форматы и задания для практики.'}
-            </p>
-            {selectedSkillData && skillLibraryHref[selectedSkillData.id] ? (
+          return (
+            <Card key={skill.id} className={cardClassName}>
               <Link
-                to={skillLibraryHref[selectedSkillData.id]}
-                className="mt-5 inline-flex items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb]"
+                to={skill.to}
+                className="group flex h-full flex-col justify-between p-6 no-underline"
               >
-                Перейти к материалам
-              </Link>
-            ) : null}
-          </CardContent>
-        </Card>
+                <div>
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="grid size-11 place-items-center rounded-[11px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                      <Icon className="size-5 transition-colors" strokeWidth={1.8} aria-hidden />
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="border-[#ededeb] bg-[#fafaf8] text-[11px] font-medium text-[#69696d]"
+                    >
+                      {skill.badge}
+                    </Badge>
+                  </div>
 
-        <aside>
-          <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-5">
-              <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                  <ClipboardList className="size-[18px]" aria-hidden />
-                </span>
-                <div className="min-w-0">
-                  <CardTitle className="text-base tracking-[-0.02em]">
-                    Как устроена практика
-                  </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
-                    Один понятный цикл работы.
-                  </CardDescription>
+                  <div className="mt-5">
+                    <div className="flex items-baseline gap-2">
+                      <h2 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+                        {skill.title}
+                      </h2>
+                      <span className="text-xs text-[#8b8b8e]">
+                        ({skill.subtitle})
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#69696d]">
+                      {skill.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-5">
-              <ol className="grid gap-5">
-                {practiceSteps.map((step) => (
-                  <li key={step.number} className="flex gap-3">
-                    <span className="mt-0.5 text-[11px] leading-5 font-semibold tracking-[0.08em] text-[#3b82f6]">
-                      {step.number}
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-[#111111]">
-                        {step.title}
-                      </span>
-                      <span className="mt-1 block text-xs leading-5 text-[#808084]">
-                        {step.description}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
-        </aside>
+
+                <div className="mt-6 flex items-center gap-2 pt-2 text-sm font-semibold text-[#2563eb]">
+                  <span>Перейти к материалам</span>
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
+                </div>
+              </Link>
+            </Card>
+          )
+        })}
       </div>
+
+      <Card className={cn(cardClassName, 'group p-6 sm:p-7')}>
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+          <div className="flex items-start gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+              <ClipboardTick className="size-6 transition-colors" aria-hidden />
+            </span>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+                  Полный пробный экзамен (Full Mock)
+                </h2>
+                <Badge
+                  variant="outline"
+                  className="border-blue-200 bg-blue-50/60 text-[11px] font-medium text-blue-700"
+                >
+                  4 секции подряд
+                </Badge>
+              </div>
+              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#69696d]">
+                Пройдите Listening, Reading, Writing и Speaking в единой экзаменационной сессии с официальными таймерами и итоговым расчётом общего Band Score.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/dashboard/full-mocks"
+            className="inline-flex shrink-0 items-center justify-center rounded-[10px] bg-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+          >
+            Перейти к Full Mock
+          </Link>
+        </div>
+      </Card>
     </div>
   )
 }

@@ -1,17 +1,17 @@
-import { Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import {
   ArrowRight,
-  BarChart3,
-  CalendarCheck2,
-  CalendarDays,
-  ClipboardCheck,
-  Dumbbell,
-  Gauge,
-  Target,
-  TriangleAlert,
-  UserRound,
-} from 'lucide-react'
+  Calendar,
+  CalendarTick,
+  Chart,
+  ClipboardTick,
+  DirectRight,
+  Speedometer,
+  User,
+  Warning2,
+  Weight,
+} from 'iconsax-react'
+import { Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -31,24 +31,24 @@ const quickActions = [
     label: 'Перейти к практике',
     description: 'Выбрать навык и формат задания',
     to: '/dashboard/practice',
-    icon: Dumbbell,
+    icon: Weight,
   },
   {
     label: 'Разобрать ошибки',
     description: 'Вернуться к сложным заданиям',
     to: '/dashboard/mistakes',
-    icon: TriangleAlert,
+    icon: Warning2,
   },
   {
     label: 'Заполнить профиль',
     description: 'Указать цель и дату экзамена',
     to: '/dashboard/profile',
-    icon: UserRound,
+    icon: User,
   },
 ] as const
 
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
+  'group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300'
 
 const skillLabels: Record<SkillId, string> = {
   listening: 'Listening',
@@ -83,7 +83,7 @@ export function OverviewPage() {
     return (
       <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+          <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
           <p className="mt-3 text-sm font-semibold text-[#111111]">
             Не удалось загрузить dashboard
           </p>
@@ -115,7 +115,7 @@ export function OverviewPage() {
         dashboard.profile.currentBand === null
           ? 'Появится после диагностики'
           : 'Расчётный IELTS Band',
-      icon: Gauge,
+      icon: Speedometer,
     },
     {
       label: 'Целевой балл',
@@ -127,7 +127,7 @@ export function OverviewPage() {
         dashboard.profile.targetBand === null
           ? 'Укажите цель в профиле'
           : 'Ваша текущая цель',
-      icon: Target,
+      icon: DirectRight,
     },
     {
       label: 'Дата экзамена',
@@ -136,7 +136,7 @@ export function OverviewPage() {
         dashboard.profile.examDate === null
           ? 'Добавьте дату в профиле'
           : 'Запланированная дата',
-      icon: CalendarDays,
+      icon: Calendar,
     },
   ] as const
   const recommendedTarget =
@@ -156,8 +156,8 @@ export function OverviewPage() {
           return (
             <Card key={metric.label} className={cardClassName}>
               <CardContent className="flex min-w-0 items-start gap-4 p-5">
-                <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d]">
-                  <Icon className="size-[19px]" strokeWidth={1.8} aria-hidden />
+                <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <Icon className="size-[19px] transition-colors" strokeWidth={1.8} aria-hidden />
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold tracking-[0.03em] text-[#69696d]">
@@ -222,8 +222,8 @@ export function OverviewPage() {
           <Card className={cardClassName}>
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                  <BarChart3 className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <Chart className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -273,8 +273,8 @@ export function OverviewPage() {
           <Card className={cardClassName}>
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                  <CalendarCheck2 className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <CalendarTick className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -289,7 +289,7 @@ export function OverviewPage() {
             <CardContent className="p-5">
               {dashboard.todayPlan.length === 0 ? (
                 <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-6 text-center">
-                  <ClipboardCheck
+                  <ClipboardTick
                     className="mx-auto size-5 text-[#9a9a9d]"
                     strokeWidth={1.8}
                     aria-hidden
@@ -344,8 +344,8 @@ export function OverviewPage() {
                     to={action.to}
                     className="group flex min-h-[72px] items-center gap-3 px-5 py-3 text-[#111111] no-underline transition-colors hover:bg-[#fafaf8]"
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6]">
-                      <Icon className="size-[18px]" aria-hidden />
+                    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                      <Icon className="size-[18px] transition-colors" aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold">

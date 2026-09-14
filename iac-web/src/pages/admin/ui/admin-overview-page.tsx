@@ -1,5 +1,10 @@
+import {
+  Book,
+  Data,
+  ShieldTick,
+  TickCircle,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpenText, CheckCircle2, Database, ShieldCheck } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adminQueryKeys, getAdminAccess } from '@/features/admin/api'
@@ -36,7 +41,7 @@ export function AdminOverviewPage() {
           <CardHeader className="border-b border-[#ededeb] p-5">
             <div className="flex items-center gap-3">
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                <ShieldCheck className="size-[18px]" aria-hidden />
+                <ShieldTick className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Проверка доступа</CardTitle>
             </div>
@@ -50,7 +55,7 @@ export function AdminOverviewPage() {
               </p>
             ) : (
               <div className="flex items-center gap-3 text-sm">
-                <CheckCircle2 className="size-5 text-emerald-600" aria-hidden />
+                <TickCircle className="size-5 text-emerald-600" aria-hidden />
                 <span>
                   Доступ подтверждён сервером: <b>{accessQuery.data.role}</b>
                 </span>
@@ -63,7 +68,7 @@ export function AdminOverviewPage() {
           <CardHeader className="border-b border-[#ededeb] p-5">
             <div className="flex items-center gap-3">
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                <BookOpenText className="size-[18px]" aria-hidden />
+                <Book className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Далее: Reading</CardTitle>
             </div>
@@ -78,7 +83,7 @@ export function AdminOverviewPage() {
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="border-b border-[#ededeb] p-5">
           <div className="flex items-center gap-3">
-            <Database className="size-5 text-[#69696d]" aria-hidden />
+            <Data className="size-5 text-[#69696d]" aria-hidden />
             <CardTitle className="text-base">Готово на этом этапе</CardTitle>
           </div>
         </CardHeader>
@@ -86,7 +91,7 @@ export function AdminOverviewPage() {
           <ul className="grid gap-3">
             {milestones.map((milestone) => (
               <li key={milestone} className="flex items-center gap-3 text-sm">
-                <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
+                <TickCircle className="size-4 text-emerald-600" aria-hidden />
                 {milestone}
               </li>
             ))}

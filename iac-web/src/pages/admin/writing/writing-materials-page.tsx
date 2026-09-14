@@ -1,12 +1,12 @@
+import {
+  DocumentForward,
+  DocumentUpload,
+  Edit,
+  Edit2,
+  Warning2,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import {
-  FileInput,
-  FilePlus2,
-  PencilLine,
-  PenLine,
-  TriangleAlert,
-} from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -36,12 +36,12 @@ export function WritingMaterialsPage() {
         <div className="flex flex-wrap gap-2">
           <Button asChild type="button" variant="outline">
             <Link to="/admin/writing/import">
-              <FileInput aria-hidden /> Импорт JSON
+              <DocumentUpload aria-hidden /> Импорт JSON
             </Link>
           </Button>
           <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/admin/writing/materials/new">
-              <FilePlus2 aria-hidden /> Создать вручную
+              <DocumentForward aria-hidden /> Создать вручную
             </Link>
           </Button>
         </div>
@@ -55,7 +55,7 @@ export function WritingMaterialsPage() {
       ) : materialsQuery.isError ? (
         <Card className="shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
             <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
             <Button
               type="button"
@@ -70,7 +70,7 @@ export function WritingMaterialsPage() {
       ) : materialsQuery.data.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <PenLine className="size-8 text-[#9a9a9d]" aria-hidden />
+            <Edit2 className="size-8 text-[#9a9a9d]" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
               Создайте первый набор из Task 1 и Task 2, затем опубликуйте его
@@ -114,7 +114,7 @@ export function WritingMaterialsPage() {
                     to="/admin/writing/materials/$materialId"
                     params={{ materialId: material.id }}
                   >
-                    <PencilLine aria-hidden /> Редактировать
+                    <Edit aria-hidden /> Редактировать
                   </Link>
                 </Button>
               </CardContent>

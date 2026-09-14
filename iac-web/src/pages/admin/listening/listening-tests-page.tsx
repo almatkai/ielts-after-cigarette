@@ -1,6 +1,11 @@
+import {
+  Add,
+  DocumentUpload,
+  Edit,
+  Headphone,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { FileInput, Headphones, PencilLine, Plus } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,12 +37,12 @@ export function ListeningTestsPage() {
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
             <Link to="/admin/listening/import">
-              <FileInput aria-hidden /> Импортировать
+              <DocumentUpload aria-hidden /> Импортировать
             </Link>
           </Button>
           <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/admin/listening/tests/new">
-              <Plus aria-hidden /> Создать вручную
+              <Add aria-hidden /> Создать вручную
             </Link>
           </Button>
         </div>
@@ -46,7 +51,7 @@ export function ListeningTestsPage() {
       {query.data?.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="grid place-items-center gap-3 p-16 text-center">
-            <Headphones className="size-8 text-[#999]" aria-hidden />
+            <Headphone className="size-8 text-[#999]" aria-hidden />
             <p className="font-semibold">Listening тестов пока нет</p>
           </CardContent>
         </Card>
@@ -70,7 +75,7 @@ export function ListeningTestsPage() {
                   to="/admin/listening/tests/$testId"
                   params={{ testId: test.id }}
                 >
-                  <PencilLine aria-hidden /> Редактировать
+                  <Edit aria-hidden /> Редактировать
                 </Link>
               </Button>
             </CardContent>

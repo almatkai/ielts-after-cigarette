@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { DashboardHeader } from './dashboard-header'
 import { getDashboardPageTitle } from './dashboard-navigation'
 import { DashboardSidebar } from './dashboard-sidebar'
+import { AiAssistantFloatingWidget } from './ai-assistant'
 
 type DashboardShellProps = {
   children: React.ReactNode
@@ -55,14 +56,15 @@ export function DashboardShell({ children }: DashboardShellProps) {
         </div>
       ) : null}
 
-      <div className="min-h-screen lg:pl-[268px]">
+      <div className="min-h-screen lg:pl-[260px]">
         <DashboardHeader
           pageTitle={pageTitle}
           onOpenNavigation={() => setNavigationIsOpen(true)}
         />
-        <main className="min-h-[calc(100vh-72px)] p-5 sm:p-7 lg:p-9">
+        <main className="min-h-[calc(100vh-64px)] p-5 sm:p-7 lg:p-9">
           {children}
         </main>
+        <AiAssistantFloatingWidget />
       </div>
     </div>
   )

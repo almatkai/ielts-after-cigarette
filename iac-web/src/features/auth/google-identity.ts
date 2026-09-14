@@ -16,6 +16,7 @@ declare global {
             element: HTMLElement,
             options: Record<string, unknown>,
           ) => void
+          prompt?: (momentListener?: (notification: unknown) => void) => void
         }
       }
     }

@@ -1,5 +1,11 @@
+import {
+  DirectInbox,
+  People,
+  Refresh,
+  Tag,
+  Warning2,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
-import { Inbox, RefreshCw, Tags, TriangleAlert, Users } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -65,7 +71,7 @@ export function WaitlistPage() {
           disabled={waitlistQuery.isFetching}
           onClick={() => void waitlistQuery.refetch()}
         >
-          <RefreshCw
+          <Refresh
             className={waitlistQuery.isFetching ? 'animate-spin' : undefined}
             aria-hidden
           />
@@ -82,7 +88,7 @@ export function WaitlistPage() {
       ) : waitlistQuery.isError ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
             <p className="mt-3 text-sm">
               {waitlistQuery.error instanceof ApiError &&
               waitlistQuery.error.status === 403
@@ -102,7 +108,7 @@ export function WaitlistPage() {
       ) : waitlistQuery.data.entries.length === 0 ? (
         <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <Inbox className="size-8 text-[#9a9a9d]" aria-hidden />
+            <DirectInbox className="size-8 text-[#9a9a9d]" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Заявок пока нет</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
               Как только посетители начнут оставлять контакты, они появятся
@@ -128,7 +134,7 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           <CardHeader className="border-b border-[#ededeb] p-5">
             <div className="flex items-center gap-3">
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                <Users className="size-[18px]" aria-hidden />
+                <People className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Топ приглашающих</CardTitle>
             </div>
@@ -168,7 +174,7 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           <CardHeader className="border-b border-[#ededeb] p-5">
             <div className="flex items-center gap-3">
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                <Tags className="size-[18px]" aria-hidden />
+                <Tag className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Внешние метки</CardTitle>
             </div>

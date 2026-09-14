@@ -1,16 +1,16 @@
-import { Link, useNavigate } from '@tanstack/react-router'
 import {
-  BookOpenText,
-  ClipboardCheck,
-  Headphones,
-  LayoutDashboard,
-  LogOut,
-  MicVocal,
-  ShieldCheck,
-  PenLine,
-  UserCog,
-  Users,
-} from 'lucide-react'
+  Book,
+  Category,
+  ClipboardTick,
+  Edit2,
+  Headphone,
+  Logout,
+  Microphone2,
+  People,
+  ShieldTick,
+  UserEdit,
+} from 'iconsax-react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -37,7 +37,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex min-h-16 max-w-[1280px] items-center justify-between gap-4 px-5 sm:px-7">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#111111] text-white">
-              <ShieldCheck className="size-5" aria-hidden />
+              <ShieldTick className="size-5" aria-hidden />
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">IAC Admin</p>
@@ -49,7 +49,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link to="/dashboard">
-                <LayoutDashboard aria-hidden />
+                <Category aria-hidden />
                 Кабинет студента
               </Link>
             </Button>
@@ -60,7 +60,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               onClick={() => void handleLogout()}
               aria-label="Выйти из аккаунта"
             >
-              <LogOut aria-hidden />
+              <Logout aria-hidden />
               <span className="hidden sm:inline">
                 {logoutIsPending ? 'Выходим…' : 'Выйти'}
               </span>
@@ -79,7 +79,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             activeOptions={{ exact: true }}
             className="flex min-h-11 items-center gap-3 rounded-[10px] bg-[#eff6ff] px-4 text-sm font-semibold text-[#1d4ed8] no-underline"
           >
-            <ShieldCheck className="size-[18px]" aria-hidden />
+            <ShieldTick className="size-[18px]" aria-hidden />
             Обзор
           </Link>
           <Link
@@ -92,7 +92,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
-            <BookOpenText className="size-[18px]" aria-hidden />
+            <Book className="size-[18px]" aria-hidden />
             Reading материалы
           </Link>
           <Link
@@ -103,7 +103,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
-            <Headphones className="size-[18px]" aria-hidden />
+            <Headphone className="size-[18px]" aria-hidden />
             Listening тесты
           </Link>
           <Link
@@ -114,7 +114,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
-            <PenLine className="size-[18px]" aria-hidden />
+            <Edit2 className="size-[18px]" aria-hidden />
             Writing материалы
           </Link>
           <Link
@@ -125,7 +125,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
-            <MicVocal className="size-[18px]" aria-hidden />
+            <Microphone2 className="size-[18px]" aria-hidden />
             Speaking материалы
           </Link>
           <Link
@@ -138,7 +138,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             }}
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
-            <ClipboardCheck className="size-[18px]" aria-hidden />
+            <ClipboardTick className="size-[18px]" aria-hidden />
             Full Mock
           </Link>
           {auth.user?.role === 'ADMIN' ? (
@@ -153,7 +153,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 }}
                 className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
               >
-                <Users className="size-[18px]" aria-hidden />
+                <People className="size-[18px]" aria-hidden />
                 Waitlist
               </Link>
               <Link
@@ -166,7 +166,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 }}
                 className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
               >
-                <UserCog className="size-[18px]" aria-hidden />
+                <UserEdit className="size-[18px]" aria-hidden />
                 Администраторы
               </Link>
             </>

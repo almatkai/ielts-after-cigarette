@@ -1,14 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import {
   ArrowLeft,
-  BookOpenText,
-  CheckCircle2,
-  CircleStop,
-  Mic,
-  MicVocal,
-  TimerReset,
-} from 'lucide-react'
+  Book,
+  Microphone2,
+  StopCircle,
+  TickCircle,
+  Timer1,
+} from 'iconsax-react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -17,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
 import {
   ErrorState,
+  ExamLoadingScreen,
   LoadingState,
   SaveIndicator,
   TimeBadge,
@@ -46,7 +46,13 @@ export function SpeakingStudentPage({ materialId }: { materialId: string }) {
     queryFn: ({ signal }) => startSpeakingAttempt(materialId, signal),
   })
   if (startQuery.isPending) {
-    return <LoadingState label="Готовим Speaking-тренировку…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Speaking"
+        label="Готовим Speaking-тренировку…"
+        description="Формируем карточки заданий Parts 1–3 и инициализируем модуль записи голоса."
+      />
+    )
   }
   if (!startQuery.data) {
     return (
@@ -92,7 +98,13 @@ export function SpeakingAttemptRunner({
     )
   }
   if (session.answers === null) {
-    return <LoadingState label="Восстанавливаем сохранённые ответы…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Speaking"
+        label="Восстанавливаем ответы…"
+        description="Синхронизируем записанные ответы и статус сессии..."
+      />
+    )
   }
   const part = material.parts[activeIndex]
   const recordings = detailQuery.data?.recordings ?? []
@@ -284,7 +296,7 @@ function SpeakingPartRunner({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <MicVocal className="size-5 text-[#3b82f6]" aria-hidden />
+              <Microphone2 className="size-5 text-[#3b82f6]" aria-hidden />
               Part {part.position}: {part.title}
             </CardTitle>
             {part.instructions ? (
@@ -312,7 +324,7 @@ function SpeakingPartRunner({
         <div className="flex flex-wrap gap-2">
           {part.type === 'part2' && phase === 'ready' && !prepared ? (
             <Button type="button" variant="outline" onClick={beginPreparation}>
-              <TimerReset aria-hidden />
+              <Timer1 aria-hidden />
               Начать 1 минуту подготовки
             </Button>
           ) : null}
@@ -325,7 +337,7 @@ function SpeakingPartRunner({
           {(phase === 'ready' || phase === 'finished') &&
           (part.type !== 'part2' || prepared || hasRecording) ? (
             <Button type="button" onClick={() => void beginRecording()}>
-              <Mic aria-hidden />
+              <Microphone2 aria-hidden />
               {hasRecording ? 'Записать заново' : 'Начать запись'}
             </Button>
           ) : null}
@@ -335,7 +347,7 @@ function SpeakingPartRunner({
               variant="destructive"
               onClick={stopRef.current}
             >
-              <CircleStop aria-hidden />
+              <StopCircle aria-hidden />
               Остановить и сохранить
             </Button>
           ) : null}
@@ -344,7 +356,7 @@ function SpeakingPartRunner({
           ) : null}
           {(phase === 'finished' || hasRecording) && !recorder.isUploading ? (
             <p className="flex items-center gap-2 text-sm text-emerald-700">
-              <CheckCircle2 className="size-4" aria-hidden />
+              <TickCircle className="size-4" aria-hidden />
               Запись сохранена.
             </p>
           ) : null}
@@ -362,7 +374,7 @@ function SpeakingPartRunner({
             onChange={(event) => onTranscriptChange(event.target.value)}
             rows={6}
             className="resize-y text-base leading-7"
-            placeholder="Можно напечатать ответ вручную. После записи AI подготовит расшифровку."
+            placeholder="Можно напечатать ответ вручную или наговорить голосом — аудио расшифруется автоматически."
           />
           <p className="text-xs text-[#808084]">
             Для точной оценки произношения нужен аудиозапись. Текстовый ответ
@@ -395,7 +407,7 @@ function SpeakingPartRunner({
               }
               onClick={onSubmit}
             >
-              {isSubmitting ? 'Проверяем AI…' : 'Отправить на проверку'}
+              {isSubmitting ? 'Проверяем работу…' : 'Отправить на проверку'}
             </Button>
           )}
         </div>
@@ -475,7 +487,7 @@ function SpeakingAttemptResult({
           onRetry={() => void detailQuery.refetch()}
         />
       ) : !evaluation ? (
-        <LoadingState label="Загружаем AI-разбор…" />
+        <LoadingState label="Загружаем результаты проверки…" />
       ) : (
         <SpeakingEvaluationView evaluation={evaluation} />
       )}
@@ -504,7 +516,7 @@ function SpeakingEvaluationView({
           <div>
             <p className="font-semibold">Ориентировочный IELTS Speaking band</p>
             <p className="mt-1 text-sm leading-6 text-[#4b5563]">
-              {evaluation.summary || 'Разбор подготовлен AI-моделью.'}
+              {evaluation.summary || 'Детальный разбор выполнен.'}
             </p>
           </div>
         </CardContent>
@@ -547,7 +559,7 @@ function SpeakingEvaluationView({
         </Card>
       ))}
       <p className="flex items-center gap-2 text-xs text-[#808084]">
-        <BookOpenText className="size-4" aria-hidden />
+        <Book className="size-4" aria-hidden />
         Оценка носит учебный характер; фактический результат IELTS определяет
         экзаменатор.
       </p>

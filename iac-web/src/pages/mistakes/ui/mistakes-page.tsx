@@ -1,6 +1,9 @@
+import {
+  ArrowRight,
+  MessageQuestion,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, MessageSquareText } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -73,8 +76,7 @@ export function MistakesPage() {
           Разберите свои ошибки
         </h2>
         <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Неверные ответы и AI-разборы завершённых попыток — без отдельных
-          запросов для каждого теста.
+          Неверные ответы и подробный разбор критериев по всем завершённым попыткам.
         </p>
       </div>
 
@@ -110,7 +112,7 @@ export function MistakesPage() {
           {aiReports.length > 0 ? (
             <section className="grid gap-3">
               <h2 className="text-xl font-semibold tracking-[-0.02em]">
-                Writing и Speaking: AI-разбор
+                Разбор критериев Writing и Speaking
               </h2>
               <div className="grid gap-3 lg:grid-cols-2">
                 {aiReports.map((report) => (
@@ -148,7 +150,7 @@ function EmptyMistakesState() {
       <CardContent className="grid justify-items-center gap-3 p-10 text-center">
         <p className="font-semibold">Ошибок пока нет</p>
         <p className="text-sm text-[#69696d]">
-          Пройдите первый тест, и сложные вопросы или AI-рекомендации появятся
+          Пройдите первый тест, и сложные вопросы с подробным разбором появятся
           здесь.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
@@ -194,7 +196,7 @@ function AIEvaluationCard({ report }: { report: MistakeReport }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
-              <MessageSquareText className="size-4 text-[#3b82f6]" aria-hidden />
+              <MessageQuestion className="size-4 text-[#3b82f6]" aria-hidden />
               {report.attempt.testTitle}
             </CardTitle>
             <p className="mt-1 text-sm text-[#69696d]">

@@ -1,5 +1,10 @@
+import {
+  HambergerMenu,
+  Notification,
+  NotificationBing,
+  User,
+} from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
-import { Bell, BellOff, Menu, UserRound } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
@@ -23,7 +28,7 @@ export function DashboardHeader({
   const accountName = user?.displayName.trim() || 'Аккаунт'
 
   return (
-    <header className="sticky top-0 z-30 flex h-[72px] items-center border-b border-[#e7e7e4] bg-[rgba(255,255,255,0.92)] px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center border-b border-[#eeeeeb] bg-white/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <Button
           type="button"
@@ -34,17 +39,17 @@ export function DashboardHeader({
           aria-label="Открыть меню"
           aria-controls="dashboard-mobile-navigation"
         >
-          <Menu aria-hidden />
+          <HambergerMenu aria-hidden />
         </Button>
         <div className="lg:hidden">
           <Brand to="/dashboard" />
         </div>
-        <span className="hidden h-7 w-px bg-[#e7e7e4] sm:block lg:hidden" />
+        <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
         <div className="min-w-0">
-          <p className="hidden text-[11px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
+          <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
             Рабочее пространство
           </p>
-          <h1 className="truncate text-base font-semibold tracking-[-0.025em] text-[#111111] sm:text-lg">
+          <h1 className="truncate text-base font-semibold tracking-[-0.025em] text-[#111111]">
             {pageTitle}
           </h1>
         </div>
@@ -60,7 +65,7 @@ export function DashboardHeader({
               className="rounded-[9px] text-[#69696d] data-[state=open]:bg-[#f4f4f1] data-[state=open]:text-[#111111]"
               aria-label="Открыть уведомления"
             >
-              <Bell aria-hidden />
+              <Notification aria-hidden />
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -75,7 +80,7 @@ export function DashboardHeader({
             </div>
             <div className="flex flex-col items-center px-5 py-10 text-center">
               <span className="grid size-11 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
-                <BellOff className="size-5" strokeWidth={1.8} aria-hidden />
+                <NotificationBing className="size-5" strokeWidth={1.8} aria-hidden />
               </span>
               <p className="mt-4 text-sm font-semibold text-[#111111]">
                 Пока нет уведомлений
@@ -86,7 +91,7 @@ export function DashboardHeader({
             </div>
           </PopoverContent>
         </Popover>
-        <span className="mx-1 hidden h-7 w-px bg-[#e7e7e4] sm:block" />
+        <span className="mx-1 hidden h-7 w-px bg-[#eeeeeb] sm:block" />
         <Button
           asChild
           variant="ghost"
@@ -94,7 +99,7 @@ export function DashboardHeader({
         >
           <Link to="/dashboard/profile" aria-label="Открыть профиль">
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
-              <UserRound
+              <User
                 className="size-[17px]"
                 strokeWidth={1.8}
                 aria-hidden

@@ -1,6 +1,10 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import {
+  CloseSquare,
+  Logout,
+  ShieldTick,
+} from 'iconsax-react'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { LogOut, ShieldCheck, X } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
 import {
@@ -32,7 +36,7 @@ type DashboardSidebarProps = {
 }
 
 const navigationLinkClassName =
-  'group relative flex min-h-11 items-center gap-3 rounded-[10px] border-l-2 border-transparent px-3.5 text-sm font-medium no-underline transition-colors'
+  'group relative flex min-h-11 items-center gap-3 rounded-[10px] px-3.5 text-sm font-medium no-underline transition-colors'
 
 export function DashboardSidebar({
   id,
@@ -44,6 +48,8 @@ export function DashboardSidebar({
   const navigate = useNavigate()
   const auth = useAuth()
   const [logoutIsPending, setLogoutIsPending] = useState(false)
+
+  const location = useLocation()
 
   const handleLogout = async () => {
     setLogoutIsPending(true)
@@ -59,14 +65,14 @@ export function DashboardSidebar({
   return (
     <aside
       id={id}
+      aria-label="Основная навигация приложения"
       className={cn(
-        'flex h-full w-[268px] flex-col border-r border-[#e7e7e4] bg-white',
+        'flex h-full w-[260px] flex-col border-r border-[#eeeeeb] bg-[#fafaf8]',
         className,
       )}
-      aria-label="Боковая навигация"
     >
-      <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-[#eeeeeb] px-6">
-        <Brand to="/dashboard" />
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#eeeeeb] px-6">
+        <Brand />
         {mobile ? (
           <Button
             type="button"
@@ -76,7 +82,7 @@ export function DashboardSidebar({
             className="rounded-[9px] text-[#69696d]"
             aria-label="Закрыть меню"
           >
-            <X aria-hidden />
+            <CloseSquare aria-hidden />
           </Button>
         ) : null}
       </div>
@@ -88,6 +94,13 @@ export function DashboardSidebar({
         <nav className="space-y-1" aria-label="Основная навигация">
           {primaryDashboardNavigation.map((item) => {
             const Icon = item.icon
+            const isRelatedActive =
+              item.to === '/dashboard/practice' &&
+              (location.pathname.startsWith('/dashboard/listening') ||
+                location.pathname.startsWith('/dashboard/reading') ||
+                location.pathname.startsWith('/dashboard/writing') ||
+                location.pathname.startsWith('/dashboard/speaking') ||
+                location.pathname.startsWith('/dashboard/full-mocks'))
 
             return (
               <Link
@@ -95,14 +108,19 @@ export function DashboardSidebar({
                 to={item.to}
                 activeOptions={{ exact: item.exact }}
                 onClick={onNavigate}
-                className={navigationLinkClassName}
+                className={cn(
+                  navigationLinkClassName,
+                  isRelatedActive &&
+                    'bg-[#eff6ff] font-semibold text-[#2563eb] [&_svg]:text-[#2563eb]',
+                )}
                 activeProps={{
                   className:
-                    'border-l-[#3b82f6] bg-[#eff6ff] text-[#111111] [&_svg]:text-[#3b82f6]',
+                    'bg-[#eff6ff] font-semibold text-[#2563eb] [&_svg]:text-[#2563eb]',
                 }}
                 inactiveProps={{
-                  className:
-                    'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+                  className: isRelatedActive
+                    ? undefined
+                    : 'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
                 }}
               >
                 <Icon
@@ -122,12 +140,16 @@ export function DashboardSidebar({
               to="/admin"
               onClick={onNavigate}
               className={navigationLinkClassName}
+              activeProps={{
+                className:
+                  'bg-[#eff6ff] font-semibold text-[#2563eb] [&_svg]:text-[#2563eb]',
+              }}
               inactiveProps={{
                 className:
                   'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
               }}
             >
-              <ShieldCheck
+              <ShieldTick
                 className="size-[19px] shrink-0 text-[#8b8b8e] transition-colors"
                 strokeWidth={1.8}
                 aria-hidden
@@ -142,7 +164,7 @@ export function DashboardSidebar({
             className={navigationLinkClassName}
             activeProps={{
               className:
-                'border-l-[#3b82f6] bg-[#eff6ff] text-[#111111] [&_svg]:text-[#3b82f6]',
+                'bg-[#eff6ff] font-semibold text-[#2563eb] [&_svg]:text-[#2563eb]',
             }}
             inactiveProps={{
               className:
@@ -162,7 +184,7 @@ export function DashboardSidebar({
                 type="button"
                 className="flex min-h-11 w-full items-center gap-3 rounded-[10px] px-4 text-sm font-medium text-[#69696d] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
               >
-                <LogOut
+                <Logout
                   className="size-[19px] shrink-0 text-[#8b8b8e]"
                   strokeWidth={1.8}
                   aria-hidden
@@ -173,7 +195,7 @@ export function DashboardSidebar({
             <AlertDialogContent>
               <AlertDialogHeader>
                 <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#eff6ff] text-[#3b82f6]">
-                  <LogOut className="size-5" strokeWidth={1.8} aria-hidden />
+                  <Logout className="size-5" strokeWidth={1.8} aria-hidden />
                 </span>
                 <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
                 <AlertDialogDescription>

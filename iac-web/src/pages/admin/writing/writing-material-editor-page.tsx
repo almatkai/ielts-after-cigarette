@@ -1,6 +1,11 @@
+import {
+  ArrowLeft,
+  Save2,
+  Send2,
+  TickCircle,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, CheckCircle2, Save, Send } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -211,7 +216,7 @@ export function WritingMaterialEditorPage({
                 publishMutation.mutate()
               }}
             >
-              <Send aria-hidden /> Опубликовать
+              <Send2 aria-hidden /> Опубликовать
             </Button>
           ) : null}
           {materialId && auth.user?.role === 'ADMIN' ? (
@@ -229,7 +234,7 @@ export function WritingMaterialEditorPage({
             </Button>
           ) : null}
           <Button type="submit" disabled={pending}>
-            <Save aria-hidden />
+            <Save2 aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
           </Button>
         </div>
@@ -239,7 +244,7 @@ export function WritingMaterialEditorPage({
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
           role="status"
         >
-          <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-emerald-600" aria-hidden />
           {message}
         </p>
       ) : null}

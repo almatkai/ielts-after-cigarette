@@ -1,6 +1,13 @@
+import {
+  Add,
+  ArrowLeft,
+  Save2,
+  Send2,
+  TickCircle,
+  Trash,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, CheckCircle2, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -219,7 +226,7 @@ export function SpeakingMaterialEditorPage({
                 publishMutation.mutate()
               }}
             >
-              <Send aria-hidden />
+              <Send2 aria-hidden />
               Опубликовать
             </Button>
           ) : null}
@@ -238,7 +245,7 @@ export function SpeakingMaterialEditorPage({
             </Button>
           ) : null}
           <Button type="submit" disabled={pending}>
-            <Save aria-hidden />
+            <Save2 aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
           </Button>
         </div>
@@ -248,7 +255,7 @@ export function SpeakingMaterialEditorPage({
           role="status"
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
         >
-          <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-emerald-600" aria-hidden />
           {message}
         </p>
       ) : null}
@@ -438,7 +445,7 @@ function PartEditor({
                 size="sm"
                 onClick={addQuestion}
               >
-                <Plus aria-hidden />
+                <Add aria-hidden />
                 Добавить
               </Button>
             </div>
@@ -460,7 +467,7 @@ function PartEditor({
                   disabled={part.questions.length <= 2}
                   onClick={() => removeQuestion(index)}
                 >
-                  <Trash2 className="size-4" aria-hidden />
+                  <Trash className="size-4" aria-hidden />
                 </Button>
               </div>
             ))}

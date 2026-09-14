@@ -1,18 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import {
   ArrowRight,
-  CheckCircle2,
-  Clock3,
-  LockKeyhole,
+  Clock,
+  Lock,
   PlayCircle,
-} from 'lucide-react'
+  TickCircle,
+} from 'iconsax-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
+import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import {
   advanceFullMockSession,
   finishFullMockSession,
@@ -46,8 +46,15 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     onSuccess: (session) =>
       queryClient.setQueryData(fullMockKeys.session(sessionId), session),
   })
-  if (query.isPending)
-    return <LoadingState label="Загружаем экзаменационную сессию…" />
+  if (query.isPending) {
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Full Mock"
+        label="Загружаем экзаменационную сессию…"
+        description="Получаем статус секций, таймеры и расписание Full Mock..."
+      />
+    )
+  }
   if (query.isError)
     return (
       <ErrorState
@@ -174,12 +181,12 @@ function SectionCard({
           </CardTitle>
           {completed ? (
             <Badge className="bg-emerald-600">
-              <CheckCircle2 aria-hidden />
+              <TickCircle aria-hidden />
               Сдано
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
-              <LockKeyhole aria-hidden />
+              <Lock aria-hidden />
               Закрыто
             </Badge>
           ) : (
@@ -283,7 +290,7 @@ function ExamTimer({ deadlineAt }: { deadlineAt: string }) {
   const remainder = seconds % 60
   return (
     <Badge variant="outline" className="gap-2 px-3 py-2 text-sm">
-      <Clock3 className="size-4" aria-hidden />
+      <Clock className="size-4" aria-hidden />
       {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:
       {String(remainder).padStart(2, '0')}
     </Badge>

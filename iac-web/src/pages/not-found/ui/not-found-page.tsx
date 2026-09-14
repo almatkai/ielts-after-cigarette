@@ -1,5 +1,8 @@
+import {
+  ArrowLeft,
+  Category,
+} from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, LayoutDashboard } from 'lucide-react'
 
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
@@ -42,7 +45,7 @@ export function NotFoundPage() {
               className="h-12 rounded-[10px] border-[#dededb] bg-white px-5 text-sm font-semibold hover:bg-[#f4f4f1]"
             >
               <Link to="/dashboard">
-                <LayoutDashboard aria-hidden />В личный кабинет
+                <Category aria-hidden />В личный кабинет
               </Link>
             </Button>
           </div>
@@ -58,7 +61,7 @@ export function NotFoundPage() {
             aria-hidden
           />
           <img
-            src={`${import.meta.env.BASE_URL}fox_404_transparent.png`}
+            src={`${import.meta.env.BASE_URL}fox_404_transparent.webp`}
             alt="Растерянная красная лиса"
             width={1600}
             height={1600}

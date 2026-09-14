@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArrowLeft,
-  CheckCircle2,
-  Save,
-  Send,
-  TriangleAlert,
-} from 'lucide-react'
+  Save2,
+  Send2,
+  TickCircle,
+  Warning2,
+} from 'iconsax-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -238,7 +238,7 @@ export function ReadingMaterialEditorPage({
     return (
       <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+          <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
           <p className="mt-3 text-sm">Материал не удалось загрузить.</p>
           <Button asChild variant="outline" className="mt-4">
             <Link to="/admin/reading/materials">Вернуться в библиотеку</Link>
@@ -284,7 +284,7 @@ export function ReadingMaterialEditorPage({
               disabled={pending}
               onClick={() => void handlePublish()}
             >
-              <Send aria-hidden />
+              <Send2 aria-hidden />
               Опубликовать текущую версию
             </Button>
           ) : null}
@@ -307,7 +307,7 @@ export function ReadingMaterialEditorPage({
             disabled={pending}
             className="bg-[#3b82f6] hover:bg-[#2563eb]"
           >
-            <Save aria-hidden />
+            <Save2 aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
           </Button>
         </div>
@@ -318,7 +318,7 @@ export function ReadingMaterialEditorPage({
           className="flex items-center gap-2 rounded-[10px] border border-[#e7e7e4] bg-white px-4 py-3 text-sm"
           role="status"
         >
-          <CheckCircle2 className="size-4 text-[#69696d]" aria-hidden />
+          <TickCircle className="size-4 text-[#69696d]" aria-hidden />
           {message}
         </div>
       ) : null}

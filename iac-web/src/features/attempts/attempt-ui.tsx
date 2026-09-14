@@ -1,4 +1,8 @@
-import { CheckCircle2, Clock3, XCircle } from 'lucide-react'
+import {
+  Clock,
+  CloseCircle,
+  TickCircle,
+} from 'iconsax-react'
 
 import {
   AlertDialog,
@@ -13,6 +17,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import type { SaveState } from '@/features/attempts/attempt-session'
 import type {
   Attempt,
@@ -21,14 +26,154 @@ import type {
 } from '@/features/attempts/api'
 
 export type Option = { id: string; text: string }
+export { EmptyState, type EmptyStateProps } from '@/components/ui/empty-state'
 
-export function LoadingState({ label }: { label: string }) {
+export function ExamLoadingScreen({
+  label,
+  description,
+  badge = 'IELTS Simulation',
+  showTimerTip = true,
+  className = '',
+}: {
+  label: string
+  description?: string
+  badge?: string
+  showTimerTip?: boolean
+  className?: string
+}) {
   return (
-    <div className="grid gap-4" aria-busy="true">
-      <div className="h-8 w-2/3 animate-pulse rounded-lg bg-[#f0f0ed]" />
-      <div className="h-40 animate-pulse rounded-xl bg-[#f0f0ed]" />
-      <div className="h-40 animate-pulse rounded-xl bg-[#f0f0ed]" />
-      <p className="text-sm text-[#69696d]">{label}</p>
+    <div
+      className={cn(
+        'flex min-h-[75vh] sm:min-h-[85vh] w-full flex-1 flex-col items-center justify-center p-6 text-center select-none',
+        className,
+      )}
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="flex w-full max-w-sm flex-col items-center">
+        {/* Subtle section badge */}
+        {badge ? (
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 mb-4 tracking-wide">
+            <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />
+            {badge}
+          </div>
+        ) : null}
+
+        {/* Sleek Minimalist Spinner */}
+        <div className="relative mb-4 flex size-10 items-center justify-center">
+          <svg
+            className="size-8 animate-spin text-blue-600"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              className="opacity-15"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            />
+            <path
+              className="opacity-90"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">
+          {label}
+        </h2>
+
+        {/* Subtitle */}
+        {description ? (
+          <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500 max-w-[320px]">
+            {description}
+          </p>
+        ) : null}
+
+        {/* Minimalist Progress Line */}
+        <div className="relative mt-5 h-1 w-36 sm:w-44 overflow-hidden rounded-full bg-slate-100">
+          <div className="animate-exam-loading-bar h-full w-full rounded-full bg-blue-600" />
+        </div>
+
+        {/* Discreet Timer Tip */}
+        {showTimerTip ? (
+          <p className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+            <Clock className="size-3.5 text-slate-400" aria-hidden="true" />
+            <span>Таймер запустится только после загрузки</span>
+          </p>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+export function LibraryCardsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div
+      className="grid gap-3 md:grid-cols-2"
+      aria-busy="true"
+      aria-label="Загрузка списка тестов"
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <Card key={i} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          <CardContent className="grid gap-3 p-5 sm:p-6">
+            <div className="size-10 animate-pulse rounded-[10px] bg-[#f1f5f9]" />
+            <div className="space-y-2">
+              <div className="h-5 w-3/5 animate-pulse rounded bg-[#f1f5f9]" />
+              <div className="h-4 w-2/5 animate-pulse rounded bg-[#f1f5f9]" />
+            </div>
+            <div className="h-10 w-28 animate-pulse rounded-[9px] bg-[#f1f5f9]" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+export function LoadingState({
+  label,
+  className = '',
+}: {
+  label?: string
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        'flex min-h-[140px] w-full flex-col items-center justify-center gap-3 p-6 text-center',
+        className,
+      )}
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+        <svg
+          className="keep-motion size-5 animate-spin text-blue-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle
+            className="opacity-20"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <path
+            className="opacity-90"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+      </div>
+      {label ? <p className="text-sm font-medium text-[#64748b]">{label}</p> : null}
     </div>
   )
 }
@@ -43,13 +188,18 @@ export function ErrorState({
   onRetry: () => void
 }) {
   return (
-    <Card className="shadow-none">
-      <CardContent className="grid justify-items-center gap-3 p-10 text-center">
-        <p className="font-semibold">{title}</p>
-        <p className="text-sm text-[#69696d]">{message}</p>
-        <Button onClick={onRetry}>Повторить</Button>
-      </CardContent>
-    </Card>
+    <div className="flex min-h-[60dvh] w-full flex-1 items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-[460px] rounded-2xl border border-[#e2e8f0] bg-white p-7 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-9">
+        <CardContent className="grid justify-items-center gap-4 p-0 text-center">
+          <div className="flex size-14 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-[#e23b3b]">
+            <CloseCircle className="size-7" aria-hidden="true" />
+          </div>
+          <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">{title}</h2>
+          <p className="text-sm leading-relaxed text-[#64748b]">{message}</p>
+          <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">Повторить попытку</Button>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -96,7 +246,7 @@ export function TimeBadge({
       }`}
       aria-label={label}
     >
-      <Clock3 className="size-4" aria-hidden />
+      <Clock className="size-4" aria-hidden />
       {formatClock(seconds)}
     </span>
   )
@@ -314,12 +464,12 @@ export function ReviewQuestion({
       </p>
       <p className="flex items-center gap-2">
         {item.isCorrect ? (
-          <CheckCircle2
+          <TickCircle
             className="size-4 shrink-0 text-emerald-600"
             aria-label="Верно"
           />
         ) : (
-          <XCircle
+          <CloseCircle
             className="size-4 shrink-0 text-[#3b82f6]"
             aria-label="Неверно"
           />

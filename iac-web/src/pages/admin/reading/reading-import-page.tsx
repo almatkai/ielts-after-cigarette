@@ -1,12 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import {
   ArrowLeft,
-  Clipboard,
-  FileInput,
-  Info,
-  TriangleAlert,
-} from 'lucide-react'
+  ClipboardText,
+  DocumentUpload,
+  InfoCircle,
+  Warning2,
+} from 'iconsax-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -228,7 +228,7 @@ export function ReadingImportPage() {
             variant="outline"
             onClick={() => void copyTemplate()}
           >
-            <Clipboard aria-hidden /> Скопировать шаблон
+            <ClipboardText aria-hidden /> Скопировать шаблон
           </Button>
           <Button
             type="button"
@@ -307,7 +307,7 @@ export function ReadingImportPage() {
               onClick={() => void parse()}
               className="bg-[#3b82f6] hover:bg-[#2563eb]"
             >
-              <FileInput aria-hidden />
+              <DocumentUpload aria-hidden />
               {parseMutation.isPending ? 'Распознаём…' : 'Распознать'}
             </Button>
           </div>
@@ -464,7 +464,7 @@ function IssueList({
     warning: 'border-amber-200 bg-amber-50',
     info: 'border-blue-200 bg-blue-50',
   }
-  const Icon = kind === 'info' ? Info : TriangleAlert
+  const Icon = kind === 'info' ? InfoCircle : Warning2
   return (
     <div className={`rounded-[10px] border p-4 ${styles[kind]}`}>
       <h3 className="flex items-center gap-2 text-sm font-semibold">

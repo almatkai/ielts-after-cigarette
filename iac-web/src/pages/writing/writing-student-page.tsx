@@ -1,6 +1,10 @@
+import {
+  ArrowLeft,
+  Book,
+  Edit2,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, BookOpenText, PenLine } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -10,6 +14,7 @@ import { useAttemptSession } from '@/features/attempts/attempt-session'
 import {
   AttemptSubmitBar,
   ErrorState,
+  ExamLoadingScreen,
   LoadingState,
   SaveIndicator,
   TimeBadge,
@@ -29,7 +34,13 @@ export function WritingStudentPage({ materialId }: { materialId: string }) {
     queryFn: ({ signal }) => startWritingAttempt(materialId, signal),
   })
   if (startQuery.isPending) {
-    return <LoadingState label="Готовим Writing-тренировку…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Writing"
+        label="Готовим задания Writing…"
+        description="Загружаем темы заданий, требования к объёму слов и подготавливаем редактор эссе."
+      />
+    )
   }
   if (!startQuery.data) {
     return (
@@ -71,7 +82,13 @@ export function WritingAttemptRunner({
     )
   }
   if (session.answers === null) {
-    return <LoadingState label="Восстанавливаем сохранённые черновики…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Writing"
+        label="Восстанавливаем сохранённые черновики…"
+        description="Загружаем ранее сохранённый текст эссе и черновики из облака..."
+      />
+    )
   }
   const answeredCount = material.tasks.filter((task) => {
     const value = session.answers?.[task.id]?.value
@@ -296,7 +313,7 @@ function WritingAttemptResult({
           onRetry={() => void detailQuery.refetch()}
         />
       ) : !evaluation ? (
-        <LoadingState label="Загружаем AI-разбор…" />
+        <LoadingState label="Загружаем результаты проверки…" />
       ) : (
         <WritingEvaluationView evaluation={evaluation} />
       )}
@@ -325,7 +342,7 @@ function WritingEvaluationView({
           <div>
             <p className="font-semibold">Ориентировочный IELTS Writing band</p>
             <p className="mt-1 text-sm leading-6 text-[#4b5563]">
-              {evaluation.summary || 'Разбор подготовлен AI-моделью.'}
+              {evaluation.summary || 'Детальный разбор выполнен.'}
             </p>
           </div>
         </CardContent>
@@ -351,7 +368,7 @@ function WritingEvaluationView({
         <Card key={task.taskId} className="shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PenLine className="size-4 text-[#3b82f6]" aria-hidden />
+              <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
               Task {index + 1}
             </CardTitle>
           </CardHeader>
@@ -363,7 +380,7 @@ function WritingEvaluationView({
         </Card>
       ))}
       <p className="flex items-center gap-2 text-xs text-[#808084]">
-        <BookOpenText className="size-4" aria-hidden />
+        <Book className="size-4" aria-hidden />
         Оценка носит учебный характер; фактический результат IELTS определяет
         экзаменатор.
       </p>

@@ -1,6 +1,13 @@
+import {
+  Add,
+  ArrowLeft,
+  ExportCurve,
+  Image,
+  Save2,
+  Send2,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Image, Plus, Save, Send, Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -219,7 +226,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               variant="outline"
               onClick={() => void publishMutation.mutateAsync()}
             >
-              <Send aria-hidden /> Опубликовать
+              <Send2 aria-hidden /> Опубликовать
             </Button>
           ) : null}
           {testId && auth.user?.role === 'ADMIN' ? (
@@ -237,7 +244,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             </Button>
           ) : null}
           <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb]">
-            <Save aria-hidden /> Сохранить
+            <Save2 aria-hidden /> Сохранить
           </Button>
         </div>
       </div>
@@ -331,7 +338,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               />
             </Field>
             <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
-              <Upload className="size-5" aria-hidden />
+              <ExportCurve className="size-5" aria-hidden />
               <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
                 Загрузить аудио
                 <input
@@ -565,7 +572,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                     })
                   }}
                 >
-                  <Plus aria-hidden /> Добавить вопрос
+                  <Add aria-hidden /> Добавить вопрос
                 </Button>
               </div>
             ))}
@@ -585,7 +592,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 })
               }
             >
-              <Plus aria-hidden /> Добавить группу
+              <Add aria-hidden /> Добавить группу
             </Button>
           </CardContent>
         </Card>
@@ -603,7 +610,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           })
         }
       >
-        <Plus aria-hidden /> Добавить Part
+        <Add aria-hidden /> Добавить Part
       </Button>
     </form>
   )

@@ -1,6 +1,9 @@
+import {
+  ArrowLeft,
+  Clock,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, Clock3 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -12,6 +15,7 @@ import {
   AttemptSubmitBar,
   ChoiceOptions,
   ErrorState,
+  ExamLoadingScreen,
   LoadingState,
   ReviewQuestion,
   SaveIndicator,
@@ -41,7 +45,13 @@ export function ListeningStudentPage({ testId }: { testId: string }) {
     queryFn: ({ signal }) => startListeningAttempt(testId, signal),
   })
   if (startQuery.isPending) {
-    return <LoadingState label="Готовим тест…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Listening"
+        label="Готовим аудирование…"
+        description="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
+      />
+    )
   }
   if (!startQuery.data) {
     return (
@@ -102,7 +112,13 @@ export function ListeningAttemptRunner({
     )
   }
   if (session.answers === null) {
-    return <LoadingState label="Восстанавливаем сохранённые ответы…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Listening"
+        label="Восстанавливаем сохранённые ответы…"
+        description="Синхронизируем ваш прогресс и последние введённые ответы с сервером..."
+      />
+    )
   }
   const answers = session.answers
 
@@ -135,7 +151,7 @@ export function ListeningAttemptRunner({
           </div>
         </div>
         <p className="sr-only">
-          <Clock3 className="size-4" aria-hidden />
+          <Clock className="size-4" aria-hidden />
           {test.durationMinutes} минут · ответы сохраняются автоматически
         </p>
       </div>

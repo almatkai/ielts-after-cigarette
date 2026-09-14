@@ -1,6 +1,9 @@
+import {
+  Add,
+  ClipboardTick,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ClipboardCheck, Plus } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -36,7 +39,7 @@ export function FullMockListPage() {
         </div>
         <Button asChild>
           <Link to="/admin/full-mocks/new">
-            <Plus aria-hidden />
+            <Add aria-hidden />
             Создать Full Mock
           </Link>
         </Button>
@@ -54,7 +57,7 @@ export function FullMockListPage() {
               <CardHeader className="flex-row items-start justify-between gap-4">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <ClipboardCheck
+                    <ClipboardTick
                       className="size-5 text-[#3b82f6]"
                       aria-hidden
                     />

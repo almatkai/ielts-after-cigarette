@@ -245,17 +245,197 @@ button {
   }
 }
 
+@keyframes examLoadingBar {
+  0% {
+    left: -35%;
+    width: 35%;
+  }
+  50% {
+    left: 25%;
+    width: 50%;
+  }
+  100% {
+    left: 100%;
+    width: 35%;
+  }
+}
+
+.animate-exam-loading-bar {
+  position: absolute;
+  animation: examLoadingBar 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
+  *:not(.keep-motion):not(.keep-motion *),
+  *:not(.keep-motion):not(.keep-motion *)::before,
+  *:not(.keep-motion):not(.keep-motion *)::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* AI Fox Mascot Character Animations (Razor-sharp vectors without blurring) */
+@keyframes foxFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes foxShadowPulse {
+  0%, 100% {
+    transform: scaleX(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: scaleX(0.8);
+    opacity: 0.16;
+  }
+}
+
+/* Realistic eye blinking cycle (every ~4.2s) */
+@keyframes foxBlink {
+  0%, 90%, 94%, 100% {
+    transform: scaleY(1);
+  }
+  92% {
+    transform: scaleY(0.08);
+  }
+}
+
+/* Magic Star 15-second cycle: gentle hovering idle, then full swooping orbit around Yuki */
+@keyframes foxStarOrbit15s {
+  0%, 70% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  20%, 50% {
+    transform: translate(-6px, -12px) scale(1.04);
+  }
+  35% {
+    transform: translate(4px, 6px) scale(0.97);
+  }
+  71% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  /* Takeoff & full graceful orbit around Yuki */
+  74% {
+    transform: translate(60px, -40px) scale(1.12);
+  }
+  78% {
+    transform: translate(160px, 420px) scale(1.22);
+  }
+  83% {
+    transform: translate(-120px, 920px) scale(1.28);
+  }
+  88% {
+    transform: translate(-880px, 640px) scale(1.2);
+  }
+  92% {
+    transform: translate(-780px, 120px) scale(1.14);
+  }
+  96% {
+    transform: translate(-320px, -60px) scale(1.06);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Ear micro-twitch every ~4.6 seconds */
+@keyframes foxEarTwitch {
+  0%, 75%, 100% {
+    transform: rotate(0deg);
+  }
+  78% {
+    transform: rotate(-4.5deg);
+  }
+  81% {
+    transform: rotate(2.5deg);
+  }
+  84% {
+    transform: rotate(-1deg);
+  }
+  87% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Speech bubble pop in */
+@keyframes speechBubblePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fox-float {
+  animation: foxFloat 3.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-fox-shadow {
+  animation: foxShadowPulse 3.6s ease-in-out infinite;
+}
+
+.animate-fox-blink {
+  animation: foxBlink 4.2s ease-in-out infinite;
+}
+
+.animate-fox-star-orbit {
+  animation: foxStarOrbit15s 15s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-fox-ear {
+  animation: foxEarTwitch 4.6s ease-in-out infinite;
+}
+
+.animate-speech-bubble {
+  animation: speechBubblePop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Iconsax React 19 stroke/color fallback */
+svg path[stroke-width]:not([stroke]) {
+  stroke: currentColor;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes examLoadingBarSmooth {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(25%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-exam-loading-bar {
+  animation: examLoadingBarSmooth 1.6s ease-in-out infinite;
+  will-change: transform;
 }

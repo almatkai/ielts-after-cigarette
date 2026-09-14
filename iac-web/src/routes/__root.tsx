@@ -4,12 +4,8 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import { NotFoundPage } from '@/pages/not-found/ui/not-found-page'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
@@ -42,8 +38,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     links: [
       {
         rel: 'icon',
-        type: 'image/svg+xml',
-        href: `${import.meta.env.BASE_URL}favicon.svg`,
+        type: 'image/x-icon',
+        href: `${import.meta.env.BASE_URL}favicon.ico`,
+      },
+      {
+        rel: 'alternate icon',
+        href: `${import.meta.env.BASE_URL}favicon.ico`,
       },
       {
         rel: 'stylesheet',
@@ -93,18 +93,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
         <Scripts />
       </body>
     </html>

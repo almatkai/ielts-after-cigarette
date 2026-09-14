@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
+import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import { fullMockKeys, getFullMockSection } from '@/features/fullmock/api'
 import { ListeningAttemptRunner } from '@/pages/listening/listening-student-page'
 import { ReadingAttemptRunner } from '@/pages/reading/reading-student-page'
@@ -22,7 +22,13 @@ export function FullMockSectionPage({
   })
 
   if (query.isPending) {
-    return <LoadingState label="Открываем секцию экзамена…" />
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Full Mock"
+        label="Открываем секцию экзамена…"
+        description="Инициализируем материалы следующей части полного пробного тестирования..."
+      />
+    )
   }
   if (query.isError) {
     return (

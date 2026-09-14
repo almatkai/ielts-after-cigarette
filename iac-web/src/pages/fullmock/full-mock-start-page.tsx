@@ -1,10 +1,12 @@
+import {
+  PlayCircle,
+} from 'iconsax-react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { PlayCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
+import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import {
   fullMockKeys,
   getPublicFullMock,
@@ -26,7 +28,15 @@ export function FullMockStartPage({ mockId }: { mockId: string }) {
         params: { sessionId: session.id },
       }),
   })
-  if (query.isPending) return <LoadingState label="Готовим пробный экзамен…" />
+  if (query.isPending) {
+    return (
+      <ExamLoadingScreen
+        badge="IELTS Full Mock"
+        label="Готовим пробный экзамен…"
+        description="Формируем структуру экзамена и проверяем готовность всех модулей..."
+      />
+    )
+  }
   if (query.isError)
     return (
       <ErrorState

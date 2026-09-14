@@ -1,6 +1,11 @@
+import {
+  ArrowLeft,
+  ClipboardText,
+  DocumentUpload,
+  Warning2,
+} from 'iconsax-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Clipboard, FileInput, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -145,7 +150,7 @@ export function ListeningImportPage() {
             variant="outline"
             onClick={() => void navigator.clipboard.writeText(template)}
           >
-            <Clipboard aria-hidden /> Скопировать шаблон
+            <ClipboardText aria-hidden /> Скопировать шаблон
           </Button>
           <Button
             variant="outline"
@@ -184,7 +189,7 @@ export function ListeningImportPage() {
               onClick={() => void parse()}
               disabled={!source.trim() || parseMutation.isPending}
             >
-              <FileInput aria-hidden /> Распознать
+              <DocumentUpload aria-hidden /> Распознать
             </Button>
           </div>
         </CardContent>
@@ -291,7 +296,7 @@ function Issues({
   return (
     <div className={`rounded-lg border p-3 ${classes[tone]}`}>
       <strong className="flex items-center gap-2">
-        <TriangleAlert className="size-4" aria-hidden />
+        <Warning2 className="size-4" aria-hidden />
         {title}: {items.length}
       </strong>
       <ul className="mt-2 text-sm">

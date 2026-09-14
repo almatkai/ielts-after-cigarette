@@ -1,15 +1,15 @@
+import {
+  Camera,
+  DirectRight,
+  Lock,
+  NotificationStatus,
+  Sms,
+  User,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
-import {
-  BellRing,
-  CalendarDays,
-  Camera,
-  LockKeyhole,
-  Mail,
-  Target,
-  UserRound,
-} from 'lucide-react'
 
+import { ExamDatePicker } from '@/components/dashboard/exam-date-picker'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -59,15 +59,6 @@ const emptyProfileForm: ProfileForm = {
   targetScore: '',
   examDate: '',
   examFormat: '',
-}
-
-function todayDateValue() {
-  const today = new Date()
-  return [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0'),
-  ].join('-')
 }
 
 export function ProfilePage() {
@@ -173,11 +164,12 @@ export function ProfilePage() {
 
   return (
     <div className="mx-auto w-full min-w-0 max-w-[1120px]">
-      <Card className="mb-5 gap-0 overflow-hidden rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+      {/* 1. Блок Фото профиля */}
+      <Card className="group mb-5 gap-0 overflow-hidden rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
         <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
-          <div className="grid size-20 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#8d8d90] sm:size-24">
-            <UserRound
-              className="size-9 sm:size-11"
+          <div className="grid size-20 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:border-blue-200 sm:size-24">
+            <User
+              className="size-9 sm:size-11 transition-colors"
               strokeWidth={1.45}
               aria-hidden
             />
@@ -205,9 +197,9 @@ export function ProfilePage() {
             type="button"
             variant="outline"
             onClick={() => photoInputRef.current?.click()}
-            className="h-10 shrink-0 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none"
+            className="h-10 shrink-0 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none hover:border-blue-300 hover:text-blue-600 transition-colors"
           >
-            <Camera aria-hidden />
+            <Camera className="transition-colors group-hover:text-blue-600" aria-hidden />
             Загрузить фото
           </Button>
         </CardContent>
@@ -215,11 +207,12 @@ export function ProfilePage() {
 
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
         <div className="grid min-w-0 gap-5 [&>*]:min-w-0">
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          {/* 2. Блок Личные данные */}
+          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                  <UserRound className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <User className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -265,8 +258,8 @@ export function ProfilePage() {
                 <div className="grid gap-2 sm:col-span-2">
                   <Label htmlFor="email">Электронная почта</Label>
                   <div className="relative">
-                    <Mail
-                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d]"
+                    <Sms
+                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d] transition-colors group-hover:text-[#3b82f6]"
                       aria-hidden
                     />
                     <Input
@@ -308,11 +301,12 @@ export function ProfilePage() {
             </form>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          {/* 3. Блок Параметры подготовки */}
+          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
-                  <Target className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <DirectRight className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -385,24 +379,12 @@ export function ProfilePage() {
                 </div>
 
                 <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor="exam-date">Планируемая дата экзамена</Label>
-                  <div className="relative">
-                    <CalendarDays
-                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d]"
-                      aria-hidden
-                    />
-                    <Input
-                      id="exam-date"
-                      name="examDate"
-                      type="date"
-                      min={todayDateValue()}
-                      value={form.examDate}
-                      onChange={(event) =>
-                        updateForm('examDate', event.target.value)
-                      }
-                      className={`${fieldClassName} pl-10`}
-                    />
-                  </div>
+                  <Label htmlFor="exam-date-trigger">Планируемая дата экзамена</Label>
+                  <ExamDatePicker
+                    value={form.examDate}
+                    onChange={(date) => updateForm('examDate', date)}
+                    error={goalErrors.examDate}
+                  />
                   {goalErrors.examDate ? (
                     <p className="text-xs text-[#c92f2f]" role="alert">
                       {goalErrors.examDate}
@@ -434,11 +416,12 @@ export function ProfilePage() {
         </div>
 
         <aside className="grid min-w-0 gap-5 [&>*]:min-w-0">
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          {/* 4. Блок Уведомления */}
+          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                  <BellRing className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <NotificationStatus className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -490,11 +473,12 @@ export function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          {/* 5. Блок Безопасность */}
+          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
-                  <LockKeyhole className="size-[18px]" aria-hidden />
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <Lock className="size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">

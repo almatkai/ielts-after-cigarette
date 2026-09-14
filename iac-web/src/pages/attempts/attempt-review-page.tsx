@@ -1,6 +1,8 @@
+import {
+  ArrowLeft,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -8,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   AttemptResultSummary,
   ErrorState,
+  ExamLoadingScreen,
   LoadingState,
   ReviewQuestion,
 } from '@/features/attempts/attempt-ui'
@@ -53,7 +56,14 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   })
 
   if (detailQuery.isPending) {
-    return <LoadingState label="Загружаем разбор попытки…" />
+    return (
+      <ExamLoadingScreen
+        badge="Анализ попытки"
+        label="Загружаем разбор попытки…"
+        description="Подготавливаем детальный отчёт по ответам, баллам и критериям оценивания..."
+        showTimerTip={false}
+      />
+    )
   }
   if (!attempt) {
     return (
@@ -69,7 +79,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const review = attempt.status === 'SUBMITTED' ? (attempt.review ?? []) : null
   const aiEvaluation = evaluationFor(attempt)
   const title =
-    material?.title ?? `${skillLabel(attempt.materialType)}: AI-разбор`
+    material?.title ?? `${skillLabel(attempt.materialType)}: Разбор работы`
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">

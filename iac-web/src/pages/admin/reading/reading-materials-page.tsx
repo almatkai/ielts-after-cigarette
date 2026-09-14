@@ -1,12 +1,12 @@
+import {
+  Book,
+  DocumentForward,
+  DocumentUpload,
+  Edit,
+  Warning2,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import {
-  BookOpenText,
-  FileInput,
-  FilePlus2,
-  PencilLine,
-  TriangleAlert,
-} from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -46,7 +46,7 @@ export function ReadingMaterialsPage() {
             variant="outline"
             onClick={() => void navigate({ to: '/admin/reading/import' })}
           >
-            <FileInput aria-hidden /> Импортировать текст
+            <DocumentUpload aria-hidden /> Импортировать текст
           </Button>
           <Button
             type="button"
@@ -55,7 +55,7 @@ export function ReadingMaterialsPage() {
               void navigate({ to: '/admin/reading/materials/new' })
             }
           >
-            <FilePlus2 aria-hidden /> Создать вручную
+            <DocumentForward aria-hidden /> Создать вручную
           </Button>
         </div>
       </div>
@@ -69,7 +69,7 @@ export function ReadingMaterialsPage() {
       ) : materialsQuery.isError ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
             <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
             <Button
               type="button"
@@ -84,7 +84,7 @@ export function ReadingMaterialsPage() {
       ) : materialsQuery.data.items.length === 0 ? (
         <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <BookOpenText className="size-8 text-[#9a9a9d]" aria-hidden />
+            <Book className="size-8 text-[#9a9a9d]" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
               Создайте первый passage. После него добавим группы вопросов и
@@ -133,7 +133,7 @@ export function ReadingMaterialsPage() {
                     to="/admin/reading/materials/$materialId"
                     params={{ materialId: material.id }}
                   >
-                    <PencilLine aria-hidden />
+                    <Edit aria-hidden />
                     Редактировать
                   </Link>
                 </Button>

@@ -1,76 +1,41 @@
 import {
-  BarChart3,
-  BookOpen,
-  CalendarRange,
-  ClipboardCheck,
-  Dumbbell,
-  Headphones,
-  LayoutDashboard,
-  MicVocal,
-  PenLine,
-  Settings2,
-  TriangleAlert,
-} from 'lucide-react'
+  CalendarSearch,
+  Category,
+  Chart,
+  Setting2,
+  Warning2,
+  Weight,
+} from 'iconsax-react'
 
 export const primaryDashboardNavigation = [
   {
     label: 'Обзор',
     to: '/dashboard',
-    icon: LayoutDashboard,
+    icon: Category,
     exact: true,
   },
   {
     label: 'План подготовки',
     to: '/dashboard/plan',
-    icon: CalendarRange,
+    icon: CalendarSearch,
     exact: false,
   },
   {
     label: 'Практика',
     to: '/dashboard/practice',
-    icon: Dumbbell,
-    exact: false,
-  },
-  {
-    label: 'Listening',
-    to: '/dashboard/listening',
-    icon: Headphones,
-    exact: false,
-  },
-  {
-    label: 'Reading',
-    to: '/dashboard/reading',
-    icon: BookOpen,
-    exact: false,
-  },
-  {
-    label: 'Writing',
-    to: '/dashboard/writing',
-    icon: PenLine,
-    exact: false,
-  },
-  {
-    label: 'Speaking',
-    to: '/dashboard/speaking',
-    icon: MicVocal,
-    exact: false,
-  },
-  {
-    label: 'Full Mock',
-    to: '/dashboard/full-mocks',
-    icon: ClipboardCheck,
+    icon: Weight,
     exact: false,
   },
   {
     label: 'Ошибки',
     to: '/dashboard/mistakes',
-    icon: TriangleAlert,
+    icon: Warning2,
     exact: false,
   },
   {
     label: 'Прогресс',
     to: '/dashboard/progress',
-    icon: BarChart3,
+    icon: Chart,
     exact: false,
   },
 ] as const
@@ -78,20 +43,24 @@ export const primaryDashboardNavigation = [
 export const settingsDashboardNavigation = {
   label: 'Настройки',
   to: '/dashboard/settings',
-  icon: Settings2,
+  icon: Setting2,
   exact: false,
 } as const
 
-const profileDashboardPage = {
-  label: 'Профиль',
-  to: '/dashboard/profile',
-} as const
+const secondaryDashboardPages = [
+  { label: 'Listening', to: '/dashboard/listening' },
+  { label: 'Reading', to: '/dashboard/reading' },
+  { label: 'Writing', to: '/dashboard/writing' },
+  { label: 'Speaking', to: '/dashboard/speaking' },
+  { label: 'Full Mock', to: '/dashboard/full-mocks' },
+  { label: 'Профиль', to: '/dashboard/profile' },
+] as const
 
 export function getDashboardPageTitle(pathname: string) {
   const navigationItem = [
     ...primaryDashboardNavigation,
     settingsDashboardNavigation,
-    profileDashboardPage,
+    ...secondaryDashboardPages,
   ].find((item) => item.to === pathname)
 
   return navigationItem?.label ?? 'Панель управления'

@@ -1,6 +1,12 @@
+import {
+  DocumentForward,
+  DocumentUpload,
+  Edit,
+  Microphone2,
+  Warning2,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { FilePlus2, FileUp, MicVocal, PencilLine, TriangleAlert } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -29,13 +35,13 @@ export function SpeakingMaterialsPage() {
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
             <Link to="/admin/speaking/import">
-              <FileUp aria-hidden />
+              <DocumentUpload aria-hidden />
               Импорт JSON
             </Link>
           </Button>
           <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/admin/speaking/materials/new">
-              <FilePlus2 aria-hidden />
+              <DocumentForward aria-hidden />
               Создать материал
             </Link>
           </Button>
@@ -51,7 +57,7 @@ export function SpeakingMaterialsPage() {
       {materialsQuery.isError ? (
         <Card className="shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
             <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
             <Button
               type="button"
@@ -67,7 +73,7 @@ export function SpeakingMaterialsPage() {
       {materialsQuery.data?.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <MicVocal className="size-8 text-[#9a9a9d]" aria-hidden />
+            <Microphone2 className="size-8 text-[#9a9a9d]" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
               Создайте набор с тремя частями и опубликуйте его для студентов.
@@ -110,7 +116,7 @@ export function SpeakingMaterialsPage() {
                   to="/admin/speaking/materials/$materialId"
                   params={{ materialId: material.id }}
                 >
-                  <PencilLine aria-hidden />
+                  <Edit aria-hidden />
                   Редактировать
                 </Link>
               </Button>

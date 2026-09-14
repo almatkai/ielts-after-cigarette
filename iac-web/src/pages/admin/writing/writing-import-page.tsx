@@ -1,6 +1,10 @@
+import {
+  ArrowLeft,
+  DocumentUpload,
+  TickCircle,
+} from 'iconsax-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, CheckCircle2, FileUp } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -65,7 +69,7 @@ export function WritingImportPage() {
             disabled={!source.trim() || parseMutation.isPending}
             onClick={() => parseMutation.mutate()}
           >
-            <FileUp aria-hidden />
+            <DocumentUpload aria-hidden />
             {parseMutation.isPending ? 'Проверяем…' : 'Проверить импорт'}
           </Button>
           {parseMutation.isError ? (
@@ -92,7 +96,7 @@ export function WritingImportPage() {
               </ul>
             ) : (
               <p className="flex items-center gap-2 text-sm text-emerald-700">
-                <CheckCircle2 className="size-4" aria-hidden />
+                <TickCircle className="size-4" aria-hidden />
                 Готово к импорту: {result.materials.length} материалов.
               </p>
             )}

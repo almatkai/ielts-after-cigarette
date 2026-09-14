@@ -1,5 +1,7 @@
+import {
+  ShieldCross,
+} from 'iconsax-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { ShieldX } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,7 +22,7 @@ function ForbiddenPage() {
       <Card className="w-full max-w-md rounded-[16px] border-[#e7e7e4] shadow-none">
         <CardContent className="flex flex-col items-center p-8 text-center">
           <span className="grid size-12 place-items-center rounded-full bg-[#fff0f0] text-[#e23b3b]">
-            <ShieldX className="size-6" aria-hidden />
+            <ShieldCross className="size-6" aria-hidden />
           </span>
           <h1 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">
             Недостаточно прав

@@ -1,5 +1,10 @@
+import {
+  ShieldTick,
+  Trash,
+  UserAdd,
+  Warning2,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ShieldCheck, Trash2, TriangleAlert, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -108,7 +113,7 @@ export function AdminsPage() {
           className="bg-[#3b82f6] hover:bg-[#2563eb]"
           disabled={busy}
         >
-          <UserPlus aria-hidden />
+          <UserAdd aria-hidden />
           Добавить
         </Button>
       </form>
@@ -128,7 +133,7 @@ export function AdminsPage() {
       ) : adminsQuery.isError ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <TriangleAlert className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
             <p className="mt-3 text-sm">
               {adminsQuery.error instanceof ApiError &&
               adminsQuery.error.status === 403
@@ -163,7 +168,7 @@ export function AdminsPage() {
                 >
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-2">
-                      <ShieldCheck
+                      <ShieldTick
                         className="size-4 text-[#a1a1a6]"
                         aria-hidden
                       />
@@ -189,7 +194,7 @@ export function AdminsPage() {
                         disabled={busy}
                         onClick={() => void handleRemove(admin)}
                       >
-                        <Trash2 aria-hidden />
+                        <Trash aria-hidden />
                         Удалить
                       </Button>
                     )}

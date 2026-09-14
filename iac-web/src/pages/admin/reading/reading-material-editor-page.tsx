@@ -250,7 +250,9 @@ export function ReadingMaterialEditorPage({
 
   const material = materialQuery.data
   const pending =
-    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending
+    saveMutation.isPending ||
+    publishMutation.isPending ||
+    archiveMutation.isPending
 
   return (
     <form className="grid gap-5" onSubmit={(event) => void handleSubmit(event)}>
@@ -429,36 +431,13 @@ export function ReadingMaterialEditorPage({
                     rows={2}
                     placeholder="Текст вопроса"
                   />
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <Textarea
-                      value={JSON.stringify(question.content)}
-                      onChange={(event) => {
-                        try {
-                          updateQuestion(groupIndex, questionIndex, {
-                            content: JSON.parse(event.target.value),
-                          })
-                        } catch {
-                          /* wait for valid JSON */
-                        }
-                      }}
-                      rows={3}
-                      placeholder='Content JSON, например {"options":[...]}'
-                    />
-                    <Textarea
-                      value={JSON.stringify(question.answer)}
-                      onChange={(event) => {
-                        try {
-                          updateQuestion(groupIndex, questionIndex, {
-                            answer: JSON.parse(event.target.value),
-                          })
-                        } catch {
-                          /* wait for valid JSON */
-                        }
-                      }}
-                      rows={3}
-                      placeholder='Answer JSON, например {"optionId":"a"}'
-                    />
-                  </div>
+                  <ReadingQuestionFields
+                    groupType={group.type}
+                    question={question}
+                    onChange={(patch) =>
+                      updateQuestion(groupIndex, questionIndex, patch)
+                    }
+                  />
                   <div className="grid gap-2">
                     <Label>Explanation after answer</Label>
                     <Textarea
@@ -634,4 +613,284 @@ export function ReadingMaterialEditorPage({
       </Card>
     </form>
   )
+}
+
+type ReadingOption = { id: string; text: string }
+
+function ReadingQuestionFields({
+  groupType,
+  question,
+  onChange,
+}: {
+  groupType: ReadingQuestionGroup['type']
+  question: ReadingQuestion
+  onChange: (patch: Partial<ReadingQuestion>) => void
+}) {
+  const options = Array.isArray(question.content.options)
+    ? question.content.options.filter(isReadingOption)
+    : []
+  const number = numericContent(question.content.number) ?? question.position
+  const numberEnd = numericContent(question.content.numberEnd)
+  const selectionLimit = numericContent(question.content.selectionLimit)
+  const updateContent = (patch: Record<string, unknown>) =>
+    onChange({ content: { ...question.content, ...patch } })
+  const updateOption = (index: number, patch: Partial<ReadingOption>) =>
+    updateContent({
+      options: options.map((option, optionIndex) =>
+        optionIndex === index ? { ...option, ...patch } : option,
+      ),
+    })
+  const completion =
+    groupType.endsWith('_completion') || groupType === 'short_answer'
+  const matching = groupType.startsWith('matching_')
+  const enumValues =
+    groupType === 'true_false_not_given'
+      ? ['TRUE', 'FALSE', 'NOT_GIVEN']
+      : groupType === 'yes_no_not_given'
+        ? ['YES', 'NO', 'NOT_GIVEN']
+        : null
+  const multiSelect = groupType === 'multiple_choice' && question.points > 1
+
+  return (
+    <div className="grid gap-4 rounded-lg border border-[#deded9] bg-white p-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-2">
+          <Label>Номер в тесте</Label>
+          <Input
+            type="number"
+            min={1}
+            value={number}
+            onChange={(event) =>
+              updateContent({ number: Number(event.target.value) })
+            }
+            className={fieldClassName}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label>Последний номер (multi-select)</Label>
+          <Input
+            type="number"
+            min={number}
+            value={numberEnd ?? ''}
+            onChange={(event) => {
+              const end = event.target.value
+                ? Number(event.target.value)
+                : undefined
+              const limit = end ? end - number + 1 : undefined
+              onChange({
+                content: {
+                  ...question.content,
+                  numberEnd: end,
+                  selectionLimit: limit,
+                },
+                ...(limit ? { points: limit } : {}),
+              })
+            }}
+            className={fieldClassName}
+            placeholder="Например 22 для диапазона 18–22"
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label>Лимит выбора</Label>
+          <Input
+            type="number"
+            min={1}
+            value={selectionLimit ?? ''}
+            onChange={(event) =>
+              updateContent({
+                selectionLimit: event.target.value
+                  ? Number(event.target.value)
+                  : undefined,
+              })
+            }
+            className={fieldClassName}
+          />
+        </div>
+      </div>
+      <div className="grid gap-2">
+        <Label>Общий текст / таблица / summary</Label>
+        <Textarea
+          value={
+            typeof question.content.context === 'string'
+              ? question.content.context
+              : ''
+          }
+          onChange={(event) => updateContent({ context: event.target.value })}
+          rows={3}
+          placeholder="Используйте {{12}} для пронумерованных пропусков"
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label>HTTPS-ссылка на изображение (diagram/map)</Label>
+        <Input
+          value={
+            typeof question.content.imageUrl === 'string'
+              ? question.content.imageUrl
+              : ''
+          }
+          onChange={(event) => updateContent({ imageUrl: event.target.value })}
+          className={fieldClassName}
+          placeholder="https://..."
+        />
+      </div>
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <Label>Варианты / банк слов</Label>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              updateContent({
+                options: [
+                  ...options,
+                  {
+                    id: String.fromCharCode(65 + options.length),
+                    text: '',
+                  },
+                ],
+              })
+            }
+          >
+            Добавить вариант
+          </Button>
+        </div>
+        {options.map((option, index) => (
+          <div key={`${option.id}-${index}`} className="flex gap-2">
+            <Input
+              aria-label="ID варианта"
+              value={option.id}
+              onChange={(event) =>
+                updateOption(index, { id: event.target.value.toUpperCase() })
+              }
+              className={`${fieldClassName} w-20`}
+            />
+            <Input
+              aria-label="Текст варианта"
+              value={option.text}
+              onChange={(event) =>
+                updateOption(index, { text: event.target.value })
+              }
+              className={fieldClassName}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() =>
+                updateContent({
+                  options: options.filter(
+                    (_, optionIndex) => optionIndex !== index,
+                  ),
+                })
+              }
+            >
+              Удалить
+            </Button>
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-2">
+        <Label>Правильный ответ</Label>
+        {enumValues ? (
+          <select
+            value={
+              typeof question.answer.value === 'string'
+                ? question.answer.value
+                : ''
+            }
+            onChange={(event) =>
+              onChange({ answer: { value: event.target.value } })
+            }
+            className={fieldClassName}
+          >
+            <option value="">Выберите ответ</option>
+            {enumValues.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        ) : multiSelect ? (
+          <div className="flex flex-wrap gap-2">
+            {options.map((option) => {
+              const selected = Array.isArray(question.answer.optionIds)
+                ? question.answer.optionIds.filter(
+                    (value): value is string => typeof value === 'string',
+                  )
+                : []
+              return (
+                <label
+                  key={option.id}
+                  className="flex gap-2 rounded-lg border p-3"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(option.id)}
+                    onChange={() => {
+                      const next = selected.includes(option.id)
+                        ? selected.filter((value) => value !== option.id)
+                        : [...selected, option.id]
+                      onChange({ answer: { optionIds: next } })
+                    }}
+                  />
+                  {option.id}. {option.text}
+                </label>
+              )
+            })}
+          </div>
+        ) : matching ||
+          groupType === 'multiple_choice' ||
+          options.length > 0 ? (
+          <select
+            value={
+              typeof question.answer.optionId === 'string'
+                ? question.answer.optionId
+                : ''
+            }
+            onChange={(event) =>
+              onChange({ answer: { optionId: event.target.value } })
+            }
+            className={fieldClassName}
+          >
+            <option value="">Выберите вариант</option>
+            {options.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.id}. {option.text}
+              </option>
+            ))}
+          </select>
+        ) : completion ? (
+          <Input
+            value={
+              Array.isArray(question.answer.accepted)
+                ? question.answer.accepted.join(' | ')
+                : ''
+            }
+            onChange={(event) =>
+              onChange({
+                answer: {
+                  accepted: event.target.value
+                    .split('|')
+                    .map((value) => value.trim())
+                    .filter(Boolean),
+                },
+              })
+            }
+            className={fieldClassName}
+            placeholder="answer | accepted alternative"
+          />
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+function isReadingOption(value: unknown): value is ReadingOption {
+  if (!value || typeof value !== 'object') return false
+  const option = value as Record<string, unknown>
+  return typeof option.id === 'string' && typeof option.text === 'string'
+}
+
+function numericContent(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null
 }

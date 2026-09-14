@@ -108,8 +108,20 @@ export function ReadingAttemptRunner({
     group.questions.map((question) => ({ group, question })),
   )
   const currentQuestion = questions[activeQuestionIndex]
-  const totalQuestions = questions.length
-  const answeredCount = Object.keys(answers).length
+  const totalQuestions = questions.reduce(
+    (total, item) => total + item.question.points,
+    0,
+  )
+  const answeredCount = questions.reduce((total, item) => {
+    if (!item.question.id) return total
+    const answer = answers[item.question.id] ?? {}
+    if (Array.isArray(answer.optionIds)) {
+      return total + Math.min(answer.optionIds.length, item.question.points)
+    }
+    if (answer.optionId || answer.value) return total + 1
+    return total
+  }, 0)
+  const currentNumber = questionNumberLabel(currentQuestion.question)
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
@@ -175,7 +187,7 @@ export function ReadingAttemptRunner({
               Назад
             </Button>
             <p className="text-sm text-[#69696d]">
-              Вопрос {activeQuestionIndex + 1} из {totalQuestions}
+              Вопрос {currentNumber} из {totalQuestions}
             </p>
             <Button
               type="button"
@@ -305,15 +317,35 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
         ),
     ),
   )
-  if (contexts.length === 0) return null
+  const images = Array.from(
+    new Set(
+      group.questions
+        .map((question) => question.content.imageUrl)
+        .filter(
+          (imageUrl): imageUrl is string =>
+            typeof imageUrl === 'string' && imageUrl.trim() !== '',
+        ),
+    ),
+  )
+  if (contexts.length === 0 && images.length === 0) return null
   return (
     <>
+      {images.map((imageUrl) => (
+        <img
+          key={imageUrl}
+          src={imageUrl}
+          alt="Diagram for the question group"
+          className="max-h-[420px] w-auto max-w-full rounded-lg border object-contain"
+        />
+      ))}
       {contexts.map((context) => (
         <div
           key={context}
           className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm"
         >
-          {context.replaceAll('{{answer}}', '_____')}
+          {context
+            .replaceAll('{{answer}}', '_____')
+            .replace(/\{\{(\d+)\}\}/g, '($1) _____')}
         </div>
       ))}
     </>
@@ -381,7 +413,9 @@ function StudentQuestion({
 
   const prompt = (
     <p className="font-medium">
-      <span className="mr-2 text-[#3b82f6]">{question.position}.</span>
+      <span className="mr-2 text-[#3b82f6]">
+        {questionNumberLabel(question)}.
+      </span>
       {question.prompt.replace('{{answer}}', '_____')}
     </p>
   )
@@ -446,4 +480,16 @@ function StudentQuestion({
       />
     </div>
   )
+}
+
+function questionNumberLabel(question: PublicReadingQuestion) {
+  const start =
+    typeof question.content.number === 'number'
+      ? question.content.number
+      : question.position
+  const end =
+    typeof question.content.numberEnd === 'number'
+      ? question.content.numberEnd
+      : null
+  return end && end > start ? `${start}–${end}` : String(start)
 }

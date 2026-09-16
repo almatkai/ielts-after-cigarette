@@ -1,9 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(__dirname, '..');
 
 const dirs = [
-  'c:/Users/Almaz/Documents/ielts-after-cigarette/iac-web/node_modules/iconsax-react/dist/esm',
-  'c:/Users/Almaz/Documents/ielts-after-cigarette/iac-web/node_modules/iconsax-react/dist/cjs'
+  path.join(root, 'node_modules/iconsax-react/dist/esm'),
+  path.join(root, 'node_modules/iconsax-react/dist/cjs')
 ];
 
 let totalPatched = 0;

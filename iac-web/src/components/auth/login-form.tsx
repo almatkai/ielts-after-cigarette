@@ -256,14 +256,14 @@ export function LoginForm() {
         {/* Кнопка входа через Google снизу со стандартным стилем */}
         <div
           onClick={() => {
-            window.google?.accounts?.id?.prompt?.()
+            window.google?.accounts.id.prompt?.()
           }}
           className="group relative flex h-12 w-full cursor-pointer items-center justify-center overflow-hidden rounded-[10px] border border-[#cbd5e1] bg-white px-4 shadow-xs transition-colors hover:border-[#94a3b8] hover:bg-[#f8fafc] active:bg-[#f1f5f9]"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              window.google?.accounts?.id?.prompt?.()
+              window.google?.accounts.id.prompt?.()
             }
           }}
         >

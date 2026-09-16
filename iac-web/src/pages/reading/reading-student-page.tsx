@@ -1,12 +1,6 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  Book1,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowLeft, TickCircle } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, Clock3 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
@@ -178,26 +172,38 @@ export function ReadingAttemptRunner({
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
-      <div>
-        <Button asChild variant="link" className="sr-only">
-          <Link to="/dashboard/reading">
-            <ArrowLeft aria-hidden />К Reading
-          </Link>
-        </Button>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="sr-only">{material.title}</h1>
-          <div className="flex items-center gap-3">
-            <SaveIndicator state={session.saveState} />
-            <TimeBadge
-              seconds={durationSeconds > 0 ? remainingSeconds : elapsedSeconds}
-              label={durationSeconds > 0 ? 'Осталось' : 'Прошедшее время'}
-            />
-          </div>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
+          >
+            {fullMockSessionId ? (
+              <Link
+                to="/exam/full-mock-sessions/$sessionId"
+                params={{ sessionId: fullMockSessionId }}
+              >
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">К Full Mock</span>
+              </Link>
+            ) : (
+              <Link to="/dashboard/reading">
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">К Reading</span>
+              </Link>
+            )}
+          </Button>
+          <h1 className="text-base font-semibold text-slate-900">{material.title}</h1>
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3">
           <SaveIndicator state={session.saveState} />
-          <TimeBadge seconds={elapsedSeconds} label="Прошедшее время" />
+          <TimeBadge
+            seconds={durationSeconds > 0 ? remainingSeconds : elapsedSeconds}
+            label={durationSeconds > 0 ? 'Осталось' : 'Прошедшее время'}
+          />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -227,35 +233,6 @@ export function ReadingAttemptRunner({
           </AlertDialog>
         </div>
       </header>
-
-      {/* Mobile Tab Switcher */}
-      <div className="mb-3 flex shrink-0 rounded-xl bg-slate-100 p-1 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setActiveMobileTab('passage')}
-          className={cn(
-            'flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all',
-            activeMobileTab === 'passage'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900',
-          )}
-        >
-          Текст задания
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveMobileTab('questions')}
-          className={cn(
-            'flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all',
-            activeMobileTab === 'questions'
-              ? 'bg-white text-slate-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900',
-          )}
-        >
-          Вопрос {activeQuestionIndex + 1} из {totalQuestions}
-          {answers[currentQuestion.question.id ?? ''] ? ' ✓' : ''}
-        </button>
-      </div>
 
       {session.submitError ? (
         <p
@@ -332,7 +309,7 @@ export function ReadingAttemptRunner({
               Далее
             </Button>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   )
@@ -485,7 +462,46 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
             .replace(/\{\{(\d+)\}\}/g, '($1) _____')}
         </div>
       ))}
-    </div>
+    </>
+  )
+}
+
+function StudentGroup({
+  group,
+  activeQuestionId,
+  answers,
+  onAnswer,
+}: {
+  group: PublicReadingGroup
+  activeQuestionId?: string
+  answers: Record<string, StudentAnswer>
+  onAnswer: (questionId: string, answer: StudentAnswer) => void
+}) {
+  const questions = activeQuestionId
+    ? group.questions.filter((question) => question.id === activeQuestionId)
+    : group.questions
+  if (questions.length === 0) return null
+  return (
+    <section className="grid gap-3 rounded-xl border p-4">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+          {group.type.replaceAll('_', ' ')}
+        </p>
+        <p className="mt-1 whitespace-pre-wrap text-sm">{group.instructions}</p>
+      </div>
+      <GroupContexts group={group} />
+      <div className="grid gap-4">
+        {questions.map((question) => (
+          <CleanStudentQuestion
+            key={question.id ?? question.position}
+            group={group}
+            question={question}
+            value={question.id ? answers[question.id] : undefined}
+            onAnswer={onAnswer}
+          />
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -516,7 +532,7 @@ function CleanStudentQuestion({
         {questionNumberLabel(question)}.
       </span>
       {question.prompt.replace('{{answer}}', '_____')}
-    </div>
+    </p>
   )
 
   // True / False / Not Given & Yes / No / Not Given

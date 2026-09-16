@@ -125,7 +125,9 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     mutationFn: () => archiveListeningTest(testId!, form.revision),
     onSuccess: async (test) => {
       setForm(toForm(test))
-      await queryClient.invalidateQueries({ queryKey: listeningKeys.adminTests })
+      await queryClient.invalidateQueries({
+        queryKey: listeningKeys.adminTests,
+      })
       setMessage('Тест перенесён в архив.')
     },
   })
@@ -159,6 +161,13 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           i === questionIndex ? { ...question, ...patch } : question,
       ),
     })
+
+  const sharedAudioAssetId =
+    form.parts.length > 0 &&
+    form.parts[0].audioAssetId &&
+    form.parts.every((part) => part.audioAssetId === form.parts[0].audioAssetId)
+      ? form.parts[0].audioAssetId
+      : null
 
   const upload = async (
     kind: 'audio' | 'image',
@@ -308,6 +317,57 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               />
             </Field>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-none">
+        <CardHeader>
+          <CardTitle>Общее аудио теста</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+            <Upload className="size-5" aria-hidden />
+            <label
+              className={
+                form.parts.length > 0
+                  ? 'cursor-pointer text-sm font-semibold text-[#1d4ed8]'
+                  : 'cursor-not-allowed text-sm font-semibold text-[#9b9b9f]'
+              }
+            >
+              Загрузить один файл для всех Parts
+              <input
+                className="sr-only"
+                type="file"
+                disabled={form.parts.length === 0}
+                accept="audio/*,.mp3,.m4a,.wav,.ogg,.webm"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) {
+                    void upload('audio', file, (id) =>
+                      setForm((current) => ({
+                        ...current,
+                        parts: current.parts.map((part) => ({
+                          ...part,
+                          audioAssetId: id,
+                        })),
+                      })),
+                    )
+                  }
+                }}
+              />
+            </label>
+            <span className="text-xs text-[#69696d]">
+              {sharedAudioAssetId
+                ? `Общий audio asset: ${sharedAudioAssetId}`
+                : form.parts.length > 0
+                  ? 'Общий аудиофайл ещё не прикреплён'
+                  : 'Сначала импортируйте или добавьте Parts'}
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-[#69696d]">
+            Один непрерывный файл будет воспроизводиться без перезапуска при
+            переходе между вопросами и частями теста.
+          </p>
         </CardContent>
       </Card>
 

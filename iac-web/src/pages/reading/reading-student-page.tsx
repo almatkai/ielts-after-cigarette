@@ -1,4 +1,11 @@
-import { ArrowLeft, TickCircle } from 'iconsax-react'
+import {
+  ArrowLeft,
+  Book1,
+  CloseCircle,
+  Eye,
+  EyeSlash,
+  TickCircle,
+} from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -15,17 +22,19 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
-  AttemptResultSummary,
-  ErrorState,
+  AttemptPerformanceReport,
+  AttemptResultHeader,
+  EnhancedReviewQuestion,
   ExamLoadingScreen,
-  ReviewQuestion,
   SaveIndicator,
   TimeBadge,
+  isQuestionAnswered,
   multiSelectLimit,
 } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
@@ -45,50 +54,149 @@ import { getErrorMessage } from '@/lib/api/client'
 const tfngValues = ['TRUE', 'FALSE', 'NOT_GIVEN'] as const
 const ynngValues = ['YES', 'NO', 'NOT_GIVEN'] as const
 
-export function ReadingStudentPage({ materialId }: { materialId: string }) {
-  const startQuery = useQuery({
-    queryKey: ['reading', 'materials', materialId, 'attempt'],
-    queryFn: ({ signal }) => startReadingAttempt(materialId, signal),
-  })
-  if (startQuery.isPending) {
-    return (
-      <ExamLoadingScreen
-        badge="IELTS Reading"
-        label="Готовим материал…"
-        description="Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов."
-      />
-    )
-  }
-  if (!startQuery.data) {
-    return (
-      <ErrorState
-        title="Не удалось начать тест"
-        message={getErrorMessage(startQuery.error)}
-        onRetry={() => void startQuery.refetch()}
-      />
-    )
-  }
+export function ReadingStudentPage({
+  materialId,
+  fullMockSessionId,
+}: {
+  materialId: string
+  fullMockSessionId?: string
+}) {
   return (
-    <ReadingAttemptRunner
-      key={startQuery.data.attempt.id}
-      attempt={startQuery.data.attempt}
-      material={startQuery.data.material}
+    <ExamAttemptShell<PublicReadingMaterial>
+      skillBadge="IELTS Reading"
+      loadingLabel="Готовим материал…"
+      loadingDescription="Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов."
+      queryKey={['reading', 'materials', materialId, 'attempt']}
+      startAttemptFn={(signal) => startReadingAttempt(materialId, signal)}
+      renderRunner={({ attempt, material, onSubmitted }) => (
+        <ReadingAttemptRunner
+          key={attempt.id}
+          attempt={attempt}
+          material={material}
+          fullMockSessionId={fullMockSessionId}
+          onSubmitted={onSubmitted}
+        />
+      )}
+      renderResult={({ attempt, material, onRetake, isRetaking }) => (
+        <ReadingAttemptResult
+          attempt={attempt}
+          material={material}
+          fullMockSessionId={fullMockSessionId}
+          onRetake={onRetake}
+          isRetaking={isRetaking}
+        />
+      )}
     />
   )
+}
+
+function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial[] {
+  if (material.passages && material.passages.length > 1) {
+    return material.passages
+  }
+
+  // Check if material.body has multiple passage markers
+  const regex = /(?:^|\n)(?:READING\s+)?PASSAGE\s+(\d+)\s*(?:[—–-]\s*([^\n]+))?/gi
+  const matches: { index: number; number: number; title: string }[] = []
+  let match: RegExpExecArray | null
+  while ((match = regex.exec(material.body)) !== null) {
+    matches.push({
+      index: match.index,
+      number: parseInt(match[1], 10),
+      title: match[2]?.trim() || `Passage ${match[1]}`,
+    })
+  }
+
+  if (matches.length > 1) {
+    return matches.map((item, i) => {
+      const start = item.index
+      const end = i < matches.length - 1 ? matches[i + 1].index : material.body.length
+      const bodyChunk = material.body.slice(start, end).trim()
+      const groups = material.questionGroups.filter((g) => {
+        const instr = g.instructions || ''
+        const matchP = instr.match(/(?:Passage|Раздел)\s+(\d+)/i)
+        if (matchP) return parseInt(matchP[1], 10) === item.number
+        const firstNum =
+          (g.questions[0]?.content?.number as number | undefined) ??
+          g.questions[0]?.position ??
+          1
+        if (item.number === 1) return firstNum <= 13
+        if (item.number === 2) return firstNum > 13 && firstNum <= 26
+        return firstNum > 26
+      })
+      return {
+        ...material,
+        id: `${material.id}-passage-${item.number}`,
+        title: item.title,
+        body: bodyChunk,
+        questionGroups: groups,
+      }
+    })
+  }
+
+  return material.passages && material.passages.length > 0
+    ? material.passages
+    : [material]
 }
 
 export function ReadingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  onSubmitted,
 }: {
   attempt: Attempt
   material: PublicReadingMaterial
   fullMockSessionId?: string
+  onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>('md')
   const autoSubmitStarted = useRef(false)
+
+  const passages = useMemo(() => resolvePassages(material), [material])
+
+  const questions = useMemo(
+    () =>
+      passages.flatMap((passage, passageIndex) =>
+        passage.questionGroups.flatMap((group) =>
+          group.questions.map((question) => ({
+            passage,
+            passageIndex,
+            group,
+            question,
+          })),
+        ),
+      ),
+    [passages],
+  )
+
+  const currentQuestion = questions[activeQuestionIndex] ?? questions[0]
+  const currentPassage = passages[currentQuestion?.passageIndex ?? 0] ?? passages[0]
+
+  const activePassageQuestions = useMemo(
+    () =>
+      questions.filter(
+        (q) => q.passageIndex === (currentQuestion?.passageIndex ?? 0),
+      ),
+    [questions, currentQuestion?.passageIndex],
+  )
+
+  const goToPassage = (passageIndex: number) => {
+    const targetIndex = questions.findIndex((item) => item.passageIndex === passageIndex)
+    if (targetIndex >= 0) {
+      setActiveQuestionIndex(targetIndex)
+    }
+  }
+
+  useEffect(() => {
+    if (!currentQuestion?.question?.id) return
+    const el = document.getElementById(`reading-q-${currentQuestion.question.id}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [activeQuestionIndex, currentQuestion?.question?.id])
 
   const startedAt = useMemo(
     () => new Date(attempt.startedAt).getTime(),
@@ -98,13 +206,15 @@ export function ReadingAttemptRunner({
     Math.max(0, Math.floor((Date.now() - startedAt) / 1000)),
   )
   useEffect(() => {
+    if (session.submitted) return
     const interval = window.setInterval(() => {
       setElapsedSeconds(
         Math.max(0, Math.floor((Date.now() - startedAt) / 1000)),
       )
     }, 1000)
     return () => window.clearInterval(interval)
-  }, [startedAt])
+  }, [startedAt, session.submitted])
+
   const durationSeconds = (material.durationMinutes ?? 0) * 60
   const remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
   useEffect(() => {
@@ -118,7 +228,13 @@ export function ReadingAttemptRunner({
       autoSubmitStarted.current = true
       void session.submit()
     }
-  }, [durationSeconds, remainingSeconds, session])
+  }, [durationSeconds, remainingSeconds, session.submitted, session.isSubmitting])
+
+  useEffect(() => {
+    if (session.submitted && onSubmitted) {
+      onSubmitted(session.submitted)
+    }
+  }, [session.submitted, onSubmitted])
 
   if (session.submitted) {
     return (
@@ -126,6 +242,9 @@ export function ReadingAttemptRunner({
         attempt={session.submitted}
         material={material}
         fullMockSessionId={fullMockSessionId}
+        onRetake={async () => {
+          window.location.reload()
+        }}
       />
     )
   }
@@ -140,21 +259,6 @@ export function ReadingAttemptRunner({
   }
   const answers = session.answers
 
-  const passages =
-    material.passages && material.passages.length > 0
-      ? material.passages
-      : [material]
-  const questions = passages.flatMap((passage, passageIndex) =>
-    passage.questionGroups.flatMap((group) =>
-      group.questions.map((question) => ({
-        passage,
-        passageIndex,
-        group,
-        question,
-      })),
-    ),
-  )
-  const currentQuestion = questions[activeQuestionIndex]
   const totalQuestions = questions.reduce(
     (total, item) => total + item.question.points,
     0,
@@ -168,11 +272,15 @@ export function ReadingAttemptRunner({
     if (answer.optionId || answer.value) return total + 1
     return total
   }, 0)
+  const activePassageAnsweredCount = activePassageQuestions.filter((item) =>
+    isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
+  ).length
   const currentNumber = questionNumberLabel(currentQuestion.question)
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto flex h-dvh w-full max-w-[1780px] flex-col gap-2.5 p-2.5 sm:p-3.5 lg:p-4 overflow-hidden">
+      {/* ВЕРХНЯЯ ШАПКА */}
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-xs shrink-0">
         <div className="flex items-center gap-3">
           <Button
             asChild
@@ -195,9 +303,54 @@ export function ReadingAttemptRunner({
               </Link>
             )}
           </Button>
-          <h1 className="text-base font-semibold text-slate-900">{material.title}</h1>
+          <div className="hidden md:block">
+            <h1 className="text-sm font-semibold text-slate-900 truncate max-w-[240px] lg:max-w-[360px]">
+              {material.title}
+            </h1>
+          </div>
         </div>
 
+        {/* Вкладки Разделов (Passages) по центру */}
+        {passages.length > 1 && (
+          <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
+            {passages.map((passage, passageIndex) => {
+              const isCurrentPassage = currentQuestion.passageIndex === passageIndex
+              const pQuestions = questions.filter((item) => item.passageIndex === passageIndex)
+              const pAnswered = pQuestions.filter((item) =>
+                isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
+              ).length
+              return (
+                <button
+                  key={passage.id ?? passageIndex}
+                  type="button"
+                  onClick={() => goToPassage(passageIndex)}
+                  className={cn(
+                    'flex items-center gap-2 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all select-none',
+                    isCurrentPassage
+                      ? 'bg-[#3b82f6] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                  )}
+                >
+                  <span>Раздел {passageIndex + 1}</span>
+                  <span
+                    className={cn(
+                      'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
+                      isCurrentPassage
+                        ? 'bg-white/25 text-white'
+                        : pAnswered === pQuestions.length && pQuestions.length > 0
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-slate-100 text-slate-600',
+                    )}
+                  >
+                    {pAnswered}/{pQuestions.length}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Правая часть шапки: Сохранение, Таймер, Кнопка Завершить */}
         <div className="flex items-center gap-2.5 sm:gap-3">
           <SaveIndicator state={session.saveState} />
           <TimeBadge
@@ -237,78 +390,252 @@ export function ReadingAttemptRunner({
       {session.submitError ? (
         <p
           role="alert"
-          className="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b]"
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
         >
           Не удалось отправить тест: {session.submitError}
         </p>
       ) : null}
-      <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <div className="flex flex-wrap gap-2">
-          {passages.map((passage, passageIndex) => (
-            <Button
-              key={passage.id}
-              type="button"
-              size="sm"
-              variant={
-                currentQuestion.passageIndex === passageIndex
-                  ? 'default'
-                  : 'outline'
-              }
-              onClick={() => {
-                const index = questions.findIndex(
-                  (item) => item.passageIndex === passageIndex,
-                )
-                if (index >= 0) setActiveQuestionIndex(index)
-              }}
-            >
-              Passage {passageIndex + 1}
-            </Button>
-          ))}
-        </div>
-        <Card className="max-h-[28dvh] shrink-0 overflow-y-auto shadow-none">
-          <CardHeader>
-            <CardTitle>{currentQuestion.passage.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="whitespace-pre-wrap text-sm leading-6">
-              {currentQuestion.passage.body}
+
+      {/* Основная рабочая зона — сплит на 2 колонки на desktop */}
+      <div className="grid flex-1 min-h-0 gap-3 lg:grid-cols-2 overflow-hidden">
+        {/* ЛЕВАЯ КОЛОНКА: Текст отрывка (Reading Passage) */}
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
+                {passages.length > 1 ? `Раздел ${currentQuestion.passageIndex + 1}` : 'Текст'}
+              </span>
+              <h2 className="text-sm font-semibold text-slate-900 truncate">
+                {currentPassage.title}
+              </h2>
             </div>
-          </CardContent>
+            {/* Контролы размера текста */}
+            <div className="flex items-center gap-1 rounded-[8px] p-0.5 border border-[#e7e7e4] bg-white shrink-0">
+              <button
+                type="button"
+                onClick={() => setPassageFontSize('sm')}
+                className={cn(
+                  'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
+                  passageFontSize === 'sm'
+                    ? 'bg-[#3b82f6] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                )}
+                title="Уменьшить шрифт"
+              >
+                A-
+              </button>
+              <button
+                type="button"
+                onClick={() => setPassageFontSize('md')}
+                className={cn(
+                  'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
+                  passageFontSize === 'md'
+                    ? 'bg-[#3b82f6] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                )}
+                title="Стандартный шрифт"
+              >
+                A
+              </button>
+              <button
+                type="button"
+                onClick={() => setPassageFontSize('lg')}
+                className={cn(
+                  'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
+                  passageFontSize === 'lg'
+                    ? 'bg-[#3b82f6] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                )}
+                title="Увеличить шрифт"
+              >
+                A+
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 select-text bg-white">
+            <div
+              className={cn(
+                'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+                passageFontSize === 'sm' && 'text-[14px] leading-[1.65]',
+                passageFontSize === 'md' && 'text-[15.5px] leading-[1.8]',
+                passageFontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
+              )}
+            >
+              {currentPassage.body}
+            </div>
+          </div>
         </Card>
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <Card className="min-h-0 flex-1 overflow-y-auto shadow-none">
-            <CardHeader>
-              <CardTitle>Вопросы</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-5">
-              <StudentGroup
-                group={currentQuestion.group}
-                activeQuestionId={currentQuestion.question.id}
-                answers={answers}
-                onAnswer={session.updateAnswer}
-              />
-            </CardContent>
-          </Card>
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+
+        {/* ПРАВАЯ КОЛОНКА: Вопросы и ответы */}
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
+          <div className="border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
+                  {passages.length > 1 ? `Раздел ${currentQuestion.passageIndex + 1}` : 'Вопросы'}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">
+                  {currentPassage.questionGroups.length}{' '}
+                  {currentPassage.questionGroups.length === 1 ? 'группа' : 'групп'} вопросов
+                </span>
+              </div>
+              <span className="text-xs font-semibold text-slate-500">
+                Вопрос {currentNumber} из {totalQuestions}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 bg-white space-y-7">
+            {currentPassage.questionGroups.map((group) => (
+              <div key={group.id ?? group.position} className="space-y-3.5">
+                <div className="border-b border-[#ededeb] pb-2.5">
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 border border-slate-200">
+                    {group.type.replaceAll('_', ' ')}
+                  </span>
+                  {group.instructions ? (
+                    <p className="mt-2 text-xs leading-relaxed text-[#69696d]">
+                      {group.instructions}
+                    </p>
+                  ) : null}
+                </div>
+                <StudentGroup
+                  group={group}
+                  activeQuestionId={currentQuestion.question.id}
+                  answers={answers}
+                  onAnswer={session.updateAnswer}
+                  onSelectQuestion={(qId) => {
+                    const idx = questions.findIndex((item) => item.question.id === qId)
+                    if (idx >= 0) setActiveQuestionIndex(idx)
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Навигация внизу правой колонки */}
+          <div className="flex items-center justify-between border-t border-[#ededeb] px-5 py-3 bg-white shrink-0">
             <Button
               type="button"
               variant="outline"
+              size="sm"
               disabled={activeQuestionIndex === 0}
               onClick={() => setActiveQuestionIndex((index) => index - 1)}
+              className="gap-1.5 rounded-[10px] text-xs font-medium border-[#e7e7e4] bg-white hover:bg-slate-50"
             >
-              Назад
+              ← Назад
             </Button>
-            <p className="text-sm text-[#69696d]">
-              Вопрос {currentNumber} из {totalQuestions}
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#69696d] font-medium">
+                Вопрос {currentNumber} из {totalQuestions}
+              </span>
+              {passages.length > 1 && (
+                <span className="text-xs text-slate-400">
+                  · Раздел {currentQuestion.passageIndex + 1}
+                </span>
+              )}
+            </div>
             <Button
               type="button"
-              disabled={activeQuestionIndex === totalQuestions - 1}
+              size="sm"
+              disabled={activeQuestionIndex === questions.length - 1}
               onClick={() => setActiveQuestionIndex((index) => index + 1)}
+              className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 text-xs font-medium shadow-xs"
             >
-              Далее
+              Далее →
             </Button>
           </div>
+        </Card>
+      </div>
+
+      {/* НИЖНИЙ НАВИГАТОР ПО ВОПРОСАМ (Question Palette) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2 sm:px-4 shadow-xs shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto py-0.5 max-w-full">
+          {/* Переключение разделов внизу (если больше 1 раздела) */}
+          {passages.length > 1 && (
+            <div className="flex items-center gap-1 border-r border-[#ededeb] pr-2.5 sm:pr-3 shrink-0">
+              {passages.map((passage, pIdx) => {
+                const isCurrentPassage = currentQuestion.passageIndex === pIdx
+                const pQuestions = questions.filter((q) => q.passageIndex === pIdx)
+                const pAnswered = pQuestions.filter((item) =>
+                  isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
+                ).length
+                return (
+                  <button
+                    key={passage.id ?? pIdx}
+                    type="button"
+                    onClick={() => goToPassage(pIdx)}
+                    className={cn(
+                      'flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-xs font-semibold transition-all shrink-0 select-none',
+                      isCurrentPassage
+                        ? 'bg-[#3b82f6] text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                    )}
+                    title={`Раздел ${pIdx + 1}: ${pAnswered}/${pQuestions.length} отвечено`}
+                  >
+                    <span>Раздел {pIdx + 1}</span>
+                    <span
+                      className={cn(
+                        'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
+                        isCurrentPassage
+                          ? 'bg-white/25 text-white'
+                          : pAnswered === pQuestions.length && pQuestions.length > 0
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-slate-100 text-slate-600',
+                      )}
+                    >
+                      {pAnswered}/{pQuestions.length}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Вопросы ТОЛЬКО активного раздела */}
+          <div className="flex items-center gap-1 shrink-0">
+            {activePassageQuestions.map((item) => {
+              const idx = questions.indexOf(item)
+              const isCurrent = idx === activeQuestionIndex
+              const answered = isQuestionAnswered(
+                item.question.id,
+                answers[item.question.id ?? ''],
+              )
+              const label = questionNumberLabel(item.question)
+              return (
+                <button
+                  key={item.question.id ?? idx}
+                  type="button"
+                  onClick={() => setActiveQuestionIndex(idx)}
+                  className={cn(
+                    'flex size-7 shrink-0 items-center justify-center rounded-[7px] border text-xs font-semibold transition-all select-none',
+                    isCurrent
+                      ? 'border-[#3b82f6] bg-[#3b82f6] text-white shadow-xs scale-105'
+                      : answered
+                        ? 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                        : 'border-[#e7e7e4] bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
+                  )}
+                  title={`Вопрос ${label}${answered ? ' (отвечен)' : ''}`}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Счётчик ответов */}
+        <div className="flex items-center gap-3 shrink-0 text-xs text-slate-600 font-medium">
+          {passages.length > 1 && (
+            <span className="text-slate-500 hidden sm:inline">
+              В разделе: <strong className="text-slate-800">{activePassageAnsweredCount}</strong> из {activePassageQuestions.length}
+              <span className="mx-2 text-slate-300">|</span>
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-blue-600" />
+            Всего: <strong className="text-slate-800">{answeredCount}</strong> из {totalQuestions}
+          </span>
         </div>
       </div>
     </div>
@@ -319,10 +646,14 @@ function ReadingAttemptResult({
   attempt,
   material,
   fullMockSessionId,
+  onRetake,
+  isRetaking,
 }: {
   attempt: Attempt
   material: PublicReadingMaterial
   fullMockSessionId?: string
+  onRetake?: () => Promise<void> | void
+  isRetaking?: boolean
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -332,89 +663,302 @@ function ReadingAttemptResult({
     detailQuery.data?.status === 'SUBMITTED'
       ? (detailQuery.data.review ?? [])
       : null
-  const reviewByQuestionId = useMemo(
-    () => new Map((review ?? []).map((item) => [item.questionId, item])),
-    [review],
-  )
+
+  const passages = useMemo(() => resolvePassages(material), [material])
+
+  // Question options map for quick lookup
+  const questionOptionsMap = useMemo(() => {
+    const map = new Map<string, Option[]>()
+    for (const passage of passages) {
+      for (const group of passage.questionGroups) {
+        for (const q of group.questions) {
+          if (q.id) {
+            map.set(q.id, (q.content.options ?? []) as Option[])
+          }
+        }
+      }
+    }
+    return map
+  }, [passages])
+
+  // Filters
+  const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
+  const [selectedPassageTab, setSelectedPassageTab] = useState<number | 'all'>('all')
+  const [showPassageText, setShowPassageText] = useState(false)
+  const [readingPassageViewIndex, setReadingPassageViewIndex] = useState(0)
+
+  // Metrics
+  const totalQuestions = review ? review.length : (attempt.maxScore ?? 40)
+  const correctCount = review ? review.filter((i) => i.isCorrect).length : (attempt.score ?? 0)
+  const incorrectCount = review ? review.filter((i) => !i.isCorrect).length : 0
+
+  // Filtered review list
+  const filteredReviewList = useMemo(() => {
+    if (!review) return []
+    return review.filter((item) => {
+      if (filterStatus === 'errors' && item.isCorrect) return false
+      if (filterStatus === 'correct' && !item.isCorrect) return false
+
+      if (selectedPassageTab !== 'all') {
+        const passage = passages[selectedPassageTab]
+        if (passage) {
+          const pQuestionIds = new Set(
+            passage.questionGroups.flatMap((g) => g.questions.map((q) => q.id)).filter(Boolean),
+          )
+          if (!pQuestionIds.has(item.questionId)) return false
+        }
+      }
+
+      return true
+    })
+  }, [review, filterStatus, selectedPassageTab, passages])
+
+  const scrollToQuestion = (questionId: string) => {
+    const el = document.getElementById(`review-q-${questionId}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+      {/* ВЕРХНЯЯ ПАНЕЛЬ НАВИГАЦИИ */}
+      <AttemptResultHeader
+        skill="reading"
+        fullMockSessionId={fullMockSessionId}
+        onRetake={onRetake}
+        isRetaking={isRetaking}
+      />
+
+      {/* ЗАГОЛОВОК ТЕСТА */}
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
-          {fullMockSessionId ? (
-            <Link
-              to="/exam/full-mock-sessions/$sessionId"
-              params={{ sessionId: fullMockSessionId }}
-            >
-              <ArrowLeft aria-hidden />К Full Mock
-            </Link>
-          ) : (
-            <Link to="/dashboard/reading">
-              <ArrowLeft aria-hidden />К материалам
-            </Link>
-          )}
-        </Button>
-        <h1 className="mt-3 text-2xl font-bold">{material.title}</h1>
-        <p className="text-sm text-[#69696d]">
-          {material.examType} · {material.difficulty}
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          {material.title}
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          IELTS Academic Reading · {material.difficulty} · {totalQuestions} вопросов
         </p>
       </div>
 
-      <AttemptResultSummary attempt={attempt} review={review} />
+      {/* РЕЗУЛЬТАТИВНЫЙ СВОДНЫЙ ОТЧЁТ */}
+      <AttemptPerformanceReport
+        band={attempt.band}
+        bandNote="Балл рассчитан по стандарту академического чтения IELTS"
+        correctCount={correctCount}
+        totalQuestions={totalQuestions}
+        startedAt={attempt.startedAt}
+        submittedAt={attempt.submittedAt}
+        durationMinutes={material.durationMinutes ?? 60}
+        paceUnit="вопрос"
+      />
 
-      {detailQuery.isPending ? (
-        <p className="text-sm text-[#69696d]">Загружаем разбор ответов…</p>
-      ) : detailQuery.isError ? (
-        <p className="text-sm text-[#e23b3b]">
-          Не удалось загрузить подробный разбор:
-          {getErrorMessage(detailQuery.error)}
-        </p>
-      ) : (
-        <Card className="shadow-none">
-          <CardContent className="grid gap-5 p-5">
-            {(material.passages && material.passages.length > 0
-              ? material.passages
-              : [material]
-            ).flatMap((passage, passageIndex) =>
-              passage.questionGroups.map((group) => (
-                <section
-                  key={`${passage.id}-${group.position}`}
-                  className="grid gap-3 rounded-xl border p-4"
-                >
-                  <div>
-                    <p className="mb-2 text-sm font-semibold">
-                      Passage {passageIndex + 1}: {passage.title}
-                    </p>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                      {group.type.replaceAll('_', ' ')}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">
-                      {group.instructions}
-                    </p>
-                  </div>
-                  <GroupContexts group={group} />
-                  <div className="grid gap-3">
-                    {group.questions.map((question) => {
-                      const item = question.id
-                        ? reviewByQuestionId.get(question.id)
-                        : undefined
-                      if (!item || !question.id) return null
-                      const options = (question.content.options ??
-                        []) as Option[]
-                      return (
-                        <ReviewQuestion
-                          key={question.id}
-                          item={item}
-                          options={options}
-                        />
-                      )
-                    })}
-                  </div>
-                </section>
-              )),
+
+      {/* КНОПКА ПРОСМОТРА ИСХОДНОГО ТЕКСТА */}
+      <div className="flex items-center justify-between rounded-[14px] border border-[#e7e7e4] bg-white p-4 shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <Book1 className="size-4 text-[#3b82f6]" />
+          <div>
+            <p className="text-sm font-semibold text-slate-900">
+              Исходный текст чтения
+            </p>
+            <p className="text-xs text-slate-500">
+              Откройте текст, чтобы проверить правильность ответов и найти цитаты
+            </p>
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowPassageText((v) => !v)}
+          className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-medium"
+        >
+          {showPassageText ? (
+            <>
+              <EyeSlash className="size-3.5" />
+              <span>Скрыть текст</span>
+            </>
+          ) : (
+            <>
+              <Eye className="size-3.5" />
+              <span>Показать текст</span>
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* БЛОК ИСХОДНОГО ТЕКСТА (РАСКРЫВАЮЩИЙСЯ) */}
+      {showPassageText && (
+        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white">
+            <span className="text-sm font-semibold text-slate-900">
+              {passages[readingPassageViewIndex]?.title}
+            </span>
+            {passages.length > 1 && (
+              <div className="flex items-center gap-1">
+                {passages.map((p, idx) => (
+                  <button
+                    key={p.id ?? idx}
+                    type="button"
+                    onClick={() => setReadingPassageViewIndex(idx)}
+                    className={cn(
+                      'px-2.5 py-1 rounded-[6px] text-xs font-semibold transition-colors',
+                      readingPassageViewIndex === idx
+                        ? 'bg-[#3b82f6] text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100',
+                    )}
+                  >
+                    Раздел {idx + 1}
+                  </button>
+                ))}
+              </div>
             )}
-          </CardContent>
+          </div>
+          <div className="max-h-[420px] overflow-y-auto p-6 font-serif text-[15px] leading-relaxed text-slate-800 whitespace-pre-wrap select-text">
+            {passages[readingPassageViewIndex]?.body}
+          </div>
         </Card>
+      )}
+
+      {/* ПАНЕЛЬ ФИЛЬТРОВ И БЫСТРОГО ПЕРЕХОДА (1-40) */}
+      <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Фильтры: Все / Ошибки / Верные */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setFilterStatus('all')}
+              className={cn(
+                'rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'all'
+                  ? 'bg-[#3b82f6] text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+              )}
+            >
+              Все вопросы ({totalQuestions})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('errors')}
+              className={cn(
+                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'errors'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'text-rose-700 bg-rose-50 hover:bg-rose-100',
+              )}
+            >
+              <CloseCircle className="size-3.5" />
+              <span>Ошибки ({incorrectCount})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('correct')}
+              className={cn(
+                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'correct'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100',
+              )}
+            >
+              <TickCircle className="size-3.5" />
+              <span>Верные ({correctCount})</span>
+            </button>
+          </div>
+
+          {/* Фильтр по разделам */}
+          {passages.length > 1 && (
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-slate-400 mr-1 hidden sm:inline">Раздел:</span>
+              <button
+                type="button"
+                onClick={() => setSelectedPassageTab('all')}
+                className={cn(
+                  'rounded-[6px] px-2 py-1 font-semibold transition-colors',
+                  selectedPassageTab === 'all'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:bg-slate-100',
+                )}
+              >
+                Все
+              </button>
+              {passages.map((_, pIdx) => (
+                <button
+                  key={pIdx}
+                  type="button"
+                  onClick={() => setSelectedPassageTab(pIdx)}
+                  className={cn(
+                    'rounded-[6px] px-2 py-1 font-semibold transition-colors',
+                    selectedPassageTab === pIdx
+                      ? 'bg-[#3b82f6] text-white shadow-xs'
+                      : 'text-slate-600 hover:bg-slate-100',
+                  )}
+                >
+                  Раздел {pIdx + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Быстрая навигационная сетка (1–40) */}
+        {review && review.length > 0 && (
+          <div className="pt-2 border-t border-[#ededeb]">
+            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              Навигация по номерам вопросов (клик для перехода):
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {review.map((item) => {
+                const isCorrect = item.isCorrect
+                return (
+                  <button
+                    key={item.questionId}
+                    type="button"
+                    onClick={() => scrollToQuestion(item.questionId)}
+                    className={cn(
+                      'flex size-7 items-center justify-center rounded-[7px] border text-xs font-semibold transition-all select-none',
+                      isCorrect
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                        : 'border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100',
+                    )}
+                    title={`Вопрос ${item.number}: ${isCorrect ? 'Верно' : 'Ошибка'}`}
+                  >
+                    {item.number}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* СПИСОК ВОПРОСОВ С ДЕТАЛЬНЫМ РАЗБОРОМ */}
+      {detailQuery.isPending ? (
+        <div className="py-12 text-center text-sm text-slate-500">
+          Загружаем подробный разбор ответов…
+        </div>
+      ) : detailQuery.isError ? (
+        <div className="rounded-[14px] border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700">
+          Не удалось загрузить разбор: {getErrorMessage(detailQuery.error)}
+        </div>
+      ) : filteredReviewList.length === 0 ? (
+        <Card className="p-8 text-center rounded-[16px] border border-[#e7e7e4] bg-white">
+          <p className="text-sm font-medium text-slate-600">
+            Вопросов с выбранным фильтром не найдено
+          </p>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {filteredReviewList.map((item) => {
+            const options = questionOptionsMap.get(item.questionId) ?? []
+            return (
+              <EnhancedReviewQuestion
+                key={item.questionId}
+                item={item}
+                options={options}
+              />
+            )
+          })}
+        </div>
       )}
     </div>
   )
@@ -455,7 +999,7 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
       {contexts.map((context) => (
         <div
           key={context}
-          className="whitespace-pre-wrap rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 text-sm leading-relaxed text-slate-700"
+          className="whitespace-pre-wrap rounded-[12px] border border-[#e7e7e4] bg-[#fafaf8] p-4 text-sm leading-relaxed text-slate-800"
         >
           {context
             .replaceAll('{{answer}}', '_____')
@@ -471,37 +1015,46 @@ function StudentGroup({
   activeQuestionId,
   answers,
   onAnswer,
+  onSelectQuestion,
 }: {
   group: PublicReadingGroup
   activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
+  onSelectQuestion?: (questionId: string) => void
 }) {
-  const questions = activeQuestionId
-    ? group.questions.filter((question) => question.id === activeQuestionId)
-    : group.questions
-  if (questions.length === 0) return null
+  if (group.questions.length === 0) return null
   return (
-    <section className="grid gap-3 rounded-xl border p-4">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-          {group.type.replaceAll('_', ' ')}
-        </p>
-        <p className="mt-1 whitespace-pre-wrap text-sm">{group.instructions}</p>
-      </div>
+    <div className="space-y-4">
       <GroupContexts group={group} />
-      <div className="grid gap-4">
-        {questions.map((question) => (
-          <CleanStudentQuestion
-            key={question.id ?? question.position}
-            group={group}
-            question={question}
-            value={question.id ? answers[question.id] : undefined}
-            onAnswer={onAnswer}
-          />
-        ))}
+      <div className="space-y-3.5">
+        {group.questions.map((question) => {
+          const isCurrent = question.id === activeQuestionId
+          return (
+            <div
+              key={question.id ?? question.position}
+              id={`reading-q-${question.id}`}
+              onClick={() => {
+                if (question.id && onSelectQuestion) onSelectQuestion(question.id)
+              }}
+              className={cn(
+                'rounded-[14px] border p-4 sm:p-5 transition-all duration-150 cursor-pointer bg-white',
+                isCurrent
+                  ? 'border-[#3b82f6] ring-2 ring-[#3b82f6]/20 shadow-xs'
+                  : 'border-[#e7e7e4] hover:border-slate-300 hover:shadow-xs',
+              )}
+            >
+              <CleanStudentQuestion
+                group={group}
+                question={question}
+                value={question.id ? answers[question.id] : undefined}
+                onAnswer={onAnswer}
+              />
+            </div>
+          )
+        })}
       </div>
-    </section>
+    </div>
   )
 }
 

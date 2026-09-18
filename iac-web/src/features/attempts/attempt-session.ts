@@ -47,10 +47,13 @@ export function useAttemptSession(attemptId: string) {
         initial[item.questionId] = item.answer
       }
       setAnswers(initial)
+      if (draftsQuery.data.status === 'SUBMITTED' && !submitted) {
+        setSubmitted(draftsQuery.data)
+      }
     } else if (draftsQuery.isError) {
       setAnswers({})
     }
-  }, [answers, draftsQuery.data, draftsQuery.isError])
+  }, [answers, draftsQuery.data, draftsQuery.isError, submitted])
 
   useEffect(() => {
     answersRef.current = answers
@@ -82,6 +85,7 @@ export function useAttemptSession(attemptId: string) {
   useEffect(() => {
     submitRef.current = () => {
       if (submitMutation.isPending) return
+      dirtyRef.current.clear()
       const current = answersRef.current ?? {}
       submitMutation.mutate(
         Object.entries(current).map(([questionId, answer]) => ({

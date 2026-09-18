@@ -1,6 +1,8 @@
 import {
   ArrowLeft,
   Clock,
+  CloseCircle,
+  TickCircle,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
@@ -9,15 +11,18 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
-  AttemptResultSummary,
+  AttemptPerformanceReport,
+  AttemptResultHeader,
   AttemptSubmitBar,
   ChoiceOptions,
+  EnhancedReviewQuestion,
   ErrorState,
   ExamLoadingScreen,
   LoadingState,
-  ReviewQuestion,
   SaveIndicator,
   TimeBadge,
   multiSelectLimit,
@@ -39,34 +44,38 @@ import { getErrorMessage } from '@/lib/api/client'
 
 const TIMER_DANGER_SECONDS = 300
 
-export function ListeningStudentPage({ testId }: { testId: string }) {
-  const startQuery = useQuery({
-    queryKey: ['listening', 'tests', testId, 'attempt'],
-    queryFn: ({ signal }) => startListeningAttempt(testId, signal),
-  })
-  if (startQuery.isPending) {
-    return (
-      <ExamLoadingScreen
-        badge="IELTS Listening"
-        label="Готовим аудирование…"
-        description="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
-      />
-    )
-  }
-  if (!startQuery.data) {
-    return (
-      <ErrorState
-        title="Не удалось начать тест"
-        message={getErrorMessage(startQuery.error)}
-        onRetry={() => void startQuery.refetch()}
-      />
-    )
-  }
+export function ListeningStudentPage({
+  testId,
+  fullMockSessionId,
+}: {
+  testId: string
+  fullMockSessionId?: string
+}) {
   return (
-    <ListeningAttemptRunner
-      key={startQuery.data.attempt.id}
-      attempt={startQuery.data.attempt}
-      test={startQuery.data.test}
+    <ExamAttemptShell<PublicListeningTest>
+      skillBadge="IELTS Listening"
+      loadingLabel="Готовим аудирование…"
+      loadingDescription="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
+      queryKey={['listening', 'tests', testId, 'attempt']}
+      startAttemptFn={(signal) => startListeningAttempt(testId, signal)}
+      renderRunner={({ attempt, material, onSubmitted }) => (
+        <ListeningAttemptRunner
+          key={attempt.id}
+          attempt={attempt}
+          test={material}
+          fullMockSessionId={fullMockSessionId}
+          onSubmitted={onSubmitted}
+        />
+      )}
+      renderResult={({ attempt, material, onRetake, isRetaking }) => (
+        <ListeningAttemptResult
+          attempt={attempt}
+          test={material}
+          fullMockSessionId={fullMockSessionId}
+          onRetake={onRetake}
+          isRetaking={isRetaking}
+        />
+      )}
     />
   )
 }
@@ -75,10 +84,12 @@ export function ListeningAttemptRunner({
   attempt,
   test,
   fullMockSessionId,
+  onSubmitted,
 }: {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
+  onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
@@ -101,6 +112,12 @@ export function ListeningAttemptRunner({
   useEffect(() => {
     if (secondsLeft === 0 && !session.submitted) session.submit()
   }, [secondsLeft, session])
+
+  useEffect(() => {
+    if (session.submitted && onSubmitted) {
+      onSubmitted(session.submitted)
+    }
+  }, [session.submitted, onSubmitted])
 
   if (session.submitted) {
     return (
@@ -227,14 +244,18 @@ export function ListeningAttemptRunner({
   )
 }
 
-function ListeningAttemptResult({
+export function ListeningAttemptResult({
   attempt,
   test,
   fullMockSessionId,
+  onRetake,
+  isRetaking,
 }: {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
+  onRetake?: () => Promise<void> | void
+  isRetaking?: boolean
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -249,28 +270,123 @@ function ListeningAttemptResult({
     [review],
   )
 
+  const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
+
+  const totalQuestions = review ? review.length : (attempt.maxScore ?? 40)
+  const correctCount = review ? review.filter((i) => i.isCorrect).length : (attempt.score ?? 0)
+  const incorrectCount = review ? review.filter((i) => !i.isCorrect).length : 0
+
+  const scrollToQuestion = (questionId: string) => {
+    const el = document.getElementById(`review-q-${questionId}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+      <AttemptResultHeader
+        skill="listening"
+        fullMockSessionId={fullMockSessionId}
+        onRetake={onRetake}
+        isRetaking={isRetaking}
+      />
+
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
-          {fullMockSessionId ? (
-            <Link
-              to="/exam/full-mock-sessions/$sessionId"
-              params={{ sessionId: fullMockSessionId }}
-            >
-              <ArrowLeft aria-hidden />К Full Mock
-            </Link>
-          ) : (
-            <Link to="/dashboard/listening">
-              <ArrowLeft aria-hidden />К Listening
-            </Link>
-          )}
-        </Button>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-          {test.title}: результат
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          {test.title}
         </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          IELTS Academic Listening · {test.parts?.length ?? 4} секции · {totalQuestions} вопросов
+        </p>
       </div>
-      <AttemptResultSummary attempt={attempt} review={review} />
+
+      <AttemptPerformanceReport
+        band={attempt.band}
+        bandNote="Балл рассчитан по стандарту аудирования IELTS"
+        correctCount={correctCount}
+        totalQuestions={totalQuestions}
+        startedAt={attempt.startedAt}
+        submittedAt={attempt.submittedAt}
+        durationMinutes={test.durationMinutes ?? 30}
+        paceUnit="вопрос"
+      />
+
+      {/* ПАНЕЛЬ ФИЛЬТРОВ И БЫСТРОГО ПЕРЕХОДА */}
+      <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setFilterStatus('all')}
+              className={cn(
+                'rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'all'
+                  ? 'bg-[#3b82f6] text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+              )}
+            >
+              Все вопросы ({totalQuestions})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('errors')}
+              className={cn(
+                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'errors'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'text-rose-700 bg-rose-50 hover:bg-rose-100',
+              )}
+            >
+              <CloseCircle className="size-3.5" />
+              <span>Ошибки ({incorrectCount})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('correct')}
+              className={cn(
+                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
+                filterStatus === 'correct'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100',
+              )}
+            >
+              <TickCircle className="size-3.5" />
+              <span>Верные ({correctCount})</span>
+            </button>
+          </div>
+        </div>
+
+        {review && review.length > 0 && (
+          <div className="pt-2 border-t border-[#ededeb]">
+            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              Навигация по номерам вопросов (клик для перехода):
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {review.map((item) => {
+                const isCorrect = item.isCorrect
+                return (
+                  <button
+                    key={item.questionId}
+                    type="button"
+                    onClick={() => scrollToQuestion(item.questionId)}
+                    className={cn(
+                      'flex size-7 items-center justify-center rounded-[7px] border text-xs font-semibold transition-all select-none',
+                      isCorrect
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                        : 'border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100',
+                    )}
+                    title={`Вопрос ${item.number}: ${isCorrect ? 'Верно' : 'Ошибка'}`}
+                  >
+                    {item.number}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </Card>
+
       {detailQuery.isError ? (
         <ErrorState
           title="Не удалось загрузить разбор"
@@ -280,58 +396,80 @@ function ListeningAttemptResult({
       ) : review === null ? (
         <LoadingState label="Загружаем разбор ответов…" />
       ) : (
-        test.parts.map((part) => (
-          <Card key={part.position} className="shadow-none">
-            <CardHeader>
-              <CardTitle>
+        test.parts.map((part) => {
+          const partHasMatchingQuestions = part.groups.some((group) =>
+            group.questions.some((q) => {
+              if (!q.id) return false
+              const item = reviewByQuestionId.get(q.id)
+              if (!item) return false
+              if (filterStatus === 'errors') return !item.isCorrect
+              if (filterStatus === 'correct') return item.isCorrect
+              return true
+            }),
+          )
+          if (!partHasMatchingQuestions) return null
+
+          return (
+            <div key={part.position} className="space-y-4">
+              <h2 className="text-lg font-bold text-slate-900">
                 Part {part.position}: {part.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-5">
-              {part.groups.map((group) => (
-                <section
-                  key={group.position}
-                  className="grid gap-3 rounded-xl border p-4"
-                >
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                      {group.type.replaceAll('_', ' ')}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">
-                      {group.instructions}
-                    </p>
-                  </div>
-                  {group.imageAssetId ? (
-                    <ProtectedImage assetId={group.imageAssetId} />
-                  ) : null}
-                  {group.context ? (
-                    <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm">
-                      {group.context}
+              </h2>
+              {part.groups.map((group) => {
+                const matchingQuestions = group.questions.filter((q) => {
+                  if (!q.id) return false
+                  const item = reviewByQuestionId.get(q.id)
+                  if (!item) return false
+                  if (filterStatus === 'errors') return !item.isCorrect
+                  if (filterStatus === 'correct') return item.isCorrect
+                  return true
+                })
+                if (matchingQuestions.length === 0) return null
+
+                return (
+                  <Card
+                    key={group.position}
+                    className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs space-y-4"
+                  >
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+                        {group.type.replaceAll('_', ' ')}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">
+                        {group.instructions}
+                      </p>
                     </div>
-                  ) : null}
-                  <div className="grid gap-3">
-                    {group.questions.map((question) => {
-                      const item = question.id
-                        ? reviewByQuestionId.get(question.id)
-                        : undefined
-                      if (!item || !question.id) return null
-                      const options = (question.content.options ??
-                        group.config.options ??
-                        []) as Option[]
-                      return (
-                        <ReviewQuestion
-                          key={question.id}
-                          item={item}
-                          options={options}
-                        />
-                      )
-                    })}
-                  </div>
-                </section>
-              ))}
-            </CardContent>
-          </Card>
-        ))
+                    {group.imageAssetId ? (
+                      <ProtectedImage assetId={group.imageAssetId} />
+                    ) : null}
+                    {group.context ? (
+                      <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm text-slate-800">
+                        {group.context}
+                      </div>
+                    ) : null}
+                    <div className="space-y-3.5">
+                      {matchingQuestions.map((question) => {
+                        const item = question.id
+                          ? reviewByQuestionId.get(question.id)
+                          : undefined
+                        if (!item || !question.id) return null
+                        const options = (question.content.options ??
+                          group.config.options ??
+                          []) as Option[]
+                        return (
+                          <EnhancedReviewQuestion
+                            key={question.id}
+                            item={item}
+                            options={options}
+                          />
+                        )
+                      })}
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )
+        })
       )}
     </div>
   )

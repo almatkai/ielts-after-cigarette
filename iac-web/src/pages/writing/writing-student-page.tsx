@@ -11,7 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
+  AttemptPerformanceReport,
+  AttemptResultHeader,
   AttemptSubmitBar,
   ErrorState,
   ExamLoadingScreen,
@@ -28,34 +31,38 @@ import type { Attempt, WritingEvaluation } from '@/features/attempts/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
 
-export function WritingStudentPage({ materialId }: { materialId: string }) {
-  const startQuery = useQuery({
-    queryKey: ['writing', 'materials', materialId, 'attempt'],
-    queryFn: ({ signal }) => startWritingAttempt(materialId, signal),
-  })
-  if (startQuery.isPending) {
-    return (
-      <ExamLoadingScreen
-        badge="IELTS Writing"
-        label="Готовим задания Writing…"
-        description="Загружаем темы заданий, требования к объёму слов и подготавливаем редактор эссе."
-      />
-    )
-  }
-  if (!startQuery.data) {
-    return (
-      <ErrorState
-        title="Не удалось начать Writing"
-        message={getErrorMessage(startQuery.error)}
-        onRetry={() => void startQuery.refetch()}
-      />
-    )
-  }
+export function WritingStudentPage({
+  materialId,
+  fullMockSessionId,
+}: {
+  materialId: string
+  fullMockSessionId?: string
+}) {
   return (
-    <WritingAttemptRunner
-      key={startQuery.data.attempt.id}
-      attempt={startQuery.data.attempt}
-      material={startQuery.data.material}
+    <ExamAttemptShell<PublicWritingMaterial>
+      skillBadge="IELTS Writing"
+      loadingLabel="Готовим задания Writing…"
+      loadingDescription="Загружаем темы заданий, требования к объёму слов и подготавливаем редактор эссе."
+      queryKey={['writing', 'materials', materialId, 'attempt']}
+      startAttemptFn={(signal) => startWritingAttempt(materialId, signal)}
+      renderRunner={({ attempt, material, onSubmitted }) => (
+        <WritingAttemptRunner
+          key={attempt.id}
+          attempt={attempt}
+          material={material}
+          fullMockSessionId={fullMockSessionId}
+          onSubmitted={onSubmitted}
+        />
+      )}
+      renderResult={({ attempt, material, onRetake, isRetaking }) => (
+        <WritingAttemptResult
+          attempt={attempt}
+          material={material}
+          fullMockSessionId={fullMockSessionId}
+          onRetake={onRetake}
+          isRetaking={isRetaking}
+        />
+      )}
     />
   )
 }
@@ -64,13 +71,21 @@ export function WritingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  onSubmitted,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
   fullMockSessionId?: string
+  onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeTaskIndex, setActiveTaskIndex] = useState(0)
+
+  useEffect(() => {
+    if (session.submitted && onSubmitted) {
+      onSubmitted(session.submitted)
+    }
+  }, [session.submitted, onSubmitted])
 
   if (session.submitted) {
     return (
@@ -271,14 +286,18 @@ function WritingTaskEditor({
   )
 }
 
-function WritingAttemptResult({
+export function WritingAttemptResult({
   attempt,
   material,
   fullMockSessionId,
+  onRetake,
+  isRetaking,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
   fullMockSessionId?: string
+  onRetake?: () => Promise<void> | void
+  isRetaking?: boolean
 }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -286,26 +305,23 @@ function WritingAttemptResult({
   })
   const evaluation = detailQuery.data?.writingEvaluation
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[920px] gap-5">
+    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+      <AttemptResultHeader
+        skill="writing"
+        fullMockSessionId={fullMockSessionId}
+        onRetake={onRetake}
+        isRetaking={isRetaking}
+      />
+
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
-          {fullMockSessionId ? (
-            <Link
-              to="/exam/full-mock-sessions/$sessionId"
-              params={{ sessionId: fullMockSessionId }}
-            >
-              <ArrowLeft aria-hidden />К Full Mock
-            </Link>
-          ) : (
-            <Link to="/dashboard/writing">
-              <ArrowLeft aria-hidden />К Writing
-            </Link>
-          )}
-        </Button>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-          {material.title}: разбор
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          {material.title}
         </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          IELTS Academic Writing · {material.tasks.length} задания · {material.durationMinutes} минут
+        </p>
       </div>
+
       {detailQuery.isError ? (
         <ErrorState
           title="Не удалось загрузить разбор"
@@ -315,76 +331,102 @@ function WritingAttemptResult({
       ) : !evaluation ? (
         <LoadingState label="Загружаем результаты проверки…" />
       ) : (
-        <WritingEvaluationView evaluation={evaluation} />
+        <WritingEvaluationView
+          attempt={attempt}
+          material={material}
+          evaluation={evaluation}
+        />
       )}
     </div>
   )
 }
 
 function WritingEvaluationView({
+  attempt,
+  material,
   evaluation,
 }: {
+  attempt: Attempt
+  material: PublicWritingMaterial
   evaluation: WritingEvaluation
 }) {
-  const criteria = [
+  const criteriaList = [
+    { label: 'Task Response', band: evaluation.criteria.taskResponse.band },
+    { label: 'Coherence & Cohesion', band: evaluation.criteria.coherence.band },
+    { label: 'Lexical Resource', band: evaluation.criteria.lexicalResource.band },
+    { label: 'Grammar Accuracy', band: evaluation.criteria.grammar.band },
+  ] as const
+
+  const criteriaFeedback = [
     ['Task Response', evaluation.criteria.taskResponse],
     ['Coherence & Cohesion', evaluation.criteria.coherence],
     ['Lexical Resource', evaluation.criteria.lexicalResource],
     ['Grammar Range & Accuracy', evaluation.criteria.grammar],
   ] as const
+
   return (
-    <>
-      <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
-        <CardContent className="flex flex-wrap items-center gap-5 p-6">
-          <span className="grid size-14 place-items-center rounded-full bg-[#3b82f6] text-2xl font-semibold text-white">
-            {evaluation.overallBand.toFixed(1)}
-          </span>
-          <div>
-            <p className="font-semibold">Ориентировочный IELTS Writing band</p>
-            <p className="mt-1 text-sm leading-6 text-[#4b5563]">
-              {evaluation.summary || 'Детальный разбор выполнен.'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <AttemptPerformanceReport
+        band={evaluation.overallBand}
+        bandNote="Оценка сформирована по 4 критериям IELTS Writing"
+        criteria={criteriaList}
+        startedAt={attempt.startedAt}
+        submittedAt={attempt.submittedAt}
+        durationMinutes={material.durationMinutes ?? 60}
+        paceUnit="эссе"
+      />
+
+      {evaluation.summary ? (
+        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+            Резюме проверки
+          </p>
+          <p className="text-sm leading-relaxed text-slate-700">
+            {evaluation.summary}
+          </p>
+        </Card>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
-        {criteria.map(([label, criterion]) => (
-          <Card key={label} className="shadow-none">
+        {criteriaFeedback.map(([label, criterion]) => (
+          <Card key={label} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold">{label}</h2>
-                <span className="text-xl font-semibold text-[#3b82f6]">
+                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
                   {criterion.band.toFixed(1)}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-6 text-[#69696d]">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {criterion.feedback || 'Комментарий не получен.'}
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
+
       {evaluation.tasks.map((task, index) => (
-        <Card key={task.taskId} className="shadow-none">
+        <Card key={task.taskId} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-slate-900">
               <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
               Task {index + 1}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm leading-6">
-            <p>{task.feedback}</p>
+            <p className="text-slate-700">{task.feedback}</p>
             <FeedbackList title="Сильные стороны" items={task.strengths} />
             <FeedbackList title="Что улучшить" items={task.improvements} />
           </CardContent>
         </Card>
       ))}
+
       <p className="flex items-center gap-2 text-xs text-[#808084]">
         <Book className="size-4" aria-hidden />
         Оценка носит учебный характер; фактический результат IELTS определяет
         экзаменатор.
       </p>
-    </>
+    </div>
   )
 }
 

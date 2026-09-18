@@ -1,8 +1,13 @@
 import {
+  ArrowLeft,
   Clock,
   CloseCircle,
+  InfoCircle,
+  Refresh2,
   TickCircle,
 } from 'iconsax-react'
+import { Link } from '@tanstack/react-router'
+import { useMemo } from 'react'
 
 import {
   AlertDialog,
@@ -31,7 +36,7 @@ export { EmptyState, type EmptyStateProps } from '@/components/ui/empty-state'
 export function ExamLoadingScreen({
   label,
   description,
-  badge = 'IELTS Simulation',
+  badge: _badge,
   showTimerTip = true,
   className = '',
 }: {
@@ -51,14 +56,6 @@ export function ExamLoadingScreen({
       aria-live="polite"
     >
       <div className="flex w-full max-w-sm flex-col items-center">
-        {/* Subtle section badge */}
-        {badge ? (
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 mb-4 tracking-wide">
-            <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />
-            {badge}
-          </div>
-        ) : null}
-
         {/* Sleek Minimalist Spinner */}
         <div className="relative mb-4 flex size-10 items-center justify-center">
           <svg
@@ -521,4 +518,406 @@ export function formatAnswer(answer: StudentAnswer | null, options: Option[]) {
 function formatOption(id: string, options: Option[]) {
   const option = options.find((item) => item.id === id)
   return option ? `${id} — ${option.text}` : id
+}
+
+export function cefrLevel(band: number | null | undefined): string {
+  if (band === null || band === undefined) return '—'
+  if (band >= 8.5) return 'C2 (Proficient)'
+  if (band >= 7.0) return 'C1 (Advanced)'
+  if (band >= 5.5) return 'B2 (Independent)'
+  if (band >= 4.0) return 'B1 (Intermediate)'
+  return 'A2 / B1'
+}
+
+export function isQuestionAnswered(
+  questionId?: string,
+  answer?: StudentAnswer | null,
+): boolean {
+  if (!questionId || !answer) return false
+  if (Array.isArray(answer.optionIds) && answer.optionIds.length > 0) return true
+  if (typeof answer.optionId === 'string' && answer.optionId.trim() !== '') return true
+  if (typeof answer.value === 'string' && answer.value.trim() !== '') return true
+  return false
+}
+
+export function AttemptResultHeader({
+  skill,
+  fullMockSessionId,
+  onRetake,
+  isRetaking,
+}: {
+  skill: 'reading' | 'listening' | 'writing' | 'speaking'
+  fullMockSessionId?: string
+  onRetake?: () => void
+  isRetaking?: boolean
+}) {
+  const skillBackLabels: Record<string, string> = {
+    reading: 'К материалам Reading',
+    listening: 'К материалам Listening',
+    writing: 'К материалам Writing',
+    speaking: 'К материалам Speaking',
+  }
+
+  return (
+    <header className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="gap-2 rounded-[10px] text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+        >
+          {fullMockSessionId ? (
+            <Link
+              to="/exam/full-mock-sessions/$sessionId"
+              params={{ sessionId: fullMockSessionId }}
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              <span>К Full Mock</span>
+            </Link>
+          ) : (
+            <Link to={`/dashboard/${skill}` as any}>
+              <ArrowLeft className="size-4" aria-hidden />
+              <span>{skillBackLabels[skill] ?? 'Назад'}</span>
+            </Link>
+          )}
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-2.5">
+        {onRetake && (
+          <Button
+            size="sm"
+            onClick={onRetake}
+            disabled={isRetaking}
+            className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
+          >
+            <Refresh2 className={cn('size-3.5', isRetaking && 'animate-spin')} />
+            <span>{isRetaking ? 'Подготовка…' : 'Пройти заново'}</span>
+          </Button>
+        )}
+
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
+        >
+          <Link to={`/dashboard/${skill}` as any}>К списку тестов</Link>
+        </Button>
+      </div>
+    </header>
+  )
+}
+
+export type PerformanceCriterion = {
+  label: string
+  band: number
+}
+
+export function AttemptPerformanceReport({
+  band,
+  bandNote = 'Балл рассчитан по стандарту академического IELTS',
+  score,
+  maxScore,
+  correctCount,
+  totalQuestions,
+  criteria,
+  startedAt,
+  submittedAt,
+  durationMinutes,
+  paceUnit = 'вопрос',
+}: {
+  band: number | null | undefined
+  bandNote?: string
+  score?: number | null
+  maxScore?: number | null
+  correctCount?: number | null
+  totalQuestions?: number | null
+  criteria?: readonly PerformanceCriterion[]
+  startedAt?: string
+  submittedAt?: string | null
+  durationMinutes?: number
+  paceUnit?: string
+}) {
+  const cefrDescription = cefrLevel(band)
+
+  const timeSpentSeconds = useMemo(() => {
+    if (!startedAt) return null
+    const start = new Date(startedAt).getTime()
+    const end = submittedAt ? new Date(submittedAt).getTime() : Date.now()
+    const elapsedSec = Math.max(0, Math.round((end - start) / 1000))
+    if (durationMinutes && durationMinutes > 0) {
+      return Math.min(elapsedSec, durationMinutes * 60)
+    }
+    return elapsedSec
+  }, [startedAt, submittedAt, durationMinutes])
+
+  const isTimeOverLimit = useMemo(() => {
+    if (!startedAt || !durationMinutes) return false
+    const start = new Date(startedAt).getTime()
+    const end = submittedAt ? new Date(submittedAt).getTime() : Date.now()
+    const rawSec = Math.round((end - start) / 1000)
+    return rawSec >= durationMinutes * 60
+  }, [startedAt, submittedAt, durationMinutes])
+
+  const timeSpentFormatted = useMemo(() => {
+    if (timeSpentSeconds === null) return '—'
+    const mins = Math.floor(timeSpentSeconds / 60)
+    const secs = timeSpentSeconds % 60
+    if (mins === 0) return `${secs} сек`
+    return `${mins} мин ${secs > 0 ? `${secs} сек` : ''}`
+  }, [timeSpentSeconds])
+
+  const totalCount = totalQuestions ?? (criteria ? criteria.length : 0)
+
+  const paceFormatted = useMemo(() => {
+    if (timeSpentSeconds === null || !totalCount || totalCount <= 0) return null
+    const paceSec = Math.round(timeSpentSeconds / totalCount)
+    const m = Math.floor(paceSec / 60)
+    const s = paceSec % 60
+    if (m === 0) return `${s} сек / ${paceUnit}`
+    return `${m} мин ${s > 0 ? `${s} сек` : ''} / ${paceUnit}`
+  }, [timeSpentSeconds, totalCount, paceUnit])
+
+  const effectiveTotal = totalQuestions ?? maxScore ?? 0
+  const effectiveCorrect = correctCount ?? score ?? 0
+  const scorePercent =
+    effectiveTotal > 0
+      ? Math.min(100, Math.round((effectiveCorrect / effectiveTotal) * 100))
+      : 0
+  const incorrectCount = Math.max(0, effectiveTotal - effectiveCorrect)
+
+  return (
+    <div className="rounded-[20px] border border-[#e7e7e4] bg-white p-6 sm:p-7 shadow-xs">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 gap-6 md:gap-0">
+        {/* ЗОНА 1: IELTS Band Score */}
+        <div className="md:pr-8 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                IELTS Band Score
+              </span>
+              <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#3b82f6] border border-blue-100/80">
+                {cefrDescription}
+              </span>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-5xl sm:text-6xl font-extrabold tracking-tight text-[#3b82f6]">
+                {band !== null && band !== undefined ? band.toFixed(1) : '—'}
+              </span>
+              <span className="text-sm font-semibold text-slate-400">из 9.0</span>
+            </div>
+          </div>
+          <p className="mt-4 text-xs text-slate-500">{bandNote}</p>
+        </div>
+
+        {/* ЗОНА 2: Точность и баллы / Критерии */}
+        <div className="md:px-8 flex flex-col justify-between pt-6 md:pt-0">
+          {criteria && criteria.length > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Критерии IELTS
+                </span>
+                <span className="text-xs font-bold text-[#3b82f6]">
+                  {criteria.length} критерия
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {criteria.map((c) => (
+                  <div
+                    key={c.label}
+                    className="rounded-[10px] border border-slate-100 bg-slate-50/70 p-2 text-center"
+                  >
+                    <span className="block text-[11px] font-medium text-slate-500 truncate" title={c.label}>
+                      {c.label}
+                    </span>
+                    <span className="text-base font-bold text-slate-900">
+                      {c.band.toFixed(1)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Точность и баллы
+                  </span>
+                  <span className="text-xs font-bold text-[#3b82f6]">
+                    {scorePercent}% точности
+                  </span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="text-4xl sm:text-5xl font-bold text-slate-900">
+                    {effectiveCorrect}
+                  </span>
+                  <span className="text-sm font-medium text-slate-400">
+                    из {effectiveTotal} правильных
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2.5">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-[#3b82f6] transition-all duration-500"
+                    style={{ width: `${scorePercent}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
+                    <TickCircle className="size-3.5 text-emerald-600" />
+                    {effectiveCorrect} верно
+                  </span>
+                  {incorrectCount > 0 ? (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200/60">
+                      <CloseCircle className="size-3.5 text-rose-600" />
+                      {incorrectCount} {incorrectCount === 1 ? 'ошибка' : 'ошибок'}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
+                      Без ошибок
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ЗОНА 3: Время выполнения и темп */}
+        <div className="md:pl-8 flex flex-col justify-between pt-6 md:pt-0">
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Время выполнения
+              </span>
+              {durationMinutes ? (
+                <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+                  <Clock className="size-3.5 text-slate-400" />
+                  Лимит: {durationMinutes} мин
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-3 flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-bold text-slate-900">
+                {timeSpentFormatted}
+              </span>
+              {isTimeOverLimit && (
+                <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 border border-amber-200/80">
+                  Лимит исчерпан
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Средний темп:</span>
+            <strong className="font-semibold text-slate-700">
+              {paceFormatted ?? '—'}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function EnhancedReviewQuestion({
+  item,
+  options,
+}: {
+  item: AttemptReviewItem
+  options: Option[]
+}) {
+  const isAnswered = isQuestionAnswered(item.questionId, item.answer)
+  const isCorrect = item.isCorrect
+
+  return (
+    <div
+      id={`review-q-${item.questionId}`}
+      className={cn(
+        'rounded-[14px] border bg-white p-5 transition-all shadow-2xs space-y-3.5',
+        isCorrect
+          ? 'border-emerald-200/80 hover:border-emerald-300'
+          : 'border-rose-200/80 hover:border-rose-300',
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="flex size-7 items-center justify-center rounded-[7px] bg-slate-100 text-xs font-bold text-slate-800">
+            {item.number}
+          </span>
+          {isCorrect ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
+              <TickCircle className="size-3.5 text-emerald-600" />
+              Верно (+{item.pointsAwarded} б.)
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
+              <CloseCircle className="size-3.5 text-rose-600" />
+              {isAnswered ? 'Ошибка (0 б.)' : 'Не отвечено (0 б.)'}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <p className="text-sm font-medium text-slate-800 leading-relaxed">
+        {item.prompt.replace('{{answer}}', '_____')}
+      </p>
+
+      {/* Сравнение ответов */}
+      <div className="grid gap-2 sm:grid-cols-2 text-xs">
+        <div
+          className={cn(
+            'rounded-[10px] border p-3',
+            isCorrect
+              ? 'border-emerald-200 bg-emerald-50/50 text-emerald-950'
+              : 'border-rose-200 bg-rose-50/50 text-rose-950',
+          )}
+        >
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+            Ваш ответ
+          </span>
+          <span
+            className={cn(
+              'font-semibold text-sm',
+              !isCorrect && 'line-through text-rose-800',
+            )}
+          >
+            {formatAnswer(item.answer, options)}
+          </span>
+        </div>
+
+        {!isCorrect && (
+          <div className="rounded-[10px] border border-emerald-200 bg-emerald-50/70 p-3 text-emerald-950">
+            <span className="block text-[11px] font-semibold uppercase tracking-wider text-emerald-700 mb-1">
+              Правильный ответ
+            </span>
+            <span className="font-bold text-sm text-emerald-900">
+              {formatAnswer(item.correctAnswer, options)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Объяснение (если есть в базе) */}
+      {item.explanation ? (
+        <div className="rounded-[10px] border border-blue-100 bg-[#f0f7ff] p-3 text-xs leading-relaxed text-slate-700">
+          <div className="flex items-center gap-1.5 font-semibold text-[#2563eb] mb-1">
+            <InfoCircle className="size-3.5" />
+            <span>Разбор и цитата:</span>
+          </div>
+          <div className="whitespace-pre-wrap text-slate-700">
+            {item.explanation}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
 }

@@ -8,11 +8,11 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  AttemptResultSummary,
+  AttemptPerformanceReport,
+  EnhancedReviewQuestion,
   ErrorState,
   ExamLoadingScreen,
   LoadingState,
-  ReviewQuestion,
 } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import {
@@ -101,7 +101,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
         <InProgressAttempt attempt={attempt} />
       ) : aiEvaluation ? (
         <>
-          <AIEvaluationReview evaluation={aiEvaluation} />
+          <AIEvaluationReview attempt={attempt} evaluation={aiEvaluation} />
           {attempt.materialType === 'speaking' &&
           (attempt.recordings?.length ?? 0) > 0 ? (
             <SpeakingRecordings
@@ -114,7 +114,23 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
         <LoadingState label="Загружаем разбор ответов…" />
       ) : (
         <>
-          <AttemptResultSummary attempt={attempt} review={review} />
+          <AttemptPerformanceReport
+            band={attempt.band}
+            score={attempt.score}
+            maxScore={attempt.maxScore}
+            correctCount={review.filter((item) => item.isCorrect).length}
+            totalQuestions={review.length}
+            startedAt={attempt.startedAt}
+            submittedAt={attempt.submittedAt}
+            durationMinutes={
+              material && 'durationMinutes' in material
+                ? (material as any).durationMinutes
+                : attempt.materialType === 'reading'
+                  ? 60
+                  : 30
+            }
+            paceUnit="вопрос"
+          />
           {material !== null ? (
             <StructuredReview material={material} review={review} />
           ) : materialQuery.isPending ? (
@@ -231,35 +247,50 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
   return null
 }
 
-function AIEvaluationReview({ evaluation }: { evaluation: AIEvaluation }) {
+function AIEvaluationReview({
+  attempt,
+  evaluation,
+}: {
+  attempt: AttemptDetail
+  evaluation: AIEvaluation
+}) {
+  const criteriaList = evaluation.criteria.map(([label, criterion]) => ({
+    label,
+    band: criterion.band,
+  }))
+
   return (
     <>
-      <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
-        <CardContent className="flex flex-wrap items-center gap-5 p-6">
-          <span className="grid size-14 place-items-center rounded-full bg-[#3b82f6] text-2xl font-semibold text-white">
-            {evaluation.overallBand.toFixed(1)}
-          </span>
-          <div>
-            <p className="font-semibold">
-              Ориентировочный IELTS {evaluation.skill} band
-            </p>
-            <p className="mt-1 text-sm leading-6 text-[#4b5563]">
-              {evaluation.summary}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <AttemptPerformanceReport
+        band={evaluation.overallBand}
+        bandNote={`Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`}
+        criteria={criteriaList}
+        startedAt={attempt.startedAt}
+        submittedAt={attempt.submittedAt}
+        durationMinutes={attempt.materialType === 'writing' ? 60 : 15}
+        paceUnit={attempt.materialType === 'writing' ? 'эссе' : 'часть'}
+      />
+      {evaluation.summary ? (
+        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+            Резюме проверки
+          </p>
+          <p className="text-sm leading-relaxed text-slate-700">
+            {evaluation.summary}
+          </p>
+        </Card>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         {evaluation.criteria.map(([label, criterion]) => (
-          <Card key={label} className="shadow-none">
+          <Card key={label} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold">{label}</h2>
-                <span className="text-xl font-semibold text-[#3b82f6]">
+                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
                   {criterion.band.toFixed(1)}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-6 text-[#69696d]">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {criterion.feedback}
               </p>
             </CardContent>
@@ -409,7 +440,7 @@ function StructuredReview({
                         group.config.options ??
                         []) as Option[]
                       return (
-                        <ReviewQuestion
+                        <EnhancedReviewQuestion
                           key={question.id}
                           item={item}
                           options={options}
@@ -460,7 +491,7 @@ function StructuredReview({
                     if (!item || !question.id) return null
                     const options = (question.content.options ?? []) as Option[]
                     return (
-                      <ReviewQuestion
+                      <EnhancedReviewQuestion
                         key={question.id}
                         item={item}
                         options={options}
@@ -482,7 +513,7 @@ function FlatReview({ review }: { review: AttemptReviewItem[] }) {
     <Card className="shadow-none">
       <CardContent className="grid gap-3 p-5">
         {review.map((item) => (
-          <ReviewQuestion key={item.questionId} item={item} options={[]} />
+          <EnhancedReviewQuestion key={item.questionId} item={item} options={[]} />
         ))}
       </CardContent>
     </Card>

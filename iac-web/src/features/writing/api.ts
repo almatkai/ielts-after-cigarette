@@ -16,6 +16,13 @@ export type WritingTask = {
     | 'map'
     | 'mixed'
   visualUrl?: string
+  visualAssetId?: string
+  essayType?:
+    | 'opinion'
+    | 'discussion'
+    | 'advantages_disadvantages'
+    | 'problem_solution'
+    | 'two_part'
   letterTone?: 'formal' | 'semi-formal' | 'informal'
 }
 
@@ -37,7 +44,13 @@ export type PublicWritingMaterialListItem = Omit<
   publishedAt: string | null
 }
 
-export type WritingMaterial = PublicWritingMaterial & {
+export type WritingTaskInput = Omit<WritingTask, 'id'> & {
+  id?: string
+  assessmentNotes?: string
+}
+
+export type WritingMaterial = Omit<PublicWritingMaterial, 'tasks'> & {
+  tasks: WritingTaskInput[]
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   revision: number
   currentVersionNumber: number
@@ -47,8 +60,6 @@ export type WritingMaterial = PublicWritingMaterial & {
   createdAt: string
   updatedAt: string
 }
-
-export type WritingTaskInput = Omit<WritingTask, 'id'> & { id?: string }
 
 export type WritingMaterialInput = Omit<
   WritingMaterial,
@@ -70,6 +81,15 @@ export type WritingMaterialInput = Omit<
 export type WritingImportResult = {
   materials: WritingMaterialInput[]
   errors: { code: string; message: string; item?: number }[]
+}
+
+export type WritingMedia = {
+  id: string
+  kind: 'image'
+  originalName: string
+  mimeType: string
+  byteSize: number
+  createdAt: string
 }
 
 export const writingKeys = {
@@ -147,4 +167,14 @@ export function confirmWritingImport(materials: WritingMaterialInput[]) {
     '/api/v1/admin/writing/import',
     { method: 'POST', body: { materials } },
   )
+}
+
+export function uploadWritingMedia(file: File) {
+  const form = new FormData()
+  form.set('file', file)
+  return apiClient.upload<WritingMedia>('/api/v1/admin/writing/media', form)
+}
+
+export function getWritingMediaBlob(id: string) {
+  return apiClient.blob(`/api/v1/writing/media/${id}`)
 }

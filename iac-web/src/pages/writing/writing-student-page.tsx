@@ -1,11 +1,7 @@
-import {
-  ArrowLeft,
-  Book,
-  Edit2,
-} from 'iconsax-react'
+import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -28,6 +24,7 @@ import {
   startWritingAttempt,
 } from '@/features/attempts/api'
 import type { Attempt, WritingEvaluation } from '@/features/attempts/api'
+import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
 
@@ -113,9 +110,9 @@ export function WritingAttemptRunner({
   const activeTaskValue = session.answers[activeTask.id].value
   const activeTaskText =
     typeof activeTaskValue === 'string' ? activeTaskValue : ''
-  const minimumWordsMet = material.tasks.every((task) => {
+  const allTasksAnswered = material.tasks.every((task) => {
     const value = session.answers?.[task.id]?.value
-    return typeof value === 'string' && countWords(value) >= task.minimumWords
+    return typeof value === 'string' && value.trim().length > 0
   })
 
   return (
@@ -183,11 +180,11 @@ export function WritingAttemptRunner({
         answeredCount={answeredCount}
         totalQuestions={material.tasks.length}
         isSubmitting={session.isSubmitting}
-        disabled={!minimumWordsMet}
+        disabled={!allTasksAnswered}
         disabledMessage={
-          minimumWordsMet
+          allTasksAnswered
             ? undefined
-            : 'Доведите каждый ответ до минимального числа слов перед сдачей.'
+            : 'Напишите ответ на оба задания. Работа короче рекомендуемого объёма будет оценена ниже.'
         }
         onSubmit={session.submit}
       />
@@ -260,7 +257,12 @@ function WritingTaskEditor({
         <div className="whitespace-pre-wrap rounded-xl bg-[#f7f7f5] p-4 text-sm leading-6">
           {task.prompt}
         </div>
-        {task.visualUrl ? (
+        {task.visualAssetId ? (
+          <ProtectedWritingImage
+            assetId={task.visualAssetId}
+            taskPosition={task.position}
+          />
+        ) : task.visualUrl ? (
           <img
             src={task.visualUrl}
             alt={`Visual for Writing Task ${task.position}`}
@@ -283,6 +285,49 @@ function WritingTaskEditor({
         </p>
       </CardContent>
     </Card>
+  )
+}
+
+function ProtectedWritingImage({
+  assetId,
+  taskPosition,
+}: {
+  assetId: string
+  taskPosition: number
+}) {
+  const query = useQuery({
+    queryKey: ['writing', 'media', assetId],
+    queryFn: () => getWritingMediaBlob(assetId),
+  })
+  const url = useMemo(
+    () => (query.data ? URL.createObjectURL(query.data) : null),
+    [query.data],
+  )
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url)
+    },
+    [url],
+  )
+  if (query.isPending) {
+    return <p className="text-sm text-[#69696d]">Загружаем изображение…</p>
+  }
+  if (!url) {
+    return <p className="text-sm text-[#e23b3b]">Изображение недоступно.</p>
+  }
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      title="Открыть в полном размере"
+    >
+      <img
+        src={url}
+        alt={`Визуальные данные для Writing Task ${taskPosition}`}
+        className="max-h-[520px] w-full rounded-xl border object-contain"
+      />
+    </a>
   )
 }
 
@@ -318,7 +363,8 @@ export function WritingAttemptResult({
           {material.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Writing · {material.tasks.length} задания · {material.durationMinutes} минут
+          IELTS Academic Writing · {material.tasks.length} задания ·{' '}
+          {material.durationMinutes} минут
         </p>
       </div>
 
@@ -353,15 +399,11 @@ function WritingEvaluationView({
   const criteriaList = [
     { label: 'Task Response', band: evaluation.criteria.taskResponse.band },
     { label: 'Coherence & Cohesion', band: evaluation.criteria.coherence.band },
-    { label: 'Lexical Resource', band: evaluation.criteria.lexicalResource.band },
+    {
+      label: 'Lexical Resource',
+      band: evaluation.criteria.lexicalResource.band,
+    },
     { label: 'Grammar Accuracy', band: evaluation.criteria.grammar.band },
-  ] as const
-
-  const criteriaFeedback = [
-    ['Task Response', evaluation.criteria.taskResponse],
-    ['Coherence & Cohesion', evaluation.criteria.coherence],
-    ['Lexical Resource', evaluation.criteria.lexicalResource],
-    ['Grammar Range & Accuracy', evaluation.criteria.grammar],
   ] as const
 
   return (
@@ -387,39 +429,61 @@ function WritingEvaluationView({
         </Card>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {criteriaFeedback.map(([label, criterion]) => (
-          <Card key={label} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-            <CardContent className="p-5">
+      {evaluation.tasks
+        .toSorted((left, right) => left.position - right.position)
+        .map((task) => (
+          <Card
+            key={task.taskId}
+            className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs"
+          >
+            <CardHeader>
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <CardTitle className="flex items-center gap-2 text-slate-900">
+                  <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
+                  Task {task.position}
+                </CardTitle>
                 <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
-                  {criterion.band.toFixed(1)}
+                  Band {task.band.toFixed(1)}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                {criterion.feedback || 'Комментарий не получен.'}
-              </p>
+            </CardHeader>
+            <CardContent className="grid gap-4 text-sm leading-6">
+              <p className="text-slate-700">{task.feedback}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  [
+                    task.position === 1 ? 'Task Achievement' : 'Task Response',
+                    task.criteria.taskResponse,
+                  ],
+                  ['Coherence & Cohesion', task.criteria.coherence],
+                  ['Lexical Resource', task.criteria.lexicalResource],
+                  ['Grammar Range & Accuracy', task.criteria.grammar],
+                ].map(([label, criterion]) => {
+                  const typedCriterion = criterion as {
+                    band: number
+                    feedback: string
+                  }
+                  return (
+                    <div
+                      key={label as string}
+                      className="rounded-xl bg-[#f7f7f5] p-3"
+                    >
+                      <div className="flex items-center justify-between gap-2 font-semibold">
+                        <span>{label as string}</span>
+                        <span>{typedCriterion.band.toFixed(1)}</span>
+                      </div>
+                      <p className="mt-1 text-[#69696d]">
+                        {typedCriterion.feedback}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+              <FeedbackList title="Сильные стороны" items={task.strengths} />
+              <FeedbackList title="Что улучшить" items={task.improvements} />
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {evaluation.tasks.map((task, index) => (
-        <Card key={task.taskId} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
-              <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
-              Task {index + 1}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 text-sm leading-6">
-            <p className="text-slate-700">{task.feedback}</p>
-            <FeedbackList title="Сильные стороны" items={task.strengths} />
-            <FeedbackList title="Что улучшить" items={task.improvements} />
-          </CardContent>
-        </Card>
-      ))}
 
       <p className="flex items-center gap-2 text-xs text-[#808084]">
         <Book className="size-4" aria-hidden />

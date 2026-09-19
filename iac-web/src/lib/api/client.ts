@@ -193,6 +193,10 @@ export function getErrorMessage(error: unknown) {
       return 'Не настроен VITE_API_BASE_URL.'
     case 'DEPENDENCY_UNAVAILABLE':
       return 'Сервис временно недоступен. Попробуйте немного позже.'
+    case 'OBJECT_STORAGE_UNAVAILABLE':
+      return 'Хранилище файлов временно недоступно. Повторите загрузку немного позже.'
+    case 'REVISION_CONFLICT':
+      return 'Черновик уже изменился. Обновите страницу и повторите действие.'
     case 'WRITING_INCOMPLETE':
       return 'Заполните ответы для Task 1 и Task 2 перед отправкой.'
     case 'SPEAKING_INCOMPLETE':

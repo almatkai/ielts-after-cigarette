@@ -82,6 +82,23 @@ const toForm = (test: ListeningTest): Form => ({
   revision: test.revision,
 })
 
+const toInput = (form: Form, editing: boolean): ListeningTestInput => ({
+  ...form,
+  revision: editing ? form.revision : undefined,
+  parts: form.parts.map((part, partIndex) => ({
+    ...part,
+    position: partIndex + 1,
+    groups: part.groups.map((group, groupIndex) => ({
+      ...group,
+      position: groupIndex + 1,
+      questions: group.questions.map((question, questionIndex) => ({
+        ...question,
+        position: questionIndex + 1,
+      })),
+    })),
+  })),
+})
+
 export function ListeningTestEditorPage({ testId }: { testId?: string }) {
   const editing = Boolean(testId)
   const auth = useAuth()
@@ -116,11 +133,20 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     },
   })
   const publishMutation = useMutation({
-    mutationFn: () => publishListeningTest(testId!, form.revision),
-    onSuccess: (test) => {
+    mutationFn: async () => {
+      // Save the audio assignment and any other edits first, then publish the
+      // revision returned by that save. This prevents Save/Publish races.
+      const saved = await updateListeningTest(testId!, toInput(form, true))
+      return publishListeningTest(testId!, saved.revision)
+    },
+    onSuccess: async (test) => {
       setForm(toForm(test))
+      await queryClient.invalidateQueries({
+        queryKey: listeningKeys.adminTests,
+      })
       setMessage('Тест опубликован и доступен студентам.')
     },
+    onError: (error) => setMessage(getErrorMessage(error)),
   })
   const archiveMutation = useMutation({
     mutationFn: () => archiveListeningTest(testId!, form.revision),
@@ -189,22 +215,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     event.preventDefault()
     setMessage(null)
     try {
-      await saveMutation.mutateAsync({
-        ...form,
-        parts: form.parts.map((part, pi) => ({
-          ...part,
-          position: pi + 1,
-          groups: part.groups.map((group, gi) => ({
-            ...group,
-            position: gi + 1,
-            questions: group.questions.map((question, qi) => ({
-              ...question,
-              position: qi + 1,
-            })),
-          })),
-        })),
-        revision: editing ? form.revision : undefined,
-      })
+      await saveMutation.mutateAsync(toInput(form, editing))
     } catch (error) {
       setMessage(getErrorMessage(error))
     }
@@ -234,9 +245,18 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => void publishMutation.mutateAsync()}
+              disabled={
+                publishMutation.isPending ||
+                saveMutation.isPending ||
+                archiveMutation.isPending
+              }
+              onClick={() => {
+                setMessage(null)
+                publishMutation.mutate()
+              }}
             >
-              <Send2 aria-hidden /> Опубликовать
+              <Send2 aria-hidden />
+              {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
             </Button>
           ) : null}
           {testId && auth.user?.role === 'ADMIN' ? (
@@ -253,7 +273,15 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
-          <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb]">
+          <Button
+            type="submit"
+            disabled={
+              saveMutation.isPending ||
+              publishMutation.isPending ||
+              archiveMutation.isPending
+            }
+            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+          >
             <Save2 aria-hidden /> Сохранить
           </Button>
         </div>

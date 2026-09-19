@@ -1,6 +1,7 @@
 import {
   Add,
   ArrowLeft,
+  DocumentUpload,
   ExportCurve,
   Image,
   Save2,
@@ -326,7 +327,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
-            <Upload className="size-5" aria-hidden />
+            <DocumentUpload className="size-5" aria-hidden />
             <label
               className={
                 form.parts.length > 0

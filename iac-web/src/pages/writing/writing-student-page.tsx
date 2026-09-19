@@ -372,7 +372,7 @@ function WritingEvaluationView({
         criteria={criteriaList}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
-        durationMinutes={material.durationMinutes ?? 60}
+        durationMinutes={material.durationMinutes}
         paceUnit="эссе"
       />
 

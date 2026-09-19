@@ -147,6 +147,12 @@ export function ListeningAttemptRunner({
   const currentQuestion = questions[activeQuestionIndex]
   const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
+  const sharedAudioAssetId =
+    test.parts.length > 0 &&
+    test.parts[0].audioAssetId &&
+    test.parts.every((part) => part.audioAssetId === test.parts[0].audioAssetId)
+      ? test.parts[0].audioAssetId
+      : null
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
@@ -180,6 +186,14 @@ export function ListeningAttemptRunner({
           Не удалось отправить тест: {session.submitError}
         </p>
       ) : null}
+      {sharedAudioAssetId ? (
+        <Card className="shrink-0 shadow-none">
+          <CardContent className="pt-4">
+            <p className="text-sm font-semibold">Аудио полного теста</p>
+            <ProtectedAudio assetId={sharedAudioAssetId} />
+          </CardContent>
+        </Card>
+      ) : null}
       {test.parts.map((part) => (
         <Card
           key={part.position}
@@ -193,13 +207,13 @@ export function ListeningAttemptRunner({
             <CardTitle>
               Part {part.position}: {part.title}
             </CardTitle>
-            {part.audioAssetId ? (
+            {!sharedAudioAssetId && part.audioAssetId ? (
               <ProtectedAudio assetId={part.audioAssetId} />
-            ) : (
+            ) : !sharedAudioAssetId ? (
               <p className="text-sm text-amber-700">
                 Аудио ещё не прикреплено.
               </p>
-            )}
+            ) : null}
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto">
             {part.groups.map((group) => (
@@ -297,7 +311,7 @@ export function ListeningAttemptResult({
           {test.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Listening · {test.parts?.length ?? 4} секции · {totalQuestions} вопросов
+          IELTS Academic Listening · {test.parts.length} секции · {totalQuestions} вопросов
         </p>
       </div>
 
@@ -308,7 +322,7 @@ export function ListeningAttemptResult({
         totalQuestions={totalQuestions}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
-        durationMinutes={test.durationMinutes ?? 30}
+        durationMinutes={test.durationMinutes}
         paceUnit="вопрос"
       />
 

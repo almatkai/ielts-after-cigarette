@@ -311,7 +311,7 @@ export function ListeningAttemptResult({
           {test.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Listening · {test.parts?.length ?? 4} секции · {totalQuestions} вопросов
+          IELTS Academic Listening · {test.parts.length} секции · {totalQuestions} вопросов
         </p>
       </div>
 
@@ -322,7 +322,7 @@ export function ListeningAttemptResult({
         totalQuestions={totalQuestions}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
-        durationMinutes={test.durationMinutes ?? 30}
+        durationMinutes={test.durationMinutes}
         paceUnit="вопрос"
       />
 

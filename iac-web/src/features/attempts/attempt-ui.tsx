@@ -576,7 +576,7 @@ export function AttemptResultHeader({
               <span>К Full Mock</span>
             </Link>
           ) : (
-            <Link to={`/dashboard/${skill}` as any}>
+            <Link to={`/dashboard/${skill}`}>
               <ArrowLeft className="size-4" aria-hidden />
               <span>{skillBackLabels[skill] ?? 'Назад'}</span>
             </Link>
@@ -603,7 +603,7 @@ export function AttemptResultHeader({
           size="sm"
           className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
         >
-          <Link to={`/dashboard/${skill}` as any}>К списку тестов</Link>
+          <Link to={`/dashboard/${skill}`}>К списку тестов</Link>
         </Button>
       </div>
     </header>

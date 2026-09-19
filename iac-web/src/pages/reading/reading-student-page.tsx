@@ -103,7 +103,7 @@ function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial
     matches.push({
       index: match.index,
       number: parseInt(match[1], 10),
-      title: match[2]?.trim() || `Passage ${match[1]}`,
+      title: match.at(2)?.trim() || `Passage ${match[1]}`,
     })
   }
 
@@ -117,8 +117,8 @@ function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial
         const matchP = instr.match(/(?:Passage|Раздел)\s+(\d+)/i)
         if (matchP) return parseInt(matchP[1], 10) === item.number
         const firstNum =
-          (g.questions[0]?.content?.number as number | undefined) ??
-          g.questions[0]?.position ??
+          (g.questions.at(0)?.content.number as number | undefined) ??
+          g.questions.at(0)?.position ??
           1
         if (item.number === 1) return firstNum <= 13
         if (item.number === 2) return firstNum > 13 && firstNum <= 26
@@ -173,14 +173,14 @@ export function ReadingAttemptRunner({
   )
 
   const currentQuestion = questions[activeQuestionIndex] ?? questions[0]
-  const currentPassage = passages[currentQuestion?.passageIndex ?? 0] ?? passages[0]
+  const currentPassage = passages[currentQuestion.passageIndex] ?? passages[0]
 
   const activePassageQuestions = useMemo(
     () =>
       questions.filter(
-        (q) => q.passageIndex === (currentQuestion?.passageIndex ?? 0),
+        (q) => q.passageIndex === currentQuestion.passageIndex,
       ),
-    [questions, currentQuestion?.passageIndex],
+    [questions, currentQuestion.passageIndex],
   )
 
   const goToPassage = (passageIndex: number) => {
@@ -191,12 +191,12 @@ export function ReadingAttemptRunner({
   }
 
   useEffect(() => {
-    if (!currentQuestion?.question?.id) return
+    if (!currentQuestion.question.id) return
     const el = document.getElementById(`reading-q-${currentQuestion.question.id}`)
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
-  }, [activeQuestionIndex, currentQuestion?.question?.id])
+  }, [activeQuestionIndex, currentQuestion.question.id])
 
   const startedAt = useMemo(
     () => new Date(attempt.startedAt).getTime(),
@@ -321,7 +321,7 @@ export function ReadingAttemptRunner({
               ).length
               return (
                 <button
-                  key={passage.id ?? passageIndex}
+                  key={passage.id}
                   type="button"
                   onClick={() => goToPassage(passageIndex)}
                   className={cn(
@@ -562,7 +562,7 @@ export function ReadingAttemptRunner({
                 ).length
                 return (
                   <button
-                    key={passage.id ?? pIdx}
+                    key={passage.id}
                     type="button"
                     onClick={() => goToPassage(pIdx)}
                     className={cn(
@@ -700,7 +700,7 @@ function ReadingAttemptResult({
       if (filterStatus === 'correct' && !item.isCorrect) return false
 
       if (selectedPassageTab !== 'all') {
-        const passage = passages[selectedPassageTab]
+        const passage = passages.at(selectedPassageTab)
         if (passage) {
           const pQuestionIds = new Set(
             passage.questionGroups.flatMap((g) => g.questions.map((q) => q.id)).filter(Boolean),
@@ -798,7 +798,7 @@ function ReadingAttemptResult({
               <div className="flex items-center gap-1">
                 {passages.map((p, idx) => (
                   <button
-                    key={p.id ?? idx}
+                    key={p.id}
                     type="button"
                     onClick={() => setReadingPassageViewIndex(idx)}
                     className={cn(

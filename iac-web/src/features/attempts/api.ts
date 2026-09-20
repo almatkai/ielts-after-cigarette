@@ -5,7 +5,7 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import type { PublicSpeakingMaterial } from '@/features/speaking/api'
 import type { PublicWritingMaterial } from '@/features/writing/api'
 
-export type AttemptStatus = 'IN_PROGRESS' | 'SUBMITTED'
+export type AttemptStatus = 'IN_PROGRESS' | 'PROCESSING' | 'SUBMITTED'
 
 // Форматы ответа студента: {"optionId": "A"}, {"optionIds": ["A", "C"]}
 // или {"value": "текст"} для completion/short answer.
@@ -47,6 +47,7 @@ export type AttemptDetail = Attempt & {
   writingEvaluation?: WritingEvaluation
   speakingEvaluation?: SpeakingEvaluation
   recordings?: SpeakingRecording[]
+  speakingAssessment?: SpeakingAssessmentJob
 }
 
 export type WritingCriterion = { band: number; feedback: string }
@@ -88,6 +89,39 @@ export type SpeakingRecording = {
   byteSize: number
   createdAt: string
   updatedAt: string
+  revision: number
+  transcription?: SpeakingTranscription
+}
+
+export type SpeakingMetrics = {
+  recordingDurationSeconds: number
+  speechDurationSeconds: number
+  wordCount: number
+  speechRateWpm: number
+  articulationRateWpm: number
+  longPauseCount: number
+  totalLongPauseSeconds: number
+  averageLongPauseSeconds: number
+  maxPauseSeconds: number
+  fillerCount: number
+  fillers: Record<string, number>
+}
+
+export type SpeakingTranscription = {
+  recordingRevision: number
+  status: 'QUEUED' | 'PROCESSING' | 'READY' | 'FAILED'
+  transcript?: string
+  metrics: SpeakingMetrics
+  attempts: number
+  errorCode?: string
+  errorMessage?: string
+}
+
+export type SpeakingAssessmentJob = {
+  status: 'QUEUED' | 'PROCESSING' | 'READY' | 'FAILED'
+  attempts: number
+  errorCode?: string
+  errorMessage?: string
 }
 
 export type SpeakingEvaluation = {
@@ -108,6 +142,7 @@ export type SpeakingEvaluation = {
     improvements: string[]
   }[]
   evaluatedAt: string
+  pronunciationAvailable: boolean
 }
 
 export type StartListeningAttemptResponse = {

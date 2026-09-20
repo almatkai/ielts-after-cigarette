@@ -94,7 +94,7 @@ export function ExamAttemptShell<TMaterial>({
     )
   }
 
-  if (attempt.status === 'SUBMITTED') {
+  if (attempt.status === 'SUBMITTED' || attempt.status === 'PROCESSING') {
     return renderResult({
       attempt,
       material,

@@ -476,8 +476,12 @@ export function SpeakingAttemptResult({
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
     queryFn: ({ signal }) => getAttempt(attempt.id, signal),
+    refetchInterval: (query) =>
+      query.state.data?.status === 'SUBMITTED' ? false : 2500,
   })
   const evaluation = detailQuery.data?.speakingEvaluation
+  const assessment = detailQuery.data?.speakingAssessment
+  const effectiveAttempt = detailQuery.data ?? attempt
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
@@ -492,7 +496,8 @@ export function SpeakingAttemptResult({
           {material.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Speaking · Parts 1–{material.parts.length} · аудио-тренировка
+          IELTS Academic Speaking · Parts 1–{material.parts.length} ·
+          аудио-тренировка
         </p>
       </div>
 
@@ -502,11 +507,20 @@ export function SpeakingAttemptResult({
           message={getErrorMessage(detailQuery.error)}
           onRetry={() => void detailQuery.refetch()}
         />
+      ) : assessment?.status === 'FAILED' ? (
+        <ErrorState
+          title="Не удалось проверить Speaking"
+          message={
+            assessment.errorMessage ||
+            'Автоматическая проверка завершилась с ошибкой. Начните новую попытку или повторите позже.'
+          }
+          onRetry={() => void detailQuery.refetch()}
+        />
       ) : !evaluation ? (
-        <LoadingState label="Загружаем результаты проверки…" />
+        <LoadingState label="Расшифровываем аудио и проверяем ответы…" />
       ) : (
         <SpeakingEvaluationView
-          attempt={attempt}
+          attempt={effectiveAttempt}
           material={material}
           evaluation={evaluation}
         />
@@ -526,23 +540,37 @@ function SpeakingEvaluationView({
 }) {
   const criteriaList = [
     { label: 'Fluency & Coherence', band: evaluation.criteria.fluency.band },
-    { label: 'Lexical Resource', band: evaluation.criteria.lexicalResource.band },
+    {
+      label: 'Lexical Resource',
+      band: evaluation.criteria.lexicalResource.band,
+    },
     { label: 'Grammar Accuracy', band: evaluation.criteria.grammar.band },
-    { label: 'Pronunciation', band: evaluation.criteria.pronunciation.band },
-  ] as const
+  ]
+  if (evaluation.pronunciationAvailable) {
+    criteriaList.push({
+      label: 'Pronunciation',
+      band: evaluation.criteria.pronunciation.band,
+    })
+  }
 
   const criteriaFeedback = [
     ['Fluency & Coherence', evaluation.criteria.fluency],
     ['Lexical Resource', evaluation.criteria.lexicalResource],
     ['Grammar Range & Accuracy', evaluation.criteria.grammar],
-    ['Pronunciation', evaluation.criteria.pronunciation],
-  ] as const
+  ] as Array<[string, { band: number; feedback: string }]>
+  if (evaluation.pronunciationAvailable) {
+    criteriaFeedback.push(['Pronunciation', evaluation.criteria.pronunciation])
+  }
 
   return (
     <div className="space-y-6">
       <AttemptPerformanceReport
         band={evaluation.overallBand}
-        bandNote="Оценка сформирована по 4 критериям IELTS Speaking"
+        bandNote={
+          evaluation.pronunciationAvailable
+            ? 'Учебная оценка по 4 критериям IELTS Speaking'
+            : 'Учебная оценка по 3 текстовым критериям; произношение пока не оценивалось'
+        }
         criteria={criteriaList}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
@@ -563,7 +591,10 @@ function SpeakingEvaluationView({
 
       <div className="grid gap-3 sm:grid-cols-2">
         {criteriaFeedback.map(([label, criterion]) => (
-          <Card key={label} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
+          <Card
+            key={label}
+            className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs"
+          >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="font-semibold text-slate-900">{label}</h2>

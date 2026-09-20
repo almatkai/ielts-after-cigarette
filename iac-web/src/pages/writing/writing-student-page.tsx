@@ -107,7 +107,12 @@ export function WritingAttemptRunner({
     return typeof value === 'string' && value.trim().length > 0
   }).length
   const activeTask = material.tasks[activeTaskIndex]
-  const activeTaskValue = session.answers[activeTask.id]?.value
+  const activeTaskValue = Object.prototype.hasOwnProperty.call(
+    session.answers,
+    activeTask.id,
+  )
+    ? session.answers[activeTask.id].value
+    : undefined
   const activeTaskText =
     typeof activeTaskValue === 'string' ? activeTaskValue : ''
   const allTasksAnswered = material.tasks.every((task) => {
@@ -433,8 +438,8 @@ function WritingEvaluationView({
         </Card>
       ) : null}
 
-      {evaluation.tasks
-        .toSorted((left, right) => left.position - right.position)
+      {[...evaluation.tasks]
+        .sort((left, right) => left.position - right.position)
         .map((task) => (
           <Card
             key={task.taskId}

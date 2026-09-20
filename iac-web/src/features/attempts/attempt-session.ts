@@ -23,10 +23,9 @@ const AUTOSAVE_DELAY_MS = 2000
 // submit с финальными ответами.
 export function useAttemptSession(attemptId: string) {
   const queryClient = useQueryClient()
-  const [answers, setAnswers] = useState<Record<
-    string,
-    StudentAnswer
-  > | null>(null)
+  const [answers, setAnswers] = useState<Record<string, StudentAnswer> | null>(
+    null,
+  )
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [submitted, setSubmitted] = useState<Attempt | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -47,7 +46,11 @@ export function useAttemptSession(attemptId: string) {
         initial[item.questionId] = item.answer
       }
       setAnswers(initial)
-      if (draftsQuery.data.status === 'SUBMITTED' && !submitted) {
+      if (
+        (draftsQuery.data.status === 'SUBMITTED' ||
+          draftsQuery.data.status === 'PROCESSING') &&
+        !submitted
+      ) {
         setSubmitted(draftsQuery.data)
       }
     } else if (draftsQuery.isError) {

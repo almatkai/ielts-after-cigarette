@@ -107,7 +107,7 @@ export function WritingAttemptRunner({
     return typeof value === 'string' && value.trim().length > 0
   }).length
   const activeTask = material.tasks[activeTaskIndex]
-  const activeTaskValue = session.answers[activeTask.id].value
+  const activeTaskValue = session.answers[activeTask.id]?.value
   const activeTaskText =
     typeof activeTaskValue === 'string' ? activeTaskValue : ''
   const allTasksAnswered = material.tasks.every((task) => {

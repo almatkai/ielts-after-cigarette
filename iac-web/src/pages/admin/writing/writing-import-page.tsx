@@ -1,8 +1,4 @@
-import {
-  ArrowLeft,
-  DocumentUpload,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowLeft, DocumentUpload, TickCircle } from 'iconsax-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -16,6 +12,41 @@ import {
   writingKeys,
 } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
+
+const writingImportTemplate = JSON.stringify(
+  {
+    materials: [
+      {
+        slug: 'academic-writing-practice-1',
+        examType: 'academic',
+        difficulty: 'intermediate',
+        title: 'Academic Writing Practice 1',
+        description: 'Task 1 map and Task 2 opinion essay.',
+        durationMinutes: 60,
+        tasks: [
+          {
+            type: 'task1',
+            prompt:
+              'The two maps below show road access to a city hospital in 2007 and 2010. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+            minimumWords: 150,
+            visualType: 'map',
+            assessmentNotes:
+              'The 2010 plan added roundabouts at both ends of Hospital Road. The roadside bus stops were replaced by a bus station west of Hospital Road. The former shared car park was divided into a staff car park south-east of the hospital and a larger public car park east of the Ring Road.',
+          },
+          {
+            type: 'task2',
+            prompt:
+              'Living in a country where you have to speak a foreign language can cause serious social problems, as well as practical problems. To what extent do you agree or disagree?',
+            minimumWords: 250,
+            essayType: 'opinion',
+          },
+        ],
+      },
+    ],
+  },
+  null,
+  2,
+)
 
 export function WritingImportPage() {
   const queryClient = useQueryClient()
@@ -64,6 +95,13 @@ export function WritingImportPage() {
             className="font-mono text-xs"
             placeholder='{"materials":[{"examType":"academic",...}]}'
           />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setSource(writingImportTemplate)}
+          >
+            Вставить пример шаблона
+          </Button>
           <Button
             type="button"
             disabled={!source.trim() || parseMutation.isPending}

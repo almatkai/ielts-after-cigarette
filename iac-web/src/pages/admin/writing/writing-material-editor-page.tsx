@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  DocumentUpload,
   Save2,
   Send2,
   TickCircle,
@@ -21,6 +22,7 @@ import {
   getWritingMaterial,
   publishWritingMaterial,
   updateWritingMaterial,
+  uploadWritingMedia,
   writingKeys,
 } from '@/features/writing/api'
 import type {
@@ -46,7 +48,13 @@ const emptyForm: WritingMaterialInput = {
       minimumWords: 150,
       visualType: 'bar_chart',
     },
-    { position: 2, type: 'task2', prompt: '', minimumWords: 250 },
+    {
+      position: 2,
+      type: 'task2',
+      prompt: '',
+      minimumWords: 250,
+      essayType: 'opinion',
+    },
   ],
 }
 
@@ -103,8 +111,10 @@ export function WritingMaterialEditorPage({
     },
   })
   const publishMutation = useMutation({
-    mutationFn: () =>
-      publishWritingMaterial(materialId ?? '', form.revision ?? 0),
+    mutationFn: async () => {
+      const saved = await updateWritingMaterial(materialId ?? '', form)
+      return publishWritingMaterial(materialId ?? '', saved.revision)
+    },
     onSuccess: async (material) => {
       await queryClient.invalidateQueries({
         queryKey: writingKeys.adminMaterials,
@@ -114,6 +124,13 @@ export function WritingMaterialEditorPage({
       })
       setForm((current) => ({ ...current, revision: material.revision }))
       setMessage('Материал опубликован.')
+    },
+  })
+  const uploadMutation = useMutation({
+    mutationFn: uploadWritingMedia,
+    onSuccess: (media) => {
+      updateTask(0, { visualAssetId: media.id, visualUrl: undefined })
+      setMessage(`${media.originalName} загружен. Сохраните черновик.`)
     },
   })
   const archiveMutation = useMutation({
@@ -151,6 +168,7 @@ export function WritingMaterialEditorPage({
       visualType:
         examType === 'academic' ? (first.visualType ?? 'bar_chart') : undefined,
       visualUrl: examType === 'academic' ? first.visualUrl : undefined,
+      visualAssetId: examType === 'academic' ? first.visualAssetId : undefined,
       letterTone:
         examType === 'general' ? (first.letterTone ?? 'formal') : undefined,
     })
@@ -170,7 +188,10 @@ export function WritingMaterialEditorPage({
   }
   const material = materialQuery.data
   const pending =
-    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending
+    saveMutation.isPending ||
+    publishMutation.isPending ||
+    archiveMutation.isPending ||
+    uploadMutation.isPending
   const taskOne = form.tasks[0]
   const taskTwo = form.tasks[1]
 
@@ -216,7 +237,8 @@ export function WritingMaterialEditorPage({
                 publishMutation.mutate()
               }}
             >
-              <Send2 aria-hidden /> Опубликовать
+              <Send2 aria-hidden />{' '}
+              {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
             </Button>
           ) : null}
           {materialId && auth.user?.role === 'ADMIN' ? (
@@ -248,13 +270,19 @@ export function WritingMaterialEditorPage({
           {message}
         </p>
       ) : null}
-      {saveMutation.isError || publishMutation.isError || archiveMutation.isError ? (
+      {saveMutation.isError ||
+      publishMutation.isError ||
+      archiveMutation.isError ||
+      uploadMutation.isError ? (
         <p
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
           role="alert"
         >
           {getErrorMessage(
-            saveMutation.error ?? publishMutation.error ?? archiveMutation.error,
+            saveMutation.error ??
+              publishMutation.error ??
+              archiveMutation.error ??
+              uploadMutation.error,
           )}
         </p>
       ) : null}
@@ -334,6 +362,11 @@ export function WritingMaterialEditorPage({
         task={taskOne}
         onChange={(patch) => updateTask(0, patch)}
         examType={form.examType}
+        uploadPending={uploadMutation.isPending}
+        onUploadVisual={(file) => {
+          setMessage(`Загружаем ${file.name}…`)
+          uploadMutation.mutate(file)
+        }}
       />
       <TaskEditor
         title="Task 2"
@@ -366,11 +399,15 @@ function TaskEditor({
   task,
   onChange,
   examType,
+  uploadPending,
+  onUploadVisual,
 }: {
   title: string
   task: WritingTaskInput
   onChange: (patch: Partial<WritingTaskInput>) => void
   examType?: 'academic' | 'general'
+  uploadPending?: boolean
+  onUploadVisual?: (file: File) => void
 }) {
   return (
     <Card className="shadow-none">
@@ -399,39 +436,72 @@ function TaskEditor({
           />
         </Field>
         {examType === 'academic' ? (
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Тип визуала">
-              <select
-                value={task.visualType ?? 'bar_chart'}
+          <div className="grid gap-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Тип визуала">
+                <select
+                  value={task.visualType ?? 'bar_chart'}
+                  onChange={(event) =>
+                    onChange({
+                      visualType: event.target.value as NonNullable<
+                        WritingTaskInput['visualType']
+                      >,
+                    })
+                  }
+                  className={fieldClassName}
+                >
+                  <option value="bar_chart">Bar chart</option>
+                  <option value="line_graph">Line graph</option>
+                  <option value="pie_chart">Pie chart</option>
+                  <option value="table">Table</option>
+                  <option value="diagram">Diagram</option>
+                  <option value="process">Process</option>
+                  <option value="map">Map</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+              </Field>
+              <Field label="Изображение задания">
+                <label className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#deded9] bg-white px-3 text-sm font-medium">
+                  <DocumentUpload className="size-4" aria-hidden />
+                  {uploadPending
+                    ? 'Загружаем…'
+                    : task.visualAssetId
+                      ? 'Заменить изображение'
+                      : 'Загрузить изображение'}
+                  <input
+                    className="sr-only"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+                    disabled={uploadPending}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      if (file) onUploadVisual?.(file)
+                      event.target.value = ''
+                    }}
+                  />
+                </label>
+                {task.visualAssetId ? (
+                  <p className="text-xs text-emerald-700">
+                    Изображение прикреплено: {task.visualAssetId}
+                  </p>
+                ) : null}
+              </Field>
+            </div>
+            <Field label="Скрытые данные для AI-проверки">
+              <Textarea
+                value={task.assessmentNotes ?? ''}
                 onChange={(event) =>
-                  onChange({
-                    visualType: event.target.value as NonNullable<
-                      WritingTaskInput['visualType']
-                    >,
-                  })
+                  onChange({ assessmentNotes: event.target.value })
                 }
-                className={fieldClassName}
-              >
-                <option value="bar_chart">Bar chart</option>
-                <option value="line_graph">Line graph</option>
-                <option value="pie_chart">Pie chart</option>
-                <option value="table">Table</option>
-                <option value="diagram">Diagram</option>
-                <option value="process">Process</option>
-                <option value="map">Map</option>
-                <option value="mixed">Mixed</option>
-              </select>
-            </Field>
-            <Field label="HTTPS-ссылка на визуал (необязательно)">
-              <Input
-                type="url"
-                value={task.visualUrl ?? ''}
-                onChange={(event) =>
-                  onChange({ visualUrl: event.target.value || undefined })
-                }
-                className={fieldClassName}
+                rows={8}
+                placeholder="Опишите все ключевые факты, значения, изменения и обязательные сравнения. Студент этот текст не увидит."
               />
             </Field>
+            <p className="text-xs leading-5 text-[#69696d]">
+              Текстовая AI-модель использует эту разметку, чтобы проверить
+              точность описания изображения. Не добавляйте готовое эссе — только
+              проверяемые факты и ожидаемые сравнения.
+            </p>
           </div>
         ) : examType === 'general' ? (
           <Field label="Тон письма">
@@ -449,6 +519,28 @@ function TaskEditor({
               <option value="formal">Formal</option>
               <option value="semi-formal">Semi-formal</option>
               <option value="informal">Informal</option>
+            </select>
+          </Field>
+        ) : task.position === 2 ? (
+          <Field label="Тип эссе">
+            <select
+              value={task.essayType ?? 'opinion'}
+              onChange={(event) =>
+                onChange({
+                  essayType: event.target.value as NonNullable<
+                    WritingTaskInput['essayType']
+                  >,
+                })
+              }
+              className={fieldClassName}
+            >
+              <option value="opinion">Opinion / agree-disagree</option>
+              <option value="discussion">Discussion</option>
+              <option value="advantages_disadvantages">
+                Advantages / disadvantages
+              </option>
+              <option value="problem_solution">Problem / solution</option>
+              <option value="two_part">Two-part question</option>
             </select>
           </Field>
         ) : null}

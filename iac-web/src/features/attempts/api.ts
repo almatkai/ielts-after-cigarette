@@ -63,6 +63,14 @@ export type WritingEvaluation = {
   summary: string
   tasks: {
     taskId: string
+    position: number
+    band: number
+    criteria: {
+      taskResponse: WritingCriterion
+      coherence: WritingCriterion
+      lexicalResource: WritingCriterion
+      grammar: WritingCriterion
+    }
     feedback: string
     strengths: string[]
     improvements: string[]
@@ -151,7 +159,9 @@ export const listAttempts = (
   signal?: AbortSignal,
 ) =>
   apiClient.request<{ items: AttemptListItem[] }>(
-    materialType ? `/api/v1/attempts?materialType=${materialType}` : '/api/v1/attempts',
+    materialType
+      ? `/api/v1/attempts?materialType=${materialType}`
+      : '/api/v1/attempts',
     { signal },
   )
 

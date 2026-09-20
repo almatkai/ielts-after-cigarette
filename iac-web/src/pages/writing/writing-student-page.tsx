@@ -397,7 +397,10 @@ function WritingEvaluationView({
   evaluation: WritingEvaluation
 }) {
   const criteriaList = [
-    { label: 'Task Response', band: evaluation.criteria.taskResponse.band },
+    {
+      label: 'Task Achievement / Response',
+      band: evaluation.criteria.taskResponse.band,
+    },
     { label: 'Coherence & Cohesion', band: evaluation.criteria.coherence.band },
     {
       label: 'Lexical Resource',
@@ -412,6 +415,7 @@ function WritingEvaluationView({
         band={evaluation.overallBand}
         bandNote="Оценка сформирована по 4 критериям IELTS Writing"
         criteria={criteriaList}
+        totalQuestions={material.tasks.length}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
         durationMinutes={material.durationMinutes}

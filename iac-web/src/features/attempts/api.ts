@@ -5,7 +5,8 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import type { PublicSpeakingMaterial } from '@/features/speaking/api'
 import type { PublicWritingMaterial } from '@/features/writing/api'
 
-export type AttemptStatus = 'IN_PROGRESS' | 'PROCESSING' | 'SUBMITTED'
+export type AttemptStatus =
+  'IN_PROGRESS' | 'PROCESSING' | 'SUBMITTED' | 'ABANDONED'
 
 // Форматы ответа студента: {"optionId": "A"}, {"optionIds": ["A", "C"]}
 // или {"value": "текст"} для completion/short answer.
@@ -204,6 +205,12 @@ export const getMistakes = (signal?: AbortSignal) =>
   apiClient.request<{ items: MistakeReport[] }>('/api/v1/attempts/mistakes', {
     signal,
   })
+
+export const getAttemptMaterial = (attemptId: string, signal?: AbortSignal) =>
+  apiClient.request<PublicListeningTest | PublicReadingMaterial>(
+    `/api/v1/attempts/${attemptId}/material`,
+    { signal },
+  )
 
 export const startListeningAttempt = (testId: string, signal?: AbortSignal) =>
   apiClient.request<StartListeningAttemptResponse>(

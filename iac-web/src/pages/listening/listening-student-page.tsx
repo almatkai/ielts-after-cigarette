@@ -6,7 +6,7 @@ import {
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -92,6 +92,7 @@ export function ListeningAttemptRunner({
   onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
+  const autoSubmitStarted = useRef(false)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
 
   const deadline = useMemo(
@@ -110,8 +111,16 @@ export function ListeningAttemptRunner({
 
   // Авто-submit по истечении времени.
   useEffect(() => {
-    if (secondsLeft === 0 && !session.submitted) session.submit()
-  }, [secondsLeft, session])
+    if (
+      secondsLeft === 0 &&
+      session.answers !== null &&
+      !session.submitted &&
+      !autoSubmitStarted.current
+    ) {
+      autoSubmitStarted.current = true
+      session.submit()
+    }
+  }, [secondsLeft, session.answers, session.submitted, session.submit])
 
   useEffect(() => {
     if (session.submitted && onSubmitted) {
@@ -125,6 +134,15 @@ export function ListeningAttemptRunner({
         attempt={session.submitted}
         test={test}
         fullMockSessionId={fullMockSessionId}
+      />
+    )
+  }
+  if (session.loadError) {
+    return (
+      <ErrorState
+        title="Не удалось восстановить ответы"
+        message={session.loadError}
+        onRetry={session.retryLoad}
       />
     )
   }

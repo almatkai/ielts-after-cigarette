@@ -112,6 +112,15 @@ export function SpeakingAttemptRunner({
       />
     )
   }
+  if (session.loadError) {
+    return (
+      <ErrorState
+        title="Не удалось восстановить ответы"
+        message={session.loadError}
+        onRetry={session.retryLoad}
+      />
+    )
+  }
   if (session.answers === null) {
     return (
       <ExamLoadingScreen

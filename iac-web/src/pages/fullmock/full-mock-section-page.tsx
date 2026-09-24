@@ -1,7 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
-import { fullMockKeys, getFullMockSection } from '@/features/fullmock/api'
+import {
+  fullMockKeys,
+  getFullMockSection,
+  getFullMockSession,
+} from '@/features/fullmock/api'
+import { FullMockSessionPage } from '@/pages/fullmock/full-mock-session-page'
 import { ListeningAttemptRunner } from '@/pages/listening/listening-student-page'
 import { ReadingAttemptRunner } from '@/pages/reading/reading-student-page'
 import { SpeakingAttemptRunner } from '@/pages/speaking/speaking-student-page'
@@ -15,11 +20,22 @@ export function FullMockSectionPage({
   sessionId: string
   sectionPosition: string
 }) {
+  // Keep the server deadline active while the student is inside a section.
+  const sessionQuery = useQuery({
+    queryKey: fullMockKeys.session(sessionId),
+    queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
+    refetchInterval: (query) =>
+      query.state.data?.status === 'SUBMITTED' ? false : 5000,
+  })
   const query = useQuery({
     queryKey: fullMockKeys.section(sessionId, sectionPosition),
     queryFn: ({ signal }) =>
       getFullMockSection(sessionId, sectionPosition, signal),
   })
+
+  if (sessionQuery.data?.status === 'SUBMITTED') {
+    return <FullMockSessionPage sessionId={sessionId} />
+  }
 
   if (query.isPending) {
     return (

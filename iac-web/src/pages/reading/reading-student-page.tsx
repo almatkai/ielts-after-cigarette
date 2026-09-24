@@ -31,6 +31,7 @@ import {
   AttemptPerformanceReport,
   AttemptResultHeader,
   EnhancedReviewQuestion,
+  ErrorState,
   ExamLoadingScreen,
   SaveIndicator,
   TimeBadge,
@@ -221,6 +222,7 @@ export function ReadingAttemptRunner({
     if (
       durationSeconds > 0 &&
       remainingSeconds === 0 &&
+      session.answers !== null &&
       !session.submitted &&
       !session.isSubmitting &&
       !autoSubmitStarted.current
@@ -228,7 +230,14 @@ export function ReadingAttemptRunner({
       autoSubmitStarted.current = true
       void session.submit()
     }
-  }, [durationSeconds, remainingSeconds, session.submitted, session.isSubmitting])
+  }, [
+    durationSeconds,
+    remainingSeconds,
+    session.submitted,
+    session.isSubmitting,
+    session.answers,
+    session.submit,
+  ])
 
   useEffect(() => {
     if (session.submitted && onSubmitted) {
@@ -245,6 +254,15 @@ export function ReadingAttemptRunner({
         onRetake={async () => {
           window.location.reload()
         }}
+      />
+    )
+  }
+  if (session.loadError) {
+    return (
+      <ErrorState
+        title="Не удалось восстановить ответы"
+        message={session.loadError}
+        onRetry={session.retryLoad}
       />
     )
   }

@@ -1,6 +1,4 @@
-import {
-  ArrowLeft,
-} from 'iconsax-react'
+import { ArrowLeft } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -18,6 +16,7 @@ import type { Option } from '@/features/attempts/attempt-ui'
 import {
   attemptKeys,
   getAttempt,
+  getAttemptMaterial,
   getSpeakingRecordingBlob,
 } from '@/features/attempts/api'
 import type {
@@ -27,9 +26,7 @@ import type {
   SpeakingCriterion,
   WritingCriterion,
 } from '@/features/attempts/api'
-import { getPublicListeningTest } from '@/features/listening/api'
 import type { PublicListeningTest } from '@/features/listening/api'
-import { getPublicReadingMaterial } from '@/features/reading/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
 
@@ -49,9 +46,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
       if (!attempt || !isObjectiveAttempt) {
         throw new Error('objective material is not loaded')
       }
-      return attempt.materialType === 'listening'
-        ? getPublicListeningTest(attempt.materialId, signal)
-        : getPublicReadingMaterial(attempt.materialId, signal)
+      return getAttemptMaterial(attempt.id, signal)
     },
   })
 
@@ -145,6 +140,30 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
 }
 
 function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
+  if (attempt.status === 'ABANDONED') {
+    return (
+      <Card>
+        <CardContent className="grid gap-4 p-6">
+          <p className="font-semibold">Секция завершена без оценки</p>
+          <p>Сохранённые черновики:</p>
+          {(attempt.answers ?? []).map((item, index) => (
+            <div key={item.questionId} className="whitespace-pre-wrap">
+              <p className="font-medium">Ответ {index + 1}</p>
+              <p>
+                {String(
+                  item.answer.value ??
+                    item.answer.optionId ??
+                    (Array.isArray(item.answer.optionIds)
+                      ? item.answer.optionIds.join(', ')
+                      : ''),
+                )}
+              </p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+  }
   return (
     <Card className="shadow-none">
       <CardContent className="grid justify-items-center gap-3 p-10 text-center">
@@ -282,7 +301,10 @@ function AIEvaluationReview({
       ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         {evaluation.criteria.map(([label, criterion]) => (
-          <Card key={label} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
+          <Card
+            key={label}
+            className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs"
+          >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="font-semibold text-slate-900">{label}</h2>
@@ -513,7 +535,11 @@ function FlatReview({ review }: { review: AttemptReviewItem[] }) {
     <Card className="shadow-none">
       <CardContent className="grid gap-3 p-5">
         {review.map((item) => (
-          <EnhancedReviewQuestion key={item.questionId} item={item} options={[]} />
+          <EnhancedReviewQuestion
+            key={item.questionId}
+            item={item}
+            options={[]}
+          />
         ))}
       </CardContent>
     </Card>

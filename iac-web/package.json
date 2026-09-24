@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000",
+    "test:regression": "node --test scripts/*.test.mjs",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",

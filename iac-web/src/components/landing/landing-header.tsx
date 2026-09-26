@@ -61,7 +61,7 @@ export function LandingHeader() {
             Войти
           </Link>
           <Link
-            to="/register"
+            to="/login"
             className="inline-flex min-h-11 items-center rounded-[10px] bg-[#3b82f6] px-4 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#2563eb]"
           >
             Начать подготовку
@@ -119,7 +119,7 @@ export function LandingHeader() {
               Войти
             </Link>
             <Link
-              to="/register"
+              to="/login"
               onClick={() => setIsMenuOpen(false)}
               className="ml-auto inline-flex min-h-11 items-center rounded-[10px] bg-[#3b82f6] px-4 text-sm font-semibold text-white no-underline"
             >

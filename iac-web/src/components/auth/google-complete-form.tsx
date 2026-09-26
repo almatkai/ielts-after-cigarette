@@ -41,12 +41,6 @@ function validateName(value: string) {
   return undefined
 }
 
-function validatePassword(value: string) {
-  if (!value) return 'Придумайте пароль'
-  if (value.length < 8) return 'Пароль должен содержать не менее 8 символов'
-  return undefined
-}
-
 export function GoogleCompleteForm({
   pending,
   onBack,
@@ -66,7 +60,6 @@ export function GoogleCompleteForm({
       phone: pending.profile.phone
         ? formatPhoneInput(pending.profile.phone)
         : '',
-      password: '',
       acceptedTerms: false,
     },
     onSubmit: async ({ value }) => {
@@ -78,7 +71,6 @@ export function GoogleCompleteForm({
           registrationToken: pending.registrationToken,
           name: value.name.trim(),
           phone: normalizePhone(value.phone),
-          password: value.password,
           acceptedTerms: value.acceptedTerms,
         })
         await navigate({ to: redirect ?? '/dashboard' })
@@ -184,33 +176,6 @@ export function GoogleCompleteForm({
                 onBlur={field.handleBlur}
                 error={
                   fieldErrors.phone ?? getFieldError(field.state.meta.errors)
-                }
-              />
-            )}
-          </form.Field>
-
-          <form.Field
-            name="password"
-            validators={{
-              onBlur: ({ value }) => validatePassword(value),
-              onSubmit: ({ value }) => validatePassword(value),
-            }}
-          >
-            {(field) => (
-              <AuthInput
-                id={field.name}
-                label="Пароль"
-                type="password"
-                autoComplete="new-password"
-                placeholder="8+ символов"
-                value={field.state.value}
-                onChange={(value) => {
-                  field.handleChange(value)
-                  clearFieldError('password')
-                }}
-                onBlur={field.handleBlur}
-                error={
-                  fieldErrors.password ?? getFieldError(field.state.meta.errors)
                 }
               />
             )}

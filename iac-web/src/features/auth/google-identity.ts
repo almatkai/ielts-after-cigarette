@@ -26,8 +26,8 @@ declare global {
 let googleScriptPromise: Promise<void> | null = null
 
 // loadGoogleIdentityScript injects the GSI client once per page. It rejects
-// when the script is blocked (e.g. by an ad blocker) — callers should treat
-// that as "Google sign-in unavailable" and keep the password fallback.
+// when the script is blocked (e.g. by an ad blocker) — callers should show
+// an explicit error instead of silently leaving the user without sign-in.
 export function loadGoogleIdentityScript(): Promise<void> {
   if (window.google) return Promise.resolve()
   if (!googleScriptPromise) {

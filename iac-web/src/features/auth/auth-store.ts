@@ -32,22 +32,6 @@ export type AuthResponse = {
   user: UserDto
 }
 
-type LoginInput = {
-  email: string
-  password: string
-  remember: boolean
-}
-
-type RegisterInput = {
-  name: string
-  email: string
-  phone: string
-  password: string
-  confirmPassword: string
-  acceptedTerms: boolean
-  verificationToken: string
-}
-
 type AuthSnapshot = {
   user: UserDto | null
   accessToken: string | null
@@ -104,26 +88,6 @@ export class AuthStore {
     return this.restorePromise
   }
 
-  login = async (input: LoginInput) => {
-    this.patch({ loading: true, error: null })
-    try {
-      const response = await apiClient.request<AuthResponse>(
-        '/api/v1/auth/login',
-        {
-          method: 'POST',
-          body: input,
-          authenticated: false,
-          retryAuthentication: false,
-        },
-      )
-      this.accept(response)
-      return response.user
-    } catch (error) {
-      this.patch({ loading: false, error: getErrorMessage(error) })
-      throw error
-    }
-  }
-
   loginWithGoogle = async (googleToken: string) => {
     this.patch({ loading: true, error: null })
     try {
@@ -146,26 +110,6 @@ export class AuthStore {
     this.patch({ loading: true, error: null })
     try {
       const response = await requestCompleteGoogleRegistration(input)
-      this.accept(response)
-      return response.user
-    } catch (error) {
-      this.patch({ loading: false, error: getErrorMessage(error) })
-      throw error
-    }
-  }
-
-  register = async (input: RegisterInput) => {
-    this.patch({ loading: true, error: null })
-    try {
-      const response = await apiClient.request<AuthResponse>(
-        '/api/v1/auth/register',
-        {
-          method: 'POST',
-          body: input,
-          authenticated: false,
-          retryAuthentication: false,
-        },
-      )
       this.accept(response)
       return response.user
     } catch (error) {
@@ -256,10 +200,8 @@ export function useAuth() {
   )
   return {
     ...snapshot,
-    login: authStore.login,
     loginWithGoogle: authStore.loginWithGoogle,
     completeGoogleRegistration: authStore.completeGoogleRegistration,
-    register: authStore.register,
     logout: authStore.logout,
     hasAnyRole: authStore.hasAnyRole,
   }

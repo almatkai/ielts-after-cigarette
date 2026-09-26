@@ -55,7 +55,7 @@ export function HeroSection() {
               delay={0.25}
               className="mt-9 flex flex-col gap-3 min-[440px]:flex-row"
             >
-              <SmoothButton to="/register" className="min-[440px]:w-auto">
+              <SmoothButton to="/login" className="min-[440px]:w-auto">
                 {heroContent.primaryAction}
               </SmoothButton>
               <SmoothButton

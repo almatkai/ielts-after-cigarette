@@ -12,9 +12,10 @@ Start the Go backend from the sibling `ielts-after-cigarette-back` repository
 with `docker compose up --build`, then start this app with `pnpm dev`.
 The frontend runs at `http://localhost:3000`.
 
-Registration verifies the user's phone through the backend's WhatsApp challenge
-before creating the account. Authentication uses an in-memory access token and
-a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
+Registration and sign-in use Google only. A new student completes their name,
+phone, and consent after Google verification; no password or WhatsApp challenge
+is required. Old `/register` URLs redirect to `/login`. Authentication uses an
+in-memory access token and a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
 (`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
 
 Users with the backend role `EDITOR` or `ADMIN` can open `/admin`. The route has

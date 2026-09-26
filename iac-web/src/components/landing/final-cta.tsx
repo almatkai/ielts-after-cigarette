@@ -41,7 +41,7 @@ export function FinalCta() {
                   удобном темпе.
                 </p>
                 <div className="mt-7 w-full sm:max-w-[280px]">
-                  <SmoothButton to="/register" className="w-full">
+                  <SmoothButton to="/login" className="w-full">
                     Начать подготовку
                   </SmoothButton>
                 </div>

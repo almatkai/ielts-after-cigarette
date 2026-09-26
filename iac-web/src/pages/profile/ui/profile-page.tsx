@@ -1,7 +1,6 @@
 import {
   Camera,
   DirectRight,
-  Lock,
   NotificationStatus,
   Sms,
   User,
@@ -47,10 +46,6 @@ const fieldClassName =
 
 const selectClassName =
   'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
-
-function preventSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault()
-}
 
 const emptyProfileForm: ProfileForm = {
   firstName: '',
@@ -199,7 +194,10 @@ export function ProfilePage() {
             onClick={() => photoInputRef.current?.click()}
             className="h-10 shrink-0 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none hover:border-blue-300 hover:text-blue-600 transition-colors"
           >
-            <Camera className="transition-colors group-hover:text-blue-600" aria-hidden />
+            <Camera
+              className="transition-colors group-hover:text-blue-600"
+              aria-hidden
+            />
             Загрузить фото
           </Button>
         </CardContent>
@@ -306,7 +304,10 @@ export function ProfilePage() {
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <DirectRight className="size-[18px] transition-colors" aria-hidden />
+                  <DirectRight
+                    className="size-[18px] transition-colors"
+                    aria-hidden
+                  />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -379,7 +380,9 @@ export function ProfilePage() {
                 </div>
 
                 <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor="exam-date-trigger">Планируемая дата экзамена</Label>
+                  <Label htmlFor="exam-date-trigger">
+                    Планируемая дата экзамена
+                  </Label>
                   <ExamDatePicker
                     value={form.examDate}
                     onChange={(date) => updateForm('examDate', date)}
@@ -421,7 +424,10 @@ export function ProfilePage() {
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <NotificationStatus className="size-[18px] transition-colors" aria-hidden />
+                  <NotificationStatus
+                    className="size-[18px] transition-colors"
+                    aria-hidden
+                  />
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -473,60 +479,13 @@ export function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* 5. Блок Безопасность */}
-          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-5">
-              <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <Lock className="size-[18px] transition-colors" aria-hidden />
-                </span>
-                <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
-                    Безопасность
-                  </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
-                    Измените пароль аккаунта.
-                  </CardDescription>
-                </div>
-              </div>
+          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+            <CardHeader className="p-5">
+              <CardTitle className="text-base">Безопасность</CardTitle>
+              <CardDescription>
+                Вход в аккаунт доступен только через Google.
+              </CardDescription>
             </CardHeader>
-
-            <form onSubmit={preventSubmit}>
-              <CardContent className="grid gap-4 p-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="current-password">Текущий пароль</Label>
-                  <Input
-                    id="current-password"
-                    name="currentPassword"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="Введите текущий пароль"
-                    className={fieldClassName}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="new-password">Новый пароль</Label>
-                  <Input
-                    id="new-password"
-                    name="newPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Не менее 8 символов"
-                    minLength={8}
-                    className={fieldClassName}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="border-t border-[#ededeb] px-5 py-4">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="h-10 w-full rounded-[9px] border-[#deded9] bg-white shadow-none"
-                >
-                  Обновить пароль
-                </Button>
-              </CardFooter>
-            </form>
           </Card>
         </aside>
       </div>

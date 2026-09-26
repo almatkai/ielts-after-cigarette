@@ -18,7 +18,6 @@ export type CompleteGoogleRegistrationInput = {
   registrationToken: string
   name: string
   phone: string
-  password: string
   acceptedTerms: boolean
 }
 

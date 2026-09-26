@@ -531,9 +531,6 @@ export function AiAssistantFloatingWidget({
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-[#0f172a] tracking-tight">
-                  Юки
-                </span>
                 <span className="rounded-full bg-blue-50 px-1.5 py-0.2 text-[9px] font-bold text-[#2563eb]">
                   IELTS AI
                 </span>
@@ -553,11 +550,11 @@ export function AiAssistantFloatingWidget({
             </div>
 
             <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-[#334155]">
-              Привет! Меня зовут <strong>Юки</strong> 🦊 — я твой наставник по IELTS. Спроси меня о структуре, критериях или стратегиях!
+              Привет! Меня зовут <strong>Юки</strong> — я твой наставник по IELTS. 
             </p>
 
             <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb]">
-              <span>Нажми, чтобы открыть чат</span>
+              <span>Открыть чат</span>
               <span className="text-xs transition-transform duration-200 group-hover/bubble:translate-x-1">
                 →
               </span>
@@ -575,7 +572,7 @@ export function AiAssistantFloatingWidget({
           <div ref={mascotRef} className="relative animate-fox-float">
             <FoxMascot
               eyeOffset={eyeOffset}
-              className="w-28 h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40"
+              className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36"
             />
           </div>
         </button>

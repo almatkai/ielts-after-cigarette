@@ -35,11 +35,19 @@ export type ListeningGroup = {
   imageAssetId: string | null
   questions: ListeningQuestion[]
 }
+export type STTSegment = {
+  id: number
+  start: number
+  end: number
+  text: string
+}
 export type ListeningPart = {
   id?: string
   position: number
   title: string
   audioAssetId: string | null
+  transcript?: string
+  transcriptSegments?: STTSegment[]
   groups: ListeningGroup[]
 }
 export type ListeningTestInput = {
@@ -136,6 +144,11 @@ export const archiveListeningTest = (id: string, revision: number) =>
   apiClient.request<ListeningTest>(
     `/api/v1/admin/listening/tests/${id}/archive`,
     { method: 'POST', body: { revision } },
+  )
+export const transcribeListeningTest = (id: string) =>
+  apiClient.request<ListeningTest>(
+    `/api/v1/admin/listening/tests/${id}/transcribe`,
+    { method: 'POST' },
   )
 export const parseListeningImport = (source: string, examType: string) =>
   apiClient.request<ListeningImportResult>(

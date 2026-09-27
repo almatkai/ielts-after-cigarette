@@ -4,12 +4,15 @@ import {
   DocumentUpload,
   ExportCurve,
   Image,
+  Magicpen,
+  Play,
   Save2,
   Send2,
+  VolumeHigh,
 } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,9 +25,11 @@ import {
   archiveListeningTest,
   createListeningTest,
   getAdminListeningTest,
+  getListeningMediaBlob,
   listeningKeys,
   listeningQuestionTypes,
   publishListeningTest,
+  transcribeListeningTest,
   updateListeningTest,
   uploadListeningMedia,
 } from '@/features/listening/api'
@@ -99,11 +104,55 @@ const toInput = (form: Form, editing: boolean): ListeningTestInput => ({
   })),
 })
 
+function formatSeconds(sec?: number): string {
+  if (typeof sec !== 'number' || isNaN(sec)) return '--:--'
+  const m = Math.floor(sec / 60)
+  const s = Math.floor(sec % 60)
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+}
+
+function PartAudioPlayer({
+  assetId,
+  onAudioRef,
+}: {
+  assetId: string
+  onAudioRef?: (el: HTMLAudioElement | null) => void
+}) {
+  const query = useQuery({
+    queryKey: ['listening', 'media', assetId],
+    queryFn: () => getListeningMediaBlob(assetId),
+  })
+  const url = useMemo(
+    () => (query.data ? URL.createObjectURL(query.data) : null),
+    [query.data],
+  )
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url)
+    },
+    [url],
+  )
+  if (query.isPending) {
+    return <span className="text-xs text-slate-500">Загружаем аудиоплеер…</span>
+  }
+  if (!url) return null
+  return (
+    <audio
+      ref={onAudioRef}
+      className="mt-2 w-full h-9"
+      controls
+      preload="metadata"
+      src={url}
+    />
+  )
+}
+
 export function ListeningTestEditorPage({ testId }: { testId?: string }) {
   const editing = Boolean(testId)
   const auth = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const partAudioRefs = useRef<Record<number, HTMLAudioElement | null>>({})
   const [form, setForm] = useState<Form>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
   const query = useQuery({
@@ -114,6 +163,14 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
   useEffect(() => {
     if (query.data) setForm(toForm(query.data))
   }, [query.data])
+
+  const handleSeek = (partIndex: number, sec: number) => {
+    const el = partAudioRefs.current[partIndex]
+    if (el) {
+      el.currentTime = sec
+      void el.play()
+    }
+  }
 
   const saveMutation = useMutation({
     mutationFn: (input: ListeningTestInput) =>
@@ -157,6 +214,22 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
       })
       setMessage('Тест перенесён в архив.')
     },
+  })
+  const transcribeMutation = useMutation({
+    mutationFn: () => transcribeListeningTest(testId!),
+    onSuccess: async (test) => {
+      setForm(toForm(test))
+      await queryClient.invalidateQueries({
+        queryKey: listeningKeys.adminTest(testId!),
+      })
+      await queryClient.invalidateQueries({
+        queryKey: listeningKeys.adminTests,
+      })
+      setMessage(
+        'Аудио успешно расшифровано нейросетью! Таймкоды и подсказки расставлены.',
+      )
+    },
+    onError: (error) => setMessage(getErrorMessage(error)),
   })
 
   const updatePart = (index: number, patch: Partial<ListeningPart>) =>
@@ -246,6 +319,37 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               type="button"
               variant="outline"
               disabled={
+                transcribeMutation.isPending ||
+                saveMutation.isPending ||
+                publishMutation.isPending ||
+                archiveMutation.isPending
+              }
+              onClick={() => {
+                if (
+                  window.confirm(
+                    'Запустить AI STT транскрибацию аудио и автоматическую расстановку таймкодов для всех вопросов теста?',
+                  )
+                ) {
+                  setMessage(
+                    'Отправляем аудио в AI STT сервис и вычисляем таймкоды вопросов (это займет 10–25 сек)…',
+                  )
+                  transcribeMutation.mutate()
+                }
+              }}
+              className="border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 font-medium"
+            >
+              <Magicpen aria-hidden className="size-4 text-purple-600 mr-1" />
+              {transcribeMutation.isPending
+                ? 'STT транскрибация…'
+                : 'AI STT Расшифровка'}
+            </Button>
+          ) : null}
+          {testId && auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={
+                transcribeMutation.isPending ||
                 publishMutation.isPending ||
                 saveMutation.isPending ||
                 archiveMutation.isPending
@@ -449,6 +553,69 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                   : 'аудио не прикреплено'}
               </span>
             </div>
+            {part.audioAssetId ? (
+              <div className="rounded-lg border bg-slate-50 p-2.5">
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                  <span className="font-semibold flex items-center gap-1.5 text-slate-700">
+                    <VolumeHigh className="size-3.5 text-blue-600" />
+                    Плеер предпросмотра аудио
+                  </span>
+                  <span>Part {partIndex + 1}</span>
+                </div>
+                <PartAudioPlayer
+                  assetId={part.audioAssetId}
+                  onAudioRef={(el) => {
+                    partAudioRefs.current[partIndex] = el
+                  }}
+                />
+              </div>
+            ) : null}
+
+            {part.transcript ? (
+              <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+                      Стенограмма аудио (AI STT Transcript)
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="bg-white text-blue-700 border-blue-200 text-[11px]"
+                    >
+                      {part.transcriptSegments?.length ?? 0} сегментов
+                    </Badge>
+                  </div>
+                </div>
+
+                {part.transcriptSegments &&
+                part.transcriptSegments.length > 0 ? (
+                  <div className="max-h-60 overflow-y-auto space-y-1.5 rounded-lg border border-blue-100 bg-white p-3 text-xs">
+                    {part.transcriptSegments.map((seg) => (
+                      <div
+                        key={seg.id}
+                        className="flex items-start gap-2 hover:bg-slate-50 p-1 rounded"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleSeek(partIndex, seg.start)}
+                          className="shrink-0 font-mono text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
+                          title="Перемотать аудио на эту секунду"
+                        >
+                          ▶ {formatSeconds(seg.start)} - {formatSeconds(seg.end)}
+                        </button>
+                        <span className="text-slate-700 leading-relaxed">
+                          {seg.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap bg-white p-3 rounded-lg border border-blue-100 max-h-48 overflow-y-auto">
+                    {part.transcript}
+                  </p>
+                )}
+              </div>
+            ) : null}
             {part.groups.map((group, groupIndex) => (
               <div
                 key={groupIndex}
@@ -594,6 +761,177 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                         />
                       </Field>
                     </div>
+
+                    {/* Audio Timestamps & Hint/Quote Editor */}
+                    <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-blue-100 bg-blue-50/30 p-3">
+                      <Field label="Таймкод начала ответа (сек)">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="0.1"
+                            min={0}
+                            placeholder="14.5"
+                            value={
+                              typeof question.content?.timestampStart ===
+                              'number'
+                                ? question.content.timestampStart
+                                : ''
+                            }
+                            onChange={(e) => {
+                              const val =
+                                e.target.value === ''
+                                  ? undefined
+                                  : Number(e.target.value)
+                              const nextContent = { ...question.content }
+                              if (val === undefined) {
+                                delete nextContent.timestampStart
+                              } else {
+                                nextContent.timestampStart = val
+                              }
+                              updateQuestion(
+                                partIndex,
+                                groupIndex,
+                                questionIndex,
+                                {
+                                  content: nextContent,
+                                },
+                              )
+                            }}
+                          />
+                          {typeof question.content?.timestampStart ===
+                            'number' && (
+                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                              (
+                              {formatSeconds(
+                                question.content.timestampStart as number,
+                              )}
+                              )
+                            </span>
+                          )}
+                          {typeof question.content?.timestampStart ===
+                            'number' &&
+                            part.audioAssetId && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  handleSeek(
+                                    partIndex,
+                                    question.content.timestampStart as number,
+                                  )
+                                }
+                                className="h-9 px-2.5 text-xs text-blue-600 shrink-0 hover:bg-blue-50"
+                                title="Слушать с этой секунды"
+                              >
+                                <Play className="size-3 mr-1 text-blue-600" />
+                                <span>Слушать</span>
+                              </Button>
+                            )}
+                        </div>
+                      </Field>
+                      <Field label="Таймкод конца ответа (сек)">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="0.1"
+                            min={0}
+                            placeholder="21.0"
+                            value={
+                              typeof question.content?.timestampEnd ===
+                              'number'
+                                ? question.content.timestampEnd
+                                : ''
+                            }
+                            onChange={(e) => {
+                              const val =
+                                e.target.value === ''
+                                  ? undefined
+                                  : Number(e.target.value)
+                              const nextContent = { ...question.content }
+                              if (val === undefined) {
+                                delete nextContent.timestampEnd
+                              } else {
+                                nextContent.timestampEnd = val
+                              }
+                              updateQuestion(
+                                partIndex,
+                                groupIndex,
+                                questionIndex,
+                                {
+                                  content: nextContent,
+                                },
+                              )
+                            }}
+                          />
+                          {typeof question.content?.timestampEnd ===
+                            'number' && (
+                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                              (
+                              {formatSeconds(
+                                question.content.timestampEnd as number,
+                              )}
+                              )
+                            </span>
+                          )}
+                        </div>
+                      </Field>
+
+                      <div className="sm:col-span-2">
+                        <Field label="Цитата-доказательство из аудио (Quote)">
+                          <Textarea
+                            rows={2}
+                            placeholder="Фраза или предложение из аудиозаписи, подтверждающее ответ..."
+                            value={
+                              typeof question.content?.quote === 'string'
+                                ? question.content.quote
+                                : ''
+                            }
+                            onChange={(e) =>
+                              updateQuestion(
+                                partIndex,
+                                groupIndex,
+                                questionIndex,
+                                {
+                                  content: {
+                                    ...question.content,
+                                    quote: e.target.value,
+                                  },
+                                },
+                              )
+                            }
+                          />
+                        </Field>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <Field label="Подсказка к поиску ответа (Scaffolding Hint на русском)">
+                          <Textarea
+                            rows={2}
+                            placeholder="Наводящая подсказка для студента: на что обратить внимание или какие ключевые слова слушать..."
+                            value={
+                              typeof question.content?.hint === 'string'
+                                ? question.content.hint
+                                : ''
+                            }
+                            onChange={(e) =>
+                              updateQuestion(
+                                partIndex,
+                                groupIndex,
+                                questionIndex,
+                                {
+                                  content: {
+                                    ...question.content,
+                                    hint: e.target.value,
+                                  },
+                                },
+                              )
+                            }
+                          />
+                        </Field>
+                      </div>
+                    </div>
+
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Content JSON">
                         <Textarea

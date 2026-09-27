@@ -45,6 +45,10 @@ export type AttemptReviewItem = {
   hint?: string
   passageTitle?: string
   passageBody?: string
+  timestampStart?: number
+  timestampEnd?: number
+  audioAssetId?: string
+  transcript?: string
 }
 
 // IN_PROGRESS — только сохранённые ответы, SUBMITTED — полный разбор.

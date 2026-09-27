@@ -1,9 +1,11 @@
 import {
   ArrowRight,
+  LampCharge,
   MessageQuestion,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +21,7 @@ import type {
   MistakeReport,
 } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
 
 const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
 
@@ -36,6 +39,13 @@ type ObjectiveMistakes = {
 }
 
 export function MistakesPage() {
+  const [retryItem, setRetryItem] = useState<{
+    item: AttemptReviewItem
+    testTitle: string
+    attemptId?: string
+    materialType?: AttemptMaterialType
+  } | null>(null)
+
   const mistakesQuery = useQuery({
     queryKey: attemptKeys.mistakes,
     queryFn: ({ signal }) => getMistakes(signal),
@@ -101,7 +111,18 @@ export function MistakesPage() {
                   </CardHeader>
                   <CardContent className="grid gap-3 p-5">
                     {entry.mistakes.map((item) => (
-                      <MistakeRow key={item.questionId} item={item} />
+                      <MistakeRow
+                        key={item.questionId}
+                        item={item}
+                        onRetry={() =>
+                          setRetryItem({
+                            item,
+                            testTitle: entry.testTitle,
+                            attemptId: entry.attemptId,
+                            materialType,
+                          })
+                        }
+                      />
                     ))}
                   </CardContent>
                 </Card>
@@ -123,6 +144,18 @@ export function MistakesPage() {
           ) : null}
         </>
       )}
+
+      {/* Интерактивное модальное окно разбора ошибки */}
+      <MistakeRetryDialog
+        item={retryItem?.item ?? null}
+        open={Boolean(retryItem)}
+        onOpenChange={(open) => {
+          if (!open) setRetryItem(null)
+        }}
+        testTitle={retryItem?.testTitle}
+        attemptId={retryItem?.attemptId}
+        materialType={retryItem?.materialType}
+      />
     </div>
   )
 }
@@ -233,34 +266,63 @@ function AIEvaluationCard({ report }: { report: MistakeReport }) {
 
 function ReviewLink({ attemptId }: { attemptId: string }) {
   return (
-    <Button asChild variant="outline" size="sm" className="shrink-0 shadow-none">
+    <Button
+      asChild
+      variant="outline"
+      size="sm"
+      className="shrink-0 shadow-none gap-1.5 rounded-[9px] border-[#dbeafe] bg-[#eff6ff] text-xs font-semibold text-[#1d4ed8] hover:bg-blue-100"
+    >
       <Link to="/dashboard/attempts/$attemptId" params={{ attemptId }}>
-        Полный разбор
-        <ArrowRight aria-hidden />
+        Интерактивный разбор
+        <ArrowRight className="size-3.5" aria-hidden />
       </Link>
     </Button>
   )
 }
 
-function MistakeRow({ item }: { item: AttemptReviewItem }) {
+function MistakeRow({
+  item,
+  onRetry,
+}: {
+  item: AttemptReviewItem
+  onRetry: () => void
+}) {
   return (
-    <div className="grid gap-2 rounded-lg border border-[#ededeb] p-3 text-sm">
-      <p className="font-medium">
-        <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
-        {item.prompt.replace('{{answer}}', '_____')}
-      </p>
-      <p>
-        Ваш ответ: <strong>{formatAnswer(item.answer, [])}</strong>
-      </p>
-      <p>
-        Правильный ответ:{' '}
-        <strong className="text-emerald-700">
-          {formatAnswer(item.correctAnswer, [])}
-        </strong>
-      </p>
-      {item.explanation ? (
-        <p className="whitespace-pre-wrap text-[#69696d]">{item.explanation}</p>
-      ) : null}
+    <div
+      onClick={onRetry}
+      className="group grid gap-2.5 rounded-[12px] border border-[#ededeb] bg-white p-4 text-sm transition-all hover:border-[#3b82f6] hover:shadow-xs cursor-pointer"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-semibold text-slate-900 group-hover:text-blue-900 transition-colors">
+          <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
+          {item.prompt.replace('{{answer}}', '_____')}
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation()
+            onRetry()
+          }}
+          className="h-8 shrink-0 gap-1.5 rounded-[8px] border-blue-200 bg-blue-50/70 text-xs font-semibold text-[#1d4ed8] hover:bg-blue-100 shadow-none"
+        >
+          <LampCharge className="size-3.5 text-[#2563eb]" />
+          Разобрать ошибку
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2.5 text-xs">
+        <span className="inline-flex items-center gap-1.5 text-slate-600">
+          Ваш ответ:{' '}
+          <strong className="text-slate-900 line-through">
+            {formatAnswer(item.answer, [])}
+          </strong>
+        </span>
+        <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 font-semibold text-rose-700 border border-rose-200 text-[11px]">
+          Ошибка (0 б.)
+        </span>
+      </div>
     </div>
   )
 }

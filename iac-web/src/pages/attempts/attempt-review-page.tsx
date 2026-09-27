@@ -29,6 +29,7 @@ import type {
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
 
 export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const detailQuery = useQuery({
@@ -75,6 +76,21 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const aiEvaluation = evaluationFor(attempt)
   const title =
     material?.title ?? `${skillLabel(attempt.materialType)}: Разбор работы`
+
+  if (
+    attempt.status === 'SUBMITTED' &&
+    attempt.materialType === 'reading' &&
+    material &&
+    !('parts' in material) &&
+    review !== null
+  ) {
+    return (
+      <ReadingReviewSplitRunner
+        attempt={attempt}
+        material={material as PublicReadingMaterial}
+      />
+    )
+  }
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">

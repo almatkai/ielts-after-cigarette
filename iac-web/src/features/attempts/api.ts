@@ -34,11 +34,17 @@ export type AttemptReviewItem = {
   questionId: string
   number: number
   prompt: string
+  type?: string
+  content?: Record<string, unknown>
   answer: StudentAnswer | null
   isCorrect: boolean
   pointsAwarded: number
   correctAnswer: StudentAnswer
   explanation: string
+  quote?: string
+  hint?: string
+  passageTitle?: string
+  passageBody?: string
 }
 
 // IN_PROGRESS — только сохранённые ответы, SUBMITTED — полный разбор.

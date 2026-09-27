@@ -8,9 +8,13 @@ import {
 import { useEffect, useRef, useState } from 'react'
 
 import { FoxMascot } from './fox-mascot'
+import { MarkdownContent } from './markdown-content'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { sendAssistantChat } from '@/features/assistant/api'
+import type { ChatMessageDto } from '@/features/assistant/api'
+import { extractPageAsReadme } from '@/features/assistant/page-reader'
 
 const quickPrompts = [
   'Критерии Writing Task 2',
@@ -28,7 +32,10 @@ type Message = {
   sender: 'fox' | 'user'
   text: string
   time: string
+  isError?: boolean
 }
+
+const STORAGE_KEY = 'iac_yuki_chat_messages_v1'
 
 function getInitialMessages(): Message[] {
   return [
@@ -41,44 +48,6 @@ function getInitialMessages(): Message[] {
   ]
 }
 
-function generateAnswer(query: string): string {
-  const lower = query.toLowerCase()
-
-  if (lower.includes('task 1') || lower.includes('график') || lower.includes('диаграмм')) {
-    return 'В Writing Task 1 (описание графика, диаграммы, таблицы или схемы процесса):\n\n1. Introduction — перефразируйте задание одним чётким предложением.\n2. Overview (критически важный абзац!) — опишите 2–3 главных тренда/отличия без углубления в цифры (без чёткого Overview балл не поднимается выше 5.0).\n3. Body 1 & Body 2 — сгруппируйте данные логично, сравните показатели и приведите конкретные цифры.\n\nРекомендация: пишите минимум 150 слов и тратьте не более 20 минут.'
-  }
-
-  if (lower.includes('writing') || lower.includes('эссе') || lower.includes('task 2')) {
-    return 'В Writing Task 2 эссе оценивается по 4 критериям (по 25% каждый):\n\n1. Task Response — полный ответ на все части темы, ясная позиция и аргументы.\n2. Coherence & Cohesion — логика абзацев и естественные связки.\n3. Lexical Resource — точный академический вокабуляр и коллокации.\n4. Grammatical Range — разнообразие сложных структур и пунктуация.\n\nСовет: напишите минимум 250 слов и всегда оставляйте 3–5 минут на финальную вычитку.'
-  }
-
-  if (lower.includes('false') || lower.includes('not given') || lower.includes('tfng')) {
-    return 'Главное отличие True / False / Not Given:\n\n• TRUE — факт подтверждается в тексте напрямую или перифразом.\n• FALSE — факт в тексте прямо противоречит утверждению (противоположный смысл).\n• NOT GIVEN — об этом в тексте просто нет информации (или она не подтверждена, даже если факт верен в реальной жизни).\n\nЗолотое правило: опирайтесь только на написанное в тексте, не додумывайте логические выводы!'
-  }
-
-  if (lower.includes('speaking') || lower.includes('part 2') || lower.includes('говорен')) {
-    return 'Для Speaking Part 2 (карточка монолога на 2 минуты):\n\n1. Используйте минуту на подготовку: запишите 3–4 ключевых слова по каждому пункту карточки.\n2. Используйте метод PPF (Past, Present, Future): расскажите предысторию, текущее положение дел и свои планы/чувства на будущее — это поможет говорить легко и без пауз.\n3. Не бойтесь перефразировать и использовать связки: "To be completely honest...", "What struck me most was...".'
-  }
-
-  if (lower.includes('listening') || lower.includes('аудио') || lower.includes('part 4')) {
-    return 'Listening Part 4 — непрерывная академическая лекция на 10 вопросов без пауз:\n\n1. До начала записи быстро прочитайте вопросы и подчеркните ключевые ориентиры.\n2. Определите форму слова перед пропуском: существительное (ед./мн. ч.), число, глагол.\n3. Внимательно следите за словами-указателями лектора: "First of all...", "However...", "The key finding was...".'
-  }
-
-  if (lower.includes('spelling') || lower.includes('правописан') || lower.includes('букв')) {
-    return 'В IELTS ошибка даже в одной букве лишает балла за ответ:\n\n• Частые коварные слова: accommodation, environment, definitely, embarrass, necessary, questionnaire.\n• Внимательно проверяйте окончания множественного числа (-s / -es) в Listening.\n• Выберите единый стандарт написания (British или American English) и придерживайтесь его.'
-  }
-
-  if (lower.includes('reading') || lower.includes('время') || lower.includes('тайм') || lower.includes('чтени')) {
-    return 'Стратегия тайм-менеджмента в IELTS Reading (60 минут на 3 текста):\n\n• Текст 1: до 17 минут\n• Текст 2: до 20 минут\n• Текст 3: до 23 минут\n\nСначала читайте заголовок и вопросы, подчеркивайте ключевые слова (имена, даты, термины), а затем применяйте Skimming и Scanning. Не застревайте на одном вопросе дольше 1.5 минут!'
-  }
-
-  if (lower.includes('band') || lower.includes('балл') || lower.includes('расчет') || lower.includes('оценк')) {
-    return 'Общий IELTS Band Score рассчитывается как среднее арифметическое четырёх навыков (Listening + Reading + Writing + Speaking) / 4 с округлением до ближайшего 0.5:\n\n• Если результат оканчивается на .25 — округляется вверх до .5 (например, 6.25 → 6.5).\n• Если результат оканчивается на .75 — округляется вверх до следующего целого (например, 6.75 → 7.0).'
-  }
-
-  return `Отличный вопрос по теме «${query.trim()}»! Для уверенной подготовки держите фокус на ключевых навыках:\n\n• Регулярно решайте материалы в разделе «Практика».\n• Обязательно разбирайте неверные ответы в разделе «Ошибки».\n• Раз в 1–2 недели проходите Full Mock для тренировки концентрации и выносливости.`
-}
-
 type AiAssistantChatWindowProps = {
   isOpen: boolean
   onClose: () => void
@@ -89,11 +58,166 @@ export function AiAssistantChatWindow({
   onClose,
 }: AiAssistantChatWindowProps) {
   const foxSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`
-  const [messages, setMessages] = useState<Message[]>(getInitialMessages)
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed
+          }
+        }
+      } catch {
+        // Fallback to initial
+      }
+    }
+    return getInitialMessages()
+  })
+
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Resizable state from top-left corner
+  const [size, setSize] = useState<{ width: number; height: number }>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('iac_yuki_chat_size')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (
+            typeof parsed.width === 'number' &&
+            typeof parsed.height === 'number'
+          ) {
+            return {
+              width: Math.min(
+                Math.max(parsed.width, 350),
+                window.innerWidth - 32,
+              ),
+              height: Math.min(
+                Math.max(parsed.height, 460),
+                window.innerHeight - 40,
+              ),
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return { width: 440, height: 600 }
+  })
+
+  const [isResizing, setIsResizing] = useState(false)
+  const resizeStartRef = useRef<{
+    startX: number
+    startY: number
+    startWidth: number
+    startHeight: number
+    direction: 'top-left' | 'top' | 'left'
+  }>({
+    startX: 0,
+    startY: 0,
+    startWidth: 440,
+    startHeight: 600,
+    direction: 'top-left',
+  })
+
+  const handleResizeStart = (
+    e: React.PointerEvent,
+    direction: 'top-left' | 'top' | 'left',
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsResizing(true)
+    resizeStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startWidth: size.width,
+      startHeight: size.height,
+      direction,
+    }
+  }
+
+  useEffect(() => {
+    if (!isResizing) return
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const { startX, startY, startWidth, startHeight, direction } =
+        resizeStartRef.current
+
+      const minWidth = Math.min(340, window.innerWidth - 32)
+      const maxWidth = Math.min(960, window.innerWidth - 32)
+      const minHeight = 440
+      const maxHeight = window.innerHeight - 36
+
+      let newWidth = startWidth
+      let newHeight = startHeight
+
+      if (direction === 'top-left' || direction === 'left') {
+        const deltaX = startX - e.clientX
+        newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + deltaX))
+      }
+
+      if (direction === 'top-left' || direction === 'top') {
+        const deltaY = startY - e.clientY
+        newHeight = Math.max(
+          minHeight,
+          Math.min(maxHeight, startHeight + deltaY),
+        )
+      }
+
+      setSize({ width: newWidth, height: newHeight })
+    }
+
+    const handlePointerUp = () => {
+      setIsResizing(false)
+      try {
+        localStorage.setItem('iac_yuki_chat_size', JSON.stringify(size))
+      } catch {
+        // ignore
+      }
+    }
+
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointercancel', handlePointerUp)
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointercancel', handlePointerUp)
+    }
+  }, [isResizing, size])
+
+  const toggleExpand = () => {
+    setSize((prev) => {
+      const isExpanded = prev.width > 550
+      const newSize = isExpanded
+        ? { width: 440, height: 600 }
+        : {
+            width: Math.min(760, window.innerWidth - 32),
+            height: Math.min(720, window.innerHeight - 40),
+          }
+      try {
+        localStorage.setItem('iac_yuki_chat_size', JSON.stringify(newSize))
+      } catch {
+        // ignore
+      }
+      return newSize
+    })
+  }
+
+  // Save messages to sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    } catch {
+      // Ignore sessionStorage errors
+    }
+  }, [messages])
 
   // Quick Prompts Carousel State & Refs
   const quickPromptsRef = useRef<HTMLDivElement>(null)
@@ -127,7 +251,8 @@ export function AiAssistantChatWindow({
     if (!el) return
 
     const handleWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      const delta =
+        Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
       if (delta !== 0) {
         e.preventDefault()
         el.scrollLeft += delta * 1.2
@@ -196,55 +321,141 @@ export function AiAssistantChatWindow({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const text = (textToSend ?? input).trim()
-    if (!text) return
+    if (!text || isTyping) return
 
     const userMsg: Message = {
       id: Date.now().toString(),
       sender: 'user',
       text,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
     }
 
-    setMessages((prev) => [...prev, userMsg])
+    const nextMessages = [...messages, userMsg]
+    setMessages(nextMessages)
     setInput('')
     setIsTyping(true)
 
-    setTimeout(() => {
-      const replyText = generateAnswer(text)
+    try {
+      // Extract current page in clean README format for model's read_page_content tool
+      const pageReadme = extractPageAsReadme()
+
+      const historyForApi: ChatMessageDto[] = nextMessages
+        .filter((m) => !m.isError && m.id !== 'welcome')
+        .map((m) => ({
+          role: m.sender === 'user' ? 'user' : 'assistant',
+          content: m.text,
+        }))
+
+      const response = await sendAssistantChat({
+        messages: historyForApi,
+        pageContext: {
+          url: pageReadme.url,
+          title: pageReadme.title,
+          content: pageReadme.markdown,
+        },
+      })
+
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'fox',
-        text: replyText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: response.message.content,
+        time: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
       }
+
       setMessages((prev) => [...prev, botMsg])
+    } catch {
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'fox',
+        text: 'Не удалось связаться с сервером AI. Пожалуйста, проверь подключение или повтори попытку через несколько секунд.',
+        time: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        isError: true,
+      }
+      setMessages((prev) => [...prev, errorMsg])
+    } finally {
       setIsTyping(false)
-    }, 450)
+    }
   }
 
   const handleReset = () => {
     setMessages(getInitialMessages())
     setInput('')
+    try {
+      sessionStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // Ignore
+    }
   }
 
   return (
     <div
+      id="ai-assistant-widget"
+      style={{
+        width:
+          typeof window !== 'undefined' && window.innerWidth < 640
+            ? 'calc(100vw - 32px)'
+            : `${size.width}px`,
+        height: `${size.height}px`,
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100vh - 36px)',
+      }}
       className={cn(
         'fixed z-50 flex flex-col overflow-hidden origin-bottom-right',
         'bottom-4 right-4 sm:bottom-6 sm:right-6',
-        'w-[calc(100vw-32px)] sm:w-[390px] md:w-[420px] h-[530px] sm:h-[580px] max-h-[calc(100vh-80px)]',
         'rounded-3xl bg-white/95 backdrop-blur-xl border border-slate-200/90',
         'shadow-[0_24px_60px_-15px_rgba(15,23,42,0.28),0_0_0_1px_rgba(226,232,240,0.6)]',
-        'transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)',
+        isResizing
+          ? 'transition-none select-none'
+          : 'transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)',
         isOpen
           ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 scale-90 translate-y-6 pointer-events-none',
       )}
     >
+      {/* Top-Left Corner Resize Handle */}
+      <div
+        onPointerDown={(e) => handleResizeStart(e, 'top-left')}
+        onDoubleClick={toggleExpand}
+        className="absolute top-0 left-0 size-8 z-30 flex items-center justify-center cursor-nwse-resize group/corner select-none touch-none"
+        title="Потяните для изменения размера (дважды кликните для переключения)"
+        aria-label="Изменить размер окна"
+      >
+        <div className="absolute top-2 left-2 size-3.5 rounded-tl-lg border-t-2 border-l-2 border-slate-300/90 group-hover/corner:border-blue-500 group-hover/corner:scale-110 group-active/corner:border-blue-600 transition-all flex items-start justify-start p-0.5">
+          <div className="size-1 rounded-full bg-slate-300/90 group-hover/corner:bg-blue-500 transition-colors" />
+        </div>
+      </div>
+
+      {/* Top Edge Resize Strip */}
+      <div
+        onPointerDown={(e) => handleResizeStart(e, 'top')}
+        className="absolute top-0 left-8 right-4 h-2 z-20 cursor-ns-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
+        title="Потяните для изменения высоты"
+      />
+
+      {/* Left Edge Resize Strip */}
+      <div
+        onPointerDown={(e) => handleResizeStart(e, 'left')}
+        className="absolute top-8 left-0 bottom-4 w-2 z-20 cursor-ew-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
+        title="Потяните для изменения ширины"
+      />
+
       {/* Modern Messenger Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 px-4 py-3 select-none">
+      <div
+        onDoubleClick={toggleExpand}
+        title="Дважды кликните, чтобы увеличить или уменьшить окно"
+        className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 px-4 py-3 select-none"
+      >
         <div className="flex items-center gap-2.5">
           <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-white bg-blue-50 shadow-xs ring-1 ring-blue-100 flex items-center justify-center">
             <img
@@ -308,19 +519,31 @@ export function AiAssistantChatWindow({
           >
             {msg.sender === 'fox' ? (
               <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
-                <img src={foxSrc} alt="Юки" className="size-full object-contain" />
+                <img
+                  src={foxSrc}
+                  alt="Юки"
+                  className="size-full object-contain"
+                />
               </div>
             ) : null}
 
             <div
               className={cn(
-                'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs whitespace-pre-wrap',
+                'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
                 msg.sender === 'user'
                   ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
-                  : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
+                  : msg.isError
+                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
+                    : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
               )}
             >
-              {msg.text}
+              {/* Message body with Markdown support */}
+              {msg.sender === 'fox' ? (
+                <MarkdownContent content={msg.text} />
+              ) : (
+                <div className="whitespace-pre-wrap">{msg.text}</div>
+              )}
+
               <div
                 className={cn(
                   'mt-1 text-[9px] font-medium text-right select-none',
@@ -336,12 +559,19 @@ export function AiAssistantChatWindow({
         {isTyping ? (
           <div className="flex items-end gap-2">
             <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
-              <img src={foxSrc} alt="Юки" className="size-full object-contain" />
+              <img
+                src={foxSrc}
+                alt="Юки"
+                className="size-full object-contain"
+              />
             </div>
             <div className="rounded-2xl rounded-bl-xs bg-white border border-slate-200/80 px-3.5 py-2.5 shadow-2xs flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:-0.3s]" />
               <span className="size-1.5 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
               <span className="size-1.5 rounded-full bg-blue-600 animate-bounce" />
+              <span className="text-[11px] text-slate-400 ml-1.5 font-medium">
+                Юки думает...
+              </span>
             </div>
           </div>
         ) : null}
@@ -349,7 +579,7 @@ export function AiAssistantChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Prompts Carousel Bar with Mouse Wheel & Arrow Nav & Drag */}
+      {/* Quick Prompts Carousel Bar */}
       <div className="relative border-t border-slate-100/90 bg-slate-50/80 backdrop-blur-sm px-2 py-2 select-none group/carousel">
         {/* Left Scroll Arrow */}
         {canScrollLeft ? (
@@ -477,7 +707,9 @@ export function AiAssistantFloatingWidget({
             y: Math.round(targetY * 10) / 10,
           })
         } else {
-          setEyeOffset((prev) => (prev.x === 0 && prev.y === 0 ? prev : { x: 0, y: 0 }))
+          setEyeOffset((prev) =>
+            prev.x === 0 && prev.y === 0 ? prev : { x: 0, y: 0 },
+          )
         }
       })
     }
@@ -550,7 +782,8 @@ export function AiAssistantFloatingWidget({
             </div>
 
             <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-[#334155]">
-              Привет! Меня зовут <strong>Юки</strong> — я твой наставник по IELTS. 
+              Привет! Меня зовут <strong>Юки</strong> — я твой наставник по
+              IELTS.
             </p>
 
             <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb]">

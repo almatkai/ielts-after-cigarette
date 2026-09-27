@@ -474,7 +474,40 @@ export function ReadingMaterialEditorPage({
                     }
                   />
                   <div className="grid gap-2">
-                    <Label>Explanation after answer</Label>
+                    <Label>Участок текста с ответом (Цитата из Passage)</Label>
+                    <Textarea
+                      value={String(question.content?.quote ?? '')}
+                      onChange={(event) =>
+                        updateQuestion(groupIndex, questionIndex, {
+                          content: {
+                            ...question.content,
+                            quote: event.target.value,
+                          },
+                        })
+                      }
+                      rows={2}
+                      placeholder="Точная фраза или предложение из текста, где чётко даётся ответ"
+                      className="text-xs font-serif"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Наводящая подсказка студенту (без спойлера ответа)</Label>
+                    <Input
+                      value={String(question.content?.hint ?? '')}
+                      onChange={(event) =>
+                        updateQuestion(groupIndex, questionIndex, {
+                          content: {
+                            ...question.content,
+                            hint: event.target.value,
+                          },
+                        })
+                      }
+                      placeholder="Например: Обратите внимание на 1-й абзац и слова-синонимы"
+                      className={fieldClassName}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Подробное объяснение (почему именно так)</Label>
                     <Textarea
                       value={question.explanation}
                       onChange={(event) =>
@@ -483,7 +516,7 @@ export function ReadingMaterialEditorPage({
                         })
                       }
                       rows={3}
-                      placeholder="Почему этот ответ правильный (необязательно)"
+                      placeholder="Почему этот ответ правильный и в чём ловушка других вариантов"
                     />
                   </div>
                   <Input

@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  ExportCurve,
   Save2,
   Send2,
   TickCircle,
@@ -8,6 +9,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeReadingToV1 } from '@/features/admin/export-utils'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -87,6 +90,7 @@ export function ReadingMaterialEditorPage({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [form, setForm] = useState<EditorForm>(emptyForm)
+  const [exportOpen, setExportOpen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const materialQuery = useQuery({
     queryKey: adminQueryKeys.readingMaterial(materialId ?? 'new'),
@@ -283,6 +287,16 @@ export function ReadingMaterialEditorPage({
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
+          {material ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setExportOpen(true)}
+            >
+              <ExportCurve aria-hidden />
+              Экспорт V1
+            </Button>
+          ) : null}
           {materialId && auth.user?.role === 'ADMIN' ? (
             <Button
               type="button"
@@ -318,6 +332,17 @@ export function ReadingMaterialEditorPage({
           </Button>
         </div>
       </div>
+
+      {material ? (
+        <DataExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          title={material.title}
+          formatLabel="IELTS_READING_IMPORT_V1"
+          filename={`${material.slug || 'reading-material'}.v1.txt`}
+          content={serializeReadingToV1(material)}
+        />
+      ) : null}
 
       {message ? (
         <div

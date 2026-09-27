@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   DocumentUpload,
+  ExportCurve,
   Save2,
   Send2,
   TickCircle,
@@ -8,6 +9,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeWritingToJSON } from '@/features/admin/export-utils'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -69,6 +73,7 @@ export function WritingMaterialEditorPage({
   const editing = Boolean(materialId)
   const [form, setForm] = useState<WritingMaterialInput>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
   const materialQuery = useQuery({
     queryKey: writingKeys.adminMaterial(materialId ?? ''),
     queryFn: ({ signal }) => getWritingMaterial(materialId ?? '', signal),
@@ -255,12 +260,31 @@ export function WritingMaterialEditorPage({
               {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
+          {materialId && material ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setExportOpen(true)}
+            >
+              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт JSON
+            </Button>
+          ) : null}
           <Button type="submit" disabled={pending}>
             <Save2 aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
           </Button>
         </div>
       </div>
+      {material ? (
+        <DataExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          title={material.title}
+          formatLabel="JSON (writing_import_envelope)"
+          filename={`${material.slug || 'writing-material'}.json`}
+          content={serializeWritingToJSON(material)}
+        />
+      ) : null}
       {message ? (
         <p
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"

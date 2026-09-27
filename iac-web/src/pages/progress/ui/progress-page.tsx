@@ -140,6 +140,7 @@ export function ProgressPage() {
 
 function AttemptRow({ item }: { item: AttemptListItem }) {
   const submitted = item.status === 'SUBMITTED'
+  const processing = item.status === 'PROCESSING'
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-[#ededeb] bg-white p-4">
       <div className="min-w-0 flex-1">
@@ -149,9 +150,18 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
         <p className="mt-1 text-xs text-[#808084]">
           {skillLabel(item.materialType)} ·{' '}
           {formatDateTime(item.submittedAt ?? item.startedAt)}
-          {submitted ? '' : ' · не завершена'}
+          {submitted ? '' : processing ? ' · на проверке ИИ' : ' · не завершена'}
         </p>
       </div>
+      {processing ? (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3b82f6]">
+          <svg className="size-3 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          Проверяется
+        </span>
+      ) : null}
       {submitted ? (
         <p className="text-sm text-[#69696d]">
           <span className="font-semibold text-[#111111]">
@@ -163,13 +173,13 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
           </span>
         </p>
       ) : null}
-      {submitted ? (
+      {submitted || processing ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
           <Link
             to="/dashboard/attempts/$attemptId"
             params={{ attemptId: item.id }}
           >
-            Разбор
+            {processing ? 'Статус' : 'Разбор'}
             <ArrowRight aria-hidden />
           </Link>
         </Button>

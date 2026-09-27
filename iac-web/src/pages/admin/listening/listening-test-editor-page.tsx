@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/features/auth/auth-store'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeListeningToV1 } from '@/features/admin/export-utils'
 import {
   archiveListeningTest,
   createListeningTest,
@@ -155,6 +157,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
   const partAudioRefs = useRef<Record<number, HTMLAudioElement | null>>({})
   const [form, setForm] = useState<Form>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
   const query = useQuery({
     queryKey: listeningKeys.adminTest(testId ?? 'new'),
     queryFn: ({ signal }) => getAdminListeningTest(testId!, signal),
@@ -377,6 +380,15 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
+          {testId && query.data ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setExportOpen(true)}
+            >
+              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт V1
+            </Button>
+          ) : null}
           <Button
             type="submit"
             disabled={
@@ -390,6 +402,16 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           </Button>
         </div>
       </div>
+      {query.data ? (
+        <DataExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          title={query.data.title}
+          formatLabel="IELTS_LISTENING_IMPORT_V1"
+          filename={`${query.data.slug || 'listening-test'}.v1.txt`}
+          content={serializeListeningToV1(query.data)}
+        />
+      ) : null}
       {message ? (
         <div className="rounded-lg border bg-white px-4 py-3 text-sm">
           {message}

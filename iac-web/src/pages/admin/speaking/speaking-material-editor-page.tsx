@@ -1,6 +1,7 @@
 import {
   Add,
   ArrowLeft,
+  ExportCurve,
   Save2,
   Send2,
   TickCircle,
@@ -9,6 +10,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeSpeakingToJSON } from '@/features/admin/export-utils'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -92,6 +96,7 @@ export function SpeakingMaterialEditorPage({
   const editing = Boolean(materialId)
   const [form, setForm] = useState<SpeakingMaterialInput>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
   const materialQuery = useQuery({
     queryKey: speakingKeys.adminMaterial(materialId ?? ''),
     queryFn: ({ signal }) => getSpeakingMaterial(materialId ?? '', signal),
@@ -244,12 +249,31 @@ export function SpeakingMaterialEditorPage({
               {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
             </Button>
           ) : null}
+          {materialId && material ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setExportOpen(true)}
+            >
+              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт JSON
+            </Button>
+          ) : null}
           <Button type="submit" disabled={pending}>
             <Save2 aria-hidden />
             {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
           </Button>
         </div>
       </div>
+      {material ? (
+        <DataExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          title={material.title}
+          formatLabel="JSON (IELTS_SPEAKING_IMPORT_V1)"
+          filename={`${material.slug || 'speaking-material'}.json`}
+          content={serializeSpeakingToJSON(material)}
+        />
+      ) : null}
       {message ? (
         <p
           role="status"

@@ -2,24 +2,45 @@ import {
   Add,
   DocumentUpload,
   Edit,
+  ExportCurve,
   Headphone,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeListeningToV1 } from '@/features/admin/export-utils'
 import {
+  getAdminListeningTest,
   listeningKeys,
   listAdminListeningTests,
 } from '@/features/listening/api'
+import type { ListeningTest } from '@/features/listening/api'
 
 export function ListeningTestsPage() {
+  const [exportTest, setExportTest] = useState<ListeningTest | null>(null)
+  const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
+
   const query = useQuery({
     queryKey: listeningKeys.adminTests,
     queryFn: ({ signal }) => listAdminListeningTests(signal),
   })
+
+  const handleExport = async (id: string) => {
+    setExportLoadingId(id)
+    try {
+      const full = await getAdminListeningTest(id)
+      setExportTest(full)
+    } catch (err) {
+      console.error('Failed to load listening test for export', err)
+    } finally {
+      setExportLoadingId(null)
+    }
+  }
   return (
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -70,18 +91,40 @@ export function ListeningTestsPage() {
                   {test.currentVersionNumber}
                 </p>
               </div>
-              <Button asChild variant="outline">
-                <Link
-                  to="/admin/listening/tests/$testId"
-                  params={{ testId: test.id }}
-                >
-                  <Edit aria-hidden /> Редактировать
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={exportLoadingId === test.id}
+                    onClick={() => void handleExport(test.id)}
+                  >
+                    <ExportCurve aria-hidden />
+                    {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link
+                      to="/admin/listening/tests/$testId"
+                      params={{ testId: test.id }}
+                    >
+                      <Edit aria-hidden /> Редактировать
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+      {exportTest ? (
+        <DataExportDialog
+          open={Boolean(exportTest)}
+          onOpenChange={(open) => !open && setExportTest(null)}
+          title={exportTest.title}
+          formatLabel="IELTS_LISTENING_IMPORT_V1"
+          filename={`${exportTest.slug || 'listening-test'}.v1.txt`}
+          content={serializeListeningToV1(exportTest)}
+        />
+      ) : null}
     </div>
   )
 }

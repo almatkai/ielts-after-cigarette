@@ -35,6 +35,8 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attemptId),
     queryFn: ({ signal }) => getAttempt(attemptId, signal),
+    refetchInterval: (query) =>
+      query.state.data?.status === 'SUBMITTED' ? false : 2500,
   })
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
@@ -108,7 +110,9 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
           {formatDateTime(attempt.startedAt)}
         </p>
       </div>
-      {attempt.status !== 'SUBMITTED' ? (
+      {attempt.status === 'PROCESSING' ? (
+        <ProcessingAttempt attempt={attempt} />
+      ) : attempt.status !== 'SUBMITTED' ? (
         <InProgressAttempt attempt={attempt} />
       ) : aiEvaluation ? (
         <>
@@ -152,6 +156,49 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
         </>
       )}
     </div>
+  )
+}
+
+function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
+  const isSpeaking = attempt.materialType === 'speaking'
+  return (
+    <Card className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-none">
+      <CardContent className="grid justify-items-center gap-3 p-10 text-center max-w-lg mx-auto">
+        <div className="size-12 rounded-full bg-blue-50 flex items-center justify-center text-[#3b82f6] mb-1">
+          <svg
+            className="size-6 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </div>
+        <p className="text-lg font-semibold text-slate-900">
+          Работа находится на проверке ИИ
+        </p>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          {isSpeaking
+            ? 'Расшифровываем аудио и анализируем беглость, словарный запас, грамматику и произношение. Страница обновится автоматически после завершения.'
+            : 'Анализируем раскрытие темы, аргументацию, связность и грамматику. Страница обновится автоматически после выставления баллов.'}
+        </p>
+        <div className="rounded-xl bg-[#f7f7f5] p-3 text-xs text-slate-500 text-left w-full mt-2">
+          💡 Проверка обычно занимает от 30 до 90 секунд. Вы можете подождать здесь или вернуться к разбору позже из раздела «Прогресс».
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

@@ -2,22 +2,46 @@ import {
   DocumentForward,
   DocumentUpload,
   Edit,
+  ExportCurve,
   Microphone2,
   Warning2,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { listSpeakingMaterials, speakingKeys } from '@/features/speaking/api'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeSpeakingToJSON } from '@/features/admin/export-utils'
+import {
+  getSpeakingMaterial,
+  listSpeakingMaterials,
+  speakingKeys,
+} from '@/features/speaking/api'
+import type { SpeakingMaterial } from '@/features/speaking/api'
 
 export function SpeakingMaterialsPage() {
+  const [exportMaterial, setExportMaterial] = useState<SpeakingMaterial | null>(null)
+  const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
+
   const materialsQuery = useQuery({
     queryKey: speakingKeys.adminMaterials,
     queryFn: ({ signal }) => listSpeakingMaterials(signal),
   })
+
+  const handleExport = async (id: string) => {
+    setExportLoadingId(id)
+    try {
+      const full = await getSpeakingMaterial(id)
+      setExportMaterial(full)
+    } catch (err) {
+      console.error('Failed to load speaking material for export', err)
+    } finally {
+      setExportLoadingId(null)
+    }
+  }
   return (
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -111,19 +135,41 @@ export function SpeakingMaterialsPage() {
                   /{material.slug} · версия {material.currentVersionNumber}
                 </p>
               </div>
-              <Button asChild variant="outline">
-                <Link
-                  to="/admin/speaking/materials/$materialId"
-                  params={{ materialId: material.id }}
-                >
-                  <Edit aria-hidden />
-                  Редактировать
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={exportLoadingId === material.id}
+                    onClick={() => void handleExport(material.id)}
+                  >
+                    <ExportCurve aria-hidden />
+                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link
+                      to="/admin/speaking/materials/$materialId"
+                      params={{ materialId: material.id }}
+                    >
+                      <Edit aria-hidden />
+                      Редактировать
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+      {exportMaterial ? (
+        <DataExportDialog
+          open={Boolean(exportMaterial)}
+          onOpenChange={(open) => !open && setExportMaterial(null)}
+          title={exportMaterial.title}
+          formatLabel="JSON (IELTS_SPEAKING_IMPORT_V1)"
+          filename={`${exportMaterial.slug || 'speaking-material'}.json`}
+          content={serializeSpeakingToJSON(exportMaterial)}
+        />
+      ) : null}
     </div>
   )
 }

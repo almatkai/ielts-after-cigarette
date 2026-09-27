@@ -3,21 +3,45 @@ import {
   DocumentUpload,
   Edit,
   Edit2,
+  ExportCurve,
   Warning2,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { listWritingMaterials, writingKeys } from '@/features/writing/api'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeWritingToJSON } from '@/features/admin/export-utils'
+import {
+  getWritingMaterial,
+  listWritingMaterials,
+  writingKeys,
+} from '@/features/writing/api'
+import type { WritingMaterial } from '@/features/writing/api'
 
 export function WritingMaterialsPage() {
+  const [exportMaterial, setExportMaterial] = useState<WritingMaterial | null>(null)
+  const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
+
   const materialsQuery = useQuery({
     queryKey: writingKeys.adminMaterials,
     queryFn: ({ signal }) => listWritingMaterials(signal),
   })
+
+  const handleExport = async (id: string) => {
+    setExportLoadingId(id)
+    try {
+      const full = await getWritingMaterial(id)
+      setExportMaterial(full)
+    } catch (err) {
+      console.error('Failed to load writing material for export', err)
+    } finally {
+      setExportLoadingId(null)
+    }
+  }
   return (
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -109,19 +133,41 @@ export function WritingMaterialsPage() {
                     /{material.slug} · версия {material.currentVersionNumber}
                   </p>
                 </div>
-                <Button asChild variant="outline">
-                  <Link
-                    to="/admin/writing/materials/$materialId"
-                    params={{ materialId: material.id }}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={exportLoadingId === material.id}
+                    onClick={() => void handleExport(material.id)}
                   >
-                    <Edit aria-hidden /> Редактировать
-                  </Link>
-                </Button>
+                    <ExportCurve aria-hidden />
+                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link
+                      to="/admin/writing/materials/$materialId"
+                      params={{ materialId: material.id }}
+                    >
+                      <Edit aria-hidden /> Редактировать
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      {exportMaterial ? (
+        <DataExportDialog
+          open={Boolean(exportMaterial)}
+          onOpenChange={(open) => !open && setExportMaterial(null)}
+          title={exportMaterial.title}
+          formatLabel="JSON (writing_import_envelope)"
+          filename={`${exportMaterial.slug || 'writing-material'}.json`}
+          content={serializeWritingToJSON(exportMaterial)}
+        />
+      ) : null}
     </div>
   )
 }

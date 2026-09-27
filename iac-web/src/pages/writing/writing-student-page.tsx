@@ -345,6 +345,68 @@ function ProtectedWritingImage({
   )
 }
 
+function WritingProcessingCard({
+  fullMockSessionId,
+}: {
+  fullMockSessionId?: string
+}) {
+  return (
+    <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 sm:p-8 shadow-xs">
+      <div className="flex flex-col items-center text-center max-w-lg mx-auto py-4">
+        <div className="size-12 rounded-full bg-blue-50 flex items-center justify-center text-[#3b82f6] mb-4">
+          <svg
+            className="size-6 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 mb-2">
+          Эссе отправлено и проверяется нейросетью
+        </h2>
+        <p className="text-sm text-slate-600 leading-relaxed mb-4">
+          ИИ оценивает раскрытие тем, связность и структуру, словарный запас и грамматическую точность. Обычно проверка занимает от 30 до 90 секунд.
+        </p>
+        <div className="rounded-xl bg-[#f7f7f5] p-4 text-xs text-slate-500 mb-6 text-left w-full">
+          💡 <strong>Вы можете не ждать на этом экране:</strong> закройте вкладку или перейдите в другие разделы. Проверка завершится в фоновом режиме, а результат с баллами и разбором сохранится в вашем профиле.
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {fullMockSessionId ? (
+            <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+              <Link
+                to="/exam/full-mock/$sessionId"
+                params={{ sessionId: fullMockSessionId }}
+              >
+                К следующей секции Full Mock
+              </Link>
+            </Button>
+          ) : null}
+          <Button asChild variant="outline">
+            <Link to="/dashboard">В личный кабинет</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link to="/dashboard/writing">К списку Writing</Link>
+          </Button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
 export function WritingAttemptResult({
   attempt,
   material,
@@ -361,8 +423,13 @@ export function WritingAttemptResult({
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
     queryFn: ({ signal }) => getAttempt(attempt.id, signal),
+    refetchInterval: (query) =>
+      query.state.data?.status === 'SUBMITTED' ? false : 2500,
   })
   const evaluation = detailQuery.data?.writingEvaluation
+  const assessment = detailQuery.data?.writingAssessment
+  const effectiveAttempt = detailQuery.data ?? attempt
+
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
@@ -388,11 +455,20 @@ export function WritingAttemptResult({
           message={getErrorMessage(detailQuery.error)}
           onRetry={() => void detailQuery.refetch()}
         />
+      ) : assessment?.status === 'FAILED' ? (
+        <ErrorState
+          title="Не удалось проверить эссе"
+          message={
+            assessment.errorMessage ||
+            'Автоматическая проверка завершилась с ошибкой. Начните новую попытку или повторите позже.'
+          }
+          onRetry={() => void detailQuery.refetch()}
+        />
       ) : !evaluation ? (
-        <LoadingState label="Загружаем результаты проверки…" />
+        <WritingProcessingCard fullMockSessionId={fullMockSessionId} />
       ) : (
         <WritingEvaluationView
-          attempt={attempt}
+          attempt={effectiveAttempt}
           material={material}
           evaluation={evaluation}
         />

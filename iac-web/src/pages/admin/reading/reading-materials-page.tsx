@@ -3,15 +3,24 @@ import {
   DocumentForward,
   DocumentUpload,
   Edit,
+  ExportCurve,
   Warning2,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { adminQueryKeys, listReadingMaterials } from '@/features/admin/api'
+import { DataExportDialog } from '@/components/admin/data-export-dialog'
+import { serializeReadingToV1 } from '@/features/admin/export-utils'
+import {
+  adminQueryKeys,
+  getReadingMaterial,
+  listReadingMaterials,
+} from '@/features/admin/api'
+import type { ReadingMaterial } from '@/features/admin/api'
 
 const difficultyLabels = {
   foundation: 'Foundation',
@@ -21,10 +30,25 @@ const difficultyLabels = {
 
 export function ReadingMaterialsPage() {
   const navigate = useNavigate()
+  const [exportMaterial, setExportMaterial] = useState<ReadingMaterial | null>(null)
+  const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
+
   const materialsQuery = useQuery({
     queryKey: adminQueryKeys.readingMaterials,
     queryFn: ({ signal }) => listReadingMaterials(signal),
   })
+
+  const handleExport = async (id: string) => {
+    setExportLoadingId(id)
+    try {
+      const full = await getReadingMaterial(id)
+      setExportMaterial(full)
+    } catch (err) {
+      console.error('Failed to load material for export', err)
+    } finally {
+      setExportLoadingId(null)
+    }
+  }
 
   return (
     <div className="grid gap-5">
@@ -128,20 +152,42 @@ export function ReadingMaterialsPage() {
                     /{material.slug} · версия {material.currentVersionNumber}
                   </p>
                 </div>
-                <Button asChild variant="outline">
-                  <Link
-                    to="/admin/reading/materials/$materialId"
-                    params={{ materialId: material.id }}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={exportLoadingId === material.id}
+                    onClick={() => void handleExport(material.id)}
                   >
-                    <Edit aria-hidden />
-                    Редактировать
-                  </Link>
-                </Button>
+                    <ExportCurve aria-hidden />
+                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link
+                      to="/admin/reading/materials/$materialId"
+                      params={{ materialId: material.id }}
+                    >
+                      <Edit aria-hidden />
+                      Редактировать
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      {exportMaterial ? (
+        <DataExportDialog
+          open={Boolean(exportMaterial)}
+          onOpenChange={(open) => !open && setExportMaterial(null)}
+          title={exportMaterial.title}
+          formatLabel="IELTS_READING_IMPORT_V1"
+          filename={`${exportMaterial.slug || 'reading-material'}.v1.txt`}
+          content={serializeReadingToV1(exportMaterial)}
+        />
+      ) : null}
     </div>
   )
 }

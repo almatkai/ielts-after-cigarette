@@ -59,6 +59,14 @@ export type AttemptDetail = Attempt & {
   speakingEvaluation?: SpeakingEvaluation
   recordings?: SpeakingRecording[]
   speakingAssessment?: SpeakingAssessmentJob
+  writingAssessment?: WritingAssessmentJob
+}
+
+export type WritingAssessmentJob = {
+  status: 'QUEUED' | 'PROCESSING' | 'READY' | 'FAILED'
+  attempts: number
+  errorCode?: string
+  errorMessage?: string
 }
 
 export type WritingCriterion = { band: number; feedback: string }

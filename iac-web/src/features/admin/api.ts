@@ -78,6 +78,7 @@ export type ReadingQuestionGroup = {
   position: number
   type: ReadingQuestionType
   instructions: string
+  config?: Record<string, unknown>
   questions: ReadingQuestion[]
 }
 

@@ -17,19 +17,70 @@ import {
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
 
-const example = `{
-  "format": "IELTS_SPEAKING_IMPORT_V1",
-  "materials": [
-    {
-      "slug": "speaking-home-town-01",
-      "examType": "academic",
-      "difficulty": "intermediate",
-      "title": "Home town",
-      "description": "",
-      "parts": []
-    }
-  ]
-}`
+const speakingImportTemplate = JSON.stringify(
+  {
+    format: 'IELTS_SPEAKING_IMPORT_V1',
+    materials: [
+      {
+        slug: 'speaking-travel-and-holidays',
+        examType: 'academic',
+        difficulty: 'intermediate',
+        title: 'IELTS Speaking: Travel and Holidays',
+        description:
+          'Full 3-part speaking practice on travel, vacations, and international tourism.',
+        parts: [
+          {
+            type: 'part1',
+            title: 'Introduction and Interview',
+            instructions: 'Answer the examiner questions naturally.',
+            preparationSeconds: 0,
+            responseSeconds: 300,
+            cueCard: [],
+            questions: [
+              { position: 1, prompt: 'Do you enjoy traveling?' },
+              { position: 2, prompt: 'What kind of places do you prefer to visit?' },
+              { position: 3, prompt: 'Who do you usually travel with?' },
+            ],
+          },
+          {
+            type: 'part2',
+            title: 'Describe a memorable holiday',
+            instructions: 'Speak for 1-2 minutes.',
+            preparationSeconds: 60,
+            responseSeconds: 120,
+            cueCard: [
+              'Where you went',
+              'Who you went with',
+              'What you did there',
+              'And explain why this holiday was so memorable to you.',
+            ],
+            questions: [],
+          },
+          {
+            type: 'part3',
+            title: 'Discussion',
+            instructions: 'Discuss broader issues.',
+            preparationSeconds: 0,
+            responseSeconds: 300,
+            cueCard: [],
+            questions: [
+              {
+                position: 1,
+                prompt: 'How has tourism changed over the last few decades?',
+              },
+              {
+                position: 2,
+                prompt: 'What are the environmental impacts of mass tourism?',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  null,
+  2,
+)
 
 export function SpeakingImportPage() {
   const queryClient = useQueryClient()
@@ -77,9 +128,16 @@ export function SpeakingImportPage() {
             onChange={(event) => setSource(event.target.value)}
             rows={20}
             className="font-mono text-xs"
-            placeholder={example}
+            placeholder='{"format":"IELTS_SPEAKING_IMPORT_V1","materials":[...]}'
             aria-label="JSON для импорта Speaking"
           />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setSource(speakingImportTemplate)}
+          >
+            Вставить пример шаблона
+          </Button>
           <Button
             type="button"
             disabled={!source.trim() || parseMutation.isPending}

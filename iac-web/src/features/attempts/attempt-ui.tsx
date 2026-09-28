@@ -613,6 +613,8 @@ export function AttemptResultHeader({
 export type PerformanceCriterion = {
   label: string
   band: number
+  displayBand?: string
+  unavailable?: boolean
 }
 
 export function AttemptPerformanceReport({
@@ -721,21 +723,33 @@ export function AttemptPerformanceReport({
                   Критерии IELTS
                 </span>
                 <span className="text-xs font-bold text-[#3b82f6]">
-                  {criteria.length} критерия
+                  {criteria.filter((c) => !c.unavailable).length < criteria.length
+                    ? `${criteria.filter((c) => !c.unavailable).length} критерия`
+                    : `${criteria.length} критерия`}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 {criteria.map((c) => (
                   <div
                     key={c.label}
-                    className="rounded-[10px] border border-slate-100 bg-slate-50/70 p-2 text-center"
+                    className={`rounded-[10px] border p-2 text-center ${
+                      c.unavailable
+                        ? 'border-amber-100 bg-amber-50/50'
+                        : 'border-slate-100 bg-slate-50/70'
+                    }`}
                   >
                     <span className="block text-[11px] font-medium text-slate-500 truncate" title={c.label}>
                       {c.label}
                     </span>
-                    <span className="text-base font-bold text-slate-900">
-                      {c.band.toFixed(1)}
-                    </span>
+                    {c.unavailable ? (
+                      <span className="block mt-1 text-[11px] font-semibold text-amber-600 truncate" title="Пока не оценивается системой">
+                        {c.displayBand ?? 'Не оценивается'}
+                      </span>
+                    ) : (
+                      <span className="text-base font-bold text-slate-900">
+                        {c.displayBand ?? c.band.toFixed(1)}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

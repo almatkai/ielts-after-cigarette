@@ -35,8 +35,11 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attemptId),
     queryFn: ({ signal }) => getAttempt(attemptId, signal),
+    // Only poll while a background assessment is actually running. Terminal or
+    // abandoned states (SUBMITTED, ABANDONED, IN_PROGRESS after a failed job)
+    // never resolve to SUBMITTED, so polling them would run forever.
     refetchInterval: (query) =>
-      query.state.data?.status === 'SUBMITTED' ? false : 2500,
+      query.state.data?.status === 'PROCESSING' ? 2500 : false,
   })
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
@@ -268,12 +271,16 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
   )
 }
 
-type Criterion = WritingCriterion | SpeakingCriterion
+type Criterion = (WritingCriterion | SpeakingCriterion) & {
+  unavailable?: boolean
+  displayBand?: string
+}
 
 type AIEvaluation = {
   skill: string
   overallBand: number
   summary: string
+  pronunciationAvailable?: boolean
   criteria: [string, Criterion][]
   parts: {
     title: string
@@ -307,15 +314,26 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
   }
   if (attempt.speakingEvaluation) {
     const evaluation = attempt.speakingEvaluation
+    const isPronunciationAvailable = Boolean(evaluation.pronunciationAvailable)
     return {
       skill: 'Speaking',
       overallBand: evaluation.overallBand,
       summary: evaluation.summary,
+      pronunciationAvailable: isPronunciationAvailable,
       criteria: [
         ['Fluency & Coherence', evaluation.criteria.fluency],
         ['Lexical Resource', evaluation.criteria.lexicalResource],
         ['Grammar Range & Accuracy', evaluation.criteria.grammar],
-        ['Pronunciation', evaluation.criteria.pronunciation],
+        [
+          'Pronunciation',
+          {
+            ...evaluation.criteria.pronunciation,
+            unavailable: !isPronunciationAvailable,
+            feedback: !isPronunciationAvailable
+              ? 'Наша система пока не оценивает Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+              : evaluation.criteria.pronunciation.feedback,
+          },
+        ],
       ],
       parts: evaluation.parts.map((part, index) => ({
         title: `Part ${index + 1}`,
@@ -339,13 +357,20 @@ function AIEvaluationReview({
   const criteriaList = evaluation.criteria.map(([label, criterion]) => ({
     label,
     band: criterion.band,
+    unavailable: criterion.unavailable,
+    displayBand: criterion.unavailable ? 'Не оценивается' : undefined,
   }))
+
+  const bandNote =
+    evaluation.skill === 'Speaking' && !evaluation.pronunciationAvailable
+      ? 'Учебная оценка по 3 критериям (произношение пока не оценивается нашей системой)'
+      : `Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`
 
   return (
     <>
       <AttemptPerformanceReport
         band={evaluation.overallBand}
-        bandNote={`Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`}
+        bandNote={bandNote}
         criteria={criteriaList}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
@@ -366,17 +391,25 @@ function AIEvaluationReview({
         {evaluation.criteria.map(([label, criterion]) => (
           <Card
             key={label}
-            className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs"
+            className={`rounded-[16px] border bg-white shadow-xs ${
+              criterion.unavailable ? 'border-amber-200/80 bg-amber-50/20' : 'border-[#e7e7e4]'
+            }`}
           >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="font-semibold text-slate-900">{label}</h2>
-                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
-                  {criterion.band.toFixed(1)}
-                </span>
+                {criterion.unavailable ? (
+                  <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
+                    Пока не оценивается
+                  </span>
+                ) : (
+                  <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
+                    {criterion.band.toFixed(1)}
+                  </span>
+                )}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                {criterion.feedback}
+                {criterion.feedback || (criterion.unavailable ? 'Наша система пока не оценивает произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.' : 'Комментарий не получен.')}
               </p>
             </CardContent>
           </Card>

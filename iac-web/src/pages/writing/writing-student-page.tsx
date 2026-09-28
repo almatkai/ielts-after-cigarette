@@ -423,8 +423,10 @@ export function WritingAttemptResult({
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
     queryFn: ({ signal }) => getAttempt(attempt.id, signal),
+    // A failed writing job resets attempts.status to IN_PROGRESS, so polling
+    // everything except SUBMITTED would loop forever next to the error card.
     refetchInterval: (query) =>
-      query.state.data?.status === 'SUBMITTED' ? false : 2500,
+      query.state.data?.status === 'PROCESSING' ? 2500 : false,
   })
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment

@@ -19,6 +19,36 @@ export function downloadTextFile(filename: string, content: string, mimeType = '
 }
 
 /**
+ * Lowercases a possibly-missing question-group type. API payloads are not
+ * guaranteed to carry `type`, and IELTS material types are uppercase
+ * (SENTENCE_COMPLETION), so callers must match case-insensitively.
+ */
+function groupTypeOf(value: unknown): string {
+  return typeof value === 'string' ? value.toLowerCase() : ''
+}
+
+/**
+ * Normalizes a cue card to the string array the backend expects. Tolerates a
+ * legacy newline-joined string so older exports still re-import cleanly.
+ */
+function cueCardLinesOf(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((line): line is string => typeof line === 'string')
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    return value.split('\n')
+  }
+  return []
+}
+
+/**
+ * Reads a positive integer field that may be absent from a legacy payload.
+ */
+function positionOf(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+/**
  * Serializes a Reading material or full Reading test into the IELTS_READING_IMPORT_V1 format.
  */
 export function serializeReadingToV1(test: ReadingMaterial): string {
@@ -74,7 +104,7 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
         else if (maxWords === 3 && allowNum)
           out += `answer_limit: NO_MORE_THAN_THREE_WORDS_OR_A_NUMBER\n`
         else out += `answer_limit: NO_MORE_THAN_${maxWords}_WORDS\n`
-      } else if (g.type.includes('completion')) {
+      } else if (groupTypeOf(g.type).includes('completion')) {
         out += `answer_limit: NO_MORE_THAN_TWO_WORDS\n`
       }
 
@@ -99,7 +129,8 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
         promptText = promptText.replace(/\{\{answer\}\}/g, `{{${qNum}}}`)
         if (
           !promptText.includes(`{{${qNum}}}`) &&
-          (g.type.includes('completion') || g.type.includes('fill'))
+          (groupTypeOf(g.type).includes('completion') ||
+            groupTypeOf(g.type).includes('fill'))
         ) {
           promptText += ` {{${qNum}}}`
         }
@@ -334,9 +365,12 @@ export function serializeSpeakingToJSON(material: SpeakingMaterial): string {
           instructions: p.instructions || '',
           preparationSeconds: p.preparationSeconds,
           responseSeconds: p.responseSeconds,
-          cueCard: Array.isArray(p.cueCard) ? p.cueCard.join('\n') : (p.cueCard || ''),
+          // The backend Part.CueCard is []string, so it must stay an array;
+          // joining it with newlines makes re-import fail with a JSON unmarshal error.
+          cueCard: cueCardLinesOf(p.cueCard),
+          // The backend Question field is `position`, not `questionNumber`.
           questions: (p.questions || []).map((q, idx) => ({
-            questionNumber: (q as any).questionNumber || idx + 1,
+            position: positionOf((q as any).position, idx + 1),
             prompt: q.prompt,
           })),
         })),

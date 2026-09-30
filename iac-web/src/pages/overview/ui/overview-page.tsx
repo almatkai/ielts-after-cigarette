@@ -30,19 +30,19 @@ const quickActions = [
   {
     label: 'Перейти к практике',
     description: 'Выбрать навык и формат задания',
-    to: '/dashboard/practice',
+    to: '/practice',
     icon: Weight,
   },
   {
     label: 'Разобрать ошибки',
     description: 'Вернуться к сложным заданиям',
-    to: '/dashboard/mistakes',
+    to: '/mistakes',
     icon: Warning2,
   },
   {
     label: 'Заполнить профиль',
     description: 'Указать цель и дату экзамена',
-    to: '/dashboard/profile',
+    to: '/profile',
     icon: User,
   },
 ] as const
@@ -140,9 +140,10 @@ export function OverviewPage() {
     },
   ] as const
   const recommendedTarget =
+    dashboard.recommendedAction.target === '/profile' ||
     dashboard.recommendedAction.target === '/dashboard/profile'
-      ? '/dashboard/profile'
-      : '/dashboard/practice'
+      ? '/profile'
+      : '/practice'
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -212,7 +213,7 @@ export function OverviewPage() {
                     variant="outline"
                     className="h-11 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none"
                   >
-                    <Link to="/dashboard/profile">Настроить цель</Link>
+                    <Link to="/profile">Настроить цель</Link>
                   </Button>
                 </div>
               </div>
@@ -263,7 +264,7 @@ export function OverviewPage() {
                 variant="outline"
                 className="h-10 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none sm:col-span-2"
               >
-                <Link to="/dashboard/progress">Открыть прогресс</Link>
+                <Link to="/progress">Открыть прогресс</Link>
               </Button>
             </CardContent>
           </Card>
@@ -323,7 +324,7 @@ export function OverviewPage() {
                 variant="outline"
                 className="mt-4 h-10 w-full rounded-[9px] border-[#deded9] bg-white shadow-none"
               >
-                <Link to="/dashboard/plan">Настроить план</Link>
+                <Link to="/plan">Настроить план</Link>
               </Button>
             </CardContent>
           </Card>

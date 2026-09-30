@@ -36,10 +36,10 @@ const skillMeta: Record<
     title: string
     subtitle: string
     to:
-      | '/dashboard/listening'
-      | '/dashboard/reading'
-      | '/dashboard/writing'
-      | '/dashboard/speaking'
+      | '/listening'
+      | '/reading'
+      | '/writing'
+      | '/speaking'
     icon: typeof Headphone
     advice: string
   }
@@ -47,28 +47,28 @@ const skillMeta: Record<
   listening: {
     title: 'Listening',
     subtitle: 'Аудирование',
-    to: '/dashboard/listening',
+    to: '/listening',
     icon: Headphone,
     advice: 'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
   },
   reading: {
     title: 'Reading',
     subtitle: 'Чтение',
-    to: '/dashboard/reading',
+    to: '/reading',
     icon: Book,
     advice: 'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
   },
   writing: {
     title: 'Writing',
     subtitle: 'Письмо',
-    to: '/dashboard/writing',
+    to: '/writing',
     icon: Edit2,
     advice: 'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
   },
   speaking: {
     title: 'Speaking',
     subtitle: 'Устная речь',
-    to: '/dashboard/speaking',
+    to: '/speaking',
     icon: Microphone,
     advice: 'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
   },
@@ -211,7 +211,7 @@ export function PlanPage() {
                     необходимый темп и распределит нагрузку по дням.
                   </p>
                   <Button asChild size="sm" className="mt-4 shadow-none">
-                    <Link to="/dashboard/profile">Задать цель в профиле</Link>
+                    <Link to="/profile">Задать цель в профиле</Link>
                   </Button>
                 </div>
               ) : (
@@ -263,7 +263,7 @@ export function PlanPage() {
                       {formatExamDate(examDate)}
                     </p>
                     <Link
-                      to="/dashboard/profile"
+                      to="/profile"
                       className="mt-1 inline-block text-[11px] text-[#3b82f6] hover:underline font-medium"
                     >
                       Изменить дату →
@@ -327,10 +327,10 @@ export function PlanPage() {
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
-                  <Link to="/dashboard/listening">Listening</Link>
+                  <Link to="/listening">Listening</Link>
                 </Button>
                 <Button asChild variant="outline" className="shadow-none">
-                  <Link to="/dashboard/reading">Reading</Link>
+                  <Link to="/reading">Reading</Link>
                 </Button>
               </div>
             </div>
@@ -371,7 +371,7 @@ export function PlanPage() {
                     </Button>
                   )}
                   <Button asChild variant="outline" className="shadow-none">
-                    <Link to="/dashboard/mistakes">Банк ошибок</Link>
+                    <Link to="/mistakes">Банк ошибок</Link>
                   </Button>
                 </div>
               </div>

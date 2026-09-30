@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { FullMockStartPage } from '@/pages/fullmock/full-mock-start-page'
 
-export const Route = createFileRoute('/dashboard/full-mocks/$mockId')({
+export const Route = createFileRoute('/_app/full-mocks/$mockId')({
   component: MockStartRoute,
 })
 

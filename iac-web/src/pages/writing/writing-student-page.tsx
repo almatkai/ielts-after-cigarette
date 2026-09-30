@@ -14,7 +14,6 @@ import {
   AttemptSubmitBar,
   ErrorState,
   ExamLoadingScreen,
-  LoadingState,
   SaveIndicator,
   TimeBadge,
 } from '@/features/attempts/attempt-ui'
@@ -133,7 +132,7 @@ export function WritingAttemptRunner({
     <div className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
         <Button asChild variant="link" className="sr-only">
-          <Link to="/dashboard/writing">
+          <Link to="/writing">
             <ArrowLeft aria-hidden />К Writing
           </Link>
         </Button>
@@ -388,7 +387,7 @@ function WritingProcessingCard({
           {fullMockSessionId ? (
             <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
               <Link
-                to="/exam/full-mock/$sessionId"
+                to="/exam/full-mock-sessions/$sessionId"
                 params={{ sessionId: fullMockSessionId }}
               >
                 К следующей секции Full Mock
@@ -396,10 +395,10 @@ function WritingProcessingCard({
             </Button>
           ) : null}
           <Button asChild variant="outline">
-            <Link to="/dashboard">В личный кабинет</Link>
+            <Link to="/">В личный кабинет</Link>
           </Button>
           <Button asChild variant="ghost">
-            <Link to="/dashboard/writing">К списку Writing</Link>
+            <Link to="/writing">К списку Writing</Link>
           </Button>
         </div>
       </div>

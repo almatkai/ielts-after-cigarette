@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { ProfilePage } from '@/pages/profile/ui/profile-page'
 
-export const Route = createFileRoute('/dashboard/profile')({
+export const Route = createFileRoute('/_app/profile')({
   head: () => ({
     meta: [
       { title: 'Профиль — IAC' },

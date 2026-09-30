@@ -101,7 +101,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/dashboard/progress">
+          <Link to="/progress">
             <ArrowLeft aria-hidden />К прогрессу
           </Link>
         </Button>

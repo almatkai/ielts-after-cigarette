@@ -40,7 +40,7 @@ export function LoginForm() {
           })
           return
         }
-        await navigate({ to: search.redirect ?? '/dashboard' })
+        await navigate({ to: search.redirect ?? '/' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
       }

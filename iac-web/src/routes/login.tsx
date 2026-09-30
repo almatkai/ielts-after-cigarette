@@ -7,8 +7,8 @@ export const Route = createFileRoute('/login')({
   ssr: false,
   validateSearch: (
     search: Record<string, unknown>,
-  ): { redirect?: '/admin' | '/dashboard' } => {
-    if (search.redirect === '/admin' || search.redirect === '/dashboard') {
+  ): { redirect?: '/admin' | '/' } => {
+    if (search.redirect === '/admin' || search.redirect === '/') {
       return { redirect: search.redirect }
     }
     return {}
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context, search }) => {
     await context.auth.initialize()
     if (context.auth.isAuthenticated()) {
-      throw redirect({ to: search.redirect ?? '/dashboard' })
+      throw redirect({ to: search.redirect ?? '/' })
     }
   },
   head: () => ({

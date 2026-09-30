@@ -122,10 +122,10 @@ export function ProgressPage() {
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
-                  <Link to="/dashboard/listening">Listening</Link>
+                  <Link to="/listening">Listening</Link>
                 </Button>
                 <Button asChild variant="outline" className="shadow-none">
-                  <Link to="/dashboard/reading">Reading</Link>
+                  <Link to="/reading">Reading</Link>
                 </Button>
               </div>
             </div>
@@ -176,7 +176,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       {submitted || processing ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
           <Link
-            to="/dashboard/attempts/$attemptId"
+            to="/attempts/$attemptId"
             params={{ attemptId: item.id }}
           >
             {processing ? 'Статус' : 'Разбор'}

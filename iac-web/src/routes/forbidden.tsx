@@ -31,7 +31,7 @@ function ForbiddenPage() {
             Этот раздел доступен редакторам и администраторам платформы.
           </p>
           <Button asChild className="mt-6 bg-[#3b82f6] hover:bg-[#2563eb]">
-            <Link to="/dashboard">Вернуться в кабинет</Link>
+            <Link to="/">Вернуться в кабинет</Link>
           </Button>
         </CardContent>
       </Card>

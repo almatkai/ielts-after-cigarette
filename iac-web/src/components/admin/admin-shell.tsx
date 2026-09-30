@@ -48,7 +48,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="outline" className="hidden sm:inline-flex">
-              <Link to="/dashboard">
+              <Link to="/">
                 <Category aria-hidden />
                 Кабинет студента
               </Link>

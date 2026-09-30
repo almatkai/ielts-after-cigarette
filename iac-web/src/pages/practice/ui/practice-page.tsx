@@ -22,7 +22,7 @@ const skills = [
     description:
       '4 секции, 40 вопросов. Диалоги и академические лекции с таймингом и автоматической проверкой ответов.',
     badge: '4 секции · 40 вопросов',
-    to: '/dashboard/listening',
+    to: '/listening',
     icon: Headphone,
   },
   {
@@ -32,7 +32,7 @@ const skills = [
     description:
       '3 академических текста, 40 вопросов. Задания True/False/Not Given, множественный выбор и заполнение пропусков.',
     badge: '3 текста · 40 вопросов',
-    to: '/dashboard/reading',
+    to: '/reading',
     icon: Book,
   },
   {
@@ -42,7 +42,7 @@ const skills = [
     description:
       'Task 1 (описание графиков/письма) и Task 2 (эссе). Детальный разбор по всем 4 официальным критериям IELTS.',
     badge: 'Task 1 & Task 2',
-    to: '/dashboard/writing',
+    to: '/writing',
     icon: Edit2,
   },
   {
@@ -52,7 +52,7 @@ const skills = [
     description:
       'Интервью (Part 1), карточка монолога (Part 2) и обсуждение (Part 3) с записью аудио и подробной оценкой.',
     badge: 'Part 1, 2, 3',
-    to: '/dashboard/speaking',
+    to: '/speaking',
     icon: Microphone,
   },
 ] as const
@@ -152,7 +152,7 @@ export function PracticePage() {
             </div>
           </div>
           <Link
-            to="/dashboard/full-mocks"
+            to="/full-mocks"
             className="inline-flex shrink-0 items-center justify-center rounded-[10px] bg-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
           >
             Перейти к Full Mock

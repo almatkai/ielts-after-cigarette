@@ -111,7 +111,7 @@ export function ReadingReviewSplitRunner({
             size="sm"
             className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
           >
-            <Link to="/dashboard/mistakes">
+            <Link to="/mistakes">
               <ArrowLeft className="size-4" aria-hidden />
               <span className="hidden sm:inline">К ошибкам</span>
             </Link>

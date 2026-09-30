@@ -315,7 +315,7 @@ export function ReadingAttemptRunner({
                 <span className="hidden sm:inline">К Full Mock</span>
               </Link>
             ) : (
-              <Link to="/dashboard/reading">
+              <Link to="/reading">
                 <ArrowLeft className="size-4" aria-hidden />
                 <span className="hidden sm:inline">К Reading</span>
               </Link>

@@ -2,7 +2,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute('/_app')({
   ssr: false,
   beforeLoad: async ({ context }) => {
     await context.auth.initialize()

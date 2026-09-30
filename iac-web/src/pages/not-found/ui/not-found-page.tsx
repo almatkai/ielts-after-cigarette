@@ -44,7 +44,7 @@ export function NotFoundPage() {
               variant="outline"
               className="h-12 rounded-[10px] border-[#dededb] bg-white px-5 text-sm font-semibold hover:bg-[#f4f4f1]"
             >
-              <Link to="/dashboard">
+              <Link to="/">
                 <Category aria-hidden />В личный кабинет
               </Link>
             </Button>

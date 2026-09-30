@@ -30,7 +30,7 @@ export type PendingGoogleRegistration = Pick<
 type GoogleCompleteFormProps = {
   pending: PendingGoogleRegistration
   onBack: () => void
-  redirect?: '/admin' | '/dashboard'
+  redirect?: '/admin' | '/'
 }
 
 function validateName(value: string) {
@@ -73,7 +73,7 @@ export function GoogleCompleteForm({
           phone: normalizePhone(value.phone),
           acceptedTerms: value.acceptedTerms,
         })
-        await navigate({ to: redirect ?? '/dashboard' })
+        await navigate({ to: redirect ?? '/' })
       } catch (error) {
         if (error instanceof ApiError && error.details) {
           setFieldErrors(error.details)

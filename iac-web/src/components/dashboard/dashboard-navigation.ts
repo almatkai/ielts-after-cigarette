@@ -10,31 +10,31 @@ import {
 export const primaryDashboardNavigation = [
   {
     label: 'Обзор',
-    to: '/dashboard',
+    to: '/',
     icon: Category,
     exact: true,
   },
   {
     label: 'План подготовки',
-    to: '/dashboard/plan',
+    to: '/plan',
     icon: CalendarSearch,
     exact: false,
   },
   {
     label: 'Практика',
-    to: '/dashboard/practice',
+    to: '/practice',
     icon: Weight,
     exact: false,
   },
   {
     label: 'Ошибки',
-    to: '/dashboard/mistakes',
+    to: '/mistakes',
     icon: Warning2,
     exact: false,
   },
   {
     label: 'Прогресс',
-    to: '/dashboard/progress',
+    to: '/progress',
     icon: Chart,
     exact: false,
   },
@@ -42,18 +42,18 @@ export const primaryDashboardNavigation = [
 
 export const settingsDashboardNavigation = {
   label: 'Настройки',
-  to: '/dashboard/settings',
+  to: '/settings',
   icon: Setting2,
   exact: false,
 } as const
 
 const secondaryDashboardPages = [
-  { label: 'Listening', to: '/dashboard/listening' },
-  { label: 'Reading', to: '/dashboard/reading' },
-  { label: 'Writing', to: '/dashboard/writing' },
-  { label: 'Speaking', to: '/dashboard/speaking' },
-  { label: 'Full Mock', to: '/dashboard/full-mocks' },
-  { label: 'Профиль', to: '/dashboard/profile' },
+  { label: 'Listening', to: '/listening' },
+  { label: 'Reading', to: '/reading' },
+  { label: 'Writing', to: '/writing' },
+  { label: 'Speaking', to: '/speaking' },
+  { label: 'Full Mock', to: '/full-mocks' },
+  { label: 'Профиль', to: '/profile' },
 ] as const
 
 export function getDashboardPageTitle(pathname: string) {

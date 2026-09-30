@@ -80,7 +80,7 @@ export function FullMockLibraryPage() {
                 </p>
                 <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
                   <Link
-                    to="/dashboard/full-mocks/$mockId"
+                    to="/full-mocks/$mockId"
                     params={{ mockId: item.id }}
                   >
                     <PlayCircle aria-hidden />

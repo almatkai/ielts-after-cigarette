@@ -257,7 +257,7 @@ function FullMockReport({ session }: { session: FullMockSession }) {
               <div>
                 <p className="font-semibold">{labels[section.skill]}</p>
                 <Link
-                  to="/dashboard/attempts/$attemptId"
+                  to="/attempts/$attemptId"
                   params={{ attemptId: section.attempt.id }}
                   className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
                 >

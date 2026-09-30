@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { PracticePage } from '@/pages/practice/ui/practice-page'
 
-export const Route = createFileRoute('/dashboard/practice')({
+export const Route = createFileRoute('/_app/practice')({
   head: () => ({
     meta: [
       { title: 'Практика — IAC' },

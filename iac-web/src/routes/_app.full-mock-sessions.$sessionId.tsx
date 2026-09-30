@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute(
-  '/dashboard/full-mock-sessions/$sessionId',
+  '/_app/full-mock-sessions/$sessionId',
 )({
   beforeLoad: ({ params }) => {
     throw redirect({

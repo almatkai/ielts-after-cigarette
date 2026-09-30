@@ -42,7 +42,7 @@ export function DashboardHeader({
           <HambergerMenu aria-hidden />
         </Button>
         <div className="lg:hidden">
-          <Brand to="/dashboard" />
+          <Brand to="/" />
         </div>
         <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
         <div className="min-w-0">
@@ -97,7 +97,7 @@ export function DashboardHeader({
           variant="ghost"
           className="h-11 gap-2 rounded-[10px] px-2.5 text-[#111111] sm:px-3"
         >
-          <Link to="/dashboard/profile" aria-label="Открыть профиль">
+          <Link to="/profile" aria-label="Открыть профиль">
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
               <User
                 className="size-[17px]"

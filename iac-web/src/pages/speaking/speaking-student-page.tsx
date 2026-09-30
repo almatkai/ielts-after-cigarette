@@ -140,7 +140,7 @@ export function SpeakingAttemptRunner({
     <div className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
         <Button asChild variant="link" className="sr-only">
-          <Link to="/dashboard/speaking">
+          <Link to="/speaking">
             <ArrowLeft aria-hidden />К Speaking
           </Link>
         </Button>

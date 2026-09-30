@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/dashboard/reading/$materialId')({
+export const Route = createFileRoute('/_app/reading/$materialId')({
   beforeLoad: ({ params }) => {
     throw redirect({
       to: '/exam/reading/$materialId',

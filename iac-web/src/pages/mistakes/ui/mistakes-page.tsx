@@ -188,16 +188,16 @@ function EmptyMistakesState() {
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild variant="outline" className="shadow-none">
-            <Link to="/dashboard/listening">Listening</Link>
+            <Link to="/listening">Listening</Link>
           </Button>
           <Button asChild variant="outline" className="shadow-none">
-            <Link to="/dashboard/reading">Reading</Link>
+            <Link to="/reading">Reading</Link>
           </Button>
           <Button asChild variant="outline" className="shadow-none">
-            <Link to="/dashboard/writing">Writing</Link>
+            <Link to="/writing">Writing</Link>
           </Button>
           <Button asChild variant="outline" className="shadow-none">
-            <Link to="/dashboard/speaking">Speaking</Link>
+            <Link to="/speaking">Speaking</Link>
           </Button>
         </div>
       </CardContent>
@@ -272,7 +272,7 @@ function ReviewLink({ attemptId }: { attemptId: string }) {
       size="sm"
       className="shrink-0 shadow-none gap-1.5 rounded-[9px] border-[#dbeafe] bg-[#eff6ff] text-xs font-semibold text-[#1d4ed8] hover:bg-blue-100"
     >
-      <Link to="/dashboard/attempts/$attemptId" params={{ attemptId }}>
+      <Link to="/attempts/$attemptId" params={{ attemptId }}>
         Интерактивный разбор
         <ArrowRight className="size-3.5" aria-hidden />
       </Link>

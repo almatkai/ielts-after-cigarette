@@ -95,12 +95,12 @@ export function DashboardSidebar({
           {primaryDashboardNavigation.map((item) => {
             const Icon = item.icon
             const isRelatedActive =
-              item.to === '/dashboard/practice' &&
-              (location.pathname.startsWith('/dashboard/listening') ||
-                location.pathname.startsWith('/dashboard/reading') ||
-                location.pathname.startsWith('/dashboard/writing') ||
-                location.pathname.startsWith('/dashboard/speaking') ||
-                location.pathname.startsWith('/dashboard/full-mocks'))
+              item.to === '/practice' &&
+              (location.pathname.startsWith('/listening') ||
+                location.pathname.startsWith('/reading') ||
+                location.pathname.startsWith('/writing') ||
+                location.pathname.startsWith('/speaking') ||
+                location.pathname.startsWith('/full-mocks'))
 
             return (
               <Link

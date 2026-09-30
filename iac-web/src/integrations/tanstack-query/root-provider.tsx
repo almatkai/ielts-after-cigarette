@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query'
 
 import { authStore } from '@/features/auth/auth-store'
 import { clearCacheOnUserChange } from '@/features/auth/query-cache'
+import { watchMistakeResults } from '@/features/attempts/mistake-cache'
 
 export function getContext() {
   const queryClient = new QueryClient({
@@ -15,6 +16,7 @@ export function getContext() {
 
   if (typeof window !== 'undefined') {
     clearCacheOnUserChange(queryClient, authStore)
+    watchMistakeResults(queryClient)
   }
 
   return {

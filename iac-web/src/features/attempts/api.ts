@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/api/client'
+import { mistakeKeys } from './mistake-cache'
 
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
@@ -197,6 +198,24 @@ export type MistakeReport = {
   speakingEvaluation?: SpeakingEvaluation
 }
 
+export type MistakeAttempt = AttemptListItem & {
+  mistakeCount: number | null
+}
+
+export type MistakeAttemptsPage = {
+  items: MistakeAttempt[]
+  page: number
+  hasNext: boolean
+}
+
+export type MistakeDetail = {
+  attempt: Omit<Attempt, 'materialType'> & { materialType: AttemptMaterialType }
+  review: (AttemptReviewItem & { contextIndex: number })[]
+  contexts: { passageBody?: string; transcript?: string }[]
+  writingEvaluation?: WritingEvaluation
+  speakingEvaluation?: SpeakingEvaluation
+}
+
 export type AttemptMaterialType =
   'listening' | 'reading' | 'writing' | 'speaking'
 
@@ -205,7 +224,9 @@ export const attemptKeys = {
   list: (materialType: AttemptMaterialType) =>
     ['attempts', 'list', materialType] as const,
   listAll: ['attempts', 'list'] as const,
-  mistakes: ['attempts', 'mistakes'] as const,
+  mistakes: mistakeKeys.all,
+  mistakeList: mistakeKeys.list,
+  mistakeDetail: mistakeKeys.detail,
 }
 
 export const listAttempts = (
@@ -219,8 +240,18 @@ export const listAttempts = (
     { signal },
   )
 
-export const getMistakes = (signal?: AbortSignal) =>
-  apiClient.request<{ items: MistakeReport[] }>('/api/v1/attempts/mistakes', {
+export const listMistakeAttempts = (
+  materialType: AttemptMaterialType,
+  page: number,
+  signal?: AbortSignal,
+) =>
+  apiClient.request<MistakeAttemptsPage>(
+    `/api/v1/attempts/mistakes/attempts?materialType=${materialType}&page=${page}&limit=12`,
+    { signal },
+  )
+
+export const getMistakeDetail = (attemptId: string, signal?: AbortSignal) =>
+  apiClient.request<MistakeDetail>(`/api/v1/attempts/${attemptId}/mistakes`, {
     signal,
   })
 

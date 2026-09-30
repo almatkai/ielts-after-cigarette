@@ -9,6 +9,7 @@ import {
 } from '@/features/attempts/api'
 import type { Attempt, StudentAnswer } from '@/features/attempts/api'
 import { DraftBuffer } from '@/features/attempts/draft-buffer'
+import { invalidateMistakeResults } from '@/features/attempts/mistake-cache'
 import { getErrorMessage } from '@/lib/api/client'
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
@@ -125,6 +126,7 @@ export function useAttemptSession(attemptId: string) {
         pending.current.acknowledge(batch)
         closed.current = true
         setSubmitted(result)
+        await invalidateMistakeResults(queryClient, attemptId)
         await queryClient.invalidateQueries({
           queryKey: attemptKeys.detail(attemptId),
         })
@@ -135,6 +137,7 @@ export function useAttemptSession(attemptId: string) {
           if (detail.status !== 'IN_PROGRESS') {
             closed.current = true
             setSubmitted(detail)
+            await invalidateMistakeResults(queryClient, attemptId)
             return
           }
         } catch {

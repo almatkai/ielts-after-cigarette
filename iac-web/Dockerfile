@@ -6,6 +6,7 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.18.3 --activate
 
 COPY package.json pnpm-lock.yaml ./
+COPY scripts/patch-iconsax.mjs ./scripts/patch-iconsax.mjs
 RUN pnpm install --frozen-lockfile
 
 COPY . .

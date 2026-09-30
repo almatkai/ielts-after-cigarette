@@ -61,8 +61,8 @@ export function ReadingReviewSplitRunner({
   const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
   const [retryModalItem, setRetryModalItem] = useState<AttemptReviewItem | null>(null)
 
-  const currentQuestion = questions[activeQuestionIndex] ?? questions[0]
-  const currentPassage = passages[currentQuestion?.passageIndex ?? 0] ?? passages[0]
+  const currentQuestion = questions.at(activeQuestionIndex) ?? questions.at(0)
+  const currentPassage = passages.at(currentQuestion?.passageIndex ?? 0) ?? passages.at(0)
 
   const totalQuestions = review.length || questions.length
   const correctCount = review.filter((i) => i.isCorrect).length
@@ -128,7 +128,7 @@ export function ReadingReviewSplitRunner({
         {passages.length > 1 && (
           <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
             {passages.map((passage, passageIndex) => {
-              const isCurrentPassage = currentQuestion.passageIndex === passageIndex
+              const isCurrentPassage = currentQuestion?.passageIndex === passageIndex
               const pQuestions = questions.filter((item) => item.passageIndex === passageIndex)
               const pErrors = pQuestions.filter((item) => item.reviewItem && !item.reviewItem.isCorrect).length
               return (
@@ -214,7 +214,7 @@ export function ReadingReviewSplitRunner({
           <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
-                {passages.length > 1 ? `Раздел ${currentQuestion?.passageIndex + 1}` : 'Текст'}
+                {passages.length > 1 ? `Раздел ${(currentQuestion?.passageIndex ?? 0) + 1}` : 'Текст'}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {currentPassage?.title}

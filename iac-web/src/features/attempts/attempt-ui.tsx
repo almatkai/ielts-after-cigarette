@@ -742,8 +742,8 @@ export function AttemptPerformanceReport({
                       {c.label}
                     </span>
                     {c.unavailable ? (
-                      <span className="block mt-1 text-[11px] font-semibold text-amber-600 truncate" title="Пока не оценивается системой">
-                        {c.displayBand ?? 'Не оценивается'}
+                      <span className="block mt-1 text-[11px] font-semibold text-amber-600 truncate" title="Пока не определяется нашей системой">
+                        {c.displayBand ?? 'Не определяется'}
                       </span>
                     ) : (
                       <span className="text-base font-bold text-slate-900">

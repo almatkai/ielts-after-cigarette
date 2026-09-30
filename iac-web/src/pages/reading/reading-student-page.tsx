@@ -91,13 +91,16 @@ export function ReadingStudentPage({
   )
 }
 
-function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial[] {
+function resolvePassages(
+  material: PublicReadingMaterial,
+): PublicReadingMaterial[] {
   if (material.passages && material.passages.length > 1) {
     return material.passages
   }
 
   // Check if material.body has multiple passage markers
-  const regex = /(?:^|\n)(?:READING\s+)?PASSAGE\s+(\d+)\s*(?:[—–-]\s*([^\n]+))?/gi
+  const regex =
+    /(?:^|\n)(?:READING\s+)?PASSAGE\s+(\d+)\s*(?:[—–-]\s*([^\n]+))?/gi
   const matches: { index: number; number: number; title: string }[] = []
   let match: RegExpExecArray | null
   while ((match = regex.exec(material.body)) !== null) {
@@ -111,7 +114,8 @@ function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial
   if (matches.length > 1) {
     return matches.map((item, i) => {
       const start = item.index
-      const end = i < matches.length - 1 ? matches[i + 1].index : material.body.length
+      const end =
+        i < matches.length - 1 ? matches[i + 1].index : material.body.length
       const bodyChunk = material.body.slice(start, end).trim()
       const groups = material.questionGroups.filter((g) => {
         const instr = g.instructions || ''
@@ -153,7 +157,9 @@ export function ReadingAttemptRunner({
 }) {
   const session = useAttemptSession(attempt.id)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
-  const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>('md')
+  const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>(
+    'md',
+  )
   const autoSubmitStarted = useRef(false)
 
   const passages = useMemo(() => resolvePassages(material), [material])
@@ -178,14 +184,14 @@ export function ReadingAttemptRunner({
 
   const activePassageQuestions = useMemo(
     () =>
-      questions.filter(
-        (q) => q.passageIndex === currentQuestion.passageIndex,
-      ),
+      questions.filter((q) => q.passageIndex === currentQuestion.passageIndex),
     [questions, currentQuestion.passageIndex],
   )
 
   const goToPassage = (passageIndex: number) => {
-    const targetIndex = questions.findIndex((item) => item.passageIndex === passageIndex)
+    const targetIndex = questions.findIndex(
+      (item) => item.passageIndex === passageIndex,
+    )
     if (targetIndex >= 0) {
       setActiveQuestionIndex(targetIndex)
     }
@@ -193,35 +199,84 @@ export function ReadingAttemptRunner({
 
   useEffect(() => {
     if (!currentQuestion.question.id) return
-    const el = document.getElementById(`reading-q-${currentQuestion.question.id}`)
+    const el = document.getElementById(
+      `reading-q-${currentQuestion.question.id}`,
+    )
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }, [activeQuestionIndex, currentQuestion.question.id])
 
-  const startedAt = useMemo(
-    () => new Date(attempt.startedAt).getTime(),
-    [attempt.startedAt],
-  )
-  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
-    Math.max(0, Math.floor((Date.now() - startedAt) / 1000)),
-  )
-  useEffect(() => {
-    if (session.submitted) return
-    const interval = window.setInterval(() => {
-      setElapsedSeconds(
-        Math.max(0, Math.floor((Date.now() - startedAt) / 1000)),
-      )
-    }, 1000)
-    return () => window.clearInterval(interval)
-  }, [startedAt, session.submitted])
+  const isReady = session.answers !== null && !session.loadError
 
-  const durationSeconds = (material.durationMinutes ?? 0) * 60
-  const remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
+  const durationMinutes =
+    (material.durationMinutes ?? 0) > 0 ? material.durationMinutes! : 60
+  const durationSeconds = durationMinutes * 60
+  const totalDurationMs = durationSeconds * 1000
+  const storageKey = `iac_reading_deadline_${attempt.id}`
+
+  const [deadline, setDeadline] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null
+
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+      const parsed = Number(saved)
+      if (parsed > 0 && !isNaN(parsed)) {
+        return parsed
+      }
+    }
+
+    const serverStartedAt = new Date(attempt.startedAt).getTime()
+    if (Date.now() - serverStartedAt > 2 * 60_000) {
+      return serverStartedAt + totalDurationMs
+    }
+
+    return null
+  })
+
+  useEffect(() => {
+    if (isReady && deadline === null) {
+      const newDeadline = Date.now() + totalDurationMs
+      setDeadline(newDeadline)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, String(newDeadline))
+      }
+    }
+  }, [isReady, deadline, totalDurationMs, storageKey])
+
+  useEffect(() => {
+    if (session.submitted && typeof window !== 'undefined') {
+      localStorage.removeItem(storageKey)
+    }
+  }, [session.submitted, storageKey])
+
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (deadline === null) {
+      return durationSeconds
+    }
+    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
+  })
+
+  useEffect(() => {
+    if (deadline === null) {
+      setSecondsLeft(durationSeconds)
+      return
+    }
+
+    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
+
+    const interval = window.setInterval(() => {
+      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
+    }, 1000)
+
+    return () => window.clearInterval(interval)
+  }, [deadline, durationSeconds])
+
   useEffect(() => {
     if (
+      deadline !== null &&
       durationSeconds > 0 &&
-      remainingSeconds === 0 &&
+      secondsLeft === 0 &&
       session.answers !== null &&
       !session.submitted &&
       !session.isSubmitting &&
@@ -231,8 +286,9 @@ export function ReadingAttemptRunner({
       void session.submit()
     }
   }, [
+    deadline,
     durationSeconds,
-    remainingSeconds,
+    secondsLeft,
     session.submitted,
     session.isSubmitting,
     session.answers,
@@ -266,12 +322,12 @@ export function ReadingAttemptRunner({
       />
     )
   }
-  if (session.answers === null) {
+  if (!isReady || session.answers === null) {
     return (
       <ExamLoadingScreen
         badge="IELTS Reading"
-        label="Восстанавливаем сохранённые ответы…"
-        description="Синхронизируем ваш прогресс и последние введённые ответы с сервером..."
+        label="Готовим чтение…"
+        description="Загружаем пассажи, формируем группы вопросов и восстанавливаем сохранённые ответы…"
       />
     )
   }
@@ -332,10 +388,16 @@ export function ReadingAttemptRunner({
         {passages.length > 1 && (
           <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
             {passages.map((passage, passageIndex) => {
-              const isCurrentPassage = currentQuestion.passageIndex === passageIndex
-              const pQuestions = questions.filter((item) => item.passageIndex === passageIndex)
+              const isCurrentPassage =
+                currentQuestion.passageIndex === passageIndex
+              const pQuestions = questions.filter(
+                (item) => item.passageIndex === passageIndex,
+              )
               const pAnswered = pQuestions.filter((item) =>
-                isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
+                isQuestionAnswered(
+                  item.question.id,
+                  answers[item.question.id ?? ''],
+                ),
               ).length
               return (
                 <button
@@ -355,7 +417,8 @@ export function ReadingAttemptRunner({
                       'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
                       isCurrentPassage
                         ? 'bg-white/25 text-white'
-                        : pAnswered === pQuestions.length && pQuestions.length > 0
+                        : pAnswered === pQuestions.length &&
+                            pQuestions.length > 0
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-slate-100 text-slate-600',
                     )}
@@ -371,10 +434,7 @@ export function ReadingAttemptRunner({
         {/* Правая часть шапки: Сохранение, Таймер, Кнопка Завершить */}
         <div className="flex items-center gap-2.5 sm:gap-3">
           <SaveIndicator state={session.saveState} />
-          <TimeBadge
-            seconds={durationSeconds > 0 ? remainingSeconds : elapsedSeconds}
-            label={durationSeconds > 0 ? 'Осталось' : 'Прошедшее время'}
-          />
+          <TimeBadge seconds={secondsLeft} label="Осталось" />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -421,7 +481,9 @@ export function ReadingAttemptRunner({
           <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
-                {passages.length > 1 ? `Раздел ${currentQuestion.passageIndex + 1}` : 'Текст'}
+                {passages.length > 1
+                  ? `Раздел ${currentQuestion.passageIndex + 1}`
+                  : 'Текст'}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {currentPassage.title}
@@ -491,11 +553,16 @@ export function ReadingAttemptRunner({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
-                  {passages.length > 1 ? `Раздел ${currentQuestion.passageIndex + 1}` : 'Вопросы'}
+                  {passages.length > 1
+                    ? `Раздел ${currentQuestion.passageIndex + 1}`
+                    : 'Вопросы'}
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
                   {currentPassage.questionGroups.length}{' '}
-                  {currentPassage.questionGroups.length === 1 ? 'группа' : 'групп'} вопросов
+                  {currentPassage.questionGroups.length === 1
+                    ? 'группа'
+                    : 'групп'}{' '}
+                  вопросов
                 </span>
               </div>
               <span className="text-xs font-semibold text-slate-500">
@@ -523,7 +590,9 @@ export function ReadingAttemptRunner({
                   answers={answers}
                   onAnswer={session.updateAnswer}
                   onSelectQuestion={(qId) => {
-                    const idx = questions.findIndex((item) => item.question.id === qId)
+                    const idx = questions.findIndex(
+                      (item) => item.question.id === qId,
+                    )
                     if (idx >= 0) setActiveQuestionIndex(idx)
                   }}
                 />
@@ -574,9 +643,14 @@ export function ReadingAttemptRunner({
             <div className="flex items-center gap-1 border-r border-[#ededeb] pr-2.5 sm:pr-3 shrink-0">
               {passages.map((passage, pIdx) => {
                 const isCurrentPassage = currentQuestion.passageIndex === pIdx
-                const pQuestions = questions.filter((q) => q.passageIndex === pIdx)
+                const pQuestions = questions.filter(
+                  (q) => q.passageIndex === pIdx,
+                )
                 const pAnswered = pQuestions.filter((item) =>
-                  isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
+                  isQuestionAnswered(
+                    item.question.id,
+                    answers[item.question.id ?? ''],
+                  ),
                 ).length
                 return (
                   <button
@@ -597,7 +671,8 @@ export function ReadingAttemptRunner({
                         'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
                         isCurrentPassage
                           ? 'bg-white/25 text-white'
-                          : pAnswered === pQuestions.length && pQuestions.length > 0
+                          : pAnswered === pQuestions.length &&
+                              pQuestions.length > 0
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-slate-100 text-slate-600',
                       )}
@@ -646,13 +721,20 @@ export function ReadingAttemptRunner({
         <div className="flex items-center gap-3 shrink-0 text-xs text-slate-600 font-medium">
           {passages.length > 1 && (
             <span className="text-slate-500 hidden sm:inline">
-              В разделе: <strong className="text-slate-800">{activePassageAnsweredCount}</strong> из {activePassageQuestions.length}
+              В разделе:{' '}
+              <strong className="text-slate-800">
+                {activePassageAnsweredCount}
+              </strong>{' '}
+              из {activePassageQuestions.length}
               <span className="mx-2 text-slate-300">|</span>
             </span>
           )}
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-blue-600" />
-            Всего: <strong className="text-slate-800">{answeredCount}</strong> из {totalQuestions}
+            Всего: <strong className="text-slate-800">
+              {answeredCount}
+            </strong>{' '}
+            из {totalQuestions}
           </span>
         </div>
       </div>
@@ -700,14 +782,20 @@ function ReadingAttemptResult({
   }, [passages])
 
   // Filters
-  const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
-  const [selectedPassageTab, setSelectedPassageTab] = useState<number | 'all'>('all')
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'errors' | 'correct'
+  >('all')
+  const [selectedPassageTab, setSelectedPassageTab] = useState<number | 'all'>(
+    'all',
+  )
   const [showPassageText, setShowPassageText] = useState(false)
   const [readingPassageViewIndex, setReadingPassageViewIndex] = useState(0)
 
   // Metrics
   const totalQuestions = review ? review.length : (attempt.maxScore ?? 40)
-  const correctCount = review ? review.filter((i) => i.isCorrect).length : (attempt.score ?? 0)
+  const correctCount = review
+    ? review.filter((i) => i.isCorrect).length
+    : (attempt.score ?? 0)
   const incorrectCount = review ? review.filter((i) => !i.isCorrect).length : 0
 
   // Filtered review list
@@ -721,7 +809,9 @@ function ReadingAttemptResult({
         const passage = passages.at(selectedPassageTab)
         if (passage) {
           const pQuestionIds = new Set(
-            passage.questionGroups.flatMap((g) => g.questions.map((q) => q.id)).filter(Boolean),
+            passage.questionGroups
+              .flatMap((g) => g.questions.map((q) => q.id))
+              .filter(Boolean),
           )
           if (!pQuestionIds.has(item.questionId)) return false
         }
@@ -754,7 +844,8 @@ function ReadingAttemptResult({
           {material.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Reading · {material.difficulty} · {totalQuestions} вопросов
+          IELTS Academic Reading · {material.difficulty} · {totalQuestions}{' '}
+          вопросов
         </p>
       </div>
 
@@ -770,7 +861,6 @@ function ReadingAttemptResult({
         paceUnit="вопрос"
       />
 
-
       {/* КНОПКА ПРОСМОТРА ИСХОДНОГО ТЕКСТА */}
       <div className="flex items-center justify-between rounded-[14px] border border-[#e7e7e4] bg-white p-4 shadow-xs">
         <div className="flex items-center gap-2.5">
@@ -780,7 +870,8 @@ function ReadingAttemptResult({
               Исходный текст чтения
             </p>
             <p className="text-xs text-slate-500">
-              Откройте текст, чтобы проверить правильность ответов и найти цитаты
+              Откройте текст, чтобы проверить правильность ответов и найти
+              цитаты
             </p>
           </div>
         </div>
@@ -886,7 +977,9 @@ function ReadingAttemptResult({
           {/* Фильтр по разделам */}
           {passages.length > 1 && (
             <div className="flex items-center gap-1 text-xs">
-              <span className="text-slate-400 mr-1 hidden sm:inline">Раздел:</span>
+              <span className="text-slate-400 mr-1 hidden sm:inline">
+                Раздел:
+              </span>
               <button
                 type="button"
                 onClick={() => setSelectedPassageTab('all')}
@@ -1053,7 +1146,8 @@ function StudentGroup({
               key={question.id ?? question.position}
               id={`reading-q-${question.id}`}
               onClick={() => {
-                if (question.id && onSelectQuestion) onSelectQuestion(question.id)
+                if (question.id && onSelectQuestion)
+                  onSelectQuestion(question.id)
               }}
               className={cn(
                 'rounded-[14px] border p-4 sm:p-5 transition-all duration-150 cursor-pointer bg-white',
@@ -1135,7 +1229,9 @@ function CleanStudentQuestion({
                       : 'border-slate-300 bg-white',
                   )}
                 >
-                  {isSelected ? <div className="size-1.5 rounded-full bg-white" /> : null}
+                  {isSelected ? (
+                    <div className="size-1.5 rounded-full bg-white" />
+                  ) : null}
                 </div>
               </label>
             )
@@ -1155,7 +1251,9 @@ function CleanStudentQuestion({
     const isMulti = limit && limit > 1
     const selectedIds = isMulti
       ? Array.isArray(value?.optionIds)
-        ? (value.optionIds as unknown[]).filter((id): id is string => typeof id === 'string')
+        ? (value.optionIds as unknown[]).filter(
+            (id): id is string => typeof id === 'string',
+          )
         : []
       : typeof value?.optionId === 'string'
         ? [value.optionId]

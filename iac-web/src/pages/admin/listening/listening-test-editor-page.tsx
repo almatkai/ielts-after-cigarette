@@ -794,7 +794,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             min={0}
                             placeholder="14.5"
                             value={
-                              typeof question.content?.timestampStart ===
+                              typeof question.content.timestampStart ===
                               'number'
                                 ? question.content.timestampStart
                                 : ''
@@ -820,17 +820,17 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                               )
                             }}
                           />
-                          {typeof question.content?.timestampStart ===
+                          {typeof question.content.timestampStart ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
                               (
                               {formatSeconds(
-                                question.content.timestampStart as number,
+                                question.content.timestampStart,
                               )}
                               )
                             </span>
                           )}
-                          {typeof question.content?.timestampStart ===
+                          {typeof question.content.timestampStart ===
                             'number' &&
                             part.audioAssetId && (
                               <Button
@@ -860,7 +860,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             min={0}
                             placeholder="21.0"
                             value={
-                              typeof question.content?.timestampEnd ===
+                              typeof question.content.timestampEnd ===
                               'number'
                                 ? question.content.timestampEnd
                                 : ''
@@ -886,12 +886,12 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                               )
                             }}
                           />
-                          {typeof question.content?.timestampEnd ===
+                          {typeof question.content.timestampEnd ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
                               (
                               {formatSeconds(
-                                question.content.timestampEnd as number,
+                                question.content.timestampEnd,
                               )}
                               )
                             </span>
@@ -905,7 +905,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             rows={2}
                             placeholder="Фраза или предложение из аудиозаписи, подтверждающее ответ..."
                             value={
-                              typeof question.content?.quote === 'string'
+                              typeof question.content.quote === 'string'
                                 ? question.content.quote
                                 : ''
                             }
@@ -932,7 +932,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             rows={2}
                             placeholder="Наводящая подсказка для студента: на что обратить внимание или какие ключевые слова слушать..."
                             value={
-                              typeof question.content?.hint === 'string'
+                              typeof question.content.hint === 'string'
                                 ? question.content.hint
                                 : ''
                             }

@@ -41,7 +41,7 @@ export function extractPageAsReadme(): ExtractedPageReadme {
 
   const url = window.location.pathname + window.location.search
   const title =
-    document.querySelector('h1')?.textContent?.trim() ||
+    document.querySelector('h1')?.textContent.trim() ||
     document.title ||
     'IELTS Platform Page'
 
@@ -52,14 +52,6 @@ export function extractPageAsReadme(): ExtractedPageReadme {
     document.querySelector('article') ||
     document.getElementById('root') ||
     document.body
-
-  if (!container) {
-    return {
-      title,
-      url,
-      markdown: `# ${title}\n**URL**: \`${url}\`\n\n*No main content found.*`,
-    }
-  }
 
   const lines: string[] = []
   lines.push(`# ${title}`)
@@ -148,7 +140,7 @@ function processNode(node: Node, lines: string[], indent = '') {
     const inputType = input.type.toLowerCase()
     if (inputType === 'radio' || inputType === 'checkbox') {
       const isChecked = input.checked
-      const label = input.labels?.[0]?.textContent?.trim() || input.value || ''
+      const label = input.labels?.[0]?.textContent.trim() || input.value || ''
       lines.push(`${indent}${isChecked ? '[x]' : '[ ]'} ${label}`)
     } else if (inputType === 'text' || !inputType) {
       const val = input.value.trim()
@@ -161,22 +153,22 @@ function processNode(node: Node, lines: string[], indent = '') {
 
   // Headings
   if (tag === 'H1') {
-    const text = el.textContent?.trim()
+    const text = el.textContent.trim()
     if (text) lines.push(`\n# ${text}\n`)
     return
   }
   if (tag === 'H2') {
-    const text = el.textContent?.trim()
+    const text = el.textContent.trim()
     if (text) lines.push(`\n## ${text}\n`)
     return
   }
   if (tag === 'H3') {
-    const text = el.textContent?.trim()
+    const text = el.textContent.trim()
     if (text) lines.push(`\n### ${text}\n`)
     return
   }
   if (tag === 'H4' || tag === 'H5' || tag === 'H6') {
-    const text = el.textContent?.trim()
+    const text = el.textContent.trim()
     if (text) lines.push(`\n#### ${text}\n`)
     return
   }
@@ -257,7 +249,7 @@ function extractTableAsMarkdown(table: HTMLTableElement): string {
   for (let r = 0; r < rows.length; r++) {
     const row = rows[r]
     const cells = Array.from(row.cells).map(
-      (c) => c.textContent?.replace(/\s+/g, ' ').trim() || '',
+      (c) => c.textContent.replace(/\s+/g, ' ').trim() || '',
     )
     result.push(`| ${cells.join(' | ')} |`)
 

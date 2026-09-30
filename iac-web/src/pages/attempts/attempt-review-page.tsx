@@ -92,7 +92,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
     return (
       <ReadingReviewSplitRunner
         attempt={attempt}
-        material={material as PublicReadingMaterial}
+        material={material}
       />
     )
   }
@@ -194,7 +194,7 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
         </p>
         <p className="text-sm text-slate-600 leading-relaxed">
           {isSpeaking
-            ? 'Расшифровываем аудио и анализируем беглость, словарный запас, грамматику и произношение. Страница обновится автоматически после завершения.'
+            ? 'Расшифровываем аудио и анализируем беглость, словарный запас и грамматику (система пока не может определить произношение). Страница обновится автоматически после завершения.'
             : 'Анализируем раскрытие темы, аргументацию, связность и грамматику. Страница обновится автоматически после выставления баллов.'}
         </p>
         <div className="rounded-xl bg-[#f7f7f5] p-3 text-xs text-slate-500 text-left w-full mt-2">
@@ -314,7 +314,10 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
   }
   if (attempt.speakingEvaluation) {
     const evaluation = attempt.speakingEvaluation
-    const isPronunciationAvailable = Boolean(evaluation.pronunciationAvailable)
+    const isPronunciationAvailable = Boolean(
+      evaluation.pronunciationAvailable &&
+        evaluation.criteria.pronunciation.band > 0,
+    )
     return {
       skill: 'Speaking',
       overallBand: evaluation.overallBand,
@@ -330,7 +333,7 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
             ...evaluation.criteria.pronunciation,
             unavailable: !isPronunciationAvailable,
             feedback: !isPronunciationAvailable
-              ? 'Наша система пока не оценивает Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+              ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
               : evaluation.criteria.pronunciation.feedback,
           },
         ],
@@ -358,12 +361,12 @@ function AIEvaluationReview({
     label,
     band: criterion.band,
     unavailable: criterion.unavailable,
-    displayBand: criterion.unavailable ? 'Не оценивается' : undefined,
+    displayBand: criterion.unavailable ? 'Не определяется' : undefined,
   }))
 
   const bandNote =
     evaluation.skill === 'Speaking' && !evaluation.pronunciationAvailable
-      ? 'Учебная оценка по 3 критериям (произношение пока не оценивается нашей системой)'
+      ? 'Учебная оценка по 3 критериям (система пока не может определить произношение)'
       : `Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`
 
   return (
@@ -400,7 +403,7 @@ function AIEvaluationReview({
                 <h2 className="font-semibold text-slate-900">{label}</h2>
                 {criterion.unavailable ? (
                   <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
-                    Пока не оценивается
+                    Пока не определяется
                   </span>
                 ) : (
                   <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
@@ -409,7 +412,7 @@ function AIEvaluationReview({
                 )}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                {criterion.feedback || (criterion.unavailable ? 'Наша система пока не оценивает произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.' : 'Комментарий не получен.')}
+                {criterion.feedback || (criterion.unavailable ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.' : 'Комментарий не получен.')}
               </p>
             </CardContent>
           </Card>

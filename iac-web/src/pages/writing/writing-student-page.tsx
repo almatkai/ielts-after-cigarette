@@ -1,5 +1,5 @@
 import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -77,6 +77,93 @@ export function WritingAttemptRunner({
   const session = useAttemptSession(attempt.id)
   const [activeTaskIndex, setActiveTaskIndex] = useState(0)
 
+  const targetImageIds = useMemo(() => {
+    const ids: string[] = []
+    for (const task of material.tasks) {
+      if (task.visualAssetId && !ids.includes(task.visualAssetId)) {
+        ids.push(task.visualAssetId)
+      }
+    }
+    return ids
+  }, [material.tasks])
+
+  const imageQueries = useQueries({
+    queries: targetImageIds.map((id) => ({
+      queryKey: ['writing', 'media', id],
+      queryFn: () => getWritingMediaBlob(id),
+      staleTime: Infinity,
+      gcTime: 1000 * 60 * 60,
+    })),
+  })
+
+  const hasImages = targetImageIds.length > 0
+  const isImagesReady = !hasImages || imageQueries.every((q) => !q.isPending)
+  const isReady =
+    session.answers !== null && isImagesReady && !session.loadError
+
+  const durationMinutes =
+    material.durationMinutes > 0 ? material.durationMinutes : 60
+  const durationSeconds = durationMinutes * 60
+  const totalDurationMs = durationSeconds * 1000
+  const storageKey = `iac_writing_deadline_${attempt.id}`
+
+  const [deadline, setDeadline] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null
+
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+      const parsed = Number(saved)
+      if (parsed > 0 && !isNaN(parsed)) {
+        return parsed
+      }
+    }
+
+    const serverStartedAt = new Date(attempt.startedAt).getTime()
+    if (Date.now() - serverStartedAt > 2 * 60_000) {
+      return serverStartedAt + totalDurationMs
+    }
+
+    return null
+  })
+
+  useEffect(() => {
+    if (isReady && deadline === null) {
+      const newDeadline = Date.now() + totalDurationMs
+      setDeadline(newDeadline)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, String(newDeadline))
+      }
+    }
+  }, [isReady, deadline, totalDurationMs, storageKey])
+
+  useEffect(() => {
+    if (session.submitted && typeof window !== 'undefined') {
+      localStorage.removeItem(storageKey)
+    }
+  }, [session.submitted, storageKey])
+
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (deadline === null) {
+      return durationSeconds
+    }
+    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
+  })
+
+  useEffect(() => {
+    if (deadline === null) {
+      setSecondsLeft(durationSeconds)
+      return
+    }
+
+    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
+
+    const interval = window.setInterval(() => {
+      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
+    }, 1000)
+
+    return () => window.clearInterval(interval)
+  }, [deadline, durationSeconds])
+
   useEffect(() => {
     if (session.submitted && onSubmitted) {
       onSubmitted(session.submitted)
@@ -101,12 +188,12 @@ export function WritingAttemptRunner({
       />
     )
   }
-  if (session.answers === null) {
+  if (!isReady || session.answers === null) {
     return (
       <ExamLoadingScreen
         badge="IELTS Writing"
-        label="Восстанавливаем сохранённые черновики…"
-        description="Загружаем ранее сохранённый текст эссе и черновики из облака..."
+        label="Готовим письменную часть…"
+        description="Загружаем задания эссе, графические материалы и восстанавливаем черновики…"
       />
     )
   }
@@ -140,9 +227,10 @@ export function WritingAttemptRunner({
           <h1 className="sr-only">{material.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
-            <WritingClock
-              startedAt={attempt.startedAt}
-              durationMinutes={material.durationMinutes}
+            <TimeBadge
+              seconds={secondsLeft}
+              danger={secondsLeft <= 5 * 60}
+              label="Оставшееся время"
             />
           </div>
         </div>
@@ -202,32 +290,6 @@ export function WritingAttemptRunner({
         onSubmit={session.submit}
       />
     </div>
-  )
-}
-
-function WritingClock({
-  startedAt,
-  durationMinutes,
-}: {
-  startedAt: string
-  durationMinutes: number
-}) {
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now()), 1000)
-    return () => window.clearInterval(interval)
-  }, [])
-  const secondsRemaining = Math.max(
-    0,
-    durationMinutes * 60 -
-      Math.floor((now - new Date(startedAt).getTime()) / 1000),
-  )
-  return (
-    <TimeBadge
-      seconds={secondsRemaining}
-      danger={secondsRemaining < 5 * 60}
-      label={`Осталось ${durationMinutes} минут на Writing`}
-    />
   )
 }
 
@@ -311,6 +373,8 @@ function ProtectedWritingImage({
   const query = useQuery({
     queryKey: ['writing', 'media', assetId],
     queryFn: () => getWritingMediaBlob(assetId),
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -378,10 +442,13 @@ function WritingProcessingCard({
           Эссе отправлено и проверяется нейросетью
         </h2>
         <p className="text-sm text-slate-600 leading-relaxed mb-4">
-          ИИ оценивает раскрытие тем, связность и структуру, словарный запас и грамматическую точность. Обычно проверка занимает от 30 до 90 секунд.
+          ИИ оценивает раскрытие тем, связность и структуру, словарный запас и
+          грамматическую точность. Обычно проверка занимает от 30 до 90 секунд.
         </p>
         <div className="rounded-xl bg-[#f7f7f5] p-4 text-xs text-slate-500 mb-6 text-left w-full">
-          💡 <strong>Вы можете не ждать на этом экране:</strong> закройте вкладку или перейдите в другие разделы. Проверка завершится в фоновом режиме, а результат с баллами и разбором сохранится в вашем профиле.
+          💡 <strong>Вы можете не ждать на этом экране:</strong> закройте
+          вкладку или перейдите в другие разделы. Проверка завершится в фоновом
+          режиме, а результат с баллами и разбором сохранится в вашем профиле.
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           {fullMockSessionId ? (

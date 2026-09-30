@@ -369,67 +369,113 @@ function AIEvaluationCard({
 }) {
   const evaluation = detail.writingEvaluation ?? detail.speakingEvaluation
   if (!evaluation) return null
+  const isSpeaking = skill === 'speaking' || Boolean(detail.speakingEvaluation)
+  const isPronunciationAvailable = Boolean(
+    detail.speakingEvaluation?.pronunciationAvailable &&
+    detail.speakingEvaluation.criteria.pronunciation.band > 0,
+  )
   const criteria = detail.writingEvaluation
     ? [
         {
           label: 'Task Response',
           criterion: detail.writingEvaluation.criteria.taskResponse,
+          unavailable: false,
+          feedback: detail.writingEvaluation.criteria.taskResponse.feedback,
         },
         {
           label: 'Coherence',
           criterion: detail.writingEvaluation.criteria.coherence,
+          unavailable: false,
+          feedback: detail.writingEvaluation.criteria.coherence.feedback,
         },
         {
           label: 'Lexical Resource',
           criterion: detail.writingEvaluation.criteria.lexicalResource,
+          unavailable: false,
+          feedback: detail.writingEvaluation.criteria.lexicalResource.feedback,
         },
         {
           label: 'Grammar',
           criterion: detail.writingEvaluation.criteria.grammar,
+          unavailable: false,
+          feedback: detail.writingEvaluation.criteria.grammar.feedback,
         },
       ]
     : [
         {
-          label: 'Fluency',
+          label: 'Fluency & Coherence',
           criterion: detail.speakingEvaluation?.criteria.fluency,
+          unavailable: false,
+          feedback: detail.speakingEvaluation?.criteria.fluency.feedback,
         },
         {
           label: 'Lexical Resource',
           criterion: detail.speakingEvaluation?.criteria.lexicalResource,
+          unavailable: false,
+          feedback:
+            detail.speakingEvaluation?.criteria.lexicalResource.feedback,
         },
         {
-          label: 'Grammar',
+          label: 'Grammar Range & Accuracy',
           criterion: detail.speakingEvaluation?.criteria.grammar,
+          unavailable: false,
+          feedback: detail.speakingEvaluation?.criteria.grammar.feedback,
         },
         {
           label: 'Pronunciation',
           criterion: detail.speakingEvaluation?.criteria.pronunciation,
+          unavailable: !isPronunciationAvailable,
+          feedback: !isPronunciationAvailable
+            ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+            : detail.speakingEvaluation?.criteria.pronunciation.feedback,
         },
       ]
 
   return (
     <Card className={cardClassName}>
       <CardHeader className="border-b border-[#ededeb] p-5">
-        <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
-          <MessageQuestion className="size-4 text-[#3b82f6]" aria-hidden />
-          {materialTypeLabels[skill]} · Band {evaluation.overallBand.toFixed(1)}
-        </CardTitle>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
+            <MessageQuestion className="size-4 text-[#3b82f6]" aria-hidden />
+            {materialTypeLabels[skill]} · Band{' '}
+            {evaluation.overallBand.toFixed(1)}
+          </CardTitle>
+          {isSpeaking && !isPronunciationAvailable ? (
+            <span className="text-xs text-[#69696d]">
+              Оценка по 3 критериям (произношение пока не определяется нашей
+              системой)
+            </span>
+          ) : null}
+        </div>
       </CardHeader>
       <CardContent className="grid gap-4 p-5">
         <p className="text-sm leading-6 text-[#4b5563]">{evaluation.summary}</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          {criteria.map(({ label, criterion }) =>
+          {criteria.map(({ label, criterion, unavailable, feedback }) =>
             criterion ? (
-              <div key={label} className="rounded-[10px] bg-[#fafaf8] p-4">
+              <div
+                key={label}
+                className={`rounded-[10px] p-4 ${
+                  unavailable
+                    ? 'border border-amber-200/80 bg-amber-50/20'
+                    : 'bg-[#fafaf8]'
+                }`}
+              >
                 <p className="flex items-center justify-between gap-2 text-sm font-medium">
                   {label}
-                  <span className="text-[#3b82f6]">
-                    {criterion.band.toFixed(1)}
-                  </span>
+                  {unavailable ? (
+                    <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                      Пока не определяется
+                    </span>
+                  ) : (
+                    <span className="text-[#3b82f6]">
+                      {criterion.band.toFixed(1)}
+                    </span>
+                  )}
                 </p>
-                {criterion.feedback ? (
+                {feedback ? (
                   <p className="mt-2 text-sm leading-6 text-[#69696d]">
-                    {criterion.feedback}
+                    {feedback}
                   </p>
                 ) : null}
               </div>

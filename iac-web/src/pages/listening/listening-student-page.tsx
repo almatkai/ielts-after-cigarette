@@ -1,10 +1,5 @@
-import {
-  ArrowLeft,
-  Clock,
-  CloseCircle,
-  TickCircle,
-} from 'iconsax-react'
-import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft, Clock, CloseCircle, TickCircle } from 'iconsax-react'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -95,23 +90,142 @@ export function ListeningAttemptRunner({
   const autoSubmitStarted = useRef(false)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
 
-  const deadline = useMemo(
-    () => new Date(attempt.startedAt).getTime() + test.durationMinutes * 60_000,
-    [attempt.startedAt, test.durationMinutes],
+  const sharedAudioAssetId = useMemo(
+    () =>
+      test.parts.length > 0 &&
+      test.parts[0].audioAssetId &&
+      test.parts.every(
+        (part) => part.audioAssetId === test.parts[0].audioAssetId,
+      )
+        ? test.parts[0].audioAssetId
+        : null,
+    [test.parts],
   )
-  const [secondsLeft, setSecondsLeft] = useState(() =>
-    Math.max(0, Math.floor((deadline - Date.now()) / 1000)),
-  )
+
+  const targetAudioIds = useMemo(() => {
+    if (sharedAudioAssetId) return [sharedAudioAssetId]
+    const ids: string[] = []
+    for (const part of test.parts) {
+      if (part.audioAssetId && !ids.includes(part.audioAssetId)) {
+        ids.push(part.audioAssetId)
+      }
+    }
+    return ids
+  }, [sharedAudioAssetId, test.parts])
+
+  const audioQueries = useQueries({
+    queries: targetAudioIds.map((id) => ({
+      queryKey: ['listening', 'media', id],
+      queryFn: () => getListeningMediaBlob(id),
+      staleTime: Infinity,
+      gcTime: 1000 * 60 * 60,
+    })),
+  })
+
+  const targetImageIds = useMemo(() => {
+    const ids: string[] = []
+    for (const part of test.parts) {
+      for (const group of part.groups) {
+        if (group.imageAssetId && !ids.includes(group.imageAssetId)) {
+          ids.push(group.imageAssetId)
+        }
+      }
+    }
+    return ids
+  }, [test.parts])
+
+  const imageQueries = useQueries({
+    queries: targetImageIds.map((id) => ({
+      queryKey: ['listening', 'media', id],
+      queryFn: () => getListeningMediaBlob(id),
+      staleTime: Infinity,
+      gcTime: 1000 * 60 * 60,
+    })),
+  })
+
+  const hasAudio = targetAudioIds.length > 0
+  const isAudioReady = !hasAudio || audioQueries.every((q) => !q.isPending)
+  const hasImages = targetImageIds.length > 0
+  const isImagesReady = !hasImages || imageQueries.every((q) => !q.isPending)
+
+  const isReady =
+    session.answers !== null &&
+    isAudioReady &&
+    isImagesReady &&
+    !session.loadError
+
+  const durationMinutes = test.durationMinutes > 0 ? test.durationMinutes : 40
+  const totalDurationSeconds = durationMinutes * 60
+  const totalDurationMs = totalDurationSeconds * 1000
+  const storageKey = `iac_listening_deadline_${attempt.id}`
+
+  const [deadline, setDeadline] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null
+
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+      const parsed = Number(saved)
+      if (parsed > 0 && !isNaN(parsed)) {
+        return parsed
+      }
+    }
+
+    const serverStartedAt = new Date(attempt.startedAt).getTime()
+    if (Date.now() - serverStartedAt > 2 * 60_000) {
+      return serverStartedAt + totalDurationMs
+    }
+
+    if (!hasAudio) {
+      const d = Date.now() + totalDurationMs
+      localStorage.setItem(storageKey, String(d))
+      return d
+    }
+
+    return null
+  })
+
   useEffect(() => {
+    if (isReady && deadline === null) {
+      const newDeadline = Date.now() + totalDurationMs
+      setDeadline(newDeadline)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, String(newDeadline))
+      }
+    }
+  }, [isReady, deadline, totalDurationMs, storageKey])
+
+  useEffect(() => {
+    if (session.submitted && typeof window !== 'undefined') {
+      localStorage.removeItem(storageKey)
+    }
+  }, [session.submitted, storageKey])
+
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (deadline === null) {
+      return totalDurationSeconds
+    }
+    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
+  })
+
+  useEffect(() => {
+    if (deadline === null) {
+      setSecondsLeft(totalDurationSeconds)
+      return
+    }
+
+    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
+
     const interval = window.setInterval(() => {
       setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
     }, 1000)
+
     return () => window.clearInterval(interval)
-  }, [deadline])
+  }, [deadline, totalDurationSeconds])
 
   // Авто-submit по истечении времени.
   useEffect(() => {
     if (
+      deadline !== null &&
       secondsLeft === 0 &&
       session.answers !== null &&
       !session.submitted &&
@@ -120,7 +234,13 @@ export function ListeningAttemptRunner({
       autoSubmitStarted.current = true
       session.submit()
     }
-  }, [secondsLeft, session.answers, session.submitted, session.submit])
+  }, [
+    deadline,
+    secondsLeft,
+    session.answers,
+    session.submitted,
+    session.submit,
+  ])
 
   useEffect(() => {
     if (session.submitted && onSubmitted) {
@@ -146,12 +266,12 @@ export function ListeningAttemptRunner({
       />
     )
   }
-  if (session.answers === null) {
+  if (!isReady || session.answers === null) {
     return (
       <ExamLoadingScreen
         badge="IELTS Listening"
-        label="Восстанавливаем сохранённые ответы…"
-        description="Синхронизируем ваш прогресс и последние введённые ответы с сервером..."
+        label="Готовим аудирование…"
+        description="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера…"
       />
     )
   }
@@ -165,12 +285,6 @@ export function ListeningAttemptRunner({
   const currentQuestion = questions[activeQuestionIndex]
   const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
-  const sharedAudioAssetId =
-    test.parts.length > 0 &&
-    test.parts[0].audioAssetId &&
-    test.parts.every((part) => part.audioAssetId === test.parts[0].audioAssetId)
-      ? test.parts[0].audioAssetId
-      : null
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
@@ -186,7 +300,7 @@ export function ListeningAttemptRunner({
             <SaveIndicator state={session.saveState} />
             <TimeBadge
               seconds={secondsLeft}
-              danger={secondsLeft <= TIMER_DANGER_SECONDS}
+              danger={deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS}
               label="Оставшееся время"
             />
           </div>
@@ -302,10 +416,14 @@ export function ListeningAttemptResult({
     [review],
   )
 
-  const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'errors' | 'correct'
+  >('all')
 
   const totalQuestions = review ? review.length : (attempt.maxScore ?? 40)
-  const correctCount = review ? review.filter((i) => i.isCorrect).length : (attempt.score ?? 0)
+  const correctCount = review
+    ? review.filter((i) => i.isCorrect).length
+    : (attempt.score ?? 0)
   const incorrectCount = review ? review.filter((i) => !i.isCorrect).length : 0
 
   const scrollToQuestion = (questionId: string) => {
@@ -329,7 +447,8 @@ export function ListeningAttemptResult({
           {test.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Listening · {test.parts.length} секции · {totalQuestions} вопросов
+          IELTS Academic Listening · {test.parts.length} секции ·{' '}
+          {totalQuestions} вопросов
         </p>
       </div>
 
@@ -511,6 +630,8 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
   const query = useQuery({
     queryKey: ['listening', 'media', assetId],
     queryFn: () => getListeningMediaBlob(assetId),
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -522,11 +643,18 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
     },
     [url],
   )
-  if (query.isPending) return <span className="text-sm">Загружаем аудио…</span>
+  if (query.isPending) {
+    return (
+      <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+        <span className="inline-block size-2 animate-pulse rounded-full bg-blue-500" />
+        <span>Загружаем аудио… Таймер начнётся после загрузки.</span>
+      </div>
+    )
+  }
   return url ? (
     <audio className="mt-3 w-full" controls preload="metadata" src={url} />
   ) : (
-    <span>Аудио недоступно</span>
+    <span className="text-sm text-amber-700">Аудио недоступно</span>
   )
 }
 
@@ -534,6 +662,8 @@ function ProtectedImage({ assetId }: { assetId: string }) {
   const query = useQuery({
     queryKey: ['listening', 'media', assetId],
     queryFn: () => getListeningMediaBlob(assetId),
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),

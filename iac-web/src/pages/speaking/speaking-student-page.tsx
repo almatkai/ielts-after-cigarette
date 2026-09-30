@@ -103,6 +103,9 @@ export function SpeakingAttemptRunner({
     }
   }, [session.submitted, onSubmitted])
 
+  const isReady =
+    session.answers !== null && !detailQuery.isPending && !session.loadError
+
   if (session.submitted) {
     return (
       <SpeakingAttemptResult
@@ -121,12 +124,12 @@ export function SpeakingAttemptRunner({
       />
     )
   }
-  if (session.answers === null) {
+  if (!isReady || session.answers === null) {
     return (
       <ExamLoadingScreen
         badge="IELTS Speaking"
-        label="Восстанавливаем ответы…"
-        description="Синхронизируем записанные ответы и статус сессии..."
+        label="Готовим устную часть…"
+        description="Загружаем карточки заданий, настраиваем микрофон и проверяем статус сессии…"
       />
     )
   }
@@ -401,8 +404,9 @@ function SpeakingPartRunner({
             placeholder="Можно напечатать ответ вручную или наговорить голосом — аудио расшифруется автоматически."
           />
           <p className="text-xs text-[#808084]">
-            Для точной оценки произношения нужен аудиозапись. Текстовый ответ
-            оценивается, но произношение будет ориентировочным.
+            Наша система пока не может определить произношение (Pronunciation).
+            Оценка будет сформирована по беглости, словарному запасу и
+            грамматической точности.
           </p>
         </div>
         <div className="flex flex-wrap justify-between gap-3 border-t pt-5">
@@ -549,7 +553,10 @@ function SpeakingEvaluationView({
   material: PublicSpeakingMaterial
   evaluation: SpeakingEvaluation
 }) {
-  const isPronunciationAvailable = Boolean(evaluation.pronunciationAvailable)
+  const isPronunciationAvailable = Boolean(
+    evaluation.pronunciationAvailable &&
+    evaluation.criteria.pronunciation.band > 0,
+  )
   const criteriaList = [
     { label: 'Fluency & Coherence', band: evaluation.criteria.fluency.band },
     {
@@ -561,7 +568,7 @@ function SpeakingEvaluationView({
       label: 'Pronunciation',
       band: evaluation.criteria.pronunciation.band,
       unavailable: !isPronunciationAvailable,
-      displayBand: !isPronunciationAvailable ? 'Не оценивается' : undefined,
+      displayBand: !isPronunciationAvailable ? 'Не определяется' : undefined,
     },
   ]
 
@@ -574,7 +581,7 @@ function SpeakingEvaluationView({
       {
         ...evaluation.criteria.pronunciation,
         feedback: !isPronunciationAvailable
-          ? 'Наша система пока не оценивает Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+          ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
           : evaluation.criteria.pronunciation.feedback,
       },
       !isPronunciationAvailable,
@@ -588,7 +595,7 @@ function SpeakingEvaluationView({
         bandNote={
           isPronunciationAvailable
             ? 'Учебная оценка по 4 критериям IELTS Speaking'
-            : 'Учебная оценка по 3 критериям (произношение пока не оценивается нашей системой)'
+            : 'Учебная оценка по 3 критериям (система пока не может определить произношение)'
         }
         criteria={criteriaList}
         startedAt={attempt.startedAt}
@@ -613,7 +620,9 @@ function SpeakingEvaluationView({
           <Card
             key={label}
             className={`rounded-[16px] border bg-white shadow-xs ${
-              unavailable ? 'border-amber-200/80 bg-amber-50/20' : 'border-[#e7e7e4]'
+              unavailable
+                ? 'border-amber-200/80 bg-amber-50/20'
+                : 'border-[#e7e7e4]'
             }`}
           >
             <CardContent className="p-5">
@@ -621,7 +630,7 @@ function SpeakingEvaluationView({
                 <h2 className="font-semibold text-slate-900">{label}</h2>
                 {unavailable ? (
                   <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
-                    Пока не оценивается
+                    Пока не определяется
                   </span>
                 ) : (
                   <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
@@ -630,7 +639,10 @@ function SpeakingEvaluationView({
                 )}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                {criterion.feedback || (unavailable ? 'Наша система пока не оценивает произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.' : 'Комментарий не получен.')}
+                {criterion.feedback ||
+                  (unavailable
+                    ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.'
+                    : 'Комментарий не получен.')}
               </p>
             </CardContent>
           </Card>

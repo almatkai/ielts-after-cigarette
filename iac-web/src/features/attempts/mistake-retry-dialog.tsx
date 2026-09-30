@@ -24,16 +24,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import {
-  getAttemptMaterial,
-  type AttemptReviewItem,
-  type StudentAnswer,
-} from '@/features/attempts/api'
-import type { PublicReadingMaterial } from '@/features/reading/api'
-import {
-  getListeningMediaBlob,
-  type PublicListeningTest,
-} from '@/features/listening/api'
+import { getAttemptMaterial } from '@/features/attempts/api'
+import type { AttemptReviewItem, StudentAnswer } from '@/features/attempts/api'
+import { getListeningMediaBlob } from '@/features/listening/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 
@@ -117,7 +110,7 @@ function MistakeRetryContent({
   // For Listening: find corresponding part
   const listeningPart = useMemo(() => {
     if (!materialQuery.data || !('parts' in materialQuery.data)) return null
-    const listMat = materialQuery.data as PublicListeningTest
+    const listMat = materialQuery.data
     for (const part of listMat.parts) {
       for (const group of part.groups) {
         if (
@@ -139,14 +132,14 @@ function MistakeRetryContent({
     typeof item.timestampStart === 'number'
       ? item.timestampStart
       : typeof item.content?.timestampStart === 'number'
-        ? (item.content.timestampStart as number)
+        ? item.content.timestampStart
         : undefined
 
   const timestampEnd =
     typeof item.timestampEnd === 'number'
       ? item.timestampEnd
       : typeof item.content?.timestampEnd === 'number'
-        ? (item.content.timestampEnd as number)
+        ? item.content.timestampEnd
         : undefined
 
   // Rewind audio 3-5 passages / dialogue segments back (with pseudo-random offset)
@@ -204,16 +197,16 @@ function MistakeRetryContent({
       return item.passageBody.trim()
     }
     if (materialQuery.data && 'body' in materialQuery.data) {
-      const readingMat = materialQuery.data as PublicReadingMaterial
+      const readingMat = materialQuery.data
       // Check nested passages
       if (readingMat.passages && readingMat.passages.length > 0) {
         if (item.passageTitle) {
           const match = readingMat.passages.find(
             (p) =>
-              p.title?.toLowerCase() === item.passageTitle?.toLowerCase() ||
+              p.title.toLowerCase() === item.passageTitle?.toLowerCase() ||
               item.passageTitle
                 ?.toLowerCase()
-                .includes(p.title?.toLowerCase() || ''),
+                .includes(p.title.toLowerCase() || ''),
           )
           if (match?.body) return match.body
         }
@@ -617,7 +610,7 @@ function MistakeRetryContent({
           <div className="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm font-medium text-slate-900 leading-relaxed shadow-2xs space-y-3">
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-[#2563eb]">Вопрос {item.number}</span>
-              {typeof item.content?.completionRule === 'object' && item.content?.completionRule ? (
+              {typeof item.content?.completionRule === 'object' && item.content.completionRule ? (
                 <Badge variant="outline" className="text-[10.5px] font-semibold bg-white text-slate-600 border-slate-200">
                   {`NO MORE THAN ${String((item.content.completionRule as Record<string, unknown>).maxWords ?? 2)} WORDS`}
                 </Badge>
@@ -628,7 +621,7 @@ function MistakeRetryContent({
             {typeof item.content?.imageUrl === 'string' && item.content.imageUrl ? (
               <div className="rounded-lg border border-slate-200 bg-white p-2.5 flex items-center justify-center">
                 <img
-                  src={item.content.imageUrl as string}
+                  src={item.content.imageUrl}
                   alt="Diagram"
                   className="max-h-52 max-w-full object-contain rounded"
                 />

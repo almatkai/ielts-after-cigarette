@@ -501,7 +501,7 @@ export function ReadingMaterialEditorPage({
                   <div className="grid gap-2">
                     <Label>Участок текста с ответом (Цитата из Passage)</Label>
                     <Textarea
-                      value={String(question.content?.quote ?? '')}
+                      value={String(question.content.quote ?? '')}
                       onChange={(event) =>
                         updateQuestion(groupIndex, questionIndex, {
                           content: {
@@ -518,7 +518,7 @@ export function ReadingMaterialEditorPage({
                   <div className="grid gap-2">
                     <Label>Наводящая подсказка студенту (без спойлера ответа)</Label>
                     <Input
-                      value={String(question.content?.hint ?? '')}
+                      value={String(question.content.hint ?? '')}
                       onChange={(event) =>
                         updateQuestion(groupIndex, questionIndex, {
                           content: {

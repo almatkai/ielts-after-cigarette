@@ -1,8 +1,4 @@
-import {
-  Clock,
-  Layer,
-  PlayCircle,
-} from 'iconsax-react'
+import { Clock, Layer, PlayCircle } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
@@ -61,7 +57,10 @@ export function FullMockLibraryPage() {
                   <CardTitle className="text-base font-semibold tracking-[-0.01em] text-[#111111] transition-colors group-hover:text-[#3b82f6]">
                     {item.title}
                   </CardTitle>
-                  <Badge variant="outline" className="border-[#deded9] bg-slate-50 text-[11px] font-semibold text-slate-600">
+                  <Badge
+                    variant="outline"
+                    className="border-[#deded9] bg-slate-50 text-[11px] font-semibold text-slate-600"
+                  >
                     {item.examType === 'academic' ? 'Academic' : 'General'}
                   </Badge>
                 </div>
@@ -73,16 +72,22 @@ export function FullMockLibraryPage() {
               </CardHeader>
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
                 <p className="flex items-center gap-2 text-sm text-[#69696d]">
-                  <Clock className="size-4 text-slate-400 transition-colors group-hover:text-[#3b82f6]" aria-hidden />
+                  <Clock
+                    className="size-4 text-slate-400 transition-colors group-hover:text-[#3b82f6]"
+                    aria-hidden
+                  />
                   {item.durationMinutes} минут ·{' '}
-                  <Layer className="size-4 text-slate-400 transition-colors group-hover:text-[#3b82f6]" aria-hidden />
+                  <Layer
+                    className="size-4 text-slate-400 transition-colors group-hover:text-[#3b82f6]"
+                    aria-hidden
+                  />
                   4 секции
                 </p>
-                <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
-                  <Link
-                    to="/full-mocks/$mockId"
-                    params={{ mockId: item.id }}
-                  >
+                <Button
+                  asChild
+                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                >
+                  <Link to="/full-mocks/$mockId" params={{ mockId: item.id }}>
                     <PlayCircle aria-hidden />
                     Начать
                   </Link>

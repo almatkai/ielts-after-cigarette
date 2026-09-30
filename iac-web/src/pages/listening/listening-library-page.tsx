@@ -1,12 +1,13 @@
-import {
-  Headphone,
-} from 'iconsax-react'
+import { Headphone } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { EmptyState, LibraryCardsSkeleton } from '@/features/attempts/attempt-ui'
+import {
+  EmptyState,
+  LibraryCardsSkeleton,
+} from '@/features/attempts/attempt-ui'
 import { useAuth } from '@/features/auth/auth-store'
 import {
   listeningKeys,
@@ -47,7 +48,10 @@ export function ListeningLibraryPage() {
               <CardContent className="flex h-full flex-col justify-between gap-4 p-5 sm:p-6">
                 <div className="flex items-start gap-3.5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                    <Headphone className="size-5 transition-colors" aria-hidden />
+                    <Headphone
+                      className="size-5 transition-colors"
+                      aria-hidden
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
@@ -64,8 +68,14 @@ export function ListeningLibraryPage() {
                   </div>
                 </div>
                 <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
-                    <Link to="/exam/listening/$testId" params={{ testId: test.id }}>
+                  <Button
+                    asChild
+                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  >
+                    <Link
+                      to="/exam/listening/$testId"
+                      params={{ testId: test.id }}
+                    >
                       Открыть тест
                     </Link>
                   </Button>

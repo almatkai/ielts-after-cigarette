@@ -1,10 +1,4 @@
-import {
-  ArrowRight,
-  Clock,
-  Lock,
-  PlayCircle,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowRight, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'

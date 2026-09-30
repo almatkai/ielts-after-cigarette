@@ -80,7 +80,11 @@ export function DashboardHeader({
             </div>
             <div className="flex flex-col items-center px-5 py-10 text-center">
               <span className="grid size-11 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
-                <NotificationBing className="size-5" strokeWidth={1.8} aria-hidden />
+                <NotificationBing
+                  className="size-5"
+                  strokeWidth={1.8}
+                  aria-hidden
+                />
               </span>
               <p className="mt-4 text-sm font-semibold text-[#111111]">
                 Пока нет уведомлений
@@ -99,11 +103,7 @@ export function DashboardHeader({
         >
           <Link to="/profile" aria-label="Открыть профиль">
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
-              <User
-                className="size-[17px]"
-                strokeWidth={1.8}
-                aria-hidden
-              />
+              <User className="size-[17px]" strokeWidth={1.8} aria-hidden />
             </span>
             <span className="hidden text-sm font-semibold sm:inline">
               {accountName}

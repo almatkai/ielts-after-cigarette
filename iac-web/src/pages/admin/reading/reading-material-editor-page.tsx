@@ -516,7 +516,9 @@ export function ReadingMaterialEditorPage({
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Наводящая подсказка студенту (без спойлера ответа)</Label>
+                    <Label>
+                      Наводящая подсказка студенту (без спойлера ответа)
+                    </Label>
                     <Input
                       value={String(question.content.hint ?? '')}
                       onChange={(event) =>

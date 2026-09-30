@@ -1,7 +1,4 @@
-import {
-  Add,
-  ClipboardTick,
-} from 'iconsax-react'
+import { Add, ClipboardTick } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 

@@ -282,7 +282,8 @@ button {
 
 /* AI Fox Mascot Character Animations (Razor-sharp vectors without blurring) */
 @keyframes foxFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -291,7 +292,8 @@ button {
 }
 
 @keyframes foxShadowPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scaleX(1);
     opacity: 0.28;
   }
@@ -303,7 +305,10 @@ button {
 
 /* Realistic eye blinking cycle (every ~4.2s) */
 @keyframes foxBlink {
-  0%, 90%, 94%, 100% {
+  0%,
+  90%,
+  94%,
+  100% {
     transform: scaleY(1);
   }
   92% {
@@ -313,10 +318,12 @@ button {
 
 /* Magic Star 15-second cycle: gentle hovering idle, then full swooping orbit around Yuki */
 @keyframes foxStarOrbit15s {
-  0%, 70% {
+  0%,
+  70% {
     transform: translate(0px, 0px) scale(1);
   }
-  20%, 50% {
+  20%,
+  50% {
     transform: translate(-6px, -12px) scale(1.04);
   }
   35% {
@@ -351,7 +358,9 @@ button {
 
 /* Ear micro-twitch every ~4.6 seconds */
 @keyframes foxEarTwitch {
-  0%, 75%, 100% {
+  0%,
+  75%,
+  100% {
     transform: rotate(0deg);
   }
   78% {
@@ -438,4 +447,93 @@ svg path[stroke-width]:not([stroke]) {
 .animate-exam-loading-bar {
   animation: examLoadingBarSmooth 1.6s ease-in-out infinite;
   will-change: transform;
+}
+
+/* Blog rich text editor (TipTap) */
+.blog-editor .tiptap {
+  min-height: 320px;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.blog-editor .tiptap p.is-editor-empty:first-child::before {
+  color: #a0a0a4;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.blog-editor .tiptap img {
+  border-radius: 12px;
+  height: auto;
+  max-width: 100%;
+}
+
+.blog-editor .tiptap a {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Blog article body */
+.blog-article {
+  color: #111111;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.blog-article h2 {
+  font-size: 1.45rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 1.8em 0 0.6em;
+}
+
+.blog-article h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 1.5em 0 0.5em;
+}
+
+.blog-article p {
+  margin: 0.9em 0;
+}
+
+.blog-article img {
+  border-radius: 12px;
+  height: auto;
+  margin: 1.4em 0;
+  max-width: 100%;
+}
+
+.blog-article a {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.blog-article blockquote {
+  border-left: 3px solid #e7e7e4;
+  color: #525256;
+  margin: 1.4em 0;
+  padding-left: 1em;
+}
+
+.blog-article ul,
+.blog-article ol {
+  margin: 0.9em 0;
+  padding-left: 1.4em;
+}
+
+.blog-article ul {
+  list-style: disc;
+}
+
+.blog-article ol {
+  list-style: decimal;
+}
+
+.blog-article li {
+  margin: 0.35em 0;
 }

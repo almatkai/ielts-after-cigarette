@@ -91,29 +91,29 @@ export function ListeningTestsPage() {
                   {test.currentVersionNumber}
                 </p>
               </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={exportLoadingId === test.id}
-                    onClick={() => void handleExport(test.id)}
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={exportLoadingId === test.id}
+                  onClick={() => void handleExport(test.id)}
+                >
+                  <ExportCurve aria-hidden />
+                  {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
+                </Button>
+                <Button asChild variant="outline">
+                  <Link
+                    to="/admin/listening/tests/$testId"
+                    params={{ testId: test.id }}
                   >
-                    <ExportCurve aria-hidden />
-                    {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link
-                      to="/admin/listening/tests/$testId"
-                      params={{ testId: test.id }}
-                    >
-                      <Edit aria-hidden /> Редактировать
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    <Edit aria-hidden /> Редактировать
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {exportTest ? (
         <DataExportDialog

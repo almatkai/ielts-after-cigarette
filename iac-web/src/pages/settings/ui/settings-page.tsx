@@ -111,9 +111,7 @@ export function SettingsPage() {
       try {
         const updated = await updateProfile({
           displayName: value.displayName.trim(),
-          ...(value.timezone.trim()
-            ? { timezone: value.timezone.trim() }
-            : {}),
+          ...(value.timezone.trim() ? { timezone: value.timezone.trim() } : {}),
         })
         authStore.updateUser(updated)
         queryClient.setQueryData(queryKeys.profile, updated)

@@ -623,7 +623,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           className="shrink-0 font-mono text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
                           title="Перемотать аудио на эту секунду"
                         >
-                          ▶ {formatSeconds(seg.start)} - {formatSeconds(seg.end)}
+                          ▶ {formatSeconds(seg.start)} -{' '}
+                          {formatSeconds(seg.end)}
                         </button>
                         <span className="text-slate-700 leading-relaxed">
                           {seg.text}
@@ -823,11 +824,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           {typeof question.content.timestampStart ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
-                              (
-                              {formatSeconds(
-                                question.content.timestampStart,
-                              )}
-                              )
+                              ({formatSeconds(question.content.timestampStart)})
                             </span>
                           )}
                           {typeof question.content.timestampStart ===
@@ -860,8 +857,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             min={0}
                             placeholder="21.0"
                             value={
-                              typeof question.content.timestampEnd ===
-                              'number'
+                              typeof question.content.timestampEnd === 'number'
                                 ? question.content.timestampEnd
                                 : ''
                             }
@@ -889,11 +885,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           {typeof question.content.timestampEnd ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
-                              (
-                              {formatSeconds(
-                                question.content.timestampEnd,
-                              )}
-                              )
+                              ({formatSeconds(question.content.timestampEnd)})
                             </span>
                           )}
                         </div>

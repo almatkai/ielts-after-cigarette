@@ -1,6 +1,4 @@
-import {
-  ArrowRight,
-} from 'iconsax-react'
+import { ArrowRight } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
@@ -50,7 +48,9 @@ export function ProgressPage() {
   const dashboard = dashboardQuery.data
   const attemptsPending = attemptsQuery.isPending
   const attemptsError = attemptsQuery.error
-  const attempts = [...(attemptsQuery.data?.items ?? [])].sort(bySubmittedAtDesc)
+  const attempts = [...(attemptsQuery.data?.items ?? [])].sort(
+    bySubmittedAtDesc,
+  )
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -150,14 +150,29 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
         <p className="mt-1 text-xs text-[#808084]">
           {skillLabel(item.materialType)} ·{' '}
           {formatDateTime(item.submittedAt ?? item.startedAt)}
-          {submitted ? '' : processing ? ' · на проверке ИИ' : ' · не завершена'}
+          {submitted
+            ? ''
+            : processing
+              ? ' · на проверке ИИ'
+              : ' · не завершена'}
         </p>
       </div>
       {processing ? (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3b82f6]">
           <svg className="size-3 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
           Проверяется
         </span>
@@ -175,10 +190,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       ) : null}
       {submitted || processing ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
-          <Link
-            to="/attempts/$attemptId"
-            params={{ attemptId: item.id }}
-          >
+          <Link to="/attempts/$attemptId" params={{ attemptId: item.id }}>
             {processing ? 'Статус' : 'Разбор'}
             <ArrowRight aria-hidden />
           </Link>

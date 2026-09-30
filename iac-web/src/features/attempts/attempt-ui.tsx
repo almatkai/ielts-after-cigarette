@@ -117,7 +117,10 @@ export function LibraryCardsSkeleton({ count = 4 }: { count?: number }) {
       aria-label="Загрузка списка тестов"
     >
       {Array.from({ length: count }).map((_, i) => (
-        <Card key={i} className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+        <Card
+          key={i}
+          className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-[0_10px_36px_rgba(17,17,17,0.035)]"
+        >
           <CardContent className="grid gap-3 p-5 sm:p-6">
             <div className="size-10 animate-pulse rounded-[10px] bg-[#f1f5f9]" />
             <div className="space-y-2">
@@ -170,7 +173,9 @@ export function LoadingState({
           />
         </svg>
       </div>
-      {label ? <p className="text-sm font-medium text-[#64748b]">{label}</p> : null}
+      {label ? (
+        <p className="text-sm font-medium text-[#64748b]">{label}</p>
+      ) : null}
     </div>
   )
 }
@@ -191,9 +196,13 @@ export function ErrorState({
           <div className="flex size-14 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-[#e23b3b]">
             <CloseCircle className="size-7" aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">{title}</h2>
+          <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">
+            {title}
+          </h2>
           <p className="text-sm leading-relaxed text-[#64748b]">{message}</p>
-          <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">Повторить попытку</Button>
+          <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">
+            Повторить попытку
+          </Button>
         </CardContent>
       </Card>
     </div>
@@ -534,9 +543,12 @@ export function isQuestionAnswered(
   answer?: StudentAnswer | null,
 ): boolean {
   if (!questionId || !answer) return false
-  if (Array.isArray(answer.optionIds) && answer.optionIds.length > 0) return true
-  if (typeof answer.optionId === 'string' && answer.optionId.trim() !== '') return true
-  if (typeof answer.value === 'string' && answer.value.trim() !== '') return true
+  if (Array.isArray(answer.optionIds) && answer.optionIds.length > 0)
+    return true
+  if (typeof answer.optionId === 'string' && answer.optionId.trim() !== '')
+    return true
+  if (typeof answer.value === 'string' && answer.value.trim() !== '')
+    return true
   return false
 }
 
@@ -592,7 +604,9 @@ export function AttemptResultHeader({
             disabled={isRetaking}
             className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
           >
-            <Refresh2 className={cn('size-3.5', isRetaking && 'animate-spin')} />
+            <Refresh2
+              className={cn('size-3.5', isRetaking && 'animate-spin')}
+            />
             <span>{isRetaking ? 'Подготовка…' : 'Пройти заново'}</span>
           </Button>
         )}
@@ -708,7 +722,9 @@ export function AttemptPerformanceReport({
               <span className="text-5xl sm:text-6xl font-extrabold tracking-tight text-[#3b82f6]">
                 {band !== null && band !== undefined ? band.toFixed(1) : '—'}
               </span>
-              <span className="text-sm font-semibold text-slate-400">из 9.0</span>
+              <span className="text-sm font-semibold text-slate-400">
+                из 9.0
+              </span>
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500">{bandNote}</p>
@@ -723,7 +739,8 @@ export function AttemptPerformanceReport({
                   Критерии IELTS
                 </span>
                 <span className="text-xs font-bold text-[#3b82f6]">
-                  {criteria.filter((c) => !c.unavailable).length < criteria.length
+                  {criteria.filter((c) => !c.unavailable).length <
+                  criteria.length
                     ? `${criteria.filter((c) => !c.unavailable).length} критерия`
                     : `${criteria.length} критерия`}
                 </span>
@@ -738,11 +755,17 @@ export function AttemptPerformanceReport({
                         : 'border-slate-100 bg-slate-50/70'
                     }`}
                   >
-                    <span className="block text-[11px] font-medium text-slate-500 truncate" title={c.label}>
+                    <span
+                      className="block text-[11px] font-medium text-slate-500 truncate"
+                      title={c.label}
+                    >
                       {c.label}
                     </span>
                     {c.unavailable ? (
-                      <span className="block mt-1 text-[11px] font-semibold text-amber-600 truncate" title="Пока не определяется нашей системой">
+                      <span
+                        className="block mt-1 text-[11px] font-semibold text-amber-600 truncate"
+                        title="Пока не определяется нашей системой"
+                      >
                         {c.displayBand ?? 'Не определяется'}
                       </span>
                     ) : (
@@ -791,7 +814,8 @@ export function AttemptPerformanceReport({
                   {incorrectCount > 0 ? (
                     <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200/60">
                       <CloseCircle className="size-3.5 text-rose-600" />
-                      {incorrectCount} {incorrectCount === 1 ? 'ошибка' : 'ошибок'}
+                      {incorrectCount}{' '}
+                      {incorrectCount === 1 ? 'ошибка' : 'ошибок'}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">

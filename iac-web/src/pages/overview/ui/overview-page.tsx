@@ -159,7 +159,11 @@ export function OverviewPage() {
             <Card key={metric.label} className={cardClassName}>
               <CardContent className="flex min-w-0 items-start gap-4 p-5">
                 <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <Icon className="size-[19px] transition-colors" strokeWidth={1.8} aria-hidden />
+                  <Icon
+                    className="size-[19px] transition-colors"
+                    strokeWidth={1.8}
+                    aria-hidden
+                  />
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold tracking-[0.03em] text-[#69696d]">
@@ -227,7 +231,10 @@ export function OverviewPage() {
             <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <Chart className="size-[18px] transition-colors" aria-hidden />
+                  <Chart
+                    className="size-[18px] transition-colors"
+                    aria-hidden
+                  />
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -278,7 +285,10 @@ export function OverviewPage() {
             <CardHeader className="border-b border-[#ededeb] p-5">
               <div className="flex items-start gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <CalendarTick className="size-[18px] transition-colors" aria-hidden />
+                  <CalendarTick
+                    className="size-[18px] transition-colors"
+                    aria-hidden
+                  />
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-base tracking-[-0.02em]">
@@ -349,7 +359,10 @@ export function OverviewPage() {
                     className="group flex min-h-[72px] items-center gap-3 px-5 py-3 text-[#111111] no-underline transition-colors hover:bg-[#fafaf8]"
                   >
                     <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                      <Icon className="size-[18px] transition-colors" aria-hidden />
+                      <Icon
+                        className="size-[18px] transition-colors"
+                        aria-hidden
+                      />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold">

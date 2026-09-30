@@ -1,6 +1,4 @@
-import {
-  PlayCircle,
-} from 'iconsax-react'
+import { PlayCircle } from 'iconsax-react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -68,7 +66,10 @@ export function FullMockStartPage({ mockId }: { mockId: string }) {
               {getErrorMessage(start.error)}
             </p>
           ) : null}
-          <Button disabled={start.isPending} onClick={() => start.mutate(false)}>
+          <Button
+            disabled={start.isPending}
+            onClick={() => start.mutate(false)}
+          >
             <PlayCircle aria-hidden />
             {start.isPending ? 'Открываем сессию…' : 'Начать или продолжить'}
           </Button>

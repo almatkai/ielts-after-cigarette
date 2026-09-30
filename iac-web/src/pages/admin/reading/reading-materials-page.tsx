@@ -30,7 +30,9 @@ const difficultyLabels = {
 
 export function ReadingMaterialsPage() {
   const navigate = useNavigate()
-  const [exportMaterial, setExportMaterial] = useState<ReadingMaterial | null>(null)
+  const [exportMaterial, setExportMaterial] = useState<ReadingMaterial | null>(
+    null,
+  )
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
 
   const materialsQuery = useQuery({

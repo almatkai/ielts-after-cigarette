@@ -1,8 +1,4 @@
-import {
-  CloseSquare,
-  Logout,
-  ShieldTick,
-} from 'iconsax-react'
+import { CloseSquare, Logout, ShieldTick } from 'iconsax-react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 

@@ -35,11 +35,7 @@ const skillMeta: Record<
   {
     title: string
     subtitle: string
-    to:
-      | '/listening'
-      | '/reading'
-      | '/writing'
-      | '/speaking'
+    to: '/listening' | '/reading' | '/writing' | '/speaking'
     icon: typeof Headphone
     advice: string
   }
@@ -49,28 +45,32 @@ const skillMeta: Record<
     subtitle: 'Аудирование',
     to: '/listening',
     icon: Headphone,
-    advice: 'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
+    advice:
+      'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
   },
   reading: {
     title: 'Reading',
     subtitle: 'Чтение',
     to: '/reading',
     icon: Book,
-    advice: 'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
+    advice:
+      'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
   },
   writing: {
     title: 'Writing',
     subtitle: 'Письмо',
     to: '/writing',
     icon: Edit2,
-    advice: 'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
+    advice:
+      'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
   },
   speaking: {
     title: 'Speaking',
     subtitle: 'Устная речь',
     to: '/speaking',
     icon: Microphone,
-    advice: 'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
+    advice:
+      'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
   },
 }
 
@@ -125,7 +125,9 @@ export function PlanPage() {
 
   const weakestMeta = weakest ? skillMeta[weakest.skill] : undefined
   const weakestGap =
-    targetBand !== null && weakest?.estimatedBand !== null && weakest?.estimatedBand !== undefined
+    targetBand !== null &&
+    weakest?.estimatedBand !== null &&
+    weakest?.estimatedBand !== undefined
       ? targetBand - weakest.estimatedBand
       : null
 
@@ -137,7 +139,8 @@ export function PlanPage() {
           План подготовки к IELTS
         </h2>
         <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Индивидуальная стратегия, фокус на самых слабых навыках и ежедневный темп занятий.
+          Индивидуальная стратегия, фокус на самых слабых навыках и ежедневный
+          темп занятий.
         </p>
       </div>
 
@@ -202,13 +205,16 @@ export function PlanPage() {
             <div className="flex flex-col gap-5 flex-1 min-w-0">
               {targetBand === null || examDate === null ? (
                 <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] p-5 text-center">
-                  <DirectRight className="mx-auto size-6 text-[#3b82f6]" aria-hidden />
+                  <DirectRight
+                    className="mx-auto size-6 text-[#3b82f6]"
+                    aria-hidden
+                  />
                   <p className="mt-2 text-sm font-semibold text-[#111111]">
                     Целевой балл или дата ещё не заданы
                   </p>
                   <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#69696d]">
-                    Укажите желаемый Overall Band и дату экзамена — алгоритм рассчитает
-                    необходимый темп и распределит нагрузку по дням.
+                    Укажите желаемый Overall Band и дату экзамена — алгоритм
+                    рассчитает необходимый темп и распределит нагрузку по дням.
                   </p>
                   <Button asChild size="sm" className="mt-4 shadow-none">
                     <Link to="/profile">Задать цель в профиле</Link>
@@ -225,10 +231,14 @@ export function PlanPage() {
                         {currentBand !== null ? currentBand.toFixed(1) : '—'}
                       </span>
                       {currentBand === null && (
-                        <span className="text-[11px] text-[#8b8b8e]">(после тестов)</span>
+                        <span className="text-[11px] text-[#8b8b8e]">
+                          (после тестов)
+                        </span>
                       )}
                     </div>
-                    <p className="mt-1 text-[11px] text-[#69696d]">Расчётный Overall Band</p>
+                    <p className="mt-1 text-[11px] text-[#69696d]">
+                      Расчётный Overall Band
+                    </p>
                   </div>
 
                   <div className="rounded-[12px] border border-[#dbeafe] bg-[#eff6ff]/40 p-4">
@@ -243,7 +253,9 @@ export function PlanPage() {
                         <span
                           className={cn(
                             'text-[11px] font-semibold',
-                            targetBand - currentBand <= 0 ? 'text-emerald-600' : 'text-[#3b82f6]',
+                            targetBand - currentBand <= 0
+                              ? 'text-emerald-600'
+                              : 'text-[#3b82f6]',
                           )}
                         >
                           {targetBand - currentBand <= 0
@@ -252,7 +264,9 @@ export function PlanPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-[11px] text-[#69696d]">Желаемый результат</p>
+                    <p className="mt-1 text-[11px] text-[#69696d]">
+                      Желаемый результат
+                    </p>
                   </div>
 
                   <div className="rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
@@ -302,7 +316,8 @@ export function PlanPage() {
                   Зона максимального роста
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Навык, улучшение которого даст наибольший прирост к общему баллу
+                  Навык, улучшение которого даст наибольший прирост к общему
+                  баллу
                 </CardDescription>
               </div>
             </div>
@@ -323,7 +338,8 @@ export function PlanPage() {
               </p>
               <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#808084]">
                 Пока нет завершённых попыток. Начните с Listening или Reading —
-                алгоритм сразу вычислит текущий балл и выявит самое слабое место.
+                алгоритм сразу вычислит текущий балл и выявит самое слабое
+                место.
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
@@ -339,7 +355,9 @@ export function PlanPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
                 <div className="flex items-center gap-3">
                   <span className="grid size-10 place-items-center rounded-[10px] bg-white text-[#3b82f6] shadow-xs">
-                    {weakestMeta && <weakestMeta.icon className="size-5" aria-hidden />}
+                    {weakestMeta && (
+                      <weakestMeta.icon className="size-5" aria-hidden />
+                    )}
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-[#111111]">
@@ -399,8 +417,8 @@ export function PlanPage() {
                     Анализ ошибок
                   </div>
                   <p className="mt-2 text-xs leading-5 text-[#69696d]">
-                    {weakestMeta?.advice} Все ошибки сохраняются в разделе «Ошибки»
-                    для повторения.
+                    {weakestMeta?.advice} Все ошибки сохраняются в разделе
+                    «Ошибки» для повторения.
                   </p>
                 </div>
 
@@ -412,8 +430,8 @@ export function PlanPage() {
                     Контрольный замер
                   </div>
                   <p className="mt-2 text-xs leading-5 text-[#69696d]">
-                    Раз в неделю проходите полный модуль целиком с таймингом, чтобы
-                    отслеживать динамику в «Прогрессе».
+                    Раз в неделю проходите полный модуль целиком с таймингом,
+                    чтобы отслеживать динамику в «Прогрессе».
                   </p>
                 </div>
               </div>
@@ -421,7 +439,6 @@ export function PlanPage() {
           )}
         </CardContent>
       </Card>
-
     </div>
   )
 }
@@ -456,10 +473,11 @@ function getPacingInfo(
     return 'Оптимальный темп: 1 модуль ежедневно + 1 полный пробный тест (Full Mock) в неделю.'
   }
   const gap =
-    targetBand !== null && currentBand !== null ? targetBand - currentBand : null
+    targetBand !== null && currentBand !== null
+      ? targetBand - currentBand
+      : null
   if (gap !== null && gap > 1.5) {
     return 'До цели значительный шаг: уделяйте особое внимание слабому навыку и словарному запасу.'
   }
   return 'Планомерная подготовка: 1 модуль в день и еженедельный разбор накопленных ошибок.'
 }
-

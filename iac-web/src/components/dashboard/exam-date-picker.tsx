@@ -78,6 +78,10 @@ type ExamDatePickerProps = {
   disabled?: boolean
   error?: string
   className?: string
+  /** id кнопки-триггера, чтобы связать Label с полем. */
+  id?: string
+  /** Классы контейнера календаря — нужны, чтобы поднять его над диалогом. */
+  contentClassName?: string
 }
 
 export function ExamDatePicker({
@@ -86,6 +90,8 @@ export function ExamDatePicker({
   disabled,
   error,
   className,
+  id,
+  contentClassName,
 }: ExamDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -236,6 +242,7 @@ export function ExamDatePicker({
       <PopoverTrigger asChild>
         <button
           type="button"
+          id={id}
           disabled={disabled}
           className={cn(
             'group/btn h-11 w-full rounded-[9px] border bg-white px-3.5 flex items-center justify-between text-left text-sm transition-all shadow-none cursor-pointer',
@@ -282,7 +289,10 @@ export function ExamDatePicker({
       <PopoverContent
         align="start"
         sideOffset={6}
-        className="w-[316px] sm:w-[332px] p-3.5 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(15,23,42,0.14),0_0_0_1px_rgba(226,232,240,0.8)] z-[70] select-none"
+        className={cn(
+          'w-[316px] sm:w-[332px] p-3.5 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(15,23,42,0.14),0_0_0_1px_rgba(226,232,240,0.8)] z-[70] select-none',
+          contentClassName,
+        )}
       >
         {/* Header: Month & Year + Controls */}
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">

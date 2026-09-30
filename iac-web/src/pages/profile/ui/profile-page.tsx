@@ -8,7 +8,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 
-import { ExamDatePicker } from '@/components/dashboard/exam-date-picker'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -20,13 +19,6 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { authStore } from '@/features/auth/auth-store'
 import {
@@ -38,14 +30,12 @@ import {
   validateGoal,
 } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { GoalFields } from '@/features/ielts/goal-form'
 
 import type { ProfileForm } from '@/features/ielts/api'
 
 const fieldClassName =
   'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
-
-const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
 
 const emptyProfileForm: ProfileForm = {
   firstName: '',
@@ -321,84 +311,15 @@ export function ProfilePage() {
             </CardHeader>
 
             <form className="min-w-0" onSubmit={handleGoalSubmit}>
-              <CardContent className="grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
-                <div className="grid gap-2">
-                  <Label htmlFor="exam-format">Формат IELTS</Label>
-                  <Select
-                    name="examFormat"
-                    value={form.examFormat}
-                    onValueChange={(value) =>
-                      updateForm(
-                        'examFormat',
-                        value as ProfileForm['examFormat'],
-                      )
-                    }
-                  >
-                    <SelectTrigger id="exam-format" className={selectClassName}>
-                      <SelectValue placeholder="Выберите формат" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="academic">Academic</SelectItem>
-                      <SelectItem value="general">General Training</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {goalErrors.examFormat ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {goalErrors.examFormat}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="target-score">Целевой балл</Label>
-                  <Select
-                    name="targetScore"
-                    value={form.targetScore}
-                    onValueChange={(value) => updateForm('targetScore', value)}
-                  >
-                    <SelectTrigger
-                      id="target-score"
-                      className={selectClassName}
-                    >
-                      <SelectValue placeholder="Выберите балл" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {['5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5'].map(
-                        (score) => (
-                          <SelectItem key={score} value={score}>
-                            {score}
-                          </SelectItem>
-                        ),
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {goalErrors.targetScore ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {goalErrors.targetScore}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor="exam-date-trigger">
-                    Планируемая дата экзамена
-                  </Label>
-                  <ExamDatePicker
-                    value={form.examDate}
-                    onChange={(date) => updateForm('examDate', date)}
-                    error={goalErrors.examDate}
-                  />
-                  {goalErrors.examDate ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {goalErrors.examDate}
-                    </p>
-                  ) : null}
-                </div>
+              <CardContent className="grid min-w-0 gap-5 p-5 sm:p-6 [&>*]:min-w-0">
+                <GoalFields
+                  form={form}
+                  errors={goalErrors}
+                  onChange={updateForm}
+                  idPrefix="profile-goal"
+                />
                 {goalMessage ? (
-                  <p
-                    className="text-sm text-[#69696d] sm:col-span-2"
-                    role="status"
-                  >
+                  <p className="text-sm text-[#69696d]" role="status">
                     {goalMessage}
                   </p>
                 ) : null}

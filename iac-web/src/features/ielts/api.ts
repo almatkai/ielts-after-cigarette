@@ -40,6 +40,11 @@ export type ProfileForm = {
   examFormat: '' | 'academic' | 'general'
 }
 
+export type GoalFormValues = Pick<
+  ProfileForm,
+  'targetScore' | 'examDate' | 'examFormat'
+>
+
 export const queryKeys = {
   dashboard: ['dashboard'] as const,
   profile: ['profile'] as const,
@@ -73,7 +78,7 @@ export function updateProfile(input: {
   })
 }
 
-export function putGoal(form: ProfileForm) {
+export function putGoal(form: GoalFormValues) {
   return updateGoal({
     targetBand: Number(form.targetScore),
     examDate: form.examDate,
@@ -92,12 +97,8 @@ export function updateGoal(input: {
   })
 }
 
-export function profileToForm(profile: UserDto): ProfileForm {
-  const [firstName = '', ...lastNameParts] = profile.displayName.split(/\s+/)
+export function profileToGoalForm(profile: UserDto): GoalFormValues {
   return {
-    firstName,
-    lastName: lastNameParts.join(' '),
-    email: profile.email,
     targetScore:
       profile.targetBand === null ? '' : profile.targetBand.toFixed(1),
     examDate: profile.examDate ?? '',
@@ -105,7 +106,17 @@ export function profileToForm(profile: UserDto): ProfileForm {
   }
 }
 
-export function validateGoal(form: ProfileForm) {
+export function profileToForm(profile: UserDto): ProfileForm {
+  const [firstName = '', ...lastNameParts] = profile.displayName.split(/\s+/)
+  return {
+    firstName,
+    lastName: lastNameParts.join(' '),
+    email: profile.email,
+    ...profileToGoalForm(profile),
+  }
+}
+
+export function validateGoal(form: GoalFormValues) {
   const errors: Record<string, string> = {}
   const band = Number(form.targetScore)
   if (

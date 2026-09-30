@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { getDashboard, queryKeys } from '@/features/ielts/api'
+import { GoalDialog } from '@/features/ielts/goal-form'
 
 import type { SkillId } from '@/features/ielts/api'
 
@@ -125,7 +126,7 @@ export function OverviewPage() {
           : dashboard.profile.targetBand.toFixed(1),
       hint:
         dashboard.profile.targetBand === null
-          ? 'Укажите цель в профиле'
+          ? 'Укажите цель в диалоге «Настроить цель»'
           : 'Ваша текущая цель',
       icon: DirectRight,
     },
@@ -134,7 +135,7 @@ export function OverviewPage() {
       value: formatExamDate(dashboard.profile.examDate),
       hint:
         dashboard.profile.examDate === null
-          ? 'Добавьте дату в профиле'
+          ? 'Добавьте дату в диалоге «Настроить цель»'
           : 'Запланированная дата',
       icon: Calendar,
     },
@@ -208,13 +209,15 @@ export function OverviewPage() {
                       <ArrowRight aria-hidden />
                     </Link>
                   </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-11 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none"
-                  >
-                    <Link to="/profile">Настроить цель</Link>
-                  </Button>
+                  <GoalDialog>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-11 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none"
+                    >
+                      Настроить цель
+                    </Button>
+                  </GoalDialog>
                 </div>
               </div>
             </CardContent>

@@ -93,6 +93,7 @@ export function WritingAttemptRunner({
       queryFn: () => getWritingMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      retry: false,
     })),
   })
 
@@ -375,6 +376,7 @@ function ProtectedWritingImage({
     queryFn: () => getWritingMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),

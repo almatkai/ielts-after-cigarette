@@ -168,6 +168,9 @@ function ListeningTestRunner({
       queryFn: () => getListeningMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      // Media blobs either exist or they don't: a retry storm on 4xx/5xx
+      // hammers the API (see the 15-request waterfall on missing audio).
+      retry: false,
     })),
   })
 
@@ -189,6 +192,7 @@ function ListeningTestRunner({
       queryFn: () => getListeningMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      retry: false,
     })),
   })
 
@@ -691,6 +695,7 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
     queryFn: () => getListeningMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -723,6 +728,7 @@ function ProtectedImage({ assetId }: { assetId: string }) {
     queryFn: () => getListeningMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),

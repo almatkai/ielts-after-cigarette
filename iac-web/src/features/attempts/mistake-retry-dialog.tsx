@@ -161,12 +161,7 @@ function MistakeRetryContent({
 
     const offsetSec = 16 + (item.number % 7) // 16 to 22 seconds back
     return Math.max(0, timestampStart - offsetSec)
-  }, [
-    item.questionId,
-    item.number,
-    timestampStart,
-    listeningPart?.transcriptSegments,
-  ])
+  }, [item.questionId, item.number, timestampStart, listeningPart?.transcriptSegments])
 
   const audioQuery = useQuery({
     queryKey: ['listening', 'media', audioAssetId],
@@ -242,6 +237,9 @@ function MistakeRetryContent({
   const hasListeningMedia =
     isListening && Boolean(audioAssetId || transcript.length > 0)
   const hasLeftColumn = hasPassage || hasListeningMedia
+  const hasAudioSnippet =
+    isListening && typeof timestampStart === 'number' && Boolean(audioUrl)
+  const hasTranscript = isListening && transcript.length > 0
   const leftColumnTitle = isListening
     ? listeningPart?.title
       ? `Listening: ${listeningPart.title}`
@@ -256,8 +254,7 @@ function MistakeRetryContent({
     item.type === 'yes_no_not_given' ||
     item.correctAnswer.value === 'YES' ||
     item.correctAnswer.value === 'NO' ||
-    (item.correctAnswer.value === 'NOT_GIVEN' &&
-      item.prompt.toLowerCase().includes('statement'))
+    (item.correctAnswer.value === 'NOT_GIVEN' && item.prompt.toLowerCase().includes('statement'))
   const isTFNG =
     item.type === 'true_false_not_given' ||
     item.correctAnswer.value === 'TRUE' ||
@@ -298,22 +295,13 @@ function MistakeRetryContent({
   useEffect(() => {
     if (revealed || isCorrect) {
       if (quoteMarkerRef.current) {
-        quoteMarkerRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        })
+        quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
     } else if (showHint || isCorrect === false) {
       if (isListening && broadRegionRef.current) {
-        broadRegionRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        })
+        broadRegionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
       } else if (quoteMarkerRef.current) {
-        quoteMarkerRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        })
+        quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
     }
   }, [showHint, isCorrect, revealed, isListening])
@@ -321,20 +309,11 @@ function MistakeRetryContent({
   const scrollToQuote = () => {
     setShowHint(true)
     if (revealed || isCorrect) {
-      quoteMarkerRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
+      quoteMarkerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     } else if (isListening && broadRegionRef.current) {
-      broadRegionRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
+      broadRegionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     } else if (quoteMarkerRef.current) {
-      quoteMarkerRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
+      quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }
 
@@ -446,9 +425,7 @@ function MistakeRetryContent({
               </div>
 
               <div className="flex items-center gap-2">
-                {isListening &&
-                typeof timestampStart === 'number' &&
-                audioUrl ? (
+                {isListening && typeof timestampStart === 'number' && audioUrl ? (
                   <Button
                     type="button"
                     variant="ghost"
@@ -535,17 +512,14 @@ function MistakeRetryContent({
                     <VolumeHigh className="size-3.5 text-blue-600" />
                     Аудиотрек задания
                   </span>
-                  {typeof timestampStart === 'number' &&
-                  (revealed || isCorrect) ? (
+                  {typeof timestampStart === 'number' && (revealed || isCorrect) ? (
                     <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded">
                       Ответ: {formatSeconds(timestampStart)} –{' '}
                       {formatSeconds(timestampEnd)}
                     </span>
-                  ) : typeof timestampStart === 'number' &&
-                    (showHint || isCorrect === false) ? (
+                  ) : typeof timestampStart === 'number' && (showHint || isCorrect === false) ? (
                     <span className="text-[11px] font-mono font-medium text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded">
-                      Фрагмент:{' '}
-                      {formatSeconds(hintAudioStart ?? timestampStart)} –{' '}
+                      Фрагмент: {formatSeconds(hintAudioStart ?? timestampStart)} –{' '}
                       {formatSeconds(timestampEnd)}
                     </span>
                   ) : null}
@@ -631,31 +605,23 @@ function MistakeRetryContent({
               )}
             </div>
             <DialogDescription className="text-xs text-slate-500 mt-0.5">
-              Внимательно найдите ответ в тексте. Попробуйте решить без
-              подсказки!
+              Внимательно найдите ответ в тексте. Попробуйте решить без подсказки!
             </DialogDescription>
           </div>
 
           {/* Question Box */}
           <div className="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm font-medium text-slate-900 leading-relaxed shadow-2xs space-y-3">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-bold text-[#2563eb]">
-                Вопрос {item.number}
-              </span>
-              {typeof item.content?.completionRule === 'object' &&
-              item.content.completionRule ? (
-                <Badge
-                  variant="outline"
-                  className="text-[10.5px] font-semibold bg-white text-slate-600 border-slate-200"
-                >
+              <span className="font-bold text-[#2563eb]">Вопрос {item.number}</span>
+              {typeof item.content?.completionRule === 'object' && item.content.completionRule ? (
+                <Badge variant="outline" className="text-[10.5px] font-semibold bg-white text-slate-600 border-slate-200">
                   {`NO MORE THAN ${String((item.content.completionRule as Record<string, unknown>).maxWords ?? 2)} WORDS`}
                 </Badge>
               ) : null}
             </div>
 
             {/* Optional diagram / illustration */}
-            {typeof item.content?.imageUrl === 'string' &&
-            item.content.imageUrl ? (
+            {typeof item.content?.imageUrl === 'string' && item.content.imageUrl ? (
               <div className="rounded-lg border border-slate-200 bg-white p-2.5 flex items-center justify-center">
                 <img
                   src={item.content.imageUrl}
@@ -667,9 +633,7 @@ function MistakeRetryContent({
 
             <p className="text-slate-900 leading-relaxed">
               {item.prompt === '{{answer}}' ? (
-                <span className="italic text-slate-600">
-                  Заполните пропуск: [ _____ ]
-                </span>
+                <span className="italic text-slate-600">Заполните пропуск: [ _____ ]</span>
               ) : (
                 item.prompt.replace('{{answer}}', '_____')
               )}
@@ -682,9 +646,7 @@ function MistakeRetryContent({
               <CloseCircle className="size-4 shrink-0 text-rose-600" />
               <span>
                 Ваш прошлый ответ:{' '}
-                <strong className="line-through">
-                  {formatAnswer(item.answer, options)}
-                </strong>
+                <strong className="line-through">{formatAnswer(item.answer, options)}</strong>
               </span>
             </div>
             <span className="font-semibold text-rose-700">Неверно (0 б.)</span>
@@ -780,12 +742,9 @@ function MistakeRetryContent({
                 <div className="flex items-start gap-2.5 rounded-[12px] border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-950">
                   <LampCharge className="size-4 shrink-0 text-amber-600 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-amber-900">
-                      Пока неверно!
-                    </p>
+                    <p className="font-semibold text-amber-900">Пока неверно!</p>
                     <p className="mt-0.5 text-amber-800 leading-relaxed">
-                      Внимательно изучите подсвеченный участок текста и обратите
-                      внимание на синонимы в вопросе.
+                      Внимательно изучите подсвеченный участок текста и обратите внимание на синонимы в вопросе.
                     </p>
                   </div>
                 </div>
@@ -832,9 +791,7 @@ function MistakeRetryContent({
                   </span>
                 </div>
 
-                {isListening &&
-                typeof timestampStart === 'number' &&
-                audioUrl ? (
+                {isListening && typeof timestampStart === 'number' && audioUrl ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -845,8 +802,7 @@ function MistakeRetryContent({
                   >
                     <Play className="size-3 text-amber-700" />
                     <span>
-                      Слушать фрагмент [
-                      {formatSeconds(hintAudioStart ?? timestampStart)} -{' '}
+                      Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)} -{' '}
                       {formatSeconds(timestampEnd)}]
                     </span>
                   </button>
@@ -876,63 +832,76 @@ function MistakeRetryContent({
 
               {/* Listening context card vs Reading quote */}
               {isListening ? (
-                <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-2.5">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-semibold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
-                      <VolumeHigh className="size-3.5 text-amber-600" />
-                      Аудиофрагмент с контекстом
-                    </span>
-                    {typeof timestampStart === 'number' && (
-                      <span className="text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 text-[10.5px]">
-                        {formatSeconds(hintAudioStart ?? timestampStart)} –{' '}
-                        {formatSeconds(timestampEnd)}
+                hasAudioSnippet || hasTranscript ? (
+                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
+                        <VolumeHigh className="size-3.5 text-amber-600" />
+                        Аудиофрагмент с контекстом
                       </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">
-                    Аудиозапись перемотана на 3–5 реплик назад до ответа, чтобы
-                    вы могли услышать контекст диалога и найти ответ на слух.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {typeof timestampStart === 'number' && audioUrl && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => {
-                          scrollToQuote()
-                          playAudioSnippet(hintAudioStart ?? timestampStart)
-                        }}
-                        className="h-8 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-lg shadow-2xs"
-                      >
-                        <Play className="size-3" />
-                        <span>
-                          Слушать фрагмент [
-                          {formatSeconds(hintAudioStart ?? timestampStart)}]
+                      {typeof timestampStart === 'number' && (
+                        <span className="text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 text-[10.5px]">
+                          {formatSeconds(hintAudioStart ?? timestampStart)} – {formatSeconds(timestampEnd)}
                         </span>
-                      </Button>
+                      )}
+                    </div>
+                    {hasAudioSnippet && (
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        Аудиозапись перемотана на 3–5 реплик назад до ответа, чтобы вы могли услышать контекст диалога и найти ответ на слух.
+                      </p>
                     )}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      {hasAudioSnippet && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => {
+                            scrollToQuote()
+                            playAudioSnippet(hintAudioStart ?? timestampStart)
+                          }}
+                          className="h-8 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-lg shadow-2xs"
+                        >
+                          <Play className="size-3" />
+                          <span>
+                            Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)}]
+                          </span>
+                        </Button>
+                      )}
 
-                    {!unblurTranscript ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setUnblurTranscript(true)
-                          scrollToQuote()
-                        }}
-                        className="h-8 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-white bg-white/90 gap-1.5 rounded-lg shadow-2xs"
-                      >
-                        <Eye className="size-3 text-slate-500" />
-                        <span>Показать стенограмму фрагмента</span>
-                      </Button>
-                    ) : (
-                      <span className="text-[11px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                        ✓ Стенограмма фрагмента открыта слева
-                      </span>
-                    )}
+                      {hasTranscript && (
+                        !unblurTranscript ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setUnblurTranscript(true)
+                              scrollToQuote()
+                            }}
+                            className="h-8 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-white bg-white/90 gap-1.5 rounded-lg shadow-2xs"
+                          >
+                            <Eye className="size-3 text-slate-500" />
+                            <span>Показать стенограмму фрагмента</span>
+                          </Button>
+                        ) : (
+                          <span className="text-[11px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                            ✓ Стенограмма фрагмента открыта слева
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
+                      <VolumeHigh className="size-3.5 text-amber-600" />
+                      Аудиозапись задания
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed">
+                      Включите плеер сверху и слушайте реплики спикера, чтобы найти ответ на вопрос.
+                    </p>
+                  </div>
+                )
               ) : quote ? (
                 <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
@@ -950,8 +919,7 @@ function MistakeRetryContent({
                 </div>
               ) : (
                 <p className="text-xs text-slate-600 italic">
-                  Ответ находится в абзаце, обсуждающем ключевые тезисы вопроса.
-                  Сопоставьте утверждение с деталями.
+                  Ответ находится в абзаце, обсуждающем ключевые тезисы вопроса. Сопоставьте утверждение с деталями.
                 </p>
               )}
 
@@ -982,15 +950,11 @@ function MistakeRetryContent({
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/90 px-2.5 py-1 text-xs font-semibold text-emerald-900 border border-emerald-200/70">
                   <TickCircle className="size-3.5 text-emerald-600" />
                   <span>
-                    {isCorrect
-                      ? 'Верный ответ найден! 🎉'
-                      : 'Правильное решение'}
+                    {isCorrect ? 'Верный ответ найден! 🎉' : 'Правильное решение'}
                   </span>
                 </div>
 
-                {isListening &&
-                typeof timestampStart === 'number' &&
-                audioUrl ? (
+                {isListening && typeof timestampStart === 'number' && audioUrl ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -1097,9 +1061,7 @@ function MistakeRetryContent({
               <span className="text-[11px] text-slate-400">
                 IELTS Reading Scaffolded Review
               </span>
-            ) : (
-              <span />
-            )}
+            ) : <span />}
             <Button
               type="button"
               variant="outline"
@@ -1151,10 +1113,7 @@ function findBroadRegion(body: string, quote?: string) {
 
   // Look forward 1-2 sentences / ~180 chars after matchIndex + matchLen
   const targetLookforward = 180
-  let broadEnd = Math.min(
-    body.length,
-    matchIndex + matchLen + targetLookforward,
-  )
+  let broadEnd = Math.min(body.length, matchIndex + matchLen + targetLookforward)
   if (broadEnd < body.length) {
     const candidates: number[] = []
     for (const punct of ['. ', '? ', '! ', '\n']) {
@@ -1223,9 +1182,7 @@ function ListeningTranscriptRender({
       >
         {!isRevealed && !unblurTranscript && (
           <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/90 p-3 flex items-center justify-between text-xs text-blue-950">
-            <span>
-              🎧 Стенограмма скрыта для тренировки восприятия на слух.
-            </span>
+            <span>🎧 Стенограмма скрыта для тренировки восприятия на слух.</span>
             <Button
               type="button"
               size="sm"
@@ -1260,8 +1217,7 @@ function ListeningTranscriptRender({
           <div className="flex items-center gap-2">
             <VolumeHigh className="size-4 text-blue-600 shrink-0" />
             <span>
-              <strong>Тренировка восприятия на слух:</strong> слушайте аудиотрек
-              в плеере сверху и постарайтесь ответить без чтения текста.
+              <strong>Тренировка восприятия на слух:</strong> слушайте аудиотрек в плеере сверху и постарайтесь ответить без чтения текста.
             </span>
           </div>
         </div>
@@ -1537,16 +1493,14 @@ function evaluateAnswer(
   // 3. Accepted array
   if (Array.isArray(correctAnswer.accepted)) {
     return correctAnswer.accepted.some(
-      (acc) =>
-        typeof acc === 'string' && acc.trim().toUpperCase() === normSelected,
+      (acc) => typeof acc === 'string' && acc.trim().toUpperCase() === normSelected,
     )
   }
 
   // 4. Option IDs array
   if (Array.isArray(correctAnswer.optionIds)) {
     return correctAnswer.optionIds.some(
-      (id) =>
-        typeof id === 'string' && id.trim().toUpperCase() === normSelected,
+      (id) => typeof id === 'string' && id.trim().toUpperCase() === normSelected,
     )
   }
 
@@ -1559,18 +1513,10 @@ function extractQuote(item: AttemptReviewItem): string {
   }
 
   // Try extracting from content
-  if (
-    item.content &&
-    typeof item.content.quote === 'string' &&
-    item.content.quote.trim().length > 0
-  ) {
+  if (item.content && typeof item.content.quote === 'string' && item.content.quote.trim().length > 0) {
     return item.content.quote.trim()
   }
-  if (
-    item.content &&
-    typeof item.content.textReference === 'string' &&
-    item.content.textReference.trim().length > 0
-  ) {
+  if (item.content && typeof item.content.textReference === 'string' && item.content.textReference.trim().length > 0) {
     return item.content.textReference.trim()
   }
 

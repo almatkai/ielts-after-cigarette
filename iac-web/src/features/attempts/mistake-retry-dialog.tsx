@@ -237,6 +237,9 @@ function MistakeRetryContent({
   const hasListeningMedia =
     isListening && Boolean(audioAssetId || transcript.length > 0)
   const hasLeftColumn = hasPassage || hasListeningMedia
+  const hasAudioSnippet =
+    isListening && typeof timestampStart === 'number' && Boolean(audioUrl)
+  const hasTranscript = isListening && transcript.length > 0
   const leftColumnTitle = isListening
     ? listeningPart?.title
       ? `Listening: ${listeningPart.title}`
@@ -829,60 +832,76 @@ function MistakeRetryContent({
 
               {/* Listening context card vs Reading quote */}
               {isListening ? (
-                <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-2.5">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-semibold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
-                      <VolumeHigh className="size-3.5 text-amber-600" />
-                      Аудиофрагмент с контекстом
-                    </span>
-                    {typeof timestampStart === 'number' && (
-                      <span className="text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 text-[10.5px]">
-                        {formatSeconds(hintAudioStart ?? timestampStart)} – {formatSeconds(timestampEnd)}
+                hasAudioSnippet || hasTranscript ? (
+                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
+                        <VolumeHigh className="size-3.5 text-amber-600" />
+                        Аудиофрагмент с контекстом
                       </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">
-                    Аудиозапись перемотана на 3–5 реплик назад до ответа, чтобы вы могли услышать контекст диалога и найти ответ на слух.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {typeof timestampStart === 'number' && audioUrl && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => {
-                          scrollToQuote()
-                          playAudioSnippet(hintAudioStart ?? timestampStart)
-                        }}
-                        className="h-8 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-lg shadow-2xs"
-                      >
-                        <Play className="size-3" />
-                        <span>
-                          Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)}]
+                      {typeof timestampStart === 'number' && (
+                        <span className="text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 text-[10.5px]">
+                          {formatSeconds(hintAudioStart ?? timestampStart)} – {formatSeconds(timestampEnd)}
                         </span>
-                      </Button>
+                      )}
+                    </div>
+                    {hasAudioSnippet && (
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        Аудиозапись перемотана на 3–5 реплик назад до ответа, чтобы вы могли услышать контекст диалога и найти ответ на слух.
+                      </p>
                     )}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      {hasAudioSnippet && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => {
+                            scrollToQuote()
+                            playAudioSnippet(hintAudioStart ?? timestampStart)
+                          }}
+                          className="h-8 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-lg shadow-2xs"
+                        >
+                          <Play className="size-3" />
+                          <span>
+                            Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)}]
+                          </span>
+                        </Button>
+                      )}
 
-                    {!unblurTranscript ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setUnblurTranscript(true)
-                          scrollToQuote()
-                        }}
-                        className="h-8 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-white bg-white/90 gap-1.5 rounded-lg shadow-2xs"
-                      >
-                        <Eye className="size-3 text-slate-500" />
-                        <span>Показать стенограмму фрагмента</span>
-                      </Button>
-                    ) : (
-                      <span className="text-[11px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                        ✓ Стенограмма фрагмента открыта слева
-                      </span>
-                    )}
+                      {hasTranscript && (
+                        !unblurTranscript ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setUnblurTranscript(true)
+                              scrollToQuote()
+                            }}
+                            className="h-8 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-white bg-white/90 gap-1.5 rounded-lg shadow-2xs"
+                          >
+                            <Eye className="size-3 text-slate-500" />
+                            <span>Показать стенограмму фрагмента</span>
+                          </Button>
+                        ) : (
+                          <span className="text-[11px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                            ✓ Стенограмма фрагмента открыта слева
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
+                      <VolumeHigh className="size-3.5 text-amber-600" />
+                      Аудиозапись задания
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed">
+                      Включите плеер сверху и слушайте реплики спикера, чтобы найти ответ на вопрос.
+                    </p>
+                  </div>
+                )
               ) : quote ? (
                 <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">

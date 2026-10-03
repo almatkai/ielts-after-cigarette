@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { usePreviewSession } from '@/features/attempts/preview-session'
+import type { AttemptSession } from '@/features/attempts/preview-session'
+import { useExamTimer } from '@/features/attempts/exam-timer'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
   AttemptPerformanceReport,
@@ -36,6 +39,11 @@ import type {
   PublicListeningTest,
 } from '@/features/listening/api'
 import { getErrorMessage } from '@/lib/api/client'
+import type { PreviewAnswerKeys } from '@/features/admin/preview-api'
+import {
+  PreviewAnswer,
+  PreviewEvidenceText,
+} from '@/features/admin/preview-answer'
 
 const TIMER_DANGER_SECONDS = 300
 
@@ -75,20 +83,61 @@ export function ListeningStudentPage({
   )
 }
 
-export function ListeningAttemptRunner({
-  attempt,
-  test,
-  fullMockSessionId,
-  onSubmitted,
-}: {
+type ListeningRunnerProps = {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
   onSubmitted?: (attempt: Attempt) => void
+}
+
+export function ListeningAttemptRunner(props: ListeningRunnerProps) {
+  const session = useAttemptSession(props.attempt.id)
+  return <ListeningTestRunner {...props} session={session} />
+}
+
+export function ListeningPreviewRunner({
+  test,
+  timerEnabled,
+  answerKeys,
+}: {
+  test: PublicListeningTest
+  timerEnabled: boolean
+  answerKeys: PreviewAnswerKeys
 }) {
-  const session = useAttemptSession(attempt.id)
+  const session = usePreviewSession()
+  return (
+    <ListeningTestRunner
+      test={test}
+      session={session}
+      answerKeys={answerKeys}
+      preview
+      timerEnabled={timerEnabled}
+    />
+  )
+}
+
+function ListeningTestRunner({
+  attempt,
+  test,
+  fullMockSessionId,
+  onSubmitted,
+  session,
+  preview = false,
+  timerEnabled = true,
+  answerKeys,
+}: Omit<ListeningRunnerProps, 'attempt'> & {
+  attempt?: Attempt
+  session: AttemptSession
+  preview?: boolean
+  timerEnabled?: boolean
+  answerKeys?: PreviewAnswerKeys
+}) {
+  const [revealedQuestionId, setRevealedQuestionId] = useState<string | null>(
+    null,
+  )
   const autoSubmitStarted = useRef(false)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const [emptyPartIndex, setEmptyPartIndex] = useState(0)
 
   const sharedAudioAssetId = useMemo(
     () =>
@@ -156,75 +205,19 @@ export function ListeningAttemptRunner({
 
   const durationMinutes = test.durationMinutes > 0 ? test.durationMinutes : 40
   const totalDurationSeconds = durationMinutes * 60
-  const totalDurationMs = totalDurationSeconds * 1000
-  const storageKey = `iac_listening_deadline_${attempt.id}`
-
-  const [deadline, setDeadline] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null
-
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      const parsed = Number(saved)
-      if (parsed > 0 && !isNaN(parsed)) {
-        return parsed
-      }
-    }
-
-    const serverStartedAt = new Date(attempt.startedAt).getTime()
-    if (Date.now() - serverStartedAt > 2 * 60_000) {
-      return serverStartedAt + totalDurationMs
-    }
-
-    if (!hasAudio) {
-      const d = Date.now() + totalDurationMs
-      localStorage.setItem(storageKey, String(d))
-      return d
-    }
-
-    return null
+  const { deadline, secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_listening_deadline_',
+    durationSeconds: totalDurationSeconds,
+    ready: isReady,
+    enabled: timerEnabled,
+    finished: Boolean(session.submitted),
   })
-
-  useEffect(() => {
-    if (isReady && deadline === null) {
-      const newDeadline = Date.now() + totalDurationMs
-      setDeadline(newDeadline)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, String(newDeadline))
-      }
-    }
-  }, [isReady, deadline, totalDurationMs, storageKey])
-
-  useEffect(() => {
-    if (session.submitted && typeof window !== 'undefined') {
-      localStorage.removeItem(storageKey)
-    }
-  }, [session.submitted, storageKey])
-
-  const [secondsLeft, setSecondsLeft] = useState(() => {
-    if (deadline === null) {
-      return totalDurationSeconds
-    }
-    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
-  })
-
-  useEffect(() => {
-    if (deadline === null) {
-      setSecondsLeft(totalDurationSeconds)
-      return
-    }
-
-    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-
-    const interval = window.setInterval(() => {
-      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [deadline, totalDurationSeconds])
 
   // Авто-submit по истечении времени.
   useEffect(() => {
     if (
+      !preview &&
       deadline !== null &&
       secondsLeft === 0 &&
       session.answers !== null &&
@@ -235,6 +228,7 @@ export function ListeningAttemptRunner({
       session.submit()
     }
   }, [
+    preview,
     deadline,
     secondsLeft,
     session.answers,
@@ -282,7 +276,8 @@ export function ListeningAttemptRunner({
       group.questions.map((question) => ({ group, part, question })),
     ),
   )
-  const currentQuestion = questions[activeQuestionIndex]
+  const currentQuestion = questions.at(activeQuestionIndex)
+  const currentPart = currentQuestion?.part ?? test.parts[emptyPartIndex]
   const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
 
@@ -290,24 +285,40 @@ export function ListeningAttemptRunner({
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
         <Button asChild variant="link" className="sr-only">
-          <Link to="/listening">
-            <ArrowLeft aria-hidden />К Listening
-          </Link>
+          {preview ? (
+            <Link
+              to="/admin/listening/tests/$testId"
+              params={{ testId: test.id }}
+            >
+              <ArrowLeft aria-hidden />К редактору
+            </Link>
+          ) : (
+            <Link to="/listening">
+              <ArrowLeft aria-hidden />К Listening
+            </Link>
+          )}
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <h1 className="sr-only">{test.title}</h1>
           <div className="flex items-center gap-3">
-            <SaveIndicator state={session.saveState} />
-            <TimeBadge
-              seconds={secondsLeft}
-              danger={deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS}
-              label="Оставшееся время"
-            />
+            {!preview ? <SaveIndicator state={session.saveState} /> : null}
+            {timerEnabled ? (
+              <TimeBadge
+                seconds={secondsLeft}
+                danger={
+                  deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS
+                }
+                label="Оставшееся время"
+              />
+            ) : null}
           </div>
         </div>
         <p className="sr-only">
           <Clock className="size-4" aria-hidden />
-          {test.durationMinutes} минут · ответы сохраняются автоматически
+          {test.durationMinutes} минут ·{' '}
+          {preview
+            ? 'пробные ответы не сохраняются'
+            : 'ответы сохраняются автоматически'}
         </p>
       </div>
       {session.submitError ? (
@@ -326,11 +337,35 @@ export function ListeningAttemptRunner({
           </CardContent>
         </Card>
       ) : null}
+      {test.parts.length === 0 ? (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+        >
+          В тесте ещё нет частей. Добавьте их в редакторе.
+        </p>
+      ) : null}
+      <nav aria-label="Части Listening" className="flex flex-wrap gap-2">
+        {test.parts.map((part, index) => (
+          <Button
+            key={part.position}
+            type="button"
+            variant={part === currentPart ? 'default' : 'outline'}
+            onClick={() => {
+              setEmptyPartIndex(index)
+              const target = questions.findIndex((item) => item.part === part)
+              setActiveQuestionIndex(target >= 0 ? target : questions.length)
+            }}
+          >
+            Part {part.position}
+          </Button>
+        ))}
+      </nav>
       {test.parts.map((part) => (
         <Card
           key={part.position}
           className={
-            part === currentQuestion.part
+            part === currentPart
               ? 'flex min-h-0 flex-1 flex-col overflow-hidden shadow-none'
               : 'hidden'
           }
@@ -348,13 +383,32 @@ export function ListeningAttemptRunner({
             ) : null}
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto">
+            {part.groups.every((group) => group.questions.length === 0) ? (
+              <p role="status" className="text-sm text-amber-700">
+                В этой части ещё нет вопросов. Добавьте их в редакторе.
+              </p>
+            ) : null}
             {part.groups.map((group) => (
               <StudentGroup
                 key={group.position}
                 group={group}
-                activeQuestionId={currentQuestion.question.id}
+                activeQuestionId={currentQuestion?.question.id}
                 answers={answers}
                 onAnswer={session.updateAnswer}
+                preview={preview}
+                answerKeys={answerKeys}
+                evidenceText={
+                  part.transcript ||
+                  part.transcriptSegments
+                    ?.map((segment) => segment.text)
+                    .join('\n')
+                }
+                revealedQuestionId={revealedQuestionId}
+                onToggleExplanation={(questionId) =>
+                  setRevealedQuestionId((current) =>
+                    current === questionId ? null : questionId,
+                  )
+                }
               />
             ))}
           </CardContent>
@@ -364,28 +418,33 @@ export function ListeningAttemptRunner({
         <Button
           type="button"
           variant="outline"
-          disabled={activeQuestionIndex === 0}
+          disabled={!currentQuestion || activeQuestionIndex === 0}
           onClick={() => setActiveQuestionIndex((index) => index - 1)}
         >
           Назад
         </Button>
         <p className="text-sm text-[#69696d]">
-          Вопрос {activeQuestionIndex + 1} из {totalQuestions}
+          Вопрос {currentQuestion ? activeQuestionIndex + 1 : '—'} из{' '}
+          {totalQuestions}
         </p>
         <Button
           type="button"
-          disabled={activeQuestionIndex === totalQuestions - 1}
+          disabled={
+            !currentQuestion || activeQuestionIndex === totalQuestions - 1
+          }
           onClick={() => setActiveQuestionIndex((index) => index + 1)}
         >
           Далее
         </Button>
       </div>
-      <AttemptSubmitBar
-        answeredCount={answeredCount}
-        totalQuestions={totalQuestions}
-        isSubmitting={session.isSubmitting}
-        onSubmit={session.submit}
-      />
+      {!preview ? (
+        <AttemptSubmitBar
+          answeredCount={answeredCount}
+          totalQuestions={totalQuestions}
+          isSubmitting={session.isSubmitting}
+          onSubmit={session.submit}
+        />
+      ) : null}
     </div>
   )
 }
@@ -647,7 +706,7 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
     return (
       <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
         <span className="inline-block size-2 animate-pulse rounded-full bg-blue-500" />
-        <span>Загружаем аудио… Таймер начнётся после загрузки.</span>
+        <span>Загружаем аудио…</span>
       </div>
     )
   }
@@ -681,7 +740,13 @@ function ProtectedImage({ assetId }: { assetId: string }) {
       src={url}
       alt="Схема задания Listening"
     />
-  ) : null
+  ) : (
+    <p role="status" className="text-sm text-amber-700">
+      {query.isPending
+        ? 'Загружаем изображение…'
+        : 'Изображение недоступно. Проверьте файл в редакторе.'}
+    </p>
+  )
 }
 
 function StudentGroup({
@@ -689,11 +754,21 @@ function StudentGroup({
   activeQuestionId,
   answers,
   onAnswer,
+  preview = false,
+  answerKeys,
+  evidenceText,
+  revealedQuestionId,
+  onToggleExplanation,
 }: {
   group: PublicListeningGroup
   activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
+  preview?: boolean
+  answerKeys?: PreviewAnswerKeys
+  evidenceText?: string
+  revealedQuestionId?: string | null
+  onToggleExplanation?: (questionId: string) => void
 }) {
   const questions = activeQuestionId
     ? group.questions.filter((question) => question.id === activeQuestionId)
@@ -717,16 +792,49 @@ function StudentGroup({
         </div>
       ) : null}
       <div className="grid gap-4">
-        {questions.map((question) => (
-          <StudentQuestion
-            key={question.id ?? question.number}
-            group={group}
-            question={question}
-            sharedOptions={shared}
-            value={question.id ? answers[question.id] : undefined}
-            onAnswer={onAnswer}
-          />
-        ))}
+        {questions.map((question) => {
+          const answerKey = question.id ? answerKeys?.[question.id] : undefined
+          const open = Boolean(
+            question.id && revealedQuestionId === question.id,
+          )
+          return (
+            <div key={question.id ?? question.number}>
+              <StudentQuestion
+                group={group}
+                question={question}
+                sharedOptions={shared}
+                value={question.id ? answers[question.id] : undefined}
+                onAnswer={onAnswer}
+              />
+              {preview ? (
+                <>
+                  <PreviewAnswer
+                    answerKey={answerKey}
+                    options={(question.content.options ?? shared) as Option[]}
+                    open={open}
+                    onToggle={() => {
+                      if (question.id) onToggleExplanation?.(question.id)
+                    }}
+                    evidenceText={evidenceText}
+                  />
+                  {open && evidenceText && answerKey?.quote.trim() ? (
+                    <div className="mt-3 rounded-xl border p-4">
+                      <p className="mb-2 text-sm font-semibold">
+                        Текст аудио — место ответа
+                      </p>
+                      <div className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed">
+                        <PreviewEvidenceText
+                          body={evidenceText}
+                          quote={answerKey.quote}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+            </div>
+          )
+        })}
       </div>
     </section>
   )

@@ -33,6 +33,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
+import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AppAttemptsAttemptIdRouteImport } from './routes/_app.attempts.$attemptId'
 import { Route as AppFullMockSessionsSessionIdRouteImport } from './routes/_app.full-mock-sessions.$sessionId'
@@ -69,6 +70,8 @@ import { Route as AdminSpeakingMaterialsNewRouteImport } from './routes/admin.sp
 import { Route as AdminWritingMaterialsIndexRouteImport } from './routes/admin.writing.materials.index'
 import { Route as AdminWritingMaterialsMaterialIdRouteImport } from './routes/admin.writing.materials.$materialId'
 import { Route as AdminWritingMaterialsNewRouteImport } from './routes/admin.writing.materials.new'
+import { Route as AdminPreviewListeningTestIdRouteImport } from './routes/admin_.preview.listening.$testId'
+import { Route as AdminPreviewReadingMaterialIdRouteImport } from './routes/admin_.preview.reading.$materialId'
 import { Route as ExamFullMockSessionsSessionIdSectionsSectionPositionRouteImport } from './routes/exam.full-mock-sessions.$sessionId.sections.$sectionPosition'
 
 const AppRoute = AppRouteImport.update({
@@ -189,6 +192,11 @@ const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
   getParentRoute: () => AdminRoute,
+} as any)
+const AdminPreviewRoute = AdminPreviewRouteImport.update({
+  id: '/admin_/preview',
+  path: '/admin/preview',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   id: '/verify',
@@ -383,6 +391,18 @@ const AdminWritingMaterialsNewRoute =
     path: '/new',
     getParentRoute: () => AdminWritingMaterialsRoute,
   } as any)
+const AdminPreviewListeningTestIdRoute =
+  AdminPreviewListeningTestIdRouteImport.update({
+    id: '/listening/$testId',
+    path: '/listening/$testId',
+    getParentRoute: () => AdminPreviewRoute,
+  } as any)
+const AdminPreviewReadingMaterialIdRoute =
+  AdminPreviewReadingMaterialIdRouteImport.update({
+    id: '/reading/$materialId',
+    path: '/reading/$materialId',
+    getParentRoute: () => AdminPreviewRoute,
+  } as any)
 const ExamFullMockSessionsSessionIdSectionsSectionPositionRoute =
   ExamFullMockSessionsSessionIdSectionsSectionPositionRouteImport.update({
     id: '/sections/$sectionPosition',
@@ -413,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
@@ -446,6 +467,8 @@ export interface FileRoutesByFullPath {
   '/admin/speaking/materials/new': typeof AdminSpeakingMaterialsNewRoute
   '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
+  '/admin/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
+  '/admin/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
@@ -472,6 +495,7 @@ export interface FileRoutesByTo {
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/': typeof AppIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -502,6 +526,8 @@ export interface FileRoutesByTo {
   '/admin/speaking/materials/new': typeof AdminSpeakingMaterialsNewRoute
   '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
+  '/admin/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
+  '/admin/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
   '/admin/listening/tests': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsIndexRoute
@@ -532,6 +558,7 @@ export interface FileRoutesById {
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
+  '/admin_/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
   '/_app/': typeof AppIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -566,6 +593,8 @@ export interface FileRoutesById {
   '/admin/speaking/materials/new': typeof AdminSpeakingMaterialsNewRoute
   '/admin/writing/materials/$materialId': typeof AdminWritingMaterialsMaterialIdRoute
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
+  '/admin_/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
+  '/admin_/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
@@ -597,6 +626,7 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/full-mocks'
     | '/admin/waitlist'
+    | '/admin/preview'
     | '/register/verify'
     | '/admin/'
     | '/attempts/$attemptId'
@@ -630,6 +660,8 @@ export interface FileRouteTypes {
     | '/admin/speaking/materials/new'
     | '/admin/writing/materials/$materialId'
     | '/admin/writing/materials/new'
+    | '/admin/preview/listening/$testId'
+    | '/admin/preview/reading/$materialId'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
@@ -656,6 +688,7 @@ export interface FileRouteTypes {
     | '/writing'
     | '/admin/admins'
     | '/admin/waitlist'
+    | '/admin/preview'
     | '/register/verify'
     | '/'
     | '/admin'
@@ -686,6 +719,8 @@ export interface FileRouteTypes {
     | '/admin/speaking/materials/new'
     | '/admin/writing/materials/$materialId'
     | '/admin/writing/materials/new'
+    | '/admin/preview/listening/$testId'
+    | '/admin/preview/reading/$materialId'
     | '/admin/listening/tests'
     | '/admin/reading/materials'
     | '/admin/speaking/materials'
@@ -715,6 +750,7 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/full-mocks'
     | '/admin/waitlist'
+    | '/admin_/preview'
     | '/register/verify'
     | '/_app/'
     | '/admin/'
@@ -749,6 +785,8 @@ export interface FileRouteTypes {
     | '/admin/speaking/materials/new'
     | '/admin/writing/materials/$materialId'
     | '/admin/writing/materials/new'
+    | '/admin_/preview/listening/$testId'
+    | '/admin_/preview/reading/$materialId'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
@@ -765,6 +803,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRouteWithChildren
   WaitlistAdminRoute: typeof WaitlistAdminRoute
+  AdminPreviewRoute: typeof AdminPreviewRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -936,6 +975,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/waitlist'
       preLoaderRoute: typeof AdminWaitlistRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin_/preview': {
+      id: '/admin_/preview'
+      path: '/admin/preview'
+      fullPath: '/admin/preview'
+      preLoaderRoute: typeof AdminPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/register/verify': {
       id: '/register/verify'
@@ -1188,6 +1234,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/writing/materials/new'
       preLoaderRoute: typeof AdminWritingMaterialsNewRouteImport
       parentRoute: typeof AdminWritingMaterialsRoute
+    }
+    '/admin_/preview/listening/$testId': {
+      id: '/admin_/preview/listening/$testId'
+      path: '/listening/$testId'
+      fullPath: '/admin/preview/listening/$testId'
+      preLoaderRoute: typeof AdminPreviewListeningTestIdRouteImport
+      parentRoute: typeof AdminPreviewRoute
+    }
+    '/admin_/preview/reading/$materialId': {
+      id: '/admin_/preview/reading/$materialId'
+      path: '/reading/$materialId'
+      fullPath: '/admin/preview/reading/$materialId'
+      preLoaderRoute: typeof AdminPreviewReadingMaterialIdRouteImport
+      parentRoute: typeof AdminPreviewRoute
     }
     '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition': {
       id: '/exam/full-mock-sessions/$sessionId/sections/$sectionPosition'
@@ -1457,6 +1517,20 @@ const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
   RegisterRouteChildren,
 )
 
+interface AdminPreviewRouteChildren {
+  AdminPreviewListeningTestIdRoute: typeof AdminPreviewListeningTestIdRoute
+  AdminPreviewReadingMaterialIdRoute: typeof AdminPreviewReadingMaterialIdRoute
+}
+
+const AdminPreviewRouteChildren: AdminPreviewRouteChildren = {
+  AdminPreviewListeningTestIdRoute: AdminPreviewListeningTestIdRoute,
+  AdminPreviewReadingMaterialIdRoute: AdminPreviewReadingMaterialIdRoute,
+}
+
+const AdminPreviewRouteWithChildren = AdminPreviewRoute._addFileChildren(
+  AdminPreviewRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
@@ -1466,6 +1540,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRouteWithChildren,
   WaitlistAdminRoute: WaitlistAdminRoute,
+  AdminPreviewRoute: AdminPreviewRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

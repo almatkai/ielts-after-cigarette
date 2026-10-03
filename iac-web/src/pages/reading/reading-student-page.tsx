@@ -26,6 +26,9 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { usePreviewSession } from '@/features/attempts/preview-session'
+import type { AttemptSession } from '@/features/attempts/preview-session'
+import { useExamTimer } from '@/features/attempts/exam-timer'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
   AttemptPerformanceReport,
@@ -51,6 +54,11 @@ import type {
   PublicReadingQuestion,
 } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
+import type { PreviewAnswerKeys } from '@/features/admin/preview-api'
+import {
+  PreviewAnswer,
+  PreviewEvidenceText,
+} from '@/features/admin/preview-answer'
 
 const tfngValues = ['TRUE', 'FALSE', 'NOT_GIVEN'] as const
 const ynngValues = ['YES', 'NO', 'NOT_GIVEN'] as const
@@ -144,19 +152,59 @@ function resolvePassages(
     : [material]
 }
 
-export function ReadingAttemptRunner({
-  attempt,
-  material,
-  fullMockSessionId,
-  onSubmitted,
-}: {
+type ReadingRunnerProps = {
   attempt: Attempt
   material: PublicReadingMaterial
   fullMockSessionId?: string
   onSubmitted?: (attempt: Attempt) => void
+}
+
+export function ReadingAttemptRunner(props: ReadingRunnerProps) {
+  const session = useAttemptSession(props.attempt.id)
+  return <ReadingTestRunner {...props} session={session} />
+}
+
+export function ReadingPreviewRunner({
+  material,
+  timerEnabled,
+  answerKeys,
+}: {
+  material: PublicReadingMaterial
+  timerEnabled: boolean
+  answerKeys: PreviewAnswerKeys
 }) {
-  const session = useAttemptSession(attempt.id)
+  const session = usePreviewSession()
+  return (
+    <ReadingTestRunner
+      material={material}
+      session={session}
+      answerKeys={answerKeys}
+      preview
+      timerEnabled={timerEnabled}
+    />
+  )
+}
+
+function ReadingTestRunner({
+  attempt,
+  material,
+  fullMockSessionId,
+  onSubmitted,
+  session,
+  preview = false,
+  timerEnabled = true,
+  answerKeys,
+}: Omit<ReadingRunnerProps, 'attempt'> & {
+  attempt?: Attempt
+  session: AttemptSession
+  preview?: boolean
+  timerEnabled?: boolean
+  answerKeys?: PreviewAnswerKeys
+}) {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const [revealedQuestionId, setRevealedQuestionId] = useState<string | null>(
+    null,
+  )
   const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>(
     'md',
   )
@@ -179,101 +227,60 @@ export function ReadingAttemptRunner({
     [passages],
   )
 
-  const currentQuestion = questions[activeQuestionIndex] ?? questions[0]
-  const currentPassage = passages[currentQuestion.passageIndex] ?? passages[0]
+  const [emptyPassageIndex, setEmptyPassageIndex] = useState(0)
+  const currentQuestion = questions.at(activeQuestionIndex)
+  const currentPassageIndex = currentQuestion?.passageIndex ?? emptyPassageIndex
+  const currentPassage = passages[currentPassageIndex] ?? passages[0]
+  const revealedInCurrentPassage =
+    preview &&
+    currentPassage.questionGroups.some((group) =>
+      group.questions.some((question) => question.id === revealedQuestionId),
+    )
+  const revealedQuote =
+    revealedInCurrentPassage && revealedQuestionId
+      ? (answerKeys?.[revealedQuestionId]?.quote ?? '')
+      : ''
 
   const activePassageQuestions = useMemo(
-    () =>
-      questions.filter((q) => q.passageIndex === currentQuestion.passageIndex),
-    [questions, currentQuestion.passageIndex],
+    () => questions.filter((q) => q.passageIndex === currentPassageIndex),
+    [questions, currentPassageIndex],
   )
 
   const goToPassage = (passageIndex: number) => {
     const targetIndex = questions.findIndex(
       (item) => item.passageIndex === passageIndex,
     )
-    if (targetIndex >= 0) {
-      setActiveQuestionIndex(targetIndex)
-    }
+    setEmptyPassageIndex(passageIndex)
+    setActiveQuestionIndex(targetIndex >= 0 ? targetIndex : questions.length)
   }
 
   useEffect(() => {
-    if (!currentQuestion.question.id) return
+    if (!currentQuestion?.question.id) return
     const el = document.getElementById(
       `reading-q-${currentQuestion.question.id}`,
     )
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
-  }, [activeQuestionIndex, currentQuestion.question.id])
+  }, [activeQuestionIndex, currentQuestion?.question.id])
 
   const isReady = session.answers !== null && !session.loadError
 
   const durationMinutes =
     (material.durationMinutes ?? 0) > 0 ? material.durationMinutes! : 60
   const durationSeconds = durationMinutes * 60
-  const totalDurationMs = durationSeconds * 1000
-  const storageKey = `iac_reading_deadline_${attempt.id}`
-
-  const [deadline, setDeadline] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null
-
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      const parsed = Number(saved)
-      if (parsed > 0 && !isNaN(parsed)) {
-        return parsed
-      }
-    }
-
-    const serverStartedAt = new Date(attempt.startedAt).getTime()
-    if (Date.now() - serverStartedAt > 2 * 60_000) {
-      return serverStartedAt + totalDurationMs
-    }
-
-    return null
+  const { deadline, secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_reading_deadline_',
+    durationSeconds,
+    ready: isReady,
+    enabled: timerEnabled,
+    finished: Boolean(session.submitted),
   })
-
-  useEffect(() => {
-    if (isReady && deadline === null) {
-      const newDeadline = Date.now() + totalDurationMs
-      setDeadline(newDeadline)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, String(newDeadline))
-      }
-    }
-  }, [isReady, deadline, totalDurationMs, storageKey])
-
-  useEffect(() => {
-    if (session.submitted && typeof window !== 'undefined') {
-      localStorage.removeItem(storageKey)
-    }
-  }, [session.submitted, storageKey])
-
-  const [secondsLeft, setSecondsLeft] = useState(() => {
-    if (deadline === null) {
-      return durationSeconds
-    }
-    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
-  })
-
-  useEffect(() => {
-    if (deadline === null) {
-      setSecondsLeft(durationSeconds)
-      return
-    }
-
-    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-
-    const interval = window.setInterval(() => {
-      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [deadline, durationSeconds])
 
   useEffect(() => {
     if (
+      !preview &&
       deadline !== null &&
       durationSeconds > 0 &&
       secondsLeft === 0 &&
@@ -286,6 +293,7 @@ export function ReadingAttemptRunner({
       void session.submit()
     }
   }, [
+    preview,
     deadline,
     durationSeconds,
     secondsLeft,
@@ -349,10 +357,19 @@ export function ReadingAttemptRunner({
   const activePassageAnsweredCount = activePassageQuestions.filter((item) =>
     isQuestionAnswered(item.question.id, answers[item.question.id ?? '']),
   ).length
-  const currentNumber = questionNumberLabel(currentQuestion.question)
+  const currentNumber = currentQuestion
+    ? questionNumberLabel(currentQuestion.question)
+    : '—'
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[1780px] flex-col gap-2.5 p-2.5 sm:p-3.5 lg:p-4 overflow-hidden">
+    <div
+      className={cn(
+        'mx-auto flex w-full max-w-[1780px] flex-col gap-2.5 p-2.5 sm:p-3.5 lg:p-4 overflow-hidden',
+        preview
+          ? 'min-h-[920px] lg:h-[calc(100dvh-100px)] lg:min-h-[560px]'
+          : 'h-dvh',
+      )}
+    >
       {/* ВЕРХНЯЯ ШАПКА */}
       <header className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-xs shrink-0">
         <div className="flex items-center gap-3">
@@ -362,7 +379,15 @@ export function ReadingAttemptRunner({
             size="sm"
             className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
           >
-            {fullMockSessionId ? (
+            {preview ? (
+              <Link
+                to="/admin/reading/materials/$materialId"
+                params={{ materialId: material.id }}
+              >
+                <ArrowLeft className="size-4" aria-hidden />
+                <span>К редактору</span>
+              </Link>
+            ) : fullMockSessionId ? (
               <Link
                 to="/exam/full-mock-sessions/$sessionId"
                 params={{ sessionId: fullMockSessionId }}
@@ -388,8 +413,7 @@ export function ReadingAttemptRunner({
         {passages.length > 1 && (
           <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
             {passages.map((passage, passageIndex) => {
-              const isCurrentPassage =
-                currentQuestion.passageIndex === passageIndex
+              const isCurrentPassage = currentPassageIndex === passageIndex
               const pQuestions = questions.filter(
                 (item) => item.passageIndex === passageIndex,
               )
@@ -433,35 +457,39 @@ export function ReadingAttemptRunner({
 
         {/* Правая часть шапки: Сохранение, Таймер, Кнопка Завершить */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <SaveIndicator state={session.saveState} />
-          <TimeBadge seconds={secondsLeft} label="Осталось" />
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                size="sm"
-                disabled={session.isSubmitting}
-                className="bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
-              >
-                {session.isSubmitting ? 'Отправляем…' : 'Завершить тест'}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Завершить попытку?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {answeredCount < totalQuestions
-                    ? `Вы ответили на ${answeredCount} из ${totalQuestions} вопросов. Неотвеченные вопросы будут засчитаны как неверные.`
-                    : 'Все вопросы отвечены. Вы уверены, что хотите завершить тест и перейти к результатам?'}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Продолжить тест</AlertDialogCancel>
-                <AlertDialogAction onClick={session.submit}>
-                  Завершить
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {!preview ? <SaveIndicator state={session.saveState} /> : null}
+          {timerEnabled ? (
+            <TimeBadge seconds={secondsLeft} label="Осталось" />
+          ) : null}
+          {!preview ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  disabled={session.isSubmitting}
+                  className="bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
+                >
+                  {session.isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Завершить попытку?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {answeredCount < totalQuestions
+                      ? `Вы ответили на ${answeredCount} из ${totalQuestions} вопросов. Неотвеченные вопросы будут засчитаны как неверные.`
+                      : 'Все вопросы отвечены. Вы уверены, что хотите завершить тест и перейти к результатам?'}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Продолжить тест</AlertDialogCancel>
+                  <AlertDialogAction onClick={session.submit}>
+                    Завершить
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : null}
         </div>
       </header>
 
@@ -482,7 +510,7 @@ export function ReadingAttemptRunner({
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
                 {passages.length > 1
-                  ? `Раздел ${currentQuestion.passageIndex + 1}`
+                  ? `Раздел ${currentPassageIndex + 1}`
                   : 'Текст'}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
@@ -542,7 +570,14 @@ export function ReadingAttemptRunner({
                 passageFontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
               )}
             >
-              {currentPassage.body}
+              {currentPassage.body.trim() ? (
+                <PreviewEvidenceText
+                  body={currentPassage.body}
+                  quote={revealedQuote}
+                />
+              ) : (
+                'Текст раздела ещё не добавлен. Вернитесь в редактор.'
+              )}
             </div>
           </div>
         </Card>
@@ -554,7 +589,7 @@ export function ReadingAttemptRunner({
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
                   {passages.length > 1
-                    ? `Раздел ${currentQuestion.passageIndex + 1}`
+                    ? `Раздел ${currentPassageIndex + 1}`
                     : 'Вопросы'}
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
@@ -572,6 +607,13 @@ export function ReadingAttemptRunner({
           </div>
 
           <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 bg-white space-y-7">
+            {currentPassage.questionGroups.every(
+              (group) => group.questions.length === 0,
+            ) ? (
+              <p role="status" className="text-sm text-amber-700">
+                В этом разделе ещё нет вопросов. Добавьте их в редакторе.
+              </p>
+            ) : null}
             {currentPassage.questionGroups.map((group) => (
               <div key={group.id ?? group.position} className="space-y-3.5">
                 <div className="border-b border-[#ededeb] pb-2.5">
@@ -586,9 +628,22 @@ export function ReadingAttemptRunner({
                 </div>
                 <StudentGroup
                   group={group}
-                  activeQuestionId={currentQuestion.question.id}
+                  activeQuestionId={currentQuestion?.question.id}
                   answers={answers}
                   onAnswer={session.updateAnswer}
+                  preview={preview}
+                  answerKeys={answerKeys}
+                  evidenceText={currentPassage.body}
+                  revealedQuestionId={revealedQuestionId}
+                  onToggleExplanation={(questionId) => {
+                    setRevealedQuestionId((current) =>
+                      current === questionId ? null : questionId,
+                    )
+                    const index = questions.findIndex(
+                      (item) => item.question.id === questionId,
+                    )
+                    if (index >= 0) setActiveQuestionIndex(index)
+                  }}
                   onSelectQuestion={(qId) => {
                     const idx = questions.findIndex(
                       (item) => item.question.id === qId,
@@ -606,7 +661,7 @@ export function ReadingAttemptRunner({
               type="button"
               variant="outline"
               size="sm"
-              disabled={activeQuestionIndex === 0}
+              disabled={!currentQuestion || activeQuestionIndex === 0}
               onClick={() => setActiveQuestionIndex((index) => index - 1)}
               className="gap-1.5 rounded-[10px] text-xs font-medium border-[#e7e7e4] bg-white hover:bg-slate-50"
             >
@@ -618,14 +673,16 @@ export function ReadingAttemptRunner({
               </span>
               {passages.length > 1 && (
                 <span className="text-xs text-slate-400">
-                  · Раздел {currentQuestion.passageIndex + 1}
+                  · Раздел {currentPassageIndex + 1}
                 </span>
               )}
             </div>
             <Button
               type="button"
               size="sm"
-              disabled={activeQuestionIndex === questions.length - 1}
+              disabled={
+                !currentQuestion || activeQuestionIndex === questions.length - 1
+              }
               onClick={() => setActiveQuestionIndex((index) => index + 1)}
               className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 text-xs font-medium shadow-xs"
             >
@@ -642,7 +699,7 @@ export function ReadingAttemptRunner({
           {passages.length > 1 && (
             <div className="flex items-center gap-1 border-r border-[#ededeb] pr-2.5 sm:pr-3 shrink-0">
               {passages.map((passage, pIdx) => {
-                const isCurrentPassage = currentQuestion.passageIndex === pIdx
+                const isCurrentPassage = currentPassageIndex === pIdx
                 const pQuestions = questions.filter(
                   (q) => q.passageIndex === pIdx,
                 )
@@ -1127,12 +1184,22 @@ function StudentGroup({
   answers,
   onAnswer,
   onSelectQuestion,
+  preview = false,
+  answerKeys,
+  evidenceText,
+  revealedQuestionId,
+  onToggleExplanation,
 }: {
   group: PublicReadingGroup
   activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
   onSelectQuestion?: (questionId: string) => void
+  preview?: boolean
+  answerKeys?: PreviewAnswerKeys
+  evidenceText?: string
+  revealedQuestionId?: string | null
+  onToggleExplanation?: (questionId: string) => void
 }) {
   if (group.questions.length === 0) return null
   return (
@@ -1161,7 +1228,23 @@ function StudentGroup({
                 question={question}
                 value={question.id ? answers[question.id] : undefined}
                 onAnswer={onAnswer}
+                preview={preview}
               />
+              {preview ? (
+                <PreviewAnswer
+                  answerKey={
+                    question.id ? answerKeys?.[question.id] : undefined
+                  }
+                  options={(question.content.options ?? []) as Option[]}
+                  open={Boolean(
+                    question.id && revealedQuestionId === question.id,
+                  )}
+                  onToggle={() => {
+                    if (question.id) onToggleExplanation?.(question.id)
+                  }}
+                  evidenceText={evidenceText}
+                />
+              ) : null}
             </div>
           )
         })}
@@ -1176,11 +1259,13 @@ function CleanStudentQuestion({
   question,
   value,
   onAnswer,
+  preview = false,
 }: {
   group: PublicReadingGroup
   question: PublicReadingQuestion
   value: StudentAnswer | undefined
   onAnswer: (questionId: string, answer: StudentAnswer) => void
+  preview?: boolean
 }) {
   const questionId = question.id
   const options = (question.content.options ?? []) as Option[]
@@ -1342,7 +1427,9 @@ function CleanStudentQuestion({
           className="h-11 rounded-xl border-slate-200 bg-white px-4 text-base focus-visible:border-blue-500 focus-visible:ring-blue-500/20"
         />
         <p className="mt-1.5 text-xs text-slate-400">
-          Ответ автоматически сохраняется по мере ввода
+          {preview
+            ? 'Пробный ответ хранится только на этой странице'
+            : 'Ответ автоматически сохраняется по мере ввода'}
         </p>
       </div>
     </div>

@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import { authStore } from '@/features/auth/auth-store'
 import {
   getProfile,
@@ -47,6 +48,8 @@ const emptyProfileForm: ProfileForm = {
 }
 
 export function ProfilePage() {
+  const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
+    useMascotVisibility()
   const photoInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
   const [form, setForm] = useState<ProfileForm>(emptyProfileForm)
@@ -394,6 +397,37 @@ export function ProfilePage() {
                 <Switch
                   id="weekly-report"
                   aria-label="Еженедельный отчёт"
+                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+            <CardHeader className="p-5">
+              <CardTitle className="text-base">Персонаж-помощник</CardTitle>
+              <CardDescription>
+                Отображение лисёнка Юки на экране.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <Label
+                    htmlFor="profile-mascot-toggle"
+                    className="leading-5 text-[#111111] cursor-pointer"
+                  >
+                    Показывать питомца (Юки)
+                  </Label>
+                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                    Если скрыть, останется маленькая кнопка чата.
+                  </p>
+                </div>
+                <Switch
+                  id="profile-mascot-toggle"
+                  checked={isMascotVisible}
+                  onCheckedChange={setMascotVisible}
+                  aria-label="Показывать питомца"
                   className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>

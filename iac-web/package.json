@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "test:regression": "node --test scripts/*.test.mjs",
+    "test:preview": "playwright test",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
@@ -42,6 +43,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/eslint-config": "latest",

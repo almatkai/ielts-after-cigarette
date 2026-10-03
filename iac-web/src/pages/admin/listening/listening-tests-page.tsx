@@ -2,6 +2,7 @@ import {
   Add,
   DocumentUpload,
   Edit,
+  Eye,
   ExportCurve,
   Headphone,
 } from 'iconsax-react'
@@ -20,8 +21,10 @@ import {
   listAdminListeningTests,
 } from '@/features/listening/api'
 import type { ListeningTest } from '@/features/listening/api'
+import { useAuth } from '@/features/auth/auth-store'
 
 export function ListeningTestsPage() {
+  const auth = useAuth()
   const [exportTest, setExportTest] = useState<ListeningTest | null>(null)
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
 
@@ -86,34 +89,51 @@ export function ListeningTestsPage() {
                   <h2 className="font-semibold">{test.title}</h2>
                   <Badge variant="outline">{test.status}</Badge>
                 </div>
+                {test.hasUnpublishedChanges ? (
+                  <p className="mt-1 text-xs text-amber-700">
+                    Есть неопубликованные изменения
+                  </p>
+                ) : null}
                 <p className="mt-1 text-sm text-[#69696d]">
                   {test.examType} · {test.durationMinutes} минут · version{' '}
                   {test.currentVersionNumber}
                 </p>
               </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={exportLoadingId === test.id}
-                    onClick={() => void handleExport(test.id)}
-                  >
-                    <ExportCurve aria-hidden />
-                    {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
-                  </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                {auth.user?.role === 'ADMIN' ? (
                   <Button asChild variant="outline">
                     <Link
-                      to="/admin/listening/tests/$testId"
+                      to="/admin/preview/listening/$testId"
                       params={{ testId: test.id }}
+                      preload={false}
                     >
-                      <Edit aria-hidden /> Редактировать
+                      <Eye aria-hidden />
+                      Предпросмотр теста
                     </Link>
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={exportLoadingId === test.id}
+                  onClick={() => void handleExport(test.id)}
+                >
+                  <ExportCurve aria-hidden />
+                  {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
+                </Button>
+                <Button asChild variant="outline">
+                  <Link
+                    to="/admin/listening/tests/$testId"
+                    params={{ testId: test.id }}
+                  >
+                    <Edit aria-hidden /> Редактировать
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {exportTest ? (
         <DataExportDialog

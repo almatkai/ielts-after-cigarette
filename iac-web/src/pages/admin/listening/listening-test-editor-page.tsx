@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   DocumentUpload,
   ExportCurve,
+  Eye,
   Image,
   Magicpen,
   Play,
@@ -180,6 +181,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
       testId ? updateListeningTest(testId, input) : createListeningTest(input),
     onSuccess: async (test) => {
       setForm(toForm(test))
+      queryClient.setQueryData(listeningKeys.adminTest(test.id), test)
       await queryClient.invalidateQueries({
         queryKey: listeningKeys.adminTests,
       })
@@ -201,6 +203,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     },
     onSuccess: async (test) => {
       setForm(toForm(test))
+      queryClient.setQueryData(listeningKeys.adminTest(test.id), test)
       await queryClient.invalidateQueries({
         queryKey: listeningKeys.adminTests,
       })
@@ -212,6 +215,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     mutationFn: () => archiveListeningTest(testId!, form.revision),
     onSuccess: async (test) => {
       setForm(toForm(test))
+      queryClient.setQueryData(listeningKeys.adminTest(test.id), test)
       await queryClient.invalidateQueries({
         queryKey: listeningKeys.adminTests,
       })
@@ -297,7 +301,42 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     }
   }
 
+  const dirty =
+    !query.data || JSON.stringify(form) !== JSON.stringify(toForm(query.data))
+  const pending =
+    saveMutation.isPending ||
+    publishMutation.isPending ||
+    archiveMutation.isPending ||
+    transcribeMutation.isPending
+  const handlePreview = async () => {
+    setMessage(null)
+    try {
+      const saved = dirty
+        ? await saveMutation.mutateAsync(toInput(form, editing))
+        : query.data
+      await navigate({
+        to: '/admin/preview/listening/$testId',
+        params: { testId: saved.id },
+      })
+    } catch (error) {
+      setMessage(getErrorMessage(error))
+    }
+  }
+
   if (editing && query.isPending) return <p>Загружаем конструктор…</p>
+  if (editing && query.isError)
+    return (
+      <div role="alert" className="grid gap-3">
+        <p>Не удалось загрузить тест: {getErrorMessage(query.error)}</p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void query.refetch()}
+        >
+          Повторить
+        </Button>
+      </div>
+    )
   return (
     <form className="grid gap-5" onSubmit={(event) => void save(event)}>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -316,7 +355,18 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             ) : null}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => void handlePreview()}
+            >
+              <Eye aria-hidden />
+              {dirty ? 'Сохранить и открыть тест' : 'Предпросмотр теста'}
+            </Button>
+          ) : null}
           {testId && auth.user?.role === 'ADMIN' ? (
             <Button
               type="button"
@@ -623,7 +673,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           className="shrink-0 font-mono text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
                           title="Перемотать аудио на эту секунду"
                         >
-                          ▶ {formatSeconds(seg.start)} - {formatSeconds(seg.end)}
+                          ▶ {formatSeconds(seg.start)} -{' '}
+                          {formatSeconds(seg.end)}
                         </button>
                         <span className="text-slate-700 leading-relaxed">
                           {seg.text}
@@ -823,11 +874,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           {typeof question.content.timestampStart ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
-                              (
-                              {formatSeconds(
-                                question.content.timestampStart,
-                              )}
-                              )
+                              ({formatSeconds(question.content.timestampStart)})
                             </span>
                           )}
                           {typeof question.content.timestampStart ===
@@ -860,8 +907,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                             min={0}
                             placeholder="21.0"
                             value={
-                              typeof question.content.timestampEnd ===
-                              'number'
+                              typeof question.content.timestampEnd === 'number'
                                 ? question.content.timestampEnd
                                 : ''
                             }
@@ -889,11 +935,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           {typeof question.content.timestampEnd ===
                             'number' && (
                             <span className="text-xs font-mono text-slate-600 shrink-0">
-                              (
-                              {formatSeconds(
-                                question.content.timestampEnd,
-                              )}
-                              )
+                              ({formatSeconds(question.content.timestampEnd)})
                             </span>
                           )}
                         </div>

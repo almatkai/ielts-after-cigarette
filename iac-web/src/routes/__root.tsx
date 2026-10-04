@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'IAC — современная подготовка к IELTS',
+        title: 'Daiyndyq IELTS — современная подготовка к IELTS',
       },
       {
         name: 'theme-color',

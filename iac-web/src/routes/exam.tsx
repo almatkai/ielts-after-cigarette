@@ -10,7 +10,7 @@ export const Route = createFileRoute('/exam')({
   },
   head: () => ({
     meta: [
-      { title: 'IELTS test — IAC' },
+      { title: 'IELTS test — Daiyndyq IELTS' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

@@ -21,7 +21,7 @@ export const Route = createFileRoute('/login')({
   },
   head: () => ({
     meta: [
-      { title: 'Войти в IAC — подготовка к IELTS' },
+      { title: 'Войти в Daiyndyq IELTS — подготовка к IELTS' },
       {
         name: 'description',
         content: 'Вход в личный кабинет платформы подготовки к IELTS.',

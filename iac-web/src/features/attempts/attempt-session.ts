@@ -11,6 +11,7 @@ import type { Attempt, StudentAnswer } from '@/features/attempts/api'
 import { DraftBuffer } from '@/features/attempts/draft-buffer'
 import { invalidateMistakeResults } from '@/features/attempts/mistake-cache'
 import { getErrorMessage } from '@/lib/api/client'
+import { reportError } from '@/lib/error-reporting'
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -28,6 +29,7 @@ export function useAttemptSession(attemptId: string) {
   const saving = useRef<Promise<void> | null>(null)
   const submitting = useRef(false)
   const closed = useRef(false)
+  const saveFailures = useRef(0)
 
   const draftsQuery = useQuery({
     queryKey: attemptKeys.detail(attemptId),
@@ -68,10 +70,14 @@ export function useAttemptSession(attemptId: string) {
       batch.map(({ questionId, answer }) => ({ questionId, answer })),
     )
       .then(() => {
+        saveFailures.current = 0
         pending.current.acknowledge(batch)
         setSaveState(pending.current.size === 0 ? 'saved' : 'saving')
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        // One signal after three consecutive failures, not one event per tick.
+        saveFailures.current += 1
+        if (saveFailures.current === 3) reportError(error, 'autosave')
         // Keep failed changes dirty for the next tick or reconnect.
         setSaveState('error')
       })

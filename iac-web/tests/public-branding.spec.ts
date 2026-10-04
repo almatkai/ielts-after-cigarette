@@ -13,7 +13,7 @@ const user = {
 }
 
 for (const [path, title] of [
-  ['./', 'Обзор — Daiyndyq IELTS'],
+  ['./', 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза'],
   ['./practice', 'Практика — Daiyndyq IELTS'],
   ['./profile', 'Профиль — Daiyndyq IELTS'],
 ]) {
@@ -65,6 +65,16 @@ for (const [path, title] of [
         exact: true,
       }),
     ).toBeVisible()
+    await expect(
+      page.locator('link[rel="icon"][type="image/x-icon"]'),
+    ).toHaveAttribute('href', /favicon\.ico$/)
+    await expect(
+      page.locator('link[rel="icon"][sizes="32x32"]'),
+    ).toHaveAttribute('href', /favicon-32\.png$/)
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+      'href',
+      /apple-touch-icon\.png$/,
+    )
     expect(errors).toEqual([])
   })
 }

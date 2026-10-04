@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Daiyndyq IELTS — современная подготовка к IELTS',
+        title: 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза',
       },
       {
         name: 'theme-color',
@@ -44,8 +44,27 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: `${import.meta.env.BASE_URL}favicon.ico`,
       },
       {
-        rel: 'alternate icon',
-        href: `${import.meta.env.BASE_URL}favicon.ico`,
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: `${import.meta.env.BASE_URL}favicon-16.png`,
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: `${import.meta.env.BASE_URL}favicon-32.png`,
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '256x256',
+        href: `${import.meta.env.BASE_URL}favicon.png`,
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: `${import.meta.env.BASE_URL}apple-touch-icon.png`,
       },
       {
         rel: 'stylesheet',

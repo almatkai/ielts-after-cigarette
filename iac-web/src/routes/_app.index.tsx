@@ -5,7 +5,7 @@ import { OverviewPage } from '@/pages/overview/ui/overview-page'
 export const Route = createFileRoute('/_app/')({
   head: () => ({
     meta: [
-      { title: 'Обзор — Daiyndyq IELTS' },
+      { title: 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

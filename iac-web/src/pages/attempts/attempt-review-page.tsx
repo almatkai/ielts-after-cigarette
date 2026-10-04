@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
+import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
@@ -14,8 +15,6 @@ import {
 } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import {
-  attemptKeys,
-  getAttempt,
   getAttemptMaterial,
   getSpeakingRecordingBlob,
 } from '@/features/attempts/api'
@@ -29,18 +28,13 @@ import type {
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { formatDateTime } from '@/lib/date'
 import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
 
+export { formatDateTime } from '@/lib/date'
+
 export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attemptId),
-    queryFn: ({ signal }) => getAttempt(attemptId, signal),
-    // Only poll while a background assessment is actually running. Terminal or
-    // abandoned states (SUBMITTED, ABANDONED, IN_PROGRESS after a failed job)
-    // never resolve to SUBMITTED, so polling them would run forever.
-    refetchInterval: (query) =>
-      query.state.data?.status === 'PROCESSING' ? 2500 : false,
-  })
+  const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
     attempt?.materialType === 'listening' || attempt?.materialType === 'reading'
@@ -89,12 +83,7 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
     !('parts' in material) &&
     review !== null
   ) {
-    return (
-      <ReadingReviewSplitRunner
-        attempt={attempt}
-        material={material}
-      />
-    )
+    return <ReadingReviewSplitRunner attempt={attempt} material={material} />
   }
 
   return (
@@ -198,7 +187,8 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
             : 'Анализируем раскрытие темы, аргументацию, связность и грамматику. Страница обновится автоматически после выставления баллов.'}
         </p>
         <div className="rounded-xl bg-[#f7f7f5] p-3 text-xs text-slate-500 text-left w-full mt-2">
-          💡 Проверка обычно занимает от 30 до 90 секунд. Вы можете подождать здесь или вернуться к разбору позже из раздела «Прогресс».
+          💡 Проверка обычно занимает от 30 до 90 секунд. Вы можете подождать
+          здесь или вернуться к разбору позже из раздела «Прогресс».
         </div>
       </CardContent>
     </Card>
@@ -316,7 +306,7 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
     const evaluation = attempt.speakingEvaluation
     const isPronunciationAvailable = Boolean(
       evaluation.pronunciationAvailable &&
-        evaluation.criteria.pronunciation.band > 0,
+      evaluation.criteria.pronunciation.band > 0,
     )
     return {
       skill: 'Speaking',
@@ -395,7 +385,9 @@ function AIEvaluationReview({
           <Card
             key={label}
             className={`rounded-[16px] border bg-white shadow-xs ${
-              criterion.unavailable ? 'border-amber-200/80 bg-amber-50/20' : 'border-[#e7e7e4]'
+              criterion.unavailable
+                ? 'border-amber-200/80 bg-amber-50/20'
+                : 'border-[#e7e7e4]'
             }`}
           >
             <CardContent className="p-5">
@@ -412,7 +404,10 @@ function AIEvaluationReview({
                 )}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                {criterion.feedback || (criterion.unavailable ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.' : 'Комментарий не получен.')}
+                {criterion.feedback ||
+                  (criterion.unavailable
+                    ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.'
+                    : 'Комментарий не получен.')}
               </p>
             </CardContent>
           </Card>
@@ -647,16 +642,4 @@ function FlatReview({ review }: { review: AttemptReviewItem[] }) {
 
 function skillLabel(materialType: string) {
   return materialType.charAt(0).toUpperCase() + materialType.slice(1)
-}
-
-export function formatDateTime(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }

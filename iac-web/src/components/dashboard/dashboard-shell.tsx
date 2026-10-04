@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { DashboardHeader } from './dashboard-header'
 import { getDashboardPageTitle } from './dashboard-navigation'
 import { DashboardSidebar } from './dashboard-sidebar'
-import { AiAssistantFloatingWidget } from './ai-assistant'
+import { AiAssistantFloatingWidget } from './ai-assistant-widget'
 
 type DashboardShellProps = {
   children: React.ReactNode

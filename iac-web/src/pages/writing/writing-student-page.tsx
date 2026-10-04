@@ -1,5 +1,6 @@
 import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
+import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -18,8 +19,6 @@ import {
   TimeBadge,
 } from '@/features/attempts/attempt-ui'
 import {
-  attemptKeys,
-  getAttempt,
   startWritingAttempt,
 } from '@/features/attempts/api'
 import type { Attempt, WritingEvaluation } from '@/features/attempts/api'
@@ -488,14 +487,7 @@ export function WritingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attempt.id),
-    queryFn: ({ signal }) => getAttempt(attempt.id, signal),
-    // A failed writing job resets attempts.status to IN_PROGRESS, so polling
-    // everything except SUBMITTED would loop forever next to the error card.
-    refetchInterval: (query) =>
-      query.state.data?.status === 'PROCESSING' ? 2500 : false,
-  })
+  const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt

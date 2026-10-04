@@ -47,6 +47,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      h3-rules:
+        specifier: ^0.1.0
+        version: 0.1.0(h3@2.0.1-rc.26(crossws@0.4.10(srvx@0.11.22)))(ocache@0.2.0)
       iconsax-react:
         specifier: ^0.0.8
         version: 0.0.8(react@19.2.8)

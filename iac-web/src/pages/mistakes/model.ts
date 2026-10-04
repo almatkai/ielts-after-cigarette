@@ -1,15 +1,48 @@
-import { z } from 'zod'
+import type { SearchSchemaInput } from '@tanstack/react-router'
+import type {
+  AttemptMaterialType,
+  MistakeDetail,
+} from '@/features/attempts/api'
 
-import type { MistakeDetail } from '@/features/attempts/api'
+type MistakesSearch = {
+  skill: AttemptMaterialType
+  page: number
+  attempt?: string
+}
 
-export const mistakesSearchSchema = z.object({
-  skill: z
-    .enum(['reading', 'listening', 'writing', 'speaking'])
-    .default('reading')
-    .catch('reading'),
-  page: z.number().int().min(1).max(100000).default(1).catch(1),
-  attempt: z.uuid().optional().catch(undefined),
-})
+// Match z.uuid(): RFC UUID versions 1–8, plus nil/max UUIDs. Keep this tiny
+// parser in the route config instead of pulling all of Zod into the entry JS.
+const uuidPattern =
+  /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/i
+
+export const mistakesSearchSchema = {
+  parse(search: Record<string, unknown>): MistakesSearch {
+    const skill =
+      search.skill === 'listening' ||
+      search.skill === 'writing' ||
+      search.skill === 'speaking'
+        ? search.skill
+        : 'reading'
+    const page =
+      typeof search.page === 'number' &&
+      Number.isInteger(search.page) &&
+      search.page >= 1 &&
+      search.page <= 100000
+        ? search.page
+        : 1
+    const attempt =
+      typeof search.attempt === 'string' && uuidPattern.test(search.attempt)
+        ? search.attempt
+        : undefined
+    return { skill, page, ...('attempt' in search ? { attempt } : {}) }
+  },
+}
+
+export function validateMistakesSearch(
+  search: Record<string, unknown> & SearchSchemaInput,
+) {
+  return mistakesSearchSchema.parse(search)
+}
 
 export function hydrateMistake(detail: MistakeDetail, index: number) {
   const item = detail.review.at(index)

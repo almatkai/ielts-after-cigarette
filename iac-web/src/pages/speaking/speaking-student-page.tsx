@@ -7,6 +7,7 @@ import {
   Timer1,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
+import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -486,14 +487,7 @@ export function SpeakingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attempt.id),
-    queryFn: ({ signal }) => getAttempt(attempt.id, signal),
-    // A failed speaking job resets attempts.status to IN_PROGRESS, so polling
-    // everything except SUBMITTED would loop forever next to the error card.
-    refetchInterval: (query) =>
-      query.state.data?.status === 'PROCESSING' ? 2500 : false,
-  })
+  const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt

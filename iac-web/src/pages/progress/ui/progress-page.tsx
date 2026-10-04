@@ -1,19 +1,18 @@
-import {
-  ArrowRight,
-} from 'iconsax-react'
-import { useQuery } from '@tanstack/react-query'
+import { ArrowRight } from 'iconsax-react'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
-import { attemptKeys, listAttempts } from '@/features/attempts/api'
+import { attemptKeys, listAttemptHistory } from '@/features/attempts/api'
 import type { AttemptListItem } from '@/features/attempts/api'
 import { getDashboard, queryKeys } from '@/features/ielts/api'
 import type { SkillId } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
 
-import { formatDateTime } from '@/pages/attempts/attempt-review-page'
+import { formatDateTime } from '@/lib/date'
 
 const skillLabels: Record<SkillId, string> = {
   listening: 'Listening',
@@ -29,10 +28,41 @@ export function ProgressPage() {
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
   })
-  const attemptsQuery = useQuery({
-    queryKey: attemptKeys.listAll,
-    queryFn: ({ signal }) => listAttempts(undefined, signal),
+  const attemptsQuery = useInfiniteQuery({
+    queryKey: attemptKeys.history,
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam, signal }) => listAttemptHistory(pageParam, signal),
+    getNextPageParam: (page) => page.nextCursor,
   })
+  const moreRef = useRef<HTMLDivElement>(null)
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = attemptsQuery
+  const attempts = useMemo(
+    () => attemptsQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    [attemptsQuery.data],
+  )
+  useEffect(() => {
+    if (
+      !hasNextPage ||
+      isFetchingNextPage ||
+      attemptsQuery.isFetchNextPageError ||
+      !moreRef.current
+    )
+      return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) void fetchNextPage()
+      },
+      { rootMargin: '600px' },
+    )
+    observer.observe(moreRef.current)
+    return () => observer.disconnect()
+  }, [
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    attemptsQuery.isFetchNextPageError,
+    dashboardQuery.isPending,
+  ])
 
   if (dashboardQuery.isPending) {
     return <LoadingState label="Загружаем прогресс…" />
@@ -49,8 +79,9 @@ export function ProgressPage() {
 
   const dashboard = dashboardQuery.data
   const attemptsPending = attemptsQuery.isPending
-  const attemptsError = attemptsQuery.error
-  const attempts = [...(attemptsQuery.data?.items ?? [])].sort(bySubmittedAtDesc)
+  const attemptsError = attemptsQuery.isFetchNextPageError
+    ? null
+    : attemptsQuery.error
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -132,6 +163,21 @@ export function ProgressPage() {
           ) : (
             attempts.map((item) => <AttemptRow key={item.id} item={item} />)
           )}
+          {hasNextPage ? (
+            <div ref={moreRef} className="flex justify-center">
+              <Button
+                variant="outline"
+                disabled={isFetchingNextPage}
+                onClick={() => void fetchNextPage()}
+              >
+                {isFetchingNextPage
+                  ? 'Загружаем историю…'
+                  : attemptsQuery.isFetchNextPageError
+                    ? 'Повторить загрузку истории'
+                    : 'Показать ещё'}
+              </Button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>
@@ -150,14 +196,29 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
         <p className="mt-1 text-xs text-[#808084]">
           {skillLabel(item.materialType)} ·{' '}
           {formatDateTime(item.submittedAt ?? item.startedAt)}
-          {submitted ? '' : processing ? ' · на проверке ИИ' : ' · не завершена'}
+          {submitted
+            ? ''
+            : processing
+              ? ' · на проверке ИИ'
+              : ' · не завершена'}
         </p>
       </div>
       {processing ? (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3b82f6]">
           <svg className="size-3 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
           Проверяется
         </span>
@@ -175,10 +236,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       ) : null}
       {submitted || processing ? (
         <Button asChild variant="outline" size="sm" className="shadow-none">
-          <Link
-            to="/attempts/$attemptId"
-            params={{ attemptId: item.id }}
-          >
+          <Link to="/attempts/$attemptId" params={{ attemptId: item.id }}>
             {processing ? 'Статус' : 'Разбор'}
             <ArrowRight aria-hidden />
           </Link>
@@ -236,10 +294,4 @@ function skillLabel(materialType: AttemptListItem['materialType']) {
       : materialType === 'writing'
         ? 'Writing'
         : 'Speaking'
-}
-
-function bySubmittedAtDesc(a: AttemptListItem, b: AttemptListItem) {
-  const aTime = new Date(a.submittedAt ?? a.startedAt).getTime()
-  const bTime = new Date(b.submittedAt ?? b.startedAt).getTime()
-  return bTime - aTime
 }

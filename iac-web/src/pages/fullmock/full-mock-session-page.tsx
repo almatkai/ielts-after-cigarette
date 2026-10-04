@@ -1,10 +1,4 @@
-import {
-  ArrowRight,
-  Clock,
-  Lock,
-  PlayCircle,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowRight, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -34,8 +28,29 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
-    refetchInterval: 10_000,
+    refetchInterval: (query) => {
+      const session = query.state.data
+      return session?.status === 'IN_PROGRESS' ||
+        session?.sections.some(
+          (section) => section.attempt.status === 'PROCESSING',
+        )
+        ? 10_000
+        : false
+    },
   })
+  // Keep cross-tab/AI updates, but request expiration at the actual deadline
+  // rather than waiting for the next 10-second polling tick.
+  const deadline = query.data?.deadlineAt
+  const sessionStatus = query.data?.status
+  const refetchSession = query.refetch
+  useEffect(() => {
+    if (sessionStatus !== 'IN_PROGRESS' || !deadline) return
+    const timer = window.setTimeout(
+      () => void refetchSession(),
+      Math.max(0, new Date(deadline).getTime() - Date.now()) + 50,
+    )
+    return () => window.clearTimeout(timer)
+  }, [deadline, sessionStatus, refetchSession])
   const advance = useMutation({
     mutationFn: () => advanceFullMockSession(sessionId),
     onSuccess: (session) =>

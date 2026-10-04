@@ -9,7 +9,19 @@ import tailwindcss from '@tailwindcss/vite'
 const config = defineConfig({
   base: '/app/',
   resolve: { tsconfigPaths: true },
-  plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    tailwindcss(),
+    tanstackStart(),
+    nitro({
+      compressPublicAssets: true,
+      routeRules: {
+        '/app/assets/**': {
+          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+        },
+      },
+    }),
+    viteReact(),
+  ],
   server: {
     watch: {
       ignored: ['**/public/**'],

@@ -1,12 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { FullMockStartPage } from '@/pages/fullmock/full-mock-start-page'
-
+// Old links no longer allow selecting a hand-assembled mock.
 export const Route = createFileRoute('/_app/full-mocks/$mockId')({
-  component: MockStartRoute,
+  beforeLoad: () => {
+    throw redirect({ to: '/full-mocks', replace: true })
+  },
 })
-
-function MockStartRoute() {
-  const { mockId } = Route.useParams()
-  return <FullMockStartPage mockId={mockId} />
-}

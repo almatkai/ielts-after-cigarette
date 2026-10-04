@@ -139,7 +139,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
             <ClipboardTick className="size-[18px]" aria-hidden />
-            Full Mock
+            Архив Full Mock
           </Link>
           {auth.user?.role === 'ADMIN' ? (
             <>

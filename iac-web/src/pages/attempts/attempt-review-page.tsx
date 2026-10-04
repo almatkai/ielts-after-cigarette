@@ -29,6 +29,7 @@ import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { formatDateTime } from '@/lib/date'
+import { CompletedBankNotice } from '@/features/fullmock/completed-bank-notice'
 import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
 
 export { formatDateTime } from '@/lib/date'
@@ -102,6 +103,10 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
           {formatDateTime(attempt.startedAt)}
         </p>
       </div>
+      {attempt.status === 'SUBMITTED' &&
+      attempt.materialType === 'listening' ? (
+        <CompletedBankNotice attemptId={attempt.id} />
+      ) : null}
       {attempt.status === 'PROCESSING' ? (
         <ProcessingAttempt attempt={attempt} />
       ) : attempt.status !== 'SUBMITTED' ? (

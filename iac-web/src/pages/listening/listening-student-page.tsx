@@ -39,6 +39,7 @@ import type {
   PublicListeningTest,
 } from '@/features/listening/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { CompletedBankNotice } from '@/features/fullmock/completed-bank-notice'
 import type { PreviewAnswerKeys } from '@/features/admin/preview-api'
 import {
   PreviewAnswer,
@@ -514,6 +515,8 @@ export function ListeningAttemptResult({
           {totalQuestions} вопросов
         </p>
       </div>
+
+      {attempt.status === 'SUBMITTED' ? <CompletedBankNotice attemptId={attempt.id} /> : null}
 
       <AttemptPerformanceReport
         band={attempt.band}

@@ -9,9 +9,7 @@ import {
 import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
-import {
-  Card,
-} from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 const skills = [
@@ -93,7 +91,11 @@ export function PracticePage() {
                 <div>
                   <div className="flex items-start justify-between gap-4">
                     <span className="grid size-11 place-items-center rounded-[11px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                      <Icon className="size-5 transition-colors" strokeWidth={1.8} aria-hidden />
+                      <Icon
+                        className="size-5 transition-colors"
+                        strokeWidth={1.8}
+                        aria-hidden
+                      />
                     </span>
                     <Badge
                       variant="outline"
@@ -120,7 +122,10 @@ export function PracticePage() {
 
                 <div className="mt-6 flex items-center gap-2 pt-2 text-sm font-semibold text-[#2563eb]">
                   <span>Перейти к материалам</span>
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
+                  <ArrowRight
+                    className="size-4 transition-transform group-hover:translate-x-1"
+                    aria-hidden
+                  />
                 </div>
               </Link>
             </Card>
@@ -147,7 +152,9 @@ export function PracticePage() {
                 </Badge>
               </div>
               <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#69696d]">
-                Пройдите Listening, Reading, Writing и Speaking в единой экзаменационной сессии с официальными таймерами и итоговым расчётом общего Band Score.
+                Мы автоматически подберём Listening, Reading, Writing и Speaking
+                из общей библиотеки — сначала непройденные тесты. Четыре секции
+                подряд, общий таймер и итоговый Band Score.
               </p>
             </div>
           </div>
@@ -155,7 +162,7 @@ export function PracticePage() {
             to="/full-mocks"
             className="inline-flex shrink-0 items-center justify-center rounded-[10px] bg-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
           >
-            Перейти к Full Mock
+            Подготовить Full Mock
           </Link>
         </div>
       </Card>

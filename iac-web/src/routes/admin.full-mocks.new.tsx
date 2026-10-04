@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import { FullMockEditorPage } from '@/pages/admin/fullmock/full-mock-editor-page'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/admin/full-mocks/new')({
-  component: FullMockEditorPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/admin/full-mocks', replace: true })
+  },
 })

@@ -24,11 +24,6 @@ export type FullMockTest = {
   updatedAt: string
 }
 
-export type FullMockInput = Omit<
-  FullMockTest,
-  'id' | 'status' | 'revision' | 'publishedAt' | 'createdAt' | 'updatedAt'
-> & { revision?: number }
-
 export type FullMockSession = {
   id: string
   mockTestId: string
@@ -67,24 +62,36 @@ export type FullMockSection =
       material: PublicSpeakingMaterial
     })
 
+export type FullMockBankStatus = {
+  skill: FullMockSkill
+  total: number
+  completed: number
+  remaining: number
+  isExhausted: boolean
+}
+
+export type FullMockOverview = {
+  examType: 'academic' | 'general' | ''
+  durationMinutes: number
+  ready: boolean
+  banks: FullMockBankStatus[]
+  activeSession: FullMockSession | null
+}
+
 export const fullMockKeys = {
-  publicTests: ['full-mocks'] as const,
-  publicTest: (id: string) => ['full-mocks', id] as const,
+  overview: (userId: string | undefined, examType: string | null | undefined) =>
+    ['full-mock-overview', userId, examType] as const,
   session: (id: string) => ['full-mock-sessions', id] as const,
   section: (sessionId: string, position: string) =>
     ['full-mock-sessions', sessionId, 'sections', position] as const,
   adminTests: ['admin', 'full-mocks'] as const,
-  adminTest: (id: string) => ['admin', 'full-mocks', id] as const,
 }
 
-export const listPublicFullMocks = (signal?: AbortSignal) =>
-  apiClient.request<{ items: FullMockTest[] }>('/api/v1/full-mocks', { signal })
+export const getFullMockOverview = (signal?: AbortSignal) =>
+  apiClient.request<FullMockOverview>('/api/v1/full-mocks/overview', { signal })
 
-export const getPublicFullMock = (id: string, signal?: AbortSignal) =>
-  apiClient.request<FullMockTest>(`/api/v1/full-mocks/${id}`, { signal })
-
-export const startFullMockSession = (id: string, restart = false) =>
-  apiClient.request<FullMockSession>(`/api/v1/full-mocks/${id}/sessions`, {
+export const startGeneratedFullMock = (restart = false) =>
+  apiClient.request<FullMockSession>('/api/v1/full-mocks/start', {
     method: 'POST',
     body: { restart },
   })
@@ -121,31 +128,4 @@ export const getFullMockSection = (
 export const listFullMocks = (signal?: AbortSignal) =>
   apiClient.request<{ items: FullMockTest[] }>('/api/v1/admin/full-mocks', {
     signal,
-  })
-
-export const getFullMock = (id: string, signal?: AbortSignal) =>
-  apiClient.request<FullMockTest>(`/api/v1/admin/full-mocks/${id}`, { signal })
-
-export const createFullMock = (input: FullMockInput) =>
-  apiClient.request<FullMockTest>('/api/v1/admin/full-mocks', {
-    method: 'POST',
-    body: input,
-  })
-
-export const updateFullMock = (id: string, input: FullMockInput) =>
-  apiClient.request<FullMockTest>(`/api/v1/admin/full-mocks/${id}`, {
-    method: 'PUT',
-    body: input,
-  })
-
-export const publishFullMock = (id: string, revision: number) =>
-  apiClient.request<FullMockTest>(`/api/v1/admin/full-mocks/${id}/publish`, {
-    method: 'POST',
-    body: { revision },
-  })
-
-export const archiveFullMock = (id: string, revision: number) =>
-  apiClient.request<FullMockTest>(`/api/v1/admin/full-mocks/${id}/archive`, {
-    method: 'POST',
-    body: { revision },
   })

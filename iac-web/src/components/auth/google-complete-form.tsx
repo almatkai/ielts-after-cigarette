@@ -194,41 +194,47 @@ export function GoogleCompleteForm({
                 getFieldError(field.state.meta.errors)
               return (
                 <div className="mb-5">
-                  <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-[#475569]">
+                  <div className="flex min-h-11 items-start gap-3 text-sm leading-6 text-[#475569]">
                     <input
+                      id="acceptedTerms"
                       type="checkbox"
                       checked={field.state.value}
                       onChange={(event) => {
                         field.handleChange(event.target.checked)
                         clearFieldError('acceptedTerms')
                       }}
-                      className="mt-1 size-4 shrink-0 rounded border-[#cbd5e1] accent-[#3b82f6]"
+                      className="mt-1 size-4 shrink-0 cursor-pointer rounded border-[#cbd5e1] accent-[#3b82f6]"
                       aria-invalid={Boolean(termsError)}
                     />
                     <span>
-                      Принимаю{' '}
+                      <label htmlFor="acceptedTerms" className="cursor-pointer">
+                        Принимаю{' '}
+                      </label>
                       <Link
                         to="/terms"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#3b82f6] hover:decoration-[#3b82f6]"
-                        onClick={(event) => event.stopPropagation()}
+                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
                       >
                         условия использования
-                      </Link>{' '}
-                      и{' '}
+                      </Link>
+                      <label htmlFor="acceptedTerms" className="cursor-pointer">
+                        {' '}
+                        и{' '}
+                      </label>
                       <Link
                         to="/privacy"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#3b82f6] hover:decoration-[#3b82f6]"
-                        onClick={(event) => event.stopPropagation()}
+                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
                       >
                         политику конфиденциальности
                       </Link>
-                      .
+                      <label htmlFor="acceptedTerms" className="cursor-pointer">
+                        .
+                      </label>
                     </span>
-                  </label>
+                  </div>
                   {termsError ? (
                     <p className="mt-1 text-xs text-[#dc2626]" role="alert">
                       {termsError}

@@ -1,9 +1,10 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -132,6 +133,29 @@ function GoogleSignInCard({
           </p>
         ) : null}
       </CardContent>
+      <CardFooter className="justify-center border-t border-[#f1f5f9] px-6 py-4 text-center text-xs leading-5 text-[#64748b] sm:px-8">
+        <p>
+          Входя в систему, вы соглашаетесь с{' '}
+          <Link
+            to="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+          >
+            условиями использования
+          </Link>{' '}
+          и{' '}
+          <Link
+            to="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+          >
+            политикой конфиденциальности
+          </Link>
+          .
+        </p>
+      </CardFooter>
     </>
   )
 }

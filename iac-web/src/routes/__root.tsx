@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 
 import { useEffect } from 'react'
+import { PresenceBeacon } from '@/features/analytics/presence-beacon'
 import { reportError } from '@/lib/error-reporting'
 import { NotFoundPage } from '@/pages/not-found/ui/not-found-page'
 
@@ -121,6 +122,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <PresenceBeacon />
         <Scripts />
       </body>
     </html>

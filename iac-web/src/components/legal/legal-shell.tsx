@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { ArrowLeft, Printer, ShieldTick } from 'iconsax-react'
+import { ArrowLeft, Printer } from 'iconsax-react'
 import * as React from 'react'
 
 import { Brand } from '@/components/landing/brand'

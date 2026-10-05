@@ -34,6 +34,7 @@ import { Route as AppWritingRouteImport } from './routes/_app.writing'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AdminAiProvidersRouteImport } from './routes/admin.ai-providers'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
@@ -199,6 +200,11 @@ const AdminAdminsRoute = AdminAdminsRouteImport.update({
 const AdminAiProvidersRoute = AdminAiProvidersRouteImport.update({
   id: '/ai-providers',
   path: '/ai-providers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFullMocksRoute = AdminFullMocksRouteImport.update({
@@ -452,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/ai-providers': typeof AdminAiProvidersRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
@@ -518,6 +525,7 @@ export interface FileRoutesByTo {
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/ai-providers': typeof AdminAiProvidersRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
@@ -583,6 +591,7 @@ export interface FileRoutesById {
   '/_app/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/ai-providers': typeof AdminAiProvidersRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
@@ -654,6 +663,7 @@ export interface FileRouteTypes {
     | '/writing'
     | '/admin/admins'
     | '/admin/ai-providers'
+    | '/admin/analytics'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin/preview'
@@ -720,6 +730,7 @@ export interface FileRouteTypes {
     | '/writing'
     | '/admin/admins'
     | '/admin/ai-providers'
+    | '/admin/analytics'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/register/verify'
@@ -784,6 +795,7 @@ export interface FileRouteTypes {
     | '/_app/writing'
     | '/admin/admins'
     | '/admin/ai-providers'
+    | '/admin/analytics'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin_/preview'
@@ -1019,6 +1031,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-providers'
       fullPath: '/admin/ai-providers'
       preLoaderRoute: typeof AdminAiProvidersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/full-mocks': {
@@ -1501,6 +1520,7 @@ const AdminWritingMaterialsRouteWithChildren =
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
   AdminAiProvidersRoute: typeof AdminAiProvidersRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1517,6 +1537,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminsRoute: AdminAdminsRoute,
   AdminAiProvidersRoute: AdminAiProvidersRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,

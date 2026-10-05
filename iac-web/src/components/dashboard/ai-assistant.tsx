@@ -11,7 +11,7 @@ import { MarkdownContent } from './markdown-content'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { sendAssistantChat } from '@/features/assistant/api'
+import { streamAssistantChat } from '@/features/assistant/stream'
 import type { ChatMessageDto } from '@/features/assistant/api'
 import { extractPageAsReadme } from '@/features/assistant/page-reader'
 
@@ -32,6 +32,7 @@ type Message = {
   text: string
   time: string
   isError?: boolean
+  isPending?: boolean
 }
 
 const STORAGE_KEY = 'iac_yuki_chat_messages_v1'
@@ -77,6 +78,8 @@ export function AiAssistantChatWindow({
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  useEffect(() => () => requestRef.current?.abort(), [])
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Resizable state from top-left corner
@@ -212,7 +215,10 @@ export function AiAssistantChatWindow({
   // Save messages to sessionStorage
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(messages.filter((message) => !message.isPending)),
+      )
     } catch {
       // Ignore sessionStorage errors
     }
@@ -322,7 +328,7 @@ export function AiAssistantChatWindow({
 
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend ?? input).trim()
-    if (!text || isTyping) return
+    if (!text || isTyping || requestRef.current) return
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -335,7 +341,16 @@ export function AiAssistantChatWindow({
     }
 
     const nextMessages = [...messages, userMsg]
-    setMessages(nextMessages)
+    const controller = new AbortController()
+    requestRef.current = controller
+    const botMsg: Message = {
+      id: `${userMsg.id}-reply`,
+      isPending: true,
+      sender: 'fox',
+      text: '',
+      time: userMsg.time,
+    }
+    setMessages([...nextMessages, botMsg])
     setInput('')
     setIsTyping(true)
 
@@ -344,50 +359,77 @@ export function AiAssistantChatWindow({
       const pageReadme = extractPageAsReadme()
 
       const historyForApi: ChatMessageDto[] = nextMessages
-        .filter((m) => !m.isError && m.id !== 'welcome')
+        .filter(
+          (m) =>
+            !m.isError && !m.isPending && m.id !== 'welcome' && m.text.trim(),
+        )
+        .slice(-20)
         .map((m) => ({
           role: m.sender === 'user' ? 'user' : 'assistant',
           content: m.text,
         }))
 
-      const response = await sendAssistantChat({
-        messages: historyForApi,
-        pageContext: {
-          url: pageReadme.url,
-          title: pageReadme.title,
-          content: pageReadme.markdown,
+      const response = await streamAssistantChat(
+        {
+          messages: historyForApi,
+          pageContext: {
+            url: pageReadme.url,
+            title: pageReadme.title,
+            content: pageReadme.markdown,
+          },
         },
-      })
-
-      const botMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'fox',
-        text: response.message.content,
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        (event) => {
+          if (controller.signal.aborted) return
+          setMessages((prev) =>
+            prev.map((message) =>
+              message.id === botMsg.id
+                ? {
+                    ...message,
+                    text:
+                      event.type === 'reset' ? '' : message.text + event.text,
+                  }
+                : message,
+            ),
+          )
+        },
+        controller.signal,
+      )
+      if (!controller.signal.aborted) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === botMsg.id
+              ? { ...message, text: response.message.content, isPending: false }
+              : message,
+          ),
+        )
       }
-
-      setMessages((prev) => [...prev, botMsg])
     } catch {
-      const errorMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'fox',
-        text: 'Не удалось связаться с сервером AI. Пожалуйста, проверь подключение или повтори попытку через несколько секунд.',
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        isError: true,
+      if (!controller.signal.aborted) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === botMsg.id
+              ? {
+                  ...message,
+                  text: 'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                  isError: true,
+                  isPending: false,
+                }
+              : message,
+          ),
+        )
       }
-      setMessages((prev) => [...prev, errorMsg])
     } finally {
-      setIsTyping(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        setIsTyping(false)
+      }
     }
   }
 
   const handleReset = () => {
+    requestRef.current?.abort()
+    requestRef.current = null
+    setIsTyping(false)
     setMessages(getInitialMessages())
     setInput('')
     try {
@@ -508,52 +550,54 @@ export function AiAssistantChatWindow({
 
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-gradient-to-b from-slate-50/40 via-white to-slate-50/20 text-slate-800">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={cn(
-              'flex items-end gap-2',
-              msg.sender === 'user' ? 'justify-end' : 'justify-start',
-            )}
-          >
-            {msg.sender === 'fox' ? (
-              <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
-                <img
-                  src={foxSrc}
-                  alt="Юки"
-                  className="size-full object-contain"
-                />
-              </div>
-            ) : null}
-
+        {messages
+          .filter((msg) => msg.text.trim())
+          .map((msg) => (
             <div
+              key={msg.id}
               className={cn(
-                'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
-                msg.sender === 'user'
-                  ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
-                  : msg.isError
-                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
-                    : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
+                'flex items-end gap-2',
+                msg.sender === 'user' ? 'justify-end' : 'justify-start',
               )}
             >
-              {/* Message body with Markdown support */}
               {msg.sender === 'fox' ? (
-                <MarkdownContent content={msg.text} />
-              ) : (
-                <div className="whitespace-pre-wrap">{msg.text}</div>
-              )}
+                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
+                  <img
+                    src={foxSrc}
+                    alt="Юки"
+                    className="size-full object-contain"
+                  />
+                </div>
+              ) : null}
 
               <div
                 className={cn(
-                  'mt-1 text-[9px] font-medium text-right select-none',
-                  msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400',
+                  'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
+                  msg.sender === 'user'
+                    ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
+                    : msg.isError
+                      ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
+                      : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
                 )}
               >
-                {msg.time}
+                {/* Message body with Markdown support */}
+                {msg.sender === 'fox' ? (
+                  <MarkdownContent content={msg.text} />
+                ) : (
+                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                )}
+
+                <div
+                  className={cn(
+                    'mt-1 text-[9px] font-medium text-right select-none',
+                    msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400',
+                  )}
+                >
+                  {msg.time}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {isTyping ? (
           <div className="flex items-end gap-2">

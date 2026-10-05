@@ -15,7 +15,9 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WaitlistAdminRouteImport } from './routes/waitlist-admin'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppFullMocksRouteImport } from './routes/_app.full-mocks'
@@ -31,6 +33,7 @@ import { Route as AppSpeakingRouteImport } from './routes/_app.speaking'
 import { Route as AppWritingRouteImport } from './routes/_app.writing'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as AdminAiProvidersRouteImport } from './routes/admin.ai-providers'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
@@ -103,9 +106,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WaitlistAdminRoute = WaitlistAdminRouteImport.update({
@@ -181,6 +194,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminAdminsRoute = AdminAdminsRouteImport.update({
   id: '/admins',
   path: '/admins',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAiProvidersRoute = AdminAiProvidersRouteImport.update({
+  id: '/ai-providers',
+  path: '/ai-providers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFullMocksRoute = AdminFullMocksRouteImport.update({
@@ -417,7 +435,9 @@ export interface FileRoutesByFullPath {
   '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRouteWithChildren
+  '/terms': typeof TermsRoute
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/full-mocks': typeof AppFullMocksRouteWithChildren
   '/listening': typeof AppListeningRouteWithChildren
@@ -431,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/speaking': typeof AppSpeakingRouteWithChildren
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
@@ -480,7 +501,9 @@ export interface FileRoutesByTo {
   '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRouteWithChildren
+  '/terms': typeof TermsRoute
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/full-mocks': typeof AppFullMocksRouteWithChildren
   '/listening': typeof AppListeningRouteWithChildren
@@ -494,6 +517,7 @@ export interface FileRoutesByTo {
   '/speaking': typeof AppSpeakingRouteWithChildren
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
@@ -542,7 +566,9 @@ export interface FileRoutesById {
   '/exam': typeof ExamRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRouteWithChildren
+  '/terms': typeof TermsRoute
   '/waitlist-admin': typeof WaitlistAdminRoute
   '/_app/full-mocks': typeof AppFullMocksRouteWithChildren
   '/_app/listening': typeof AppListeningRouteWithChildren
@@ -556,6 +582,7 @@ export interface FileRoutesById {
   '/_app/speaking': typeof AppSpeakingRouteWithChildren
   '/_app/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
@@ -610,7 +637,9 @@ export interface FileRouteTypes {
     | '/exam'
     | '/forbidden'
     | '/login'
+    | '/privacy'
     | '/register'
+    | '/terms'
     | '/waitlist-admin'
     | '/full-mocks'
     | '/listening'
@@ -624,6 +653,7 @@ export interface FileRouteTypes {
     | '/speaking'
     | '/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin/preview'
@@ -673,7 +703,9 @@ export interface FileRouteTypes {
     | '/exam'
     | '/forbidden'
     | '/login'
+    | '/privacy'
     | '/register'
+    | '/terms'
     | '/waitlist-admin'
     | '/full-mocks'
     | '/listening'
@@ -687,6 +719,7 @@ export interface FileRouteTypes {
     | '/speaking'
     | '/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/register/verify'
@@ -734,7 +767,9 @@ export interface FileRouteTypes {
     | '/exam'
     | '/forbidden'
     | '/login'
+    | '/privacy'
     | '/register'
+    | '/terms'
     | '/waitlist-admin'
     | '/_app/full-mocks'
     | '/_app/listening'
@@ -748,6 +783,7 @@ export interface FileRouteTypes {
     | '/_app/speaking'
     | '/_app/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin_/preview'
@@ -801,7 +837,9 @@ export interface RootRouteChildren {
   ExamRoute: typeof ExamRouteWithChildren
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRouteWithChildren
+  TermsRoute: typeof TermsRoute
   WaitlistAdminRoute: typeof WaitlistAdminRoute
   AdminPreviewRoute: typeof AdminPreviewRouteWithChildren
 }
@@ -850,11 +888,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/waitlist-admin': {
@@ -960,6 +1012,13 @@ declare module '@tanstack/react-router' {
       path: '/admins'
       fullPath: '/admin/admins'
       preLoaderRoute: typeof AdminAdminsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ai-providers': {
+      id: '/admin/ai-providers'
+      path: '/ai-providers'
+      fullPath: '/admin/ai-providers'
+      preLoaderRoute: typeof AdminAiProvidersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/full-mocks': {
@@ -1441,6 +1500,7 @@ const AdminWritingMaterialsRouteWithChildren =
 
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
+  AdminAiProvidersRoute: typeof AdminAiProvidersRoute
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1456,6 +1516,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminsRoute: AdminAdminsRoute,
+  AdminAiProvidersRoute: AdminAiProvidersRoute,
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -1538,7 +1599,9 @@ const rootRouteChildren: RootRouteChildren = {
   ExamRoute: ExamRouteWithChildren,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRouteWithChildren,
+  TermsRoute: TermsRoute,
   WaitlistAdminRoute: WaitlistAdminRoute,
   AdminPreviewRoute: AdminPreviewRouteWithChildren,
 }

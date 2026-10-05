@@ -91,8 +91,8 @@ export const footerColumns = [
   {
     title: 'Документы',
     items: [
-      { label: 'Политика конфиденциальности' },
-      { label: 'Условия использования' },
+      { label: 'Политика конфиденциальности', href: '/privacy' },
+      { label: 'Условия использования', href: '/terms' },
     ],
   },
 ] as const

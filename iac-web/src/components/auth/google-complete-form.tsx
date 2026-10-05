@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
 
@@ -206,8 +206,27 @@ export function GoogleCompleteForm({
                       aria-invalid={Boolean(termsError)}
                     />
                     <span>
-                      Принимаю условия использования и политику
-                      конфиденциальности.
+                      Принимаю{' '}
+                      <Link
+                        to="/terms"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#3b82f6] hover:decoration-[#3b82f6]"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        условия использования
+                      </Link>{' '}
+                      и{' '}
+                      <Link
+                        to="/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#3b82f6] hover:decoration-[#3b82f6]"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        политику конфиденциальности
+                      </Link>
+                      .
                     </span>
                   </label>
                   {termsError ? (

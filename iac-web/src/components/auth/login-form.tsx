@@ -1,9 +1,10 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -22,11 +23,9 @@ export function LoginForm() {
   const navigate = useNavigate()
   const search = useSearch({ from: '/login' })
   const { loginWithGoogle } = useAuth()
-  const [googleFailed, setGoogleFailed] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [pendingGoogle, setPendingGoogle] =
     useState<PendingGoogleRegistration | null>(null)
-  const googleButtonRef = useRef<HTMLDivElement>(null)
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
@@ -48,6 +47,37 @@ export function LoginForm() {
     [loginWithGoogle, navigate, search.redirect],
   )
 
+  if (pendingGoogle) {
+    return (
+      <GoogleCompleteForm
+        pending={pendingGoogle}
+        onBack={() => {
+          setPendingGoogle(null)
+          setSubmissionError(null)
+        }}
+        redirect={search.redirect}
+      />
+    )
+  }
+
+  return (
+    <GoogleSignInCard
+      onCredential={handleGoogleCredential}
+      submissionError={submissionError}
+    />
+  )
+}
+
+function GoogleSignInCard({
+  onCredential,
+  submissionError,
+}: {
+  onCredential: (credential: string) => Promise<void>
+  submissionError: string | null
+}) {
+  const [googleFailed, setGoogleFailed] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     let cancelled = false
     loadGoogleIdentityScript()
@@ -57,7 +87,7 @@ export function LoginForm() {
           client_id: GOOGLE_CLIENT_ID,
           callback: (response) => {
             if (response.credential) {
-              void handleGoogleCredential(response.credential)
+              void onCredential(response.credential)
             }
           },
         })
@@ -77,20 +107,7 @@ export function LoginForm() {
     return () => {
       cancelled = true
     }
-  }, [handleGoogleCredential])
-
-  if (pendingGoogle) {
-    return (
-      <GoogleCompleteForm
-        pending={pendingGoogle}
-        onBack={() => {
-          setPendingGoogle(null)
-          setSubmissionError(null)
-        }}
-        redirect={search.redirect}
-      />
-    )
-  }
+  }, [onCredential])
 
   return (
     <>
@@ -116,6 +133,29 @@ export function LoginForm() {
           </p>
         ) : null}
       </CardContent>
+      <CardFooter className="justify-center border-t border-[#f1f5f9] px-6 py-4 text-center text-xs leading-5 text-[#64748b] sm:px-8">
+        <p>
+          Входя в систему, вы соглашаетесь с{' '}
+          <Link
+            to="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+          >
+            условиями использования
+          </Link>{' '}
+          и{' '}
+          <Link
+            to="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+          >
+            политикой конфиденциальности
+          </Link>
+          .
+        </p>
+      </CardFooter>
     </>
   )
 }

@@ -21,6 +21,7 @@ type ApiRequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
   authenticated?: boolean
   retryAuthentication?: boolean
+  responseBody?: 'json' | 'raw'
 }
 
 export class ApiClient {
@@ -48,6 +49,7 @@ export class ApiClient {
       body,
       authenticated = true,
       retryAuthentication = true,
+      responseBody = 'json',
       headers: initialHeaders,
       ...requestInit
     } = options
@@ -105,10 +107,15 @@ export class ApiClient {
     if (!response.ok) {
       throw await parseApiError(response)
     }
+    if (responseBody === 'raw') return response as T
     if (response.status === 204) {
       return undefined as T
     }
     return (await response.json()) as T
+  }
+
+  async stream(path: string, options: ApiRequestOptions): Promise<Response> {
+    return this.request<Response>(path, { ...options, responseBody: 'raw' })
   }
 
   async upload<T>(path: string, form: FormData): Promise<T> {

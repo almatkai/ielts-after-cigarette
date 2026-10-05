@@ -144,6 +144,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           {auth.user?.role === 'ADMIN' ? (
             <>
               <Link
+                to="/admin/ai-providers"
+                activeProps={{
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <ClipboardTick className="size-[18px]" aria-hidden />
+                AI-провайдеры
+              </Link>
+              <Link
                 to="/admin/waitlist"
                 activeProps={{
                   className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',

@@ -33,6 +33,7 @@ import { Route as AppSpeakingRouteImport } from './routes/_app.speaking'
 import { Route as AppWritingRouteImport } from './routes/_app.writing'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
+import { Route as AdminAiProvidersRouteImport } from './routes/admin.ai-providers'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
@@ -193,6 +194,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminAdminsRoute = AdminAdminsRouteImport.update({
   id: '/admins',
   path: '/admins',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAiProvidersRoute = AdminAiProvidersRouteImport.update({
+  id: '/ai-providers',
+  path: '/ai-providers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFullMocksRoute = AdminFullMocksRouteImport.update({
@@ -445,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/speaking': typeof AppSpeakingRouteWithChildren
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
@@ -510,6 +517,7 @@ export interface FileRoutesByTo {
   '/speaking': typeof AppSpeakingRouteWithChildren
   '/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/register/verify': typeof RegisterVerifyRoute
@@ -574,6 +582,7 @@ export interface FileRoutesById {
   '/_app/speaking': typeof AppSpeakingRouteWithChildren
   '/_app/writing': typeof AppWritingRouteWithChildren
   '/admin/admins': typeof AdminAdminsRoute
+  '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
@@ -644,6 +653,7 @@ export interface FileRouteTypes {
     | '/speaking'
     | '/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin/preview'
@@ -709,6 +719,7 @@ export interface FileRouteTypes {
     | '/speaking'
     | '/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/register/verify'
@@ -772,6 +783,7 @@ export interface FileRouteTypes {
     | '/_app/speaking'
     | '/_app/writing'
     | '/admin/admins'
+    | '/admin/ai-providers'
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin_/preview'
@@ -1000,6 +1012,13 @@ declare module '@tanstack/react-router' {
       path: '/admins'
       fullPath: '/admin/admins'
       preLoaderRoute: typeof AdminAdminsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ai-providers': {
+      id: '/admin/ai-providers'
+      path: '/ai-providers'
+      fullPath: '/admin/ai-providers'
+      preLoaderRoute: typeof AdminAiProvidersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/full-mocks': {
@@ -1481,6 +1500,7 @@ const AdminWritingMaterialsRouteWithChildren =
 
 interface AdminRouteChildren {
   AdminAdminsRoute: typeof AdminAdminsRoute
+  AdminAiProvidersRoute: typeof AdminAiProvidersRoute
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1496,6 +1516,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminsRoute: AdminAdminsRoute,
+  AdminAiProvidersRoute: AdminAiProvidersRoute,
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,

@@ -22,11 +22,9 @@ export function LoginForm() {
   const navigate = useNavigate()
   const search = useSearch({ from: '/login' })
   const { loginWithGoogle } = useAuth()
-  const [googleFailed, setGoogleFailed] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [pendingGoogle, setPendingGoogle] =
     useState<PendingGoogleRegistration | null>(null)
-  const googleButtonRef = useRef<HTMLDivElement>(null)
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
@@ -48,6 +46,37 @@ export function LoginForm() {
     [loginWithGoogle, navigate, search.redirect],
   )
 
+  if (pendingGoogle) {
+    return (
+      <GoogleCompleteForm
+        pending={pendingGoogle}
+        onBack={() => {
+          setPendingGoogle(null)
+          setSubmissionError(null)
+        }}
+        redirect={search.redirect}
+      />
+    )
+  }
+
+  return (
+    <GoogleSignInCard
+      onCredential={handleGoogleCredential}
+      submissionError={submissionError}
+    />
+  )
+}
+
+function GoogleSignInCard({
+  onCredential,
+  submissionError,
+}: {
+  onCredential: (credential: string) => Promise<void>
+  submissionError: string | null
+}) {
+  const [googleFailed, setGoogleFailed] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     let cancelled = false
     loadGoogleIdentityScript()
@@ -57,7 +86,7 @@ export function LoginForm() {
           client_id: GOOGLE_CLIENT_ID,
           callback: (response) => {
             if (response.credential) {
-              void handleGoogleCredential(response.credential)
+              void onCredential(response.credential)
             }
           },
         })
@@ -77,20 +106,7 @@ export function LoginForm() {
     return () => {
       cancelled = true
     }
-  }, [handleGoogleCredential])
-
-  if (pendingGoogle) {
-    return (
-      <GoogleCompleteForm
-        pending={pendingGoogle}
-        onBack={() => {
-          setPendingGoogle(null)
-          setSubmissionError(null)
-        }}
-        redirect={search.redirect}
-      />
-    )
-  }
+  }, [onCredential])
 
   return (
     <>

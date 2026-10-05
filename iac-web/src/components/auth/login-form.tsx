@@ -140,7 +140,7 @@ function GoogleSignInCard({
             to="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
           >
             условиями использования
           </Link>{' '}
@@ -149,7 +149,7 @@ function GoogleSignInCard({
             to="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-[#cbd5e1] underline-offset-2 transition-colors hover:text-[#0f172a] hover:decoration-[#3b82f6]"
+            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
           >
             политикой конфиденциальности
           </Link>

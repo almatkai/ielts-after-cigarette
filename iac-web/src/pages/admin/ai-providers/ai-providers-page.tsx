@@ -69,7 +69,9 @@ export function AIProvidersPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  const [results, setResults] = useState<Record<string, ProviderTestResult>>({})
+  const [results, setResults] = useState<
+    Partial<Record<string, ProviderTestResult>>
+  >({})
   const [formResult, setFormResult] = useState<ProviderTestResult | null>(null)
   const [statsRevision, setStatsRevision] = useState(0)
   const sensors = useSensors(
@@ -320,159 +322,163 @@ export function AIProvidersPage() {
                   >
                     {data?.items
                       .filter((p) => p.priority === priority)
-                      .map((provider) => (
-                        <SortableProviderCard
-                          key={provider.id}
-                          id={provider.id}
-                          name={provider.name}
-                          disabled={
-                            busy ||
-                            !!data.migrationRequired ||
-                            !data.encryptionConfigured
-                          }
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-semibold text-slate-900">
-                                  {provider.name}
-                                </h3>
-                                <span
-                                  className={`rounded-full px-2 py-0.5 text-xs ${provider.enabled ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
-                                >
-                                  {provider.enabled ? 'Включён' : 'Выключен'}
-                                </span>
-                                {provider.fromEnv && (
-                                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                                    .env
+                      .map((provider) => {
+                        const providerResult = results[provider.id]
+                        return (
+                          <SortableProviderCard
+                            key={provider.id}
+                            id={provider.id}
+                            name={provider.name}
+                            disabled={
+                              busy ||
+                              !!data.migrationRequired ||
+                              !data.encryptionConfigured
+                            }
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="font-semibold text-slate-900">
+                                    {provider.name}
+                                  </h3>
+                                  <span
+                                    className={`rounded-full px-2 py-0.5 text-xs ${provider.enabled ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
+                                  >
+                                    {provider.enabled ? 'Включён' : 'Выключен'}
                                   </span>
-                                )}
+                                  {provider.fromEnv && (
+                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                                      .env
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="mt-1 break-all text-sm text-slate-700">
+                                  {provider.model}
+                                </p>
+                                <p className="mt-1 break-all text-xs text-slate-500">
+                                  {provider.endpoint}
+                                </p>
+                                <p className="mt-2 text-xs text-slate-600">
+                                  {provider.scopes
+                                    .map((scope) => scopeNames[scope])
+                                    .join(', ')}{' '}
+                                  · Таймаут {provider.timeoutSeconds} с ·{' '}
+                                  {provider.hasKey
+                                    ? provider.fromEnv
+                                      ? 'Ключ из .env'
+                                      : 'Ключ зашифрован'
+                                    : 'Нет ключа'}
+                                </p>
                               </div>
-                              <p className="mt-1 break-all text-sm text-slate-700">
-                                {provider.model}
-                              </p>
-                              <p className="mt-1 break-all text-xs text-slate-500">
-                                {provider.endpoint}
-                              </p>
-                              <p className="mt-2 text-xs text-slate-600">
-                                {provider.scopes
-                                  .map((scope) => scopeNames[scope])
-                                  .join(', ')}{' '}
-                                · Таймаут {provider.timeoutSeconds} с ·{' '}
-                                {provider.hasKey
-                                  ? provider.fromEnv
-                                    ? 'Ключ из .env'
-                                    : 'Ключ зашифрован'
-                                  : 'Нет ключа'}
-                              </p>
                             </div>
-                          </div>
-                          {results[provider.id] && (
-                            <p
-                              role="status"
-                              className={`mt-3 text-sm ${results[provider.id].ok ? 'text-emerald-700' : 'text-amber-800'}`}
-                            >
-                              {resultLabel(results[provider.id])}
-                            </p>
-                          )}
-                          <div className="mt-3">
-                            <label className="text-xs text-slate-500">
-                              Уровень
-                              <select
-                                aria-label={`Уровень ${provider.name}`}
-                                value={provider.priority}
+                            {providerResult && (
+                              <p
+                                role="status"
+                                className={`mt-3 text-sm ${providerResult.ok ? 'text-emerald-700' : 'text-amber-800'}`}
+                              >
+                                {resultLabel(providerResult)}
+                              </p>
+                            )}
+                            <div className="mt-3">
+                              <label className="text-xs text-slate-500">
+                                Уровень
+                                <select
+                                  aria-label={`Уровень ${provider.name}`}
+                                  value={provider.priority}
+                                  disabled={
+                                    busy ||
+                                    !data.encryptionConfigured ||
+                                    data.migrationRequired
+                                  }
+                                  className="ml-2 max-w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700"
+                                  onChange={(event) =>
+                                    moveToLevel(
+                                      provider,
+                                      event.target.value === 'new'
+                                        ? newPriority
+                                        : Number(event.target.value),
+                                    )
+                                  }
+                                >
+                                  {levels.map((value, levelIndex) => (
+                                    <option key={value} value={value}>
+                                      Уровень {levelIndex + 1} · приоритет{' '}
+                                      {value}
+                                    </option>
+                                  ))}
+                                  <option value="new">
+                                    Новый отдельный уровень
+                                  </option>
+                                </select>
+                              </label>
+                            </div>
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={busy || telemetryUnavailable}
+                                onClick={() =>
+                                  void perform(async () => {
+                                    const result = await testAIProvider(
+                                      provider.id,
+                                    )
+                                    setStatsRevision((value) => value + 1)
+                                    setResults((current) => ({
+                                      ...current,
+                                      [provider.id]: result,
+                                    }))
+                                  })
+                                }
+                              >
+                                Проверить
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 disabled={
                                   busy ||
                                   !data.encryptionConfigured ||
                                   data.migrationRequired
                                 }
-                                className="ml-2 max-w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700"
-                                onChange={(event) =>
-                                  moveToLevel(
-                                    provider,
-                                    event.target.value === 'new'
-                                      ? newPriority
-                                      : Number(event.target.value),
-                                  )
-                                }
+                                onClick={() => edit(provider)}
                               >
-                                {levels.map((value, index) => (
-                                  <option key={value} value={value}>
-                                    Уровень {index + 1} · приоритет {value}
-                                  </option>
-                                ))}
-                                <option value="new">
-                                  Новый отдельный уровень
-                                </option>
-                              </select>
-                            </label>
-                          </div>
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={busy || telemetryUnavailable}
-                              onClick={() =>
-                                void perform(async () => {
-                                  const result = await testAIProvider(
-                                    provider.id,
-                                  )
-                                  setStatsRevision((value) => value + 1)
-                                  setResults((current) => ({
-                                    ...current,
-                                    [provider.id]: result,
-                                  }))
-                                })
-                              }
-                            >
-                              Проверить
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={
-                                busy ||
-                                !data.encryptionConfigured ||
-                                data.migrationRequired
-                              }
-                              onClick={() => edit(provider)}
-                            >
-                              Изменить
-                            </Button>
-                            {!provider.fromEnv && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                disabled={busy}
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      `Удалить провайдера «${provider.name}»?`,
-                                    )
-                                  )
-                                    void perform(async () => {
-                                      await deleteAIProvider(provider)
-                                      if (editing === provider.id) {
-                                        setShowForm(false)
-                                        setInput(blank())
-                                      }
-                                      await reload()
-                                      setNotice('Провайдер удалён')
-                                    })
-                                }}
-                              >
-                                Удалить
+                                Изменить
                               </Button>
-                            )}
-                          </div>
-                        </SortableProviderCard>
-                      ))}
+                              {!provider.fromEnv && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={busy}
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        `Удалить провайдера «${provider.name}»?`,
+                                      )
+                                    )
+                                      void perform(async () => {
+                                        await deleteAIProvider(provider)
+                                        if (editing === provider.id) {
+                                          setShowForm(false)
+                                          setInput(blank())
+                                        }
+                                        await reload()
+                                        setNotice('Провайдер удалён')
+                                      })
+                                  }}
+                                >
+                                  Удалить
+                                </Button>
+                              )}
+                            </div>
+                          </SortableProviderCard>
+                        )
+                      })}
                   </PriorityLevel>
                 ))}
                 {!!data?.items.length && (
                   <PriorityLevel
                     priority="new"
-                    disabled={busy || !data?.encryptionConfigured}
+                    disabled={busy || !data.encryptionConfigured}
                   />
                 )}
               </div>

@@ -27,7 +27,7 @@ export async function streamAssistantChat(
   const decoder = new TextDecoder()
   let buffer = ''
   try {
-    while (true) {
+    for (;;) {
       const { value, done } = await reader.read()
       buffer += decoder.decode(value, { stream: !done })
       if (buffer.length > 1_000_000)

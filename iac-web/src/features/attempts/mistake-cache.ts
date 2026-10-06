@@ -28,6 +28,8 @@ export function invalidateMistakeResults(
 ) {
   return Promise.all([
     client.invalidateQueries({ queryKey: mistakeKeys.lists }),
+    client.invalidateQueries({ queryKey: ['attempts', 'list'] }),
+    client.invalidateQueries({ queryKey: ['dashboard'] }),
     client.invalidateQueries({ queryKey: mistakeKeys.detail(attemptId) }),
   ])
 }

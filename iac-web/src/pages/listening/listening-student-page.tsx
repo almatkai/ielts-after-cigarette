@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
 import { usePreviewSession } from '@/features/attempts/preview-session'
 import type { AttemptSession } from '@/features/attempts/preview-session'
 import { useExamTimer } from '@/features/attempts/exam-timer'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
+import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
   AttemptPerformanceReport,
   AttemptResultHeader,
@@ -46,6 +47,11 @@ import {
   PreviewEvidenceText,
 } from '@/features/admin/preview-answer'
 
+import {
+  completionQuestionNumbers,
+  ListeningCompletionText,
+} from './listening-completion-text'
+
 const TIMER_DANGER_SECONDS = 300
 
 export function ListeningStudentPage({
@@ -60,7 +66,7 @@ export function ListeningStudentPage({
       skillBadge="IELTS Listening"
       loadingLabel="Готовим аудирование…"
       loadingDescription="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
-      queryKey={['listening', 'tests', testId, 'attempt']}
+      queryKey={attemptStartQueryKey('listening', testId)}
       startAttemptFn={(signal) => startListeningAttempt(testId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
         <ListeningAttemptRunner
@@ -219,6 +225,8 @@ function ListeningTestRunner({
     finished: Boolean(session.submitted),
   })
 
+  const handleContinueLater = useContinueLater(session, { fullMockSessionId })
+
   // Авто-submit по истечении времени.
   useEffect(() => {
     if (
@@ -317,6 +325,18 @@ function ListeningTestRunner({
               />
             ) : null}
           </div>
+          {!preview ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={session.isSavingAndExiting || session.isSubmitting}
+              onClick={handleContinueLater}
+              className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+            >
+              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+            </Button>
+          ) : null}
         </div>
         <p className="sr-only">
           <Clock className="size-4" aria-hidden />
@@ -326,6 +346,14 @@ function ListeningTestRunner({
             : 'ответы сохраняются автоматически'}
         </p>
       </div>
+      {session.exitError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+        >
+          Не удалось сохранить черновик: {session.exitError}
+        </p>
+      ) : null}
       {session.submitError ? (
         <p
           role="alert"
@@ -400,6 +428,12 @@ function ListeningTestRunner({
                 activeQuestionId={currentQuestion?.question.id}
                 answers={answers}
                 onAnswer={session.updateAnswer}
+                onActivate={(questionId) => {
+                  const index = questions.findIndex(
+                    (item) => item.question.id === questionId,
+                  )
+                  if (index >= 0) setActiveQuestionIndex(index)
+                }}
                 preview={preview}
                 answerKeys={answerKeys}
                 evidenceText={
@@ -447,6 +481,8 @@ function ListeningTestRunner({
           answeredCount={answeredCount}
           totalQuestions={totalQuestions}
           isSubmitting={session.isSubmitting}
+          onContinueLater={handleContinueLater}
+          isSavingAndExiting={session.isSavingAndExiting}
           onSubmit={session.submit}
         />
       ) : null}
@@ -477,6 +513,14 @@ export function ListeningAttemptResult({
       : null
   const reviewByQuestionId = useMemo(
     () => new Map((review ?? []).map((item) => [item.questionId, item])),
+    [review],
+  )
+
+  const reviewAnswers = useMemo(
+    () =>
+      Object.fromEntries(
+        (review ?? []).map((item) => [item.questionId, item.answer ?? {}]),
+      ),
     [review],
   )
 
@@ -516,11 +560,12 @@ export function ListeningAttemptResult({
         </p>
       </div>
 
-      {attempt.status === 'SUBMITTED' ? <CompletedBankNotice attemptId={attempt.id} /> : null}
+      {attempt.status === 'SUBMITTED' ? (
+        <CompletedBankNotice attemptId={attempt.id} />
+      ) : null}
 
       <AttemptPerformanceReport
         band={attempt.band}
-        bandNote="Балл рассчитан по стандарту аудирования IELTS"
         correctCount={correctCount}
         totalQuestions={totalQuestions}
         startedAt={attempt.startedAt}
@@ -576,9 +621,6 @@ export function ListeningAttemptResult({
 
         {review && review.length > 0 && (
           <div className="pt-2 border-t border-[#ededeb]">
-            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Навигация по номерам вопросов (клик для перехода):
-            </span>
             <div className="flex flex-wrap items-center gap-1.5">
               {review.map((item) => {
                 const isCorrect = item.isCorrect
@@ -641,17 +683,29 @@ export function ListeningAttemptResult({
                   return true
                 })
                 if (matchingQuestions.length === 0) return null
+                const isCompletion = group.type.endsWith('_completion')
 
                 return (
                   <Card
                     key={group.position}
-                    className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs space-y-4"
+                    className={
+                      isCompletion
+                        ? 'gap-4 rounded-none border-0 bg-transparent p-0 shadow-none'
+                        : 'rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs space-y-4'
+                    }
                   >
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                        {group.type.replaceAll('_', ' ')}
-                      </p>
-                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">
+                      {!isCompletion ? (
+                        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+                          {group.type.replaceAll('_', ' ')}
+                        </p>
+                      ) : null}
+                      <p
+                        className={cn(
+                          'whitespace-pre-wrap text-sm text-slate-700',
+                          !isCompletion && 'mt-1',
+                        )}
+                      >
                         {group.instructions}
                       </p>
                     </div>
@@ -659,8 +713,23 @@ export function ListeningAttemptResult({
                       <ProtectedImage assetId={group.imageAssetId} />
                     ) : null}
                     {group.context ? (
-                      <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm text-slate-800">
-                        {group.context}
+                      <div
+                        className={
+                          isCompletion
+                            ? 'whitespace-pre-wrap text-sm leading-loose text-slate-800'
+                            : 'whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm text-slate-800'
+                        }
+                      >
+                        {isCompletion ? (
+                          <ListeningCompletionText
+                            text={group.context}
+                            questions={group.questions}
+                            answers={reviewAnswers}
+                            readOnly
+                          />
+                        ) : (
+                          group.context
+                        )}
                       </div>
                     ) : null}
                     <div className="space-y-3.5">
@@ -763,6 +832,7 @@ function StudentGroup({
   activeQuestionId,
   answers,
   onAnswer,
+  onActivate,
   preview = false,
   answerKeys,
   evidenceText,
@@ -773,6 +843,7 @@ function StudentGroup({
   activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
+  onActivate?: (questionId: string) => void
   preview?: boolean
   answerKeys?: PreviewAnswerKeys
   evidenceText?: string
@@ -784,20 +855,51 @@ function StudentGroup({
     : group.questions
   if (questions.length === 0) return null
   const shared = (group.config.options ?? []) as Option[]
+  const isCompletion = group.type.endsWith('_completion')
+  const contextNumbers = isCompletion
+    ? completionQuestionNumbers(group.context)
+    : new Set<number>()
   return (
-    <section className="grid gap-3 rounded-xl border p-4">
+    <section
+      className={
+        isCompletion ? 'grid gap-3' : 'grid gap-3 rounded-xl border p-4'
+      }
+    >
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-          {group.type.replaceAll('_', ' ')}
+        {!isCompletion ? (
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+            {group.type.replaceAll('_', ' ')}
+          </p>
+        ) : null}
+        <p
+          className={cn('whitespace-pre-wrap text-sm', !isCompletion && 'mt-1')}
+        >
+          {group.instructions}
         </p>
-        <p className="mt-1 whitespace-pre-wrap text-sm">{group.instructions}</p>
       </div>
       {group.imageAssetId ? (
         <ProtectedImage assetId={group.imageAssetId} />
       ) : null}
       {group.context ? (
-        <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm">
-          {group.context}
+        <div
+          className={
+            isCompletion
+              ? 'whitespace-pre-wrap text-sm leading-loose'
+              : 'whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm'
+          }
+        >
+          {isCompletion ? (
+            <ListeningCompletionText
+              text={group.context}
+              questions={group.questions}
+              answers={answers}
+              activeQuestionId={activeQuestionId}
+              onAnswer={onAnswer}
+              onActivate={onActivate}
+            />
+          ) : (
+            group.context
+          )}
         </div>
       ) : null}
       <div className="grid gap-4">
@@ -808,13 +910,15 @@ function StudentGroup({
           )
           return (
             <div key={question.id ?? question.number}>
-              <StudentQuestion
-                group={group}
-                question={question}
-                sharedOptions={shared}
-                value={question.id ? answers[question.id] : undefined}
-                onAnswer={onAnswer}
-              />
+              {!contextNumbers.has(question.number) ? (
+                <StudentQuestion
+                  group={group}
+                  question={question}
+                  sharedOptions={shared}
+                  value={question.id ? answers[question.id] : undefined}
+                  onAnswer={onAnswer}
+                />
+              ) : null}
               {preview ? (
                 <>
                   <PreviewAnswer
@@ -875,6 +979,22 @@ function StudentQuestion({
       {question.prompt.replace('{{answer}}', '_____')}
     </p>
   )
+
+  if (options.length === 0 && group.type.endsWith('_completion')) {
+    const hasGap = /\{\{\s*(?:\d+|answer)\s*\}\}|_{3,}/.test(question.prompt)
+    return (
+      <p className="text-sm leading-loose">
+        <span className="mr-2 text-[#3b82f6]">{question.number}.</span>
+        <ListeningCompletionText
+          text={hasGap ? question.prompt : `${question.prompt} {{answer}}`}
+          questions={[question]}
+          defaultQuestion={question}
+          answers={questionId && value ? { [questionId]: value } : {}}
+          onAnswer={onAnswer}
+        />
+      </p>
+    )
+  }
 
   if (!questionId || options.length === 0) {
     const text = typeof value?.value === 'string' ? value.value : ''

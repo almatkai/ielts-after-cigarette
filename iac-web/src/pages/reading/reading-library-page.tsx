@@ -1,18 +1,24 @@
-import {
-  Book1,
-} from 'iconsax-react'
+import { Book1 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ErrorState, EmptyState, LibraryCardsSkeleton } from '@/features/attempts/attempt-ui'
+import {
+  ErrorState,
+  EmptyState,
+  LibraryCardsSkeleton,
+} from '@/features/attempts/attempt-ui'
+import {
+  LibraryAttemptActions,
+  LibraryAttemptResult,
+  useLibraryAttempts,
+} from '@/features/attempts/library-attempts'
 import { useAuth } from '@/features/auth/auth-store'
 import { listPublicReadingMaterials, readingKeys } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
 
 export function ReadingLibraryPage() {
   const { user } = useAuth()
+  const attemptsQuery = useLibraryAttempts('reading')
   const query = useQuery({
     queryKey: readingKeys.publicMaterials,
     queryFn: ({ signal }) => listPublicReadingMaterials(signal),
@@ -26,11 +32,14 @@ export function ReadingLibraryPage() {
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
           Выберите текст для тренировки
         </h2>
-        <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Пройдите reading в формате, близком к экзамену, и сразу получите
-          band-оценку.
-        </p>
       </div>
+      {attemptsQuery.isError ? (
+        <ErrorState
+          title="Не удалось загрузить результаты"
+          message={getErrorMessage(attemptsQuery.error)}
+          onRetry={() => void attemptsQuery.refetch()}
+        />
+      ) : null}
       {query.isPending ? (
         <LibraryCardsSkeleton />
       ) : query.isError ? (
@@ -59,7 +68,9 @@ export function ReadingLibraryPage() {
                         {material.title}
                       </h3>
                       <span className="shrink-0 rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
-                        {material.examType === 'academic' ? 'Academic' : 'General'}
+                        {material.examType === 'academic'
+                          ? 'Academic'
+                          : 'General'}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
@@ -72,16 +83,19 @@ export function ReadingLibraryPage() {
                     ) : null}
                   </div>
                 </div>
-                <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
-                    <Link
-                      to="/exam/reading/$materialId"
-                      params={{ materialId: material.id }}
-                    >
-                      Открыть текст
-                    </Link>
-                  </Button>
-                </div>
+                <LibraryAttemptResult
+                  items={(attemptsQuery.data?.items ?? []).filter(
+                    (item) => item.materialId === material.id,
+                  )}
+                />
+                <LibraryAttemptActions
+                  skill="reading"
+                  materialId={material.id}
+                  items={(attemptsQuery.data?.items ?? []).filter(
+                    (item) => item.materialId === material.id,
+                  )}
+                  pending={attemptsQuery.isPending}
+                />
               </CardContent>
             </Card>
           ))}

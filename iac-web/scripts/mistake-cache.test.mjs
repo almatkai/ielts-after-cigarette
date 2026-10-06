@@ -102,6 +102,9 @@ test('new results invalidate every skill/page but not unrelated completed result
     mistakeKeys.list('reading', 1),
     mistakeKeys.list('reading', 2),
     mistakeKeys.list('speaking', 1),
+    ['attempts', 'list', 'listening'],
+    ['attempts', 'list', 'history'],
+    ['dashboard'],
   ]
   for (const key of pages) client.setQueryData(key, { items: [] })
   client.setQueryData(mistakeKeys.detail('new'), { review: [] })

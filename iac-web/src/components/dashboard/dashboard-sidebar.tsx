@@ -1,11 +1,8 @@
-import {
-  CloseSquare,
-  Logout,
-  ShieldTick,
-} from 'iconsax-react'
+import { CloseSquare, Logout, ShieldTick } from 'iconsax-react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
+import { SidebarProgress } from './sidebar-progress'
 import { Brand } from '@/components/landing/brand'
 import {
   AlertDialog,
@@ -87,7 +84,7 @@ export function DashboardSidebar({
         ) : null}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5">
         <p className="px-3.5 pb-3 text-[11px] font-semibold tracking-[0.09em] text-[#9a9a9d] uppercase">
           Обучение
         </p>
@@ -134,7 +131,9 @@ export function DashboardSidebar({
           })}
         </nav>
 
-        <div className="mt-auto space-y-1 border-t border-[#eeeeeb] pt-4">
+        <SidebarProgress onNavigate={onNavigate} />
+
+        <div className="shrink-0 space-y-1 border-t border-[#eeeeeb] pt-4">
           {auth.hasAnyRole(['EDITOR', 'ADMIN']) ? (
             <Link
               to="/admin"

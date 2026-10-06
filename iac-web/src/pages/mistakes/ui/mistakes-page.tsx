@@ -73,9 +73,6 @@ export function MistakesPage() {
           <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
             Банк ошибок
           </h2>
-          <p className="mt-1 text-sm leading-6 text-[#69696d]">
-            Выберите попытку и разберите вопросы, которые вызвали трудности.
-          </p>
         </div>
         <Button
           variant="outline"
@@ -163,13 +160,13 @@ export function MistakesPage() {
                 {listQuery.data.items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6"
+                    className="flex flex-wrap items-center justify-between gap-3 px-3.5 py-3 sm:px-6 sm:py-4"
                   >
-                    <div className="min-w-0 flex-1 basis-[200px]">
-                      <h3 className="break-words text-sm font-semibold text-[#111111]">
+                    <div className="min-w-0 flex-1 basis-[180px]">
+                      <h3 className="break-words text-xs sm:text-sm font-semibold text-[#111111]">
                         {item.testTitle || 'Без названия'}
                       </h3>
-                      <p className="mt-1 text-xs leading-5 text-[#69696d]">
+                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
                         {dateFormatter.format(
                           new Date(item.submittedAt ?? item.startedAt),
                         )}

@@ -56,12 +56,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
         </div>
       ) : null}
 
-      <div className="min-h-screen lg:pl-[260px]">
+      <div className="min-h-screen lg:pl-[260px] min-w-0 overflow-x-clip">
         <DashboardHeader
           pageTitle={pageTitle}
           onOpenNavigation={() => setNavigationIsOpen(true)}
         />
-        <main className="min-h-[calc(100vh-64px)] p-5 sm:p-7 lg:p-9">
+        <main className="min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] p-3 sm:p-7 lg:p-9 min-w-0 max-w-full overflow-x-clip">
           {children}
         </main>
         <AiAssistantFloatingWidget />

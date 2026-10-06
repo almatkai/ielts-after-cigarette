@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
+import { attemptKeys } from '@/features/attempts/api'
 import type { Attempt } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
 
@@ -36,9 +37,15 @@ export function ExamAttemptShell<TMaterial>({
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null)
   const [isRetaking, setIsRetaking] = useState(false)
 
+  const startAttempt = async (signal?: AbortSignal) => {
+    const result = await startAttemptFn(signal)
+    void queryClient.invalidateQueries({ queryKey: attemptKeys.listAll })
+    return result
+  }
+
   const startQuery = useQuery({
     queryKey,
-    queryFn: ({ signal }) => startAttemptFn(signal),
+    queryFn: ({ signal }) => startAttempt(signal),
     staleTime: Infinity,
     gcTime: Infinity,
     refetchOnWindowFocus: false,
@@ -55,7 +62,7 @@ export function ExamAttemptShell<TMaterial>({
     if (isRetaking) return
     setIsRetaking(true)
     try {
-      const res = await startAttemptFn()
+      const res = await startAttempt()
       queryClient.setQueryData(queryKey, res)
       setSubmittedAttempt(null)
     } catch (e) {

@@ -16,6 +16,7 @@ import {
 import { PriorityLevel } from './priority-level'
 import { SortableProviderCard } from './sortable-provider-card'
 import { RoutingControls } from './routing-controls'
+import { DailyLimitsControls } from './daily-limits-controls'
 import { ProviderStats } from './provider-stats'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -726,6 +727,7 @@ export function AIProvidersPage() {
           </form>
         )}
       </div>
+      <DailyLimitsControls />
       {data && <RoutingControls />}
       <ProviderStats revision={statsRevision} />
       <p className="max-w-3xl text-xs leading-5 text-slate-500">

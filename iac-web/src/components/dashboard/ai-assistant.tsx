@@ -11,6 +11,7 @@ import { MarkdownContent } from './markdown-content'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { getErrorMessage } from '@/lib/api/client'
 import { streamAssistantChat } from '@/features/assistant/stream'
 import type { ChatMessageDto } from '@/features/assistant/api'
 import { extractPageAsReadme } from '@/features/assistant/page-reader'
@@ -403,14 +404,14 @@ export function AiAssistantChatWindow({
           ),
         )
       }
-    } catch {
+    } catch (err) {
       if (!controller.signal.aborted) {
         setMessages((prev) =>
           prev.map((message) =>
             message.id === botMsg.id
               ? {
                   ...message,
-                  text: 'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                  text: getErrorMessage(err) || 'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
                   isError: true,
                   isPending: false,
                 }

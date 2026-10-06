@@ -193,6 +193,8 @@ export function getErrorMessage(error: unknown) {
       return 'Подтверждение через WhatsApp скоро будет доступно.'
     case 'RATE_LIMITED':
       return 'Слишком много попыток. Подождите минуту и попробуйте снова.'
+    case 'DAILY_LIMIT_EXCEEDED':
+      return error.message || 'Достигнут дневной лимит использования. Лимит обновится в полночь.'
     case 'NETWORK_ERROR':
       return 'Сервер недоступен. Проверьте, что backend запущен.'
     case 'API_URL_MISSING':

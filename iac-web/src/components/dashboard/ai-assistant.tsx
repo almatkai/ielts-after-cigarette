@@ -411,7 +411,9 @@ export function AiAssistantChatWindow({
             message.id === botMsg.id
               ? {
                   ...message,
-                  text: getErrorMessage(err) || 'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                  text:
+                    getErrorMessage(err) ||
+                    'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
                   isError: true,
                   isPending: false,
                 }

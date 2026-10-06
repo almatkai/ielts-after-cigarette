@@ -27,7 +27,9 @@ export function DailyLimitsControls() {
       .catch((err: unknown) => {
         if (active) {
           setError(
-            err instanceof ApiError ? err.message : 'Не удалось загрузить лимиты',
+            err instanceof ApiError
+              ? err.message
+              : 'Не удалось загрузить лимиты',
           )
         }
       })
@@ -96,8 +98,8 @@ export function DailyLimitsControls() {
             </span>
           </div>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Ограничение расхода токенов на пользователя в сутки. При пиковой нагрузке
-            можно снизить лимиты на лету без перезапуска сервера.
+            Ограничение расхода токенов на пользователя в сутки. При пиковой
+            нагрузке можно снизить лимиты на лету без перезапуска сервера.
           </p>
         </div>
 
@@ -142,10 +144,15 @@ export function DailyLimitsControls() {
       <form onSubmit={handleSave} className="mt-5 space-y-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-1.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
-            <Label htmlFor="assistantLimit" className="text-xs font-semibold text-slate-700">
+            <Label
+              htmlFor="assistantLimit"
+              className="text-xs font-semibold text-slate-700"
+            >
               Юки (студент)
             </Label>
-            <p className="text-[11px] text-slate-500">Сообщений в день на пользователя</p>
+            <p className="text-[11px] text-slate-500">
+              Сообщений в день на пользователя
+            </p>
             <Input
               id="assistantLimit"
               type="number"
@@ -163,10 +170,15 @@ export function DailyLimitsControls() {
           </div>
 
           <div className="space-y-1.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
-            <Label htmlFor="guestAssistantLimit" className="text-xs font-semibold text-slate-700">
+            <Label
+              htmlFor="guestAssistantLimit"
+              className="text-xs font-semibold text-slate-700"
+            >
               Юки (гость без входа)
             </Label>
-            <p className="text-[11px] text-slate-500">Сообщений в день на IP-адрес</p>
+            <p className="text-[11px] text-slate-500">
+              Сообщений в день на IP-адрес
+            </p>
             <Input
               id="guestAssistantLimit"
               type="number"
@@ -176,7 +188,10 @@ export function DailyLimitsControls() {
               onChange={(e) =>
                 setLimits((prev) => ({
                   ...prev,
-                  guestAssistantLimit: Math.max(0, parseInt(e.target.value) || 0),
+                  guestAssistantLimit: Math.max(
+                    0,
+                    parseInt(e.target.value) || 0,
+                  ),
                 }))
               }
               className="mt-2 bg-white"
@@ -184,10 +199,15 @@ export function DailyLimitsControls() {
           </div>
 
           <div className="space-y-1.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
-            <Label htmlFor="writingLimit" className="text-xs font-semibold text-slate-700">
+            <Label
+              htmlFor="writingLimit"
+              className="text-xs font-semibold text-slate-700"
+            >
               Writing (проверки)
             </Label>
-            <p className="text-[11px] text-slate-500">Оценок эссе в день на студента</p>
+            <p className="text-[11px] text-slate-500">
+              Оценок эссе в день на студента
+            </p>
             <Input
               id="writingLimit"
               type="number"
@@ -205,10 +225,15 @@ export function DailyLimitsControls() {
           </div>
 
           <div className="space-y-1.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
-            <Label htmlFor="speakingLimit" className="text-xs font-semibold text-slate-700">
+            <Label
+              htmlFor="speakingLimit"
+              className="text-xs font-semibold text-slate-700"
+            >
               Speaking (проверки)
             </Label>
-            <p className="text-[11px] text-slate-500">Оценок устной речи в день на студента</p>
+            <p className="text-[11px] text-slate-500">
+              Оценок устной речи в день на студента
+            </p>
             <Input
               id="speakingLimit"
               type="number"
@@ -229,7 +254,9 @@ export function DailyLimitsControls() {
         <div className="flex items-center justify-between pt-1">
           <p className="text-xs text-slate-400">
             {limits.updatedAt ? (
-              <>Обновлено: {new Date(limits.updatedAt).toLocaleString('ru-RU')}</>
+              <>
+                Обновлено: {new Date(limits.updatedAt).toLocaleString('ru-RU')}
+              </>
             ) : (
               <>Используются базовые значения системы</>
             )}

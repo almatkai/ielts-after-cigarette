@@ -1,7 +1,14 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
+const iPhoneUserAgent =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
+
+test.use({
+  viewport: { width: 390, height: 844 },
+  hasTouch: true,
+  userAgent: iPhoneUserAgent,
+})
 
 const user = {
   id: 'student',
@@ -221,4 +228,30 @@ test('blocked Google script shows an error after a bounded wait', async ({
   await expect(page.getByRole('alert')).toContainText(
     'Не удалось загрузить вход через Google',
   )
+})
+
+test.describe('desktop', () => {
+  test.use({
+    viewport: { width: 1280, height: 800 },
+    hasTouch: false,
+    userAgent: undefined,
+  })
+
+  test('keeps the popup flow so sign-in needs no redirect URI', async ({
+    page,
+  }) => {
+    await mockGoogle(page)
+    await page.route('**/api/v1/**', (route) =>
+      route.fulfill({ status: 401, json: { code: 'INVALID_REFRESH_TOKEN' } }),
+    )
+    await page.goto('./login')
+    await expect(
+      page.getByRole('button', { name: 'Continue with Google' }),
+    ).toBeVisible()
+    const options = await page.evaluate(() => {
+      const { ux_mode, login_uri } = (window as any).googleOptions
+      return { ux_mode, login_uri }
+    })
+    expect(options).toEqual({ ux_mode: undefined, login_uri: undefined })
+  })
 })

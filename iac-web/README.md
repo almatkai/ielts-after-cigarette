@@ -18,8 +18,10 @@ is required. Old `/register` URLs redirect to `/login`. Authentication uses an
 in-memory access token and a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
 (`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
 
-Google sign-in uses a full-page redirect so it can return without a popup's
-`window.opener` on iPhone and in-app browsers. Before deploying, add
+On iPhone/iPad, Google sign-in uses a full-page redirect so it can return
+without a popup's `window.opener` in Safari and in-app browsers. Other platforms
+keep the popup. Until the redirect URI below is registered, Google blocks iOS
+sign-in with `redirect_uri_mismatch`. Add
 `https://ielts.academy-ai.kz/api/v1/auth/google` to **Authorized redirect URIs**
 for the Google OAuth web client (the exact origin + `/api/v1/auth/google` on
 other environments). Keep the site's origin in **Authorized JavaScript origins**.

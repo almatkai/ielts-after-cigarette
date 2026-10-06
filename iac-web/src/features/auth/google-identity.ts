@@ -56,14 +56,26 @@ export function consumeGoogleReturnPath(): '/admin' | '/' {
   return path
 }
 
+// iPadOS reports a Mac user agent, so touch support identifies it.
+function isAppleMobile() {
+  return (
+    /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  )
+}
+
 export function googleSignInOptions(
   callback: (response: { credential?: string }) => void,
 ) {
+  if (!isAppleMobile()) {
+    return { client_id: GOOGLE_CLIENT_ID, callback }
+  }
   return {
     client_id: GOOGLE_CLIENT_ID,
     callback,
     // Keep the sign-in and its return in one tab. Popup callbacks are lost in
-    // iOS in-app browsers when the popup replaces the original webview.
+    // iOS in-app browsers when the popup replaces the original webview. Other
+    // platforms keep the popup so they don't depend on the redirect URI setup.
     ux_mode: 'redirect' as const,
     login_uri: new URL('/api/v1/auth/google', window.location.origin).href,
   }

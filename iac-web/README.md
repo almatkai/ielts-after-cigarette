@@ -18,6 +18,29 @@ is required. Old `/register` URLs redirect to `/login`. Authentication uses an
 in-memory access token and a backend-owned HttpOnly refresh cookie. Both frontend and backend should use the same hostname
 (`localhost`, not a mix of `localhost` and `127.0.0.1`) during local development.
 
+Google sign-in uses a full-page redirect so it can return without a popup's
+`window.opener` on iPhone and in-app browsers. Before deploying, add
+`https://ielts.academy-ai.kz/api/v1/auth/google` to **Authorized redirect URIs**
+for the Google OAuth web client (the exact origin + `/api/v1/auth/google` on
+other environments). Keep the site's origin in **Authorized JavaScript origins**.
+Deploy the backend form handler before this frontend. The production reverse
+proxy must route `/api/v1/auth/google` to the backend; Vite proxies that path
+to `VITE_API_BASE_URL` in development. The handler validates Google's
+`g_csrf_token` double-submit cookie, verifies the ID token, and returns a 303
+to `/app/login`. Existing users restore their HttpOnly session; new users
+restore a signed registration profile from an HttpOnly cookie. Credentials
+never appear in the redirect URL. Google may still require users of embedded
+browsers to open the site in Safari/Chrome; the sign-in page explains how.
+
+Targeted mobile regressions:
+
+```bash
+pnpm exec playwright test tests/google-sign-in.spec.ts --browser=webkit
+```
+
+The tests simulate Google's credential return; a real-account check on an
+iPhone is still needed after updating OAuth settings and deploying.
+
 Users with the backend role `EDITOR` or `ADMIN` can open `/admin`. The route has
 a client guard for navigation, and the data request is independently protected
 by `GET /api/v1/admin/access`. Assign the first administrator through the

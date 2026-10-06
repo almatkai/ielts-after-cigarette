@@ -9,10 +9,15 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/features/auth/auth-store'
-import { isGoogleRegistrationRequired } from '@/features/auth/google-auth'
 import {
-  GOOGLE_CLIENT_ID,
+  isGoogleRegistrationRequired,
+  requestPendingGoogleRegistration,
+} from '@/features/auth/google-auth'
+import {
+  getGoogleReturnPath,
+  googleSignInOptions,
   loadGoogleIdentityScript,
+  rememberGoogleReturnPath,
 } from '@/features/auth/google-identity'
 import { getErrorMessage } from '@/lib/api/client'
 
@@ -24,8 +29,42 @@ export function LoginForm() {
   const search = useSearch({ from: '/login' })
   const { loginWithGoogle } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
+  const [restoringGoogle, setRestoringGoogle] = useState(
+    search.google === 'registration',
+  )
   const [pendingGoogle, setPendingGoogle] =
     useState<PendingGoogleRegistration | null>(null)
+  const googleRedirect =
+    search.redirect ??
+    (search.google === 'registration' ? getGoogleReturnPath() : undefined)
+
+  useEffect(() => {
+    if (search.google === 'error' || search.google === 'success') {
+      setSubmissionError(
+        'Не удалось завершить вход через Google. Попробуйте ещё раз.',
+      )
+    }
+    if (search.google !== 'registration') return
+    let cancelled = false
+    requestPendingGoogleRegistration()
+      .then((response) => {
+        if (!cancelled) {
+          setPendingGoogle({
+            registrationToken: response.registrationToken,
+            profile: response.profile,
+          })
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) setSubmissionError(getErrorMessage(error))
+      })
+      .finally(() => {
+        if (!cancelled) setRestoringGoogle(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [search.google, search.redirect])
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
@@ -55,7 +94,7 @@ export function LoginForm() {
           setPendingGoogle(null)
           setSubmissionError(null)
         }}
-        redirect={search.redirect}
+        redirect={googleRedirect}
       />
     )
   }
@@ -64,6 +103,8 @@ export function LoginForm() {
     <GoogleSignInCard
       onCredential={handleGoogleCredential}
       submissionError={submissionError}
+      restoringGoogle={restoringGoogle}
+      redirect={googleRedirect}
     />
   )
 }
@@ -71,26 +112,30 @@ export function LoginForm() {
 function GoogleSignInCard({
   onCredential,
   submissionError,
+  restoringGoogle,
+  redirect,
 }: {
   onCredential: (credential: string) => Promise<void>
   submissionError: string | null
+  restoringGoogle: boolean
+  redirect?: '/admin' | '/'
 }) {
   const [googleFailed, setGoogleFailed] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (restoringGoogle) return
     let cancelled = false
     loadGoogleIdentityScript()
       .then(() => {
         if (cancelled || !window.google || !googleButtonRef.current) return
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => {
+        window.google.accounts.id.initialize(
+          googleSignInOptions((response) => {
             if (response.credential) {
               void onCredential(response.credential)
             }
-          },
-        })
+          }),
+        )
         const container = googleButtonRef.current
         window.google.accounts.id.renderButton(container, {
           type: 'standard',
@@ -99,6 +144,7 @@ function GoogleSignInCard({
           text: 'continue_with',
           shape: 'rectangular',
           width: Math.min(400, Math.max(200, container.clientWidth || 320)),
+          click_listener: () => rememberGoogleReturnPath(redirect),
         })
       })
       .catch(() => {
@@ -107,7 +153,7 @@ function GoogleSignInCard({
     return () => {
       cancelled = true
     }
-  }, [onCredential])
+  }, [onCredential, redirect, restoringGoogle])
 
   return (
     <>
@@ -121,6 +167,15 @@ function GoogleSignInCard({
       </CardHeader>
       <CardContent className="px-6 pt-6 pb-8 sm:px-8">
         <div ref={googleButtonRef} className="flex min-h-11 justify-center" />
+        {restoringGoogle ? (
+          <p className="text-center text-sm text-[#475569]" role="status">
+            Завершаем вход через Google…
+          </p>
+        ) : null}
+        <p className="mt-3 text-center text-xs leading-5 text-[#64748b]">
+          Если вы открыли сайт из Telegram или Instagram, используйте меню
+          браузера «Открыть в Safari» или «Открыть в браузере» для входа.
+        </p>
         {googleFailed ? (
           <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
             Не удалось загрузить вход через Google. Проверьте подключение и

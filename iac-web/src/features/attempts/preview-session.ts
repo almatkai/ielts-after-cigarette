@@ -13,8 +13,14 @@ export function usePreviewSession(): AttemptSession {
     saveState: 'idle',
     submitted: null,
     submitError: null,
+    exitError: null,
     isSubmitting: false,
     loadError: null,
+    isSavingAndExiting: false,
+    saveAndExit: async (onExit) => {
+      onExit?.()
+    },
+    flush: () => Promise.resolve(),
     retryLoad: () => {},
     updateAnswer: (questionId, answer) =>
       setAnswers((current) => ({ ...current, [questionId]: answer })),

@@ -788,6 +788,312 @@ test('every Listening question type offers the stored answer and explanation', a
   expectNoAttempts(requests)
 })
 
+for (const preview of [true, false]) {
+  test(`Listening completion uses live underlined gaps in ${preview ? 'preview' : 'exam'}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 })
+    const requests = await mockApi(page, preview ? 'ADMIN' : 'STUDENT')
+    const material = {
+      ...listening,
+      parts: [
+        {
+          position: 1,
+          title: 'Children’s Engineering Workshops',
+          audioAssetId: null,
+          groups: [
+            {
+              ...group('notes', 1),
+              type: 'note_completion',
+              instructions:
+                'Complete the notes. Write ONE WORD AND/OR A NUMBER.',
+              context:
+                'Tiny Engineers: cover for an {{1}}.\nTallest structure: {{2}}.',
+              config: {},
+              imageAssetId: null,
+              questions: [
+                {
+                  ...group('gap-1', 1).questions[0],
+                  prompt: 'Tiny Engineers: cover for an {{answer}}.',
+                },
+                {
+                  ...group('gap-2', 2).questions[0],
+                  prompt: 'Tallest structure: {{answer}}.',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    const attempt = {
+      id: 'completion-attempt',
+      materialType: 'listening',
+      materialId: listening.id,
+      materialVersionId: 'published-version',
+      status: 'IN_PROGRESS',
+      startedAt: new Date().toISOString(),
+      submittedAt: null,
+      score: null,
+      maxScore: null,
+      band: null,
+    }
+    const writes: unknown[] = []
+    if (preview) {
+      await page.route('**/preview?version=draft', (route) =>
+        route.fulfill({
+          json: {
+            material,
+            answerKeys: {},
+            revision: 4,
+            versionNumber: 2,
+            status: 'DRAFT',
+            hasUnpublishedChanges: true,
+          },
+        }),
+      )
+    } else {
+      await page.route('**/api/v1/**', (route) => {
+        const path = new URL(route.request().url()).pathname
+        if (!path.includes('/attempts')) return route.fallback()
+        if (path.endsWith('/answers')) {
+          writes.push(route.request().postDataJSON())
+          return route.fulfill({ json: { saved: 1 } })
+        }
+        if (path.endsWith('/attempts'))
+          return route.fulfill({ json: { attempt, test: material } })
+        return route.fulfill({ json: { ...attempt, answers: [] } })
+      })
+    }
+    await page.goto(
+      preview
+        ? 'admin/preview/listening/listening-id'
+        : 'exam/listening/listening-id',
+    )
+    const first = page.getByRole('textbox', {
+      name: 'Ответ на вопрос 1',
+      exact: true,
+    })
+    const second = page.getByRole('textbox', {
+      name: 'Ответ на вопрос 2',
+      exact: true,
+    })
+    await expect(first).toBeVisible()
+    await expect(first).toHaveValue('')
+    await expect(first).toBeFocused()
+    await expect(second).toBeVisible()
+    await expect(second).not.toBeFocused()
+    await expect(page.getByPlaceholder('Ваш ответ')).toHaveCount(0)
+    await expect(
+      page.getByText('note completion', { exact: true }),
+    ).toHaveCount(0)
+    await expect(page.getByText(/\{\{/)).toHaveCount(0)
+    const notes = first.locator('..')
+    await expect(notes).toContainText('Tiny Engineers: cover for an')
+    await expect(notes).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+    await expect(notes.locator('..')).toHaveCSS('border-top-width', '0px')
+    await expect(first).toHaveCSS('border-bottom-width', '1px')
+    await first.fill('umbrella')
+    await expect(first).toHaveValue('umbrella')
+    await expect(first).toHaveCSS('border-bottom-width', '1px')
+    await page.getByRole('button', { name: 'Далее', exact: true }).click()
+    await expect(first).toHaveValue('umbrella')
+    await second.fill('tower')
+    await expect(second).toBeFocused()
+    await expect(
+      page.getByText('Вопрос 2 из 2', { exact: false }),
+    ).toBeVisible()
+    await first.focus()
+    await expect(
+      page.getByText('Вопрос 1 из 2', { exact: false }),
+    ).toBeVisible()
+    await first.fill('')
+    await expect(first).toHaveCSS('border-bottom-width', '1px')
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true)
+    if (preview) expectNoAttempts(requests)
+    else await expect.poll(() => JSON.stringify(writes)).toContain('tower')
+  })
+}
+
+test('Listening completion without context renders prompt gaps inline', async ({
+  page,
+}) => {
+  await mockApi(page)
+  await page.route('**/preview?version=draft', (route) =>
+    route.fulfill({
+      json: {
+        material: {
+          ...listening,
+          parts: [
+            {
+              position: 1,
+              title: 'Completion prompts',
+              audioAssetId: null,
+              groups: [
+                {
+                  ...group('prompt-gap', 1),
+                  type: 'sentence_completion',
+                  config: {},
+                  context: '',
+                  imageAssetId: null,
+                  questions: [
+                    {
+                      ...group('prompt-gap', 1).questions[0],
+                      prompt: 'Build an {{answer}}.',
+                    },
+                    {
+                      ...group('underscores', 2).questions[0],
+                      prompt: 'Create a short ____.',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        answerKeys: {},
+        revision: 4,
+        versionNumber: 2,
+        status: 'DRAFT',
+        hasUnpublishedChanges: true,
+      },
+    }),
+  )
+  await page.goto('admin/preview/listening/listening-id')
+  const first = page.getByRole('textbox', {
+    name: 'Ответ на вопрос 1',
+    exact: true,
+  })
+  await expect(first).toBeFocused()
+  await expect(first.locator('..')).toContainText('Build an')
+  await first.fill('engine')
+  await expect(first).toHaveValue('engine')
+  await page.getByRole('button', { name: 'Далее', exact: true }).click()
+  const second = page.getByRole('textbox', {
+    name: 'Ответ на вопрос 2',
+    exact: true,
+  })
+  await expect(second).toBeFocused()
+  await expect(second.locator('..')).toContainText('Create a short')
+  await second.fill('film')
+  await expect(second).toHaveValue('film')
+  await page.getByRole('button', { name: 'Назад', exact: true }).click()
+  await expect(first).toHaveValue('engine')
+})
+
+test('Listening submitted review replaces note templates with underlined student answers', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 426, height: 900 })
+  await mockApi(page, 'STUDENT')
+  await page.route('**/api/v1/full-mocks/overview', (route) =>
+    route.fulfill({ json: { banks: [] } }),
+  )
+  const questions = [
+    {
+      ...group('review-31', 31).questions[0],
+      prompt: 'Products accessible without need for {{answer}}.',
+    },
+    {
+      ...group('review-32', 32).questions[0],
+      prompt:
+        'Universal design also caters for people with {{answer}} problems.',
+    },
+  ]
+  const material = {
+    ...listening,
+    parts: [
+      {
+        position: 4,
+        title: 'Inclusive design',
+        audioAssetId: null,
+        groups: [
+          {
+            ...group('review-notes', 31),
+            type: 'note_completion',
+            instructions:
+              'Complete the notes. Write ONE WORD ONLY for each answer.',
+            context:
+              'Inclusive design\n• Products accessible without need for {{31}}.\n• Universal design also caters for people with {{32}} problems.',
+            config: {},
+            imageAssetId: null,
+            questions,
+          },
+        ],
+      },
+    ],
+  }
+  const attempt = {
+    id: 'review-attempt',
+    materialType: 'listening',
+    materialId: listening.id,
+    materialVersionId: 'published-version',
+    status: 'SUBMITTED',
+    startedAt: '2026-10-05T10:00:00Z',
+    submittedAt: '2026-10-05T10:40:00Z',
+    score: 1,
+    maxScore: 2,
+    band: 4,
+  }
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname
+    if (!path.includes('/attempts')) return route.fallback()
+    if (path.endsWith('/attempts'))
+      return route.fulfill({ json: { attempt, test: material } })
+    return route.fulfill({
+      json: {
+        ...attempt,
+        review: questions.map((question, index) => ({
+          questionId: question.id,
+          number: question.number,
+          prompt: question.prompt,
+          answer: index === 0 ? null : { value: 'mobility' },
+          correctAnswer: {
+            accepted: [index === 0 ? 'adaptation' : 'mobility'],
+          },
+          isCorrect: index === 1,
+          pointsAwarded: index === 1 ? 1 : 0,
+          explanation: 'Stored explanation',
+        })),
+      },
+    })
+  })
+  await page.goto('exam/listening/listening-id')
+  await expect(
+    page.getByRole('heading', { name: 'Part 4: Inclusive design' }),
+  ).toBeVisible()
+  await expect(page.getByText(/\{\{31\}\}/)).toHaveCount(0)
+  await expect(page.getByText('note completion', { exact: true })).toHaveCount(
+    0,
+  )
+  const first = page.locator('span[title="Вопрос 31"]')
+  const second = page.locator('span[title="Вопрос 32"]')
+  await expect(first).toHaveAttribute(
+    'aria-label',
+    'Ответ на вопрос 31: не отвечено',
+  )
+  await expect(first).toHaveCSS('border-bottom-width', '1px')
+  await expect(second).toHaveText('mobility')
+  await expect(second).toHaveCSS('border-bottom-width', '1px')
+  await expect(first.locator('..')).toHaveCSS(
+    'background-color',
+    'rgba(0, 0, 0, 0)',
+  )
+  await expect(first.locator('../..')).toHaveCSS('border-top-width', '0px')
+  await expect(page.getByRole('textbox')).toHaveCount(0)
+  await expect(page.getByText('adaptation', { exact: true })).toBeVisible()
+  await page.screenshot({
+    path: testInfo.outputPath('listening-review-gaps.png'),
+    fullPage: true,
+  })
+  await page.getByRole('button', { name: /Ошибки/ }).click()
+  await expect(second).toHaveText('mobility')
+})
+
 for (const skill of ['reading', 'listening']) {
   test(`normal ${skill} exam still saves a real attempt and persists its timer`, async ({
     page,

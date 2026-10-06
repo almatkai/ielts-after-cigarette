@@ -1,20 +1,28 @@
-import {
-  Headphone,
-} from 'iconsax-react'
+import { Headphone } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { EmptyState, LibraryCardsSkeleton } from '@/features/attempts/attempt-ui'
+import {
+  ErrorState,
+  EmptyState,
+  LibraryCardsSkeleton,
+} from '@/features/attempts/attempt-ui'
+import {
+  LibraryAttemptActions,
+  LibraryAttemptResult,
+  useLibraryAttempts,
+} from '@/features/attempts/library-attempts'
 import { useAuth } from '@/features/auth/auth-store'
 import {
   listeningKeys,
   listPublicListeningTests,
 } from '@/features/listening/api'
 
+import { getErrorMessage } from '@/lib/api/client'
+
 export function ListeningLibraryPage() {
   const { user } = useAuth()
+  const attemptsQuery = useLibraryAttempts('listening')
   const query = useQuery({
     queryKey: listeningKeys.publicTests,
     queryFn: ({ signal }) => listPublicListeningTests(signal),
@@ -28,13 +36,22 @@ export function ListeningLibraryPage() {
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
           Выберите тест для тренировки
         </h2>
-        <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Пройдите listening в формате, близком к экзамену, и сразу получите
-          band-оценку.
-        </p>
       </div>
+      {attemptsQuery.isError ? (
+        <ErrorState
+          title="Не удалось загрузить результаты"
+          message={getErrorMessage(attemptsQuery.error)}
+          onRetry={() => void attemptsQuery.refetch()}
+        />
+      ) : null}
       {query.isPending ? (
         <LibraryCardsSkeleton />
+      ) : query.isError ? (
+        <ErrorState
+          title="Не удалось загрузить тесты"
+          message={getErrorMessage(query.error)}
+          onRetry={() => void query.refetch()}
+        />
       ) : tests.length === 0 ? (
         <EmptyState />
       ) : (
@@ -47,7 +64,10 @@ export function ListeningLibraryPage() {
               <CardContent className="flex h-full flex-col justify-between gap-4 p-5 sm:p-6">
                 <div className="flex items-start gap-3.5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                    <Headphone className="size-5 transition-colors" aria-hidden />
+                    <Headphone
+                      className="size-5 transition-colors"
+                      aria-hidden
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
@@ -63,13 +83,19 @@ export function ListeningLibraryPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
-                    <Link to="/exam/listening/$testId" params={{ testId: test.id }}>
-                      Открыть тест
-                    </Link>
-                  </Button>
-                </div>
+                <LibraryAttemptResult
+                  items={(attemptsQuery.data?.items ?? []).filter(
+                    (item) => item.materialId === test.id,
+                  )}
+                />
+                <LibraryAttemptActions
+                  skill="listening"
+                  materialId={test.id}
+                  items={(attemptsQuery.data?.items ?? []).filter(
+                    (item) => item.materialId === test.id,
+                  )}
+                  pending={attemptsQuery.isPending}
+                />
               </CardContent>
             </Card>
           ))}

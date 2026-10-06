@@ -25,11 +25,12 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useAttemptSession } from '@/features/attempts/attempt-session'
+import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
 import { usePreviewSession } from '@/features/attempts/preview-session'
 import type { AttemptSession } from '@/features/attempts/preview-session'
 import { useExamTimer } from '@/features/attempts/exam-timer'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
+import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
   AttemptPerformanceReport,
   AttemptResultHeader,
@@ -75,7 +76,7 @@ export function ReadingStudentPage({
       skillBadge="IELTS Reading"
       loadingLabel="Готовим материал…"
       loadingDescription="Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов."
-      queryKey={['reading', 'materials', materialId, 'attempt']}
+      queryKey={attemptStartQueryKey('reading', materialId)}
       startAttemptFn={(signal) => startReadingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
         <ReadingAttemptRunner
@@ -265,6 +266,8 @@ function ReadingTestRunner({
   }, [activeQuestionIndex, currentQuestion?.question.id])
 
   const isReady = session.answers !== null && !session.loadError
+
+  const handleContinueLater = useContinueLater(session, { fullMockSessionId })
 
   const durationMinutes =
     (material.durationMinutes ?? 0) > 0 ? material.durationMinutes! : 60
@@ -462,6 +465,18 @@ function ReadingTestRunner({
             <TimeBadge seconds={secondsLeft} label="Осталось" />
           ) : null}
           {!preview ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={session.isSavingAndExiting || session.isSubmitting}
+              onClick={handleContinueLater}
+              className="rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+            >
+              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+            </Button>
+          ) : null}
+          {!preview ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
@@ -492,6 +507,15 @@ function ReadingTestRunner({
           ) : null}
         </div>
       </header>
+
+      {session.exitError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
+        >
+          Не удалось сохранить черновик: {session.exitError}
+        </p>
+      ) : null}
 
       {session.submitError ? (
         <p
@@ -909,7 +933,6 @@ function ReadingAttemptResult({
       {/* РЕЗУЛЬТАТИВНЫЙ СВОДНЫЙ ОТЧЁТ */}
       <AttemptPerformanceReport
         band={attempt.band}
-        bandNote="Балл рассчитан по стандарту академического чтения IELTS"
         correctCount={correctCount}
         totalQuestions={totalQuestions}
         startedAt={attempt.startedAt}
@@ -1071,9 +1094,6 @@ function ReadingAttemptResult({
         {/* Быстрая навигационная сетка (1–40) */}
         {review && review.length > 0 && (
           <div className="pt-2 border-t border-[#ededeb]">
-            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Навигация по номерам вопросов (клик для перехода):
-            </span>
             <div className="flex flex-wrap items-center gap-1.5">
               {review.map((item) => {
                 const isCorrect = item.isCorrect

@@ -153,21 +153,21 @@ export function ProfilePage() {
   return (
     <div className="mx-auto w-full min-w-0 max-w-[1120px]">
       {/* 1. Блок Фото профиля */}
-      <Card className="group mb-5 gap-0 overflow-hidden rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-        <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
-          <div className="grid size-20 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:border-blue-200 sm:size-24">
+      <Card className="group mb-4 sm:mb-5 gap-0 overflow-hidden rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
+        <CardContent className="flex flex-col gap-4 p-3.5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+          <div className="grid size-16 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:border-blue-200 sm:size-24">
             <User
-              className="size-9 sm:size-11 transition-colors"
+              className="size-7 sm:size-11 transition-colors"
               strokeWidth={1.45}
               aria-hidden
             />
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+            <h3 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
               Фото профиля
             </h3>
-            <p className="mt-1 max-w-lg text-sm leading-6 text-[#69696d]">
+            <p className="mt-0.5 sm:mt-1 max-w-lg text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
               Загрузите JPG, PNG или WebP. Рекомендуемый размер — от 400 × 400
               пикселей.
             </p>
@@ -199,17 +199,17 @@ export function ProfilePage() {
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
         <div className="grid min-w-0 gap-5 [&>*]:min-w-0">
           {/* 2. Блок Личные данные */}
-          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <Card className="group gap-0 rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
+            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <User className="size-[18px] transition-colors" aria-hidden />
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <User className="size-4 sm:size-[18px] transition-colors" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
                     Личные данные
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
                     Основная информация вашего аккаунта.
                   </CardDescription>
                 </div>
@@ -217,7 +217,7 @@ export function ProfilePage() {
             </CardHeader>
 
             <form className="min-w-0" onSubmit={handleProfileSubmit}>
-              <CardContent className="grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
+              <CardContent className="grid min-w-0 gap-3.5 p-3.5 sm:gap-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
                 <div className="grid gap-2">
                   <Label htmlFor="first-name">Имя</Label>
                   <Input
@@ -278,11 +278,11 @@ export function ProfilePage() {
                   </p>
                 ) : null}
               </CardContent>
-              <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+              <CardFooter className="justify-end border-t border-[#ededeb] px-3.5 py-3 sm:px-6 sm:py-4">
                 <Button
                   type="submit"
                   disabled={profileMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-9 sm:h-10 rounded-[9px] bg-[#3b82f6] px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-[#2563eb]"
                 >
                   {profileMutation.isPending
                     ? 'Сохраняем…'
@@ -293,20 +293,20 @@ export function ProfilePage() {
           </Card>
 
           {/* 3. Блок Параметры подготовки */}
-          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <Card className="group gap-0 rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
+            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
                   <DirectRight
-                    className="size-[18px] transition-colors"
+                    className="size-4 sm:size-[18px] transition-colors"
                     aria-hidden
                   />
                 </span>
                 <div>
-                  <CardTitle className="text-base tracking-[-0.02em]">
+                  <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
                     Параметры подготовки
                   </CardTitle>
-                  <CardDescription className="mt-1 leading-5">
+                  <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
                     Цель и формат, под которые будет строиться план.
                   </CardDescription>
                 </div>

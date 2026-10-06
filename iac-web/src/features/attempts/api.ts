@@ -197,6 +197,9 @@ export type AttemptListItem = Omit<Attempt, 'materialType'> & {
   materialType: AttemptMaterialType
   testTitle: string
   testSlug: string
+  // Set when the attempt is a section of a Full Mock session, so the drafts
+  // banner can resume the session instead of the practice routes.
+  fullMockSessionId: string | null
 }
 
 export type MistakeReport = {
@@ -323,12 +326,14 @@ export const getSpeakingRecordingBlob = (attemptId: string, partId: string) =>
 export const saveAttemptAnswers = (
   attemptId: string,
   answers: AttemptAnswer[],
+  options?: { keepalive?: boolean },
 ) =>
   apiClient.request<{ saved: number }>(
     `/api/v1/attempts/${attemptId}/answers`,
     {
       method: 'PUT',
       body: { answers },
+      keepalive: options?.keepalive,
     },
   )
 export const submitAttempt = (attemptId: string, answers: AttemptAnswer[]) =>

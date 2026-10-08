@@ -1,12 +1,14 @@
-import {
-  Edit2,
-} from 'iconsax-react'
+import { Edit2 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ErrorState, EmptyState, LibraryCardsSkeleton } from '@/features/attempts/attempt-ui'
+import {
+  ErrorState,
+  EmptyState,
+  LibraryCardsSkeleton,
+} from '@/features/attempts/attempt-ui'
 import { useAuth } from '@/features/auth/auth-store'
 import { listPublicWritingMaterials, writingKeys } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
@@ -60,7 +62,9 @@ export function WritingLibraryPage() {
                         {material.title}
                       </h3>
                       <span className="shrink-0 rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
-                        {material.examType === 'academic' ? 'Academic' : 'General'}
+                        {material.examType === 'academic'
+                          ? 'Academic'
+                          : 'General'}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
@@ -74,7 +78,10 @@ export function WritingLibraryPage() {
                   </div>
                 </div>
                 <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
+                  <Button
+                    asChild
+                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  >
                     <Link
                       to="/exam/writing/$materialId"
                       params={{ materialId: material.id }}

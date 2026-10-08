@@ -21,6 +21,7 @@ import {
   normalizePhone,
   validatePhone,
 } from './phone-validation'
+import type { LoginReturnPath } from '@/features/auth/google-identity'
 
 export type PendingGoogleRegistration = Pick<
   GoogleRegistrationRequired,
@@ -30,7 +31,7 @@ export type PendingGoogleRegistration = Pick<
 type GoogleCompleteFormProps = {
   pending: PendingGoogleRegistration
   onBack: () => void
-  redirect?: '/admin' | '/'
+  redirect?: LoginReturnPath
 }
 
 function validateName(value: string) {

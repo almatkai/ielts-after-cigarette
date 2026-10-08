@@ -8,7 +8,7 @@ import {
 import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-auth'
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 
-export type UserRole = 'STUDENT' | 'EDITOR' | 'ADMIN'
+export type UserRole = 'STUDENT' | 'WRITER' | 'EDITOR' | 'ADMIN'
 
 export type UserDto = {
   id: string

@@ -56,12 +56,16 @@ const secondaryDashboardPages = [
   { label: 'Профиль', to: '/profile' },
 ] as const
 
-export function getDashboardPageTitle(pathname: string) {
+// Writer pages carry their own heading, so the shell header shows no title.
+export function getDashboardPageTitle(pathname: string): string | null {
+  if (pathname.startsWith('/writer/posts')) return null
+
   const navigationItem = [
     ...primaryDashboardNavigation,
     settingsDashboardNavigation,
     ...secondaryDashboardPages,
   ].find((item) => item.to === pathname)
 
-  return navigationItem?.label ?? 'Панель управления'
+  if (navigationItem) return navigationItem.label
+  return 'Панель управления'
 }

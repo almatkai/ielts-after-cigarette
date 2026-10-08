@@ -3,7 +3,11 @@ import { useEffect, useRef } from 'react'
 
 import { AuthShell } from '#/components/auth/auth-shell'
 import { LoginForm } from '#/components/auth/login-form'
-import { consumeGoogleReturnPath } from '#/features/auth/google-identity'
+import {
+  consumeGoogleReturnPath,
+  isLoginReturnPath,
+} from '#/features/auth/google-identity'
+import type { LoginReturnPath } from '#/features/auth/google-identity'
 import { useAuth } from '#/features/auth/auth-store'
 
 export const Route = createFileRoute('/login')({
@@ -11,14 +15,14 @@ export const Route = createFileRoute('/login')({
   validateSearch: (
     search: Record<string, unknown>,
   ): {
-    redirect?: '/admin' | '/'
+    redirect?: LoginReturnPath
     google?: 'success' | 'registration' | 'error'
   } => {
     const validated: {
-      redirect?: '/admin' | '/'
+      redirect?: LoginReturnPath
       google?: 'success' | 'registration' | 'error'
     } = {}
-    if (search.redirect === '/admin' || search.redirect === '/') {
+    if (isLoginReturnPath(search.redirect)) {
       validated.redirect = search.redirect
     }
     if (

@@ -38,6 +38,11 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as BlogBecomeWriterRouteImport } from './routes/blog.become-writer'
+import { Route as BlogRssDotxmlRouteImport } from './routes/blog.rss[.]xml'
+import { Route as BlogSitemapDotxmlRouteImport } from './routes/blog.sitemap[.]xml'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AppAttemptsAttemptIdRouteImport } from './routes/_app.attempts.$attemptId'
 import { Route as AppFullMockSessionsSessionIdRouteImport } from './routes/_app.full-mock-sessions.$sessionId'
@@ -46,6 +51,7 @@ import { Route as AppListeningTestIdRouteImport } from './routes/_app.listening.
 import { Route as AppReadingMaterialIdRouteImport } from './routes/_app.reading.$materialId'
 import { Route as AppSpeakingMaterialIdRouteImport } from './routes/_app.speaking.$materialId'
 import { Route as AppWritingMaterialIdRouteImport } from './routes/_app.writing.$materialId'
+import { Route as AdminBlogPostsRouteImport } from './routes/admin.blog.posts'
 import { Route as AdminFullMocksIndexRouteImport } from './routes/admin.full-mocks.index'
 import { Route as AdminFullMocksMockIdRouteImport } from './routes/admin.full-mocks.$mockId'
 import { Route as AdminFullMocksNewRouteImport } from './routes/admin.full-mocks.new'
@@ -55,6 +61,7 @@ import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.i
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
 import { Route as AdminSpeakingImportRouteImport } from './routes/admin.speaking.import'
 import { Route as AdminSpeakingMaterialsRouteImport } from './routes/admin.speaking.materials'
+import { Route as AdminWritersApplicationsRouteImport } from './routes/admin.writers.applications'
 import { Route as AdminWritingImportRouteImport } from './routes/admin.writing.import'
 import { Route as AdminWritingMaterialsRouteImport } from './routes/admin.writing.materials'
 import { Route as ExamFullMockSessionsSessionIdRouteImport } from './routes/exam.full-mock-sessions.$sessionId'
@@ -62,6 +69,9 @@ import { Route as ExamListeningTestIdRouteImport } from './routes/exam.listening
 import { Route as ExamReadingMaterialIdRouteImport } from './routes/exam.reading.$materialId'
 import { Route as ExamSpeakingMaterialIdRouteImport } from './routes/exam.speaking.$materialId'
 import { Route as ExamWritingMaterialIdRouteImport } from './routes/exam.writing.$materialId'
+import { Route as AppWriterPostsIndexRouteImport } from './routes/_app.writer.posts.index'
+import { Route as AppWriterPostsPostIdRouteImport } from './routes/_app.writer.posts.$postId'
+import { Route as AppWriterPostsNewRouteImport } from './routes/_app.writer.posts.new'
 import { Route as AdminListeningTestsIndexRouteImport } from './routes/admin.listening.tests.index'
 import { Route as AdminListeningTestsTestIdRouteImport } from './routes/admin.listening.tests.$testId'
 import { Route as AdminListeningTestsNewRouteImport } from './routes/admin.listening.tests.new'
@@ -222,6 +232,31 @@ const AdminPreviewRoute = AdminPreviewRouteImport.update({
   path: '/admin/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogBecomeWriterRoute = BlogBecomeWriterRouteImport.update({
+  id: '/blog/become-writer',
+  path: '/blog/become-writer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRssDotxmlRoute = BlogRssDotxmlRouteImport.update({
+  id: '/blog/rss.xml',
+  path: '/blog/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSitemapDotxmlRoute = BlogSitemapDotxmlRouteImport.update({
+  id: '/blog/sitemap.xml',
+  path: '/blog/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
@@ -262,6 +297,11 @@ const AppWritingMaterialIdRoute = AppWritingMaterialIdRouteImport.update({
   id: '/$materialId',
   path: '/$materialId',
   getParentRoute: () => AppWritingRoute,
+} as any)
+const AdminBlogPostsRoute = AdminBlogPostsRouteImport.update({
+  id: '/blog/posts',
+  path: '/blog/posts',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminFullMocksIndexRoute = AdminFullMocksIndexRouteImport.update({
   id: '/',
@@ -308,6 +348,12 @@ const AdminSpeakingMaterialsRoute = AdminSpeakingMaterialsRouteImport.update({
   path: '/speaking/materials',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminWritersApplicationsRoute =
+  AdminWritersApplicationsRouteImport.update({
+    id: '/writers/applications',
+    path: '/writers/applications',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminWritingImportRoute = AdminWritingImportRouteImport.update({
   id: '/writing/import',
   path: '/writing/import',
@@ -343,6 +389,21 @@ const ExamWritingMaterialIdRoute = ExamWritingMaterialIdRouteImport.update({
   id: '/writing/$materialId',
   path: '/writing/$materialId',
   getParentRoute: () => ExamRoute,
+} as any)
+const AppWriterPostsIndexRoute = AppWriterPostsIndexRouteImport.update({
+  id: '/writer/posts/',
+  path: '/writer/posts/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWriterPostsPostIdRoute = AppWriterPostsPostIdRouteImport.update({
+  id: '/writer/posts/$postId',
+  path: '/writer/posts/$postId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWriterPostsNewRoute = AppWriterPostsNewRouteImport.update({
+  id: '/writer/posts/new',
+  path: '/writer/posts/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AdminListeningTestsIndexRoute =
   AdminListeningTestsIndexRouteImport.update({
@@ -462,8 +523,13 @@ export interface FileRoutesByFullPath {
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
   '/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
@@ -471,6 +537,7 @@ export interface FileRoutesByFullPath {
   '/reading/$materialId': typeof AppReadingMaterialIdRoute
   '/speaking/$materialId': typeof AppSpeakingMaterialIdRoute
   '/writing/$materialId': typeof AppWritingMaterialIdRoute
+  '/admin/blog/posts': typeof AdminBlogPostsRoute
   '/admin/full-mocks/$mockId': typeof AdminFullMocksMockIdRoute
   '/admin/full-mocks/new': typeof AdminFullMocksNewRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
@@ -479,6 +546,7 @@ export interface FileRoutesByFullPath {
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
+  '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
   '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
@@ -487,6 +555,8 @@ export interface FileRoutesByFullPath {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
+  '/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
+  '/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -497,6 +567,7 @@ export interface FileRoutesByFullPath {
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
   '/admin/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
+  '/writer/posts/': typeof AppWriterPostsIndexRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
@@ -528,9 +599,14 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/': typeof AppIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
   '/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
@@ -538,11 +614,13 @@ export interface FileRoutesByTo {
   '/reading/$materialId': typeof AppReadingMaterialIdRoute
   '/speaking/$materialId': typeof AppSpeakingMaterialIdRoute
   '/writing/$materialId': typeof AppWritingMaterialIdRoute
+  '/admin/blog/posts': typeof AdminBlogPostsRoute
   '/admin/full-mocks/$mockId': typeof AdminFullMocksMockIdRoute
   '/admin/full-mocks/new': typeof AdminFullMocksNewRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
+  '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
   '/exam/listening/$testId': typeof ExamListeningTestIdRoute
@@ -550,6 +628,8 @@ export interface FileRoutesByTo {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks': typeof AdminFullMocksIndexRoute
+  '/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
+  '/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -560,6 +640,7 @@ export interface FileRoutesByTo {
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
   '/admin/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
+  '/writer/posts': typeof AppWriterPostsIndexRoute
   '/admin/listening/tests': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsIndexRoute
@@ -595,9 +676,14 @@ export interface FileRoutesById {
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/_app/': typeof AppIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/_app/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
   '/_app/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/_app/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
@@ -605,6 +691,7 @@ export interface FileRoutesById {
   '/_app/reading/$materialId': typeof AppReadingMaterialIdRoute
   '/_app/speaking/$materialId': typeof AppSpeakingMaterialIdRoute
   '/_app/writing/$materialId': typeof AppWritingMaterialIdRoute
+  '/admin/blog/posts': typeof AdminBlogPostsRoute
   '/admin/full-mocks/$mockId': typeof AdminFullMocksMockIdRoute
   '/admin/full-mocks/new': typeof AdminFullMocksNewRoute
   '/admin/listening/import': typeof AdminListeningImportRoute
@@ -613,6 +700,7 @@ export interface FileRoutesById {
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
+  '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
   '/exam/full-mock-sessions/$sessionId': typeof ExamFullMockSessionsSessionIdRouteWithChildren
@@ -621,6 +709,8 @@ export interface FileRoutesById {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
+  '/_app/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
+  '/_app/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
   '/admin/listening/tests/new': typeof AdminListeningTestsNewRoute
   '/admin/reading/materials/$materialId': typeof AdminReadingMaterialsMaterialIdRoute
@@ -631,6 +721,7 @@ export interface FileRoutesById {
   '/admin/writing/materials/new': typeof AdminWritingMaterialsNewRoute
   '/admin_/preview/listening/$testId': typeof AdminPreviewListeningTestIdRoute
   '/admin_/preview/reading/$materialId': typeof AdminPreviewReadingMaterialIdRoute
+  '/_app/writer/posts/': typeof AppWriterPostsIndexRoute
   '/admin/listening/tests/': typeof AdminListeningTestsIndexRoute
   '/admin/reading/materials/': typeof AdminReadingMaterialsIndexRoute
   '/admin/speaking/materials/': typeof AdminSpeakingMaterialsIndexRoute
@@ -667,8 +758,13 @@ export interface FileRouteTypes {
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin/preview'
+    | '/blog/$slug'
+    | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/admin/'
+    | '/blog/'
     | '/attempts/$attemptId'
     | '/full-mock-sessions/$sessionId'
     | '/full-mocks/$mockId'
@@ -676,6 +772,7 @@ export interface FileRouteTypes {
     | '/reading/$materialId'
     | '/speaking/$materialId'
     | '/writing/$materialId'
+    | '/admin/blog/posts'
     | '/admin/full-mocks/$mockId'
     | '/admin/full-mocks/new'
     | '/admin/listening/import'
@@ -684,6 +781,7 @@ export interface FileRouteTypes {
     | '/admin/reading/materials'
     | '/admin/speaking/import'
     | '/admin/speaking/materials'
+    | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/admin/writing/materials'
     | '/exam/full-mock-sessions/$sessionId'
@@ -692,6 +790,8 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
+    | '/writer/posts/$postId'
+    | '/writer/posts/new'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -702,6 +802,7 @@ export interface FileRouteTypes {
     | '/admin/writing/materials/new'
     | '/admin/preview/listening/$testId'
     | '/admin/preview/reading/$materialId'
+    | '/writer/posts/'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
@@ -733,9 +834,14 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/waitlist'
     | '/admin/preview'
+    | '/blog/$slug'
+    | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/'
     | '/admin'
+    | '/blog'
     | '/attempts/$attemptId'
     | '/full-mock-sessions/$sessionId'
     | '/full-mocks/$mockId'
@@ -743,11 +849,13 @@ export interface FileRouteTypes {
     | '/reading/$materialId'
     | '/speaking/$materialId'
     | '/writing/$materialId'
+    | '/admin/blog/posts'
     | '/admin/full-mocks/$mockId'
     | '/admin/full-mocks/new'
     | '/admin/listening/import'
     | '/admin/reading/import'
     | '/admin/speaking/import'
+    | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/exam/full-mock-sessions/$sessionId'
     | '/exam/listening/$testId'
@@ -755,6 +863,8 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks'
+    | '/writer/posts/$postId'
+    | '/writer/posts/new'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -765,6 +875,7 @@ export interface FileRouteTypes {
     | '/admin/writing/materials/new'
     | '/admin/preview/listening/$testId'
     | '/admin/preview/reading/$materialId'
+    | '/writer/posts'
     | '/admin/listening/tests'
     | '/admin/reading/materials'
     | '/admin/speaking/materials'
@@ -799,9 +910,14 @@ export interface FileRouteTypes {
     | '/admin/full-mocks'
     | '/admin/waitlist'
     | '/admin_/preview'
+    | '/blog/$slug'
+    | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/_app/'
     | '/admin/'
+    | '/blog/'
     | '/_app/attempts/$attemptId'
     | '/_app/full-mock-sessions/$sessionId'
     | '/_app/full-mocks/$mockId'
@@ -809,6 +925,7 @@ export interface FileRouteTypes {
     | '/_app/reading/$materialId'
     | '/_app/speaking/$materialId'
     | '/_app/writing/$materialId'
+    | '/admin/blog/posts'
     | '/admin/full-mocks/$mockId'
     | '/admin/full-mocks/new'
     | '/admin/listening/import'
@@ -817,6 +934,7 @@ export interface FileRouteTypes {
     | '/admin/reading/materials'
     | '/admin/speaking/import'
     | '/admin/speaking/materials'
+    | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/admin/writing/materials'
     | '/exam/full-mock-sessions/$sessionId'
@@ -825,6 +943,8 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
+    | '/_app/writer/posts/$postId'
+    | '/_app/writer/posts/new'
     | '/admin/listening/tests/$testId'
     | '/admin/listening/tests/new'
     | '/admin/reading/materials/$materialId'
@@ -835,6 +955,7 @@ export interface FileRouteTypes {
     | '/admin/writing/materials/new'
     | '/admin_/preview/listening/$testId'
     | '/admin_/preview/reading/$materialId'
+    | '/_app/writer/posts/'
     | '/admin/listening/tests/'
     | '/admin/reading/materials/'
     | '/admin/speaking/materials/'
@@ -854,6 +975,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WaitlistAdminRoute: typeof WaitlistAdminRoute
   AdminPreviewRoute: typeof AdminPreviewRouteWithChildren
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogBecomeWriterRoute: typeof BlogBecomeWriterRoute
+  BlogRssDotxmlRoute: typeof BlogRssDotxmlRoute
+  BlogSitemapDotxmlRoute: typeof BlogSitemapDotxmlRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1061,6 +1187,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/become-writer': {
+      id: '/blog/become-writer'
+      path: '/blog/become-writer'
+      fullPath: '/blog/become-writer'
+      preLoaderRoute: typeof BlogBecomeWriterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/rss.xml': {
+      id: '/blog/rss.xml'
+      path: '/blog/rss.xml'
+      fullPath: '/blog/rss.xml'
+      preLoaderRoute: typeof BlogRssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/sitemap.xml': {
+      id: '/blog/sitemap.xml'
+      path: '/blog/sitemap.xml'
+      fullPath: '/blog/sitemap.xml'
+      preLoaderRoute: typeof BlogSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register/verify': {
       id: '/register/verify'
       path: '/verify'
@@ -1116,6 +1277,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/writing/$materialId'
       preLoaderRoute: typeof AppWritingMaterialIdRouteImport
       parentRoute: typeof AppWritingRoute
+    }
+    '/admin/blog/posts': {
+      id: '/admin/blog/posts'
+      path: '/blog/posts'
+      fullPath: '/admin/blog/posts'
+      preLoaderRoute: typeof AdminBlogPostsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/full-mocks/': {
       id: '/admin/full-mocks/'
@@ -1180,6 +1348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSpeakingMaterialsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/writers/applications': {
+      id: '/admin/writers/applications'
+      path: '/writers/applications'
+      fullPath: '/admin/writers/applications'
+      preLoaderRoute: typeof AdminWritersApplicationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/writing/import': {
       id: '/admin/writing/import'
       path: '/writing/import'
@@ -1228,6 +1403,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/exam/writing/$materialId'
       preLoaderRoute: typeof ExamWritingMaterialIdRouteImport
       parentRoute: typeof ExamRoute
+    }
+    '/_app/writer/posts/': {
+      id: '/_app/writer/posts/'
+      path: '/writer/posts'
+      fullPath: '/writer/posts/'
+      preLoaderRoute: typeof AppWriterPostsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/writer/posts/$postId': {
+      id: '/_app/writer/posts/$postId'
+      path: '/writer/posts/$postId'
+      fullPath: '/writer/posts/$postId'
+      preLoaderRoute: typeof AppWriterPostsPostIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/writer/posts/new': {
+      id: '/_app/writer/posts/new'
+      path: '/writer/posts/new'
+      fullPath: '/writer/posts/new'
+      preLoaderRoute: typeof AppWriterPostsNewRouteImport
+      parentRoute: typeof AppRoute
     }
     '/admin/listening/tests/': {
       id: '/admin/listening/tests/'
@@ -1412,6 +1608,9 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppAttemptsAttemptIdRoute: typeof AppAttemptsAttemptIdRoute
   AppFullMockSessionsSessionIdRoute: typeof AppFullMockSessionsSessionIdRoute
+  AppWriterPostsPostIdRoute: typeof AppWriterPostsPostIdRoute
+  AppWriterPostsNewRoute: typeof AppWriterPostsNewRoute
+  AppWriterPostsIndexRoute: typeof AppWriterPostsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1429,6 +1628,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppAttemptsAttemptIdRoute: AppAttemptsAttemptIdRoute,
   AppFullMockSessionsSessionIdRoute: AppFullMockSessionsSessionIdRoute,
+  AppWriterPostsPostIdRoute: AppWriterPostsPostIdRoute,
+  AppWriterPostsNewRoute: AppWriterPostsNewRoute,
+  AppWriterPostsIndexRoute: AppWriterPostsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -1524,12 +1726,14 @@ interface AdminRouteChildren {
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminBlogPostsRoute: typeof AdminBlogPostsRoute
   AdminListeningImportRoute: typeof AdminListeningImportRoute
   AdminListeningTestsRoute: typeof AdminListeningTestsRouteWithChildren
   AdminReadingImportRoute: typeof AdminReadingImportRoute
   AdminReadingMaterialsRoute: typeof AdminReadingMaterialsRouteWithChildren
   AdminSpeakingImportRoute: typeof AdminSpeakingImportRoute
   AdminSpeakingMaterialsRoute: typeof AdminSpeakingMaterialsRouteWithChildren
+  AdminWritersApplicationsRoute: typeof AdminWritersApplicationsRoute
   AdminWritingImportRoute: typeof AdminWritingImportRoute
   AdminWritingMaterialsRoute: typeof AdminWritingMaterialsRouteWithChildren
 }
@@ -1541,12 +1745,14 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminBlogPostsRoute: AdminBlogPostsRoute,
   AdminListeningImportRoute: AdminListeningImportRoute,
   AdminListeningTestsRoute: AdminListeningTestsRouteWithChildren,
   AdminReadingImportRoute: AdminReadingImportRoute,
   AdminReadingMaterialsRoute: AdminReadingMaterialsRouteWithChildren,
   AdminSpeakingImportRoute: AdminSpeakingImportRoute,
   AdminSpeakingMaterialsRoute: AdminSpeakingMaterialsRouteWithChildren,
+  AdminWritersApplicationsRoute: AdminWritersApplicationsRoute,
   AdminWritingImportRoute: AdminWritingImportRoute,
   AdminWritingMaterialsRoute: AdminWritingMaterialsRouteWithChildren,
 }
@@ -1625,6 +1831,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WaitlistAdminRoute: WaitlistAdminRoute,
   AdminPreviewRoute: AdminPreviewRouteWithChildren,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogBecomeWriterRoute: BlogBecomeWriterRoute,
+  BlogRssDotxmlRoute: BlogRssDotxmlRoute,
+  BlogSitemapDotxmlRoute: BlogSitemapDotxmlRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

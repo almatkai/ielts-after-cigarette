@@ -12,10 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type {
-  AttemptDetail,
-  AttemptReviewItem,
-} from '@/features/attempts/api'
+import type { AttemptDetail, AttemptReviewItem } from '@/features/attempts/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
@@ -42,7 +39,9 @@ export function ReadingReviewSplitRunner({
       passages.flatMap((passage, passageIndex) =>
         passage.questionGroups.flatMap((group) =>
           group.questions.map((question) => {
-            const item = question.id ? reviewByQuestionId.get(question.id) : undefined
+            const item = question.id
+              ? reviewByQuestionId.get(question.id)
+              : undefined
             return {
               passage,
               passageIndex,
@@ -57,19 +56,27 @@ export function ReadingReviewSplitRunner({
   )
 
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
-  const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>('md')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'errors' | 'correct'>('all')
-  const [retryModalItem, setRetryModalItem] = useState<AttemptReviewItem | null>(null)
+  const [passageFontSize, setPassageFontSize] = useState<'sm' | 'md' | 'lg'>(
+    'md',
+  )
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'errors' | 'correct'
+  >('all')
+  const [retryModalItem, setRetryModalItem] =
+    useState<AttemptReviewItem | null>(null)
 
   const currentQuestion = questions.at(activeQuestionIndex) ?? questions.at(0)
-  const currentPassage = passages.at(currentQuestion?.passageIndex ?? 0) ?? passages.at(0)
+  const currentPassage =
+    passages.at(currentQuestion?.passageIndex ?? 0) ?? passages.at(0)
 
   const totalQuestions = review.length || questions.length
   const correctCount = review.filter((i) => i.isCorrect).length
   const errorCount = review.filter((i) => !i.isCorrect).length
 
   const goToPassage = (passageIndex: number) => {
-    const targetIndex = questions.findIndex((item) => item.passageIndex === passageIndex)
+    const targetIndex = questions.findIndex(
+      (item) => item.passageIndex === passageIndex,
+    )
     if (targetIndex >= 0) {
       setActiveQuestionIndex(targetIndex)
     }
@@ -78,7 +85,9 @@ export function ReadingReviewSplitRunner({
   // Scroll to question on select
   useEffect(() => {
     if (!currentQuestion?.question.id) return
-    const el = document.getElementById(`review-split-q-${currentQuestion.question.id}`)
+    const el = document.getElementById(
+      `review-split-q-${currentQuestion.question.id}`,
+    )
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
@@ -89,7 +98,11 @@ export function ReadingReviewSplitRunner({
     const item = currentQuestion?.reviewItem
     if (!item) return ''
     if (item.quote && item.quote.trim().length > 0) return item.quote.trim()
-    if (item.content && typeof item.content.quote === 'string' && item.content.quote.trim().length > 0) {
+    if (
+      item.content &&
+      typeof item.content.quote === 'string' &&
+      item.content.quote.trim().length > 0
+    ) {
       return item.content.quote.trim()
     }
     // Try extract quote in quotes from explanation
@@ -120,7 +133,9 @@ export function ReadingReviewSplitRunner({
             <h1 className="text-sm font-semibold text-slate-900 truncate max-w-[240px] lg:max-w-[360px]">
               {material.title}
             </h1>
-            <span className="text-[11px] text-slate-500">Интерактивный разбор ответов</span>
+            <span className="text-[11px] text-slate-500">
+              Интерактивный разбор ответов
+            </span>
           </div>
         </div>
 
@@ -128,9 +143,14 @@ export function ReadingReviewSplitRunner({
         {passages.length > 1 && (
           <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
             {passages.map((passage, passageIndex) => {
-              const isCurrentPassage = currentQuestion?.passageIndex === passageIndex
-              const pQuestions = questions.filter((item) => item.passageIndex === passageIndex)
-              const pErrors = pQuestions.filter((item) => item.reviewItem && !item.reviewItem.isCorrect).length
+              const isCurrentPassage =
+                currentQuestion?.passageIndex === passageIndex
+              const pQuestions = questions.filter(
+                (item) => item.passageIndex === passageIndex,
+              )
+              const pErrors = pQuestions.filter(
+                (item) => item.reviewItem && !item.reviewItem.isCorrect,
+              ).length
               return (
                 <button
                   key={passage.id}
@@ -148,7 +168,9 @@ export function ReadingReviewSplitRunner({
                     <span
                       className={cn(
                         'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
-                        isCurrentPassage ? 'bg-white/30 text-white' : 'bg-rose-100 text-rose-700',
+                        isCurrentPassage
+                          ? 'bg-white/30 text-white'
+                          : 'bg-rose-100 text-rose-700',
                       )}
                     >
                       {pErrors} ош.
@@ -201,7 +223,10 @@ export function ReadingReviewSplitRunner({
             </button>
           </div>
 
-          <Badge variant="outline" className="hidden sm:inline-flex text-xs font-bold text-slate-800 bg-white">
+          <Badge
+            variant="outline"
+            className="hidden sm:inline-flex text-xs font-bold text-slate-800 bg-white"
+          >
             Score: {correctCount}/{totalQuestions}
           </Badge>
         </div>
@@ -214,7 +239,9 @@ export function ReadingReviewSplitRunner({
           <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
-                {passages.length > 1 ? `Раздел ${(currentQuestion?.passageIndex ?? 0) + 1}` : 'Текст'}
+                {passages.length > 1
+                  ? `Раздел ${(currentQuestion?.passageIndex ?? 0) + 1}`
+                  : 'Текст'}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {currentPassage?.title}
@@ -283,11 +310,15 @@ export function ReadingReviewSplitRunner({
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
                   {currentPassage?.questionGroups.length}{' '}
-                  {currentPassage?.questionGroups.length === 1 ? 'группа' : 'групп'} вопросов
+                  {currentPassage?.questionGroups.length === 1
+                    ? 'группа'
+                    : 'групп'}{' '}
+                  вопросов
                 </span>
               </div>
               <span className="text-xs font-semibold text-slate-500">
-                Активный вопрос: {currentQuestion?.reviewItem?.number ?? activeQuestionIndex + 1}
+                Активный вопрос:{' '}
+                {currentQuestion?.reviewItem?.number ?? activeQuestionIndex + 1}
               </span>
             </div>
           </div>
@@ -318,9 +349,13 @@ export function ReadingReviewSplitRunner({
 
                   <div className="space-y-3.5">
                     {groupQuestions.map((q) => {
-                      const item = q.id ? reviewByQuestionId.get(q.id) : undefined
+                      const item = q.id
+                        ? reviewByQuestionId.get(q.id)
+                        : undefined
                       if (!item || !q.id) return null
-                      const globalIdx = questions.findIndex((it) => it.question.id === q.id)
+                      const globalIdx = questions.findIndex(
+                        (it) => it.question.id === q.id,
+                      )
                       const isCurrent = globalIdx === activeQuestionIndex
 
                       return (
@@ -330,7 +365,8 @@ export function ReadingReviewSplitRunner({
                           options={(q.content.options ?? []) as Option[]}
                           isCurrent={isCurrent}
                           onSelect={() => {
-                            if (globalIdx >= 0) setActiveQuestionIndex(globalIdx)
+                            if (globalIdx >= 0)
+                              setActiveQuestionIndex(globalIdx)
                           }}
                           onRetry={() => setRetryModalItem(item)}
                         />
@@ -350,7 +386,9 @@ export function ReadingReviewSplitRunner({
           {questions.map((item, index) => {
             const isCurrent = index === activeQuestionIndex
             const isCorrect = item.reviewItem?.isCorrect
-            const isAnswered = item.reviewItem?.answer !== null && item.reviewItem?.answer !== undefined
+            const isAnswered =
+              item.reviewItem?.answer !== null &&
+              item.reviewItem?.answer !== undefined
             const num = item.reviewItem?.number ?? index + 1
 
             return (
@@ -425,7 +463,9 @@ function ReviewQuestionCard({
           <span
             className={cn(
               'flex size-6 items-center justify-center rounded-[6px] text-xs font-bold',
-              isCurrent ? 'bg-[#3b82f6] text-white' : 'bg-slate-100 text-slate-800',
+              isCurrent
+                ? 'bg-[#3b82f6] text-white'
+                : 'bg-slate-100 text-slate-800',
             )}
           >
             {item.number}
@@ -478,7 +518,12 @@ function ReviewQuestionCard({
           <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">
             Ваш ответ
           </span>
-          <span className={cn('font-semibold', !isCorrect && 'line-through text-rose-800')}>
+          <span
+            className={cn(
+              'font-semibold',
+              !isCorrect && 'line-through text-rose-800',
+            )}
+          >
             {formatAnswer(item.answer, options)}
           </span>
         </div>
@@ -506,7 +551,11 @@ function ReviewQuestionCard({
             className="flex items-center gap-1.5 text-xs font-medium text-[#2563eb] hover:text-blue-700"
           >
             <InfoCircle className="size-3.5" />
-            <span>{expandedExplanation ? 'Скрыть объяснение' : 'Показать разбор и цитату'}</span>
+            <span>
+              {expandedExplanation
+                ? 'Скрыть объяснение'
+                : 'Показать разбор и цитату'}
+            </span>
           </button>
 
           {expandedExplanation && (
@@ -526,7 +575,9 @@ function ReviewQuestionCard({
                   <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
                     Пояснение:
                   </span>
-                  <p className="whitespace-pre-wrap mt-0.5 text-slate-700">{item.explanation}</p>
+                  <p className="whitespace-pre-wrap mt-0.5 text-slate-700">
+                    {item.explanation}
+                  </p>
                 </div>
               ) : null}
             </div>
@@ -644,12 +695,15 @@ function HighlightedPassageText({
   )
 }
 
-function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial[] {
+function resolvePassages(
+  material: PublicReadingMaterial,
+): PublicReadingMaterial[] {
   if (material.passages && material.passages.length > 1) {
     return material.passages
   }
 
-  const regex = /(?:^|\n)(?:READING\s+)?PASSAGE\s+(\d+)\s*(?:[—–-]\s*([^\n]+))?/gi
+  const regex =
+    /(?:^|\n)(?:READING\s+)?PASSAGE\s+(\d+)\s*(?:[—–-]\s*([^\n]+))?/gi
   const matches: { index: number; number: number; title: string }[] = []
   let match: RegExpExecArray | null
   while ((match = regex.exec(material.body)) !== null) {
@@ -663,7 +717,8 @@ function resolvePassages(material: PublicReadingMaterial): PublicReadingMaterial
   if (matches.length > 1) {
     return matches.map((item, i) => {
       const start = item.index
-      const end = i < matches.length - 1 ? matches[i + 1].index : material.body.length
+      const end =
+        i < matches.length - 1 ? matches[i + 1].index : material.body.length
       const bodyChunk = material.body.slice(start, end).trim()
       const groups = material.questionGroups.filter((g) => {
         const instr = g.instructions || ''

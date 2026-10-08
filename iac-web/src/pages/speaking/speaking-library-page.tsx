@@ -1,12 +1,14 @@
-import {
-  Microphone2,
-} from 'iconsax-react'
+import { Microphone2 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ErrorState, EmptyState, LibraryCardsSkeleton } from '@/features/attempts/attempt-ui'
+import {
+  ErrorState,
+  EmptyState,
+  LibraryCardsSkeleton,
+} from '@/features/attempts/attempt-ui'
 import { useAuth } from '@/features/auth/auth-store'
 import {
   listPublicSpeakingMaterials,
@@ -55,7 +57,10 @@ export function SpeakingLibraryPage() {
               <CardContent className="flex h-full flex-col justify-between gap-4 p-5 sm:p-6">
                 <div className="flex items-start gap-3.5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                    <Microphone2 className="size-5 transition-colors" aria-hidden />
+                    <Microphone2
+                      className="size-5 transition-colors"
+                      aria-hidden
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
@@ -63,7 +68,9 @@ export function SpeakingLibraryPage() {
                         {material.title}
                       </h3>
                       <span className="shrink-0 rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
-                        {material.examType === 'academic' ? 'Academic' : 'General'}
+                        {material.examType === 'academic'
+                          ? 'Academic'
+                          : 'General'}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
@@ -77,7 +84,10 @@ export function SpeakingLibraryPage() {
                   </div>
                 </div>
                 <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button asChild className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]">
+                  <Button
+                    asChild
+                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  >
                     <Link
                       to="/exam/speaking/$materialId"
                       params={{ materialId: material.id }}

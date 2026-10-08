@@ -56,7 +56,7 @@ const skills = [
 ] as const
 
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]'
+  'gap-0 rounded-[16px] border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-[border-color,box-shadow] duration-200 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]'
 
 export function PracticePage() {
   return (

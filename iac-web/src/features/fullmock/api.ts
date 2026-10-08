@@ -42,6 +42,7 @@ export type FullMockSession = {
     remainingMilliseconds?: number | null
   }[]
   overallBand: number | null
+  resultsLocked?: boolean
 }
 
 export type FullMockSkill = 'listening' | 'reading' | 'writing' | 'speaking'

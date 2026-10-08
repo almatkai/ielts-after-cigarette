@@ -31,12 +31,14 @@ type LoginFormProps = {
   }
   onSuccess?: () => Promise<void>
   onContinueAsGuest?: () => void
+  description?: string
 }
 
 export function LoginForm({
   search = {},
   onSuccess,
   onContinueAsGuest,
+  description,
 }: LoginFormProps) {
   const navigate = useNavigate()
   const { loginWithGoogle } = useAuth()
@@ -120,6 +122,7 @@ export function LoginForm({
       restoringGoogle={restoringGoogle}
       redirect={googleRedirect}
       onContinueAsGuest={onContinueAsGuest}
+      description={description}
     />
   )
 }
@@ -130,7 +133,9 @@ function GoogleSignInCard({
   restoringGoogle,
   redirect,
   onContinueAsGuest,
+  description = 'Для входа и регистрации используйте Google.',
 }: {
+  description?: string
   onContinueAsGuest?: () => void
   onCredential: (credential: string) => Promise<void>
   submissionError: string | null
@@ -179,7 +184,7 @@ function GoogleSignInCard({
           Войти или создать аккаунт
         </CardTitle>
         <CardDescription className="mt-2 text-sm text-[#475569]">
-          Для входа и регистрации используйте Google.
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pt-6 pb-8 sm:px-8">

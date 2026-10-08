@@ -10,6 +10,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import {
+  GuestLockedBand,
+  GuestResultsAccess,
+} from '@/components/auth/guest-results-access'
+import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,10 +37,13 @@ const labels: Record<FullMockSkill, string> = {
 }
 
 export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
+  // Rebind the mounted query observer when sign-in clears the guest's cache.
+  const { initialized } = useAuth()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
+    enabled: initialized,
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
     refetchInterval: (cachedQuery) => {
       const session = cachedQuery.state.data
@@ -348,8 +356,10 @@ function SectionLink({
 }
 
 function FullMockReport({ session }: { session: FullMockSession }) {
+  const { user } = useAuth()
+  const locked = Boolean(session.resultsLocked || !user)
   return (
-    <>
+    <GuestResultsAccess>
       <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
         <CardContent className="flex flex-wrap items-center gap-5 p-6">
           <span className="grid size-14 place-items-center rounded-full bg-[#3b82f6] text-2xl font-semibold text-white">
@@ -363,6 +373,12 @@ function FullMockReport({ session }: { session: FullMockSession }) {
           </div>
         </CardContent>
       </Card>
+      {locked ? (
+        <p className="text-sm leading-6 text-[#69696d]">
+          Общая оценка открыта. Нажмите на скрытую оценку секции, чтобы войти и
+          увидеть её. Без аккаунта доступны 30% ошибок в каждой секции.
+        </p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         {session.sections.map((section) => (
           <Card key={section.position} className="shadow-none">
@@ -375,7 +391,7 @@ function FullMockReport({ session }: { session: FullMockSession }) {
                     params={{ attemptId: section.attempt.id }}
                     className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
                   >
-                    Разбор попытки{' '}
+                    {locked ? 'Разобрать ошибки' : 'Разбор попытки'}{' '}
                     <ArrowRight className="size-3.5" aria-hidden />
                   </Link>
                 ) : (
@@ -384,14 +400,18 @@ function FullMockReport({ session }: { session: FullMockSession }) {
                   </p>
                 )}
               </div>
-              <span className="text-2xl font-semibold text-[#3b82f6]">
-                {section.attempt.band?.toFixed(1) ?? '—'}
-              </span>
+              {locked && section.attempt.status !== 'ABANDONED' ? (
+                <GuestLockedBand skill={labels[section.skill]} />
+              ) : (
+                <span className="text-2xl font-semibold text-[#3b82f6]">
+                  {section.attempt.band?.toFixed(1) ?? '—'}
+                </span>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
-    </>
+    </GuestResultsAccess>
   )
 }
 

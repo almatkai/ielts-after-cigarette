@@ -30,6 +30,14 @@ export const startGuestMock = (
     body: { examType, turnstileToken, acceptedTerms: true },
   })
 
+export const claimGuestResults = (accessToken: string) =>
+  apiClient.request<{ sessionId: string | null }>('/api/v1/guest/claim', {
+    method: 'POST',
+    authenticated: false,
+    retryAuthentication: false,
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
 // This is navigation policy. The backend independently restricts all guest APIs.
 export function canGuestVisit(pathname: string) {
   return (

@@ -54,14 +54,14 @@ export function MistakeRetryDialog({
   attemptId,
   materialType,
 }: MistakeRetryDialogProps) {
-  if (!item) return null
+  if (!item || item.locked || !item.correctAnswer) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[1440px] w-[97vw] max-h-[94vh] h-[92vh] p-0 overflow-hidden flex flex-col gap-0 border-[#e7e7e4] bg-white rounded-[20px] shadow-2xl">
         <MistakeRetryContent
           key={item.questionId}
-          item={item}
+          item={{ ...item, correctAnswer: item.correctAnswer }}
           testTitle={testTitle}
           attemptId={attemptId}
           materialType={materialType}
@@ -79,7 +79,7 @@ function MistakeRetryContent({
   materialType,
   onClose,
 }: {
-  item: AttemptReviewItem
+  item: AttemptReviewItem & { correctAnswer: StudentAnswer }
   testTitle?: string
   attemptId?: string
   materialType?: string

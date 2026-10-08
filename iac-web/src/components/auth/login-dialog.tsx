@@ -11,11 +11,13 @@ export function LoginDialog({
   onOpenChange,
   onSuccess,
   trigger,
+  description = 'Войдите через Google, чтобы открыть другие тесты и сохранить прогресс.',
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess: () => Promise<void>
   trigger: HTMLElement | null
+  description?: string
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -27,10 +29,9 @@ export function LoginDialog({
         }}
       >
         <DialogTitle className="sr-only">Войти или создать аккаунт</DialogTitle>
-        <DialogDescription className="sr-only">
-          Войдите через Google, чтобы открыть другие тесты и сохранить прогресс.
-        </DialogDescription>
+        <DialogDescription className="sr-only">{description}</DialogDescription>
         <LoginForm
+          description={description}
           onSuccess={onSuccess}
           onContinueAsGuest={() => onOpenChange(false)}
         />

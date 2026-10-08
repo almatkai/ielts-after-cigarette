@@ -32,18 +32,19 @@ import { formatDateTime } from '@/lib/date'
 import { CompletedBankNotice } from '@/features/fullmock/completed-bank-notice'
 import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
 import { useAuth } from '@/features/auth/auth-store'
+import { GuestAttemptReview } from './guest-attempt-review'
 
 export { formatDateTime } from '@/lib/date'
 
 export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
-  const { guest } = useAuth()
+  const { guest, user } = useAuth()
   const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
     attempt?.materialType === 'listening' || attempt?.materialType === 'reading'
   const materialQuery = useQuery<PublicListeningTest | PublicReadingMaterial>({
     queryKey: ['attempts', attemptId, 'material'],
-    enabled: isObjectiveAttempt,
+    enabled: isObjectiveAttempt && Boolean(user) && !attempt?.guestPreview,
     retry: false,
     queryFn: ({ signal }) => {
       if (!attempt || !isObjectiveAttempt) {
@@ -78,6 +79,10 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   const aiEvaluation = evaluationFor(attempt)
   const title =
     material?.title ?? `${skillLabel(attempt.materialType)}: Разбор работы`
+
+  if (attempt.status === 'SUBMITTED' && (attempt.guestPreview || !user)) {
+    return <GuestAttemptReview attempt={attempt} />
+  }
 
   if (
     attempt.status === 'SUBMITTED' &&

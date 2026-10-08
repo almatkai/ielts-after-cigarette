@@ -1,6 +1,4 @@
-import {
-  ShieldCross,
-} from 'iconsax-react'
+import { ShieldCross } from 'iconsax-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'

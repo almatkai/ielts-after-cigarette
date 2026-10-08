@@ -176,7 +176,9 @@ export function SpeakingMaterialEditorPage({
       ),
     )
   const pending =
-    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending
+    saveMutation.isPending ||
+    publishMutation.isPending ||
+    archiveMutation.isPending
 
   if (materialQuery.isPending && editing)
     return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
@@ -283,13 +285,17 @@ export function SpeakingMaterialEditorPage({
           {message}
         </p>
       ) : null}
-      {saveMutation.isError || publishMutation.isError || archiveMutation.isError ? (
+      {saveMutation.isError ||
+      publishMutation.isError ||
+      archiveMutation.isError ? (
         <p
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
         >
           {getErrorMessage(
-            saveMutation.error ?? publishMutation.error ?? archiveMutation.error,
+            saveMutation.error ??
+              publishMutation.error ??
+              archiveMutation.error,
           )}
         </p>
       ) : null}

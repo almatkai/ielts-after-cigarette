@@ -29,7 +29,14 @@ let googleScriptPromise: Promise<void> | null = null
 
 const returnPathKey = 'google-sign-in-return-path'
 
-export function rememberGoogleReturnPath(path: '/admin' | '/' = '/') {
+export const loginReturnPaths = ['/admin', '/', '/blog/become-writer'] as const
+export type LoginReturnPath = (typeof loginReturnPaths)[number]
+
+export function isLoginReturnPath(value: unknown): value is LoginReturnPath {
+  return loginReturnPaths.some((path) => path === value)
+}
+
+export function rememberGoogleReturnPath(path: LoginReturnPath = '/') {
   try {
     sessionStorage.setItem(returnPathKey, path)
   } catch {
@@ -37,16 +44,16 @@ export function rememberGoogleReturnPath(path: '/admin' | '/' = '/') {
   }
 }
 
-export function getGoogleReturnPath(): '/admin' | '/' {
+export function getGoogleReturnPath(): LoginReturnPath {
   try {
     const path = sessionStorage.getItem(returnPathKey)
-    return path === '/admin' ? '/admin' : '/'
+    return isLoginReturnPath(path) ? path : '/'
   } catch {
     return '/'
   }
 }
 
-export function consumeGoogleReturnPath(): '/admin' | '/' {
+export function consumeGoogleReturnPath(): LoginReturnPath {
   const path = getGoogleReturnPath()
   try {
     sessionStorage.removeItem(returnPathKey)

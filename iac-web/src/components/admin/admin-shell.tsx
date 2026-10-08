@@ -161,8 +161,34 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <ClipboardTick className="size-[18px]" aria-hidden />
             Архив Full Mock
           </Link>
+          <Link
+            to="/admin/blog/posts"
+            activeProps={{
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+            }}
+            inactiveProps={{
+              className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+            }}
+            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+          >
+            <Edit2 className="size-[18px]" aria-hidden />
+            Статьи блога
+          </Link>
           {auth.user?.role === 'ADMIN' ? (
             <>
+              <Link
+                to="/admin/writers/applications"
+                activeProps={{
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <People className="size-[18px]" aria-hidden />
+                Заявки авторов
+              </Link>
               <Link
                 to="/admin/ai-providers"
                 activeProps={{

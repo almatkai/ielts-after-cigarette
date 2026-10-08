@@ -6,7 +6,11 @@ import type { SpeakingMaterial } from '@/features/speaking/api'
 /**
  * Downloads a string content as a file in the browser.
  */
-export function downloadTextFile(filename: string, content: string, mimeType = 'text/plain;charset=utf-8') {
+export function downloadTextFile(
+  filename: string,
+  content: string,
+  mimeType = 'text/plain;charset=utf-8',
+) {
   const blob = new Blob([content], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -71,16 +75,20 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
     groups.forEach((g, gIdx) => {
       out += `### GROUP ${gIdx + 1}\n`
       const questions = g.questions
-      const startNum = questions[0]?.content?.number as number || 1
-      let endNum = questions[questions.length - 1]?.content?.number as number || startNum
-      if (typeof questions[questions.length - 1]?.content?.numberEnd === 'number') {
+      const startNum = (questions[0]?.content?.number as number) || 1
+      let endNum =
+        (questions[questions.length - 1]?.content?.number as number) || startNum
+      if (
+        typeof questions[questions.length - 1]?.content?.numberEnd === 'number'
+      ) {
         endNum = questions[questions.length - 1].content.numberEnd as number
       }
       out += `range: ${startNum}-${endNum}\n`
 
       const isMultiSelect = questions.some(
         (q) =>
-          (typeof q.content.selectionLimit === 'number' && q.content.selectionLimit > 1) ||
+          (typeof q.content.selectionLimit === 'number' &&
+            q.content.selectionLimit > 1) ||
           (typeof q.content.numberEnd === 'number' &&
             q.content.numberEnd > ((q.content.number as number) || 0)),
       )
@@ -135,7 +143,8 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
           promptText += ` {{${qNum}}}`
         }
 
-        const qOptions = q.content.options as Array<{ id: string; text: string }> | undefined
+        const qOptions = q.content.options as
+          Array<{ id: string; text: string }> | undefined
         if (qNumEnd > qNum) {
           if (Array.isArray(qOptions) && qOptions.length > 0) {
             out += `options:\n`
@@ -145,7 +154,11 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
           }
         } else {
           out += `${qNum}. ${promptText}\n`
-          if (Array.isArray(qOptions) && qOptions.length > 0 && !config?.options) {
+          if (
+            Array.isArray(qOptions) &&
+            qOptions.length > 0 &&
+            !config?.options
+          ) {
             qOptions.forEach((opt) => {
               out += `${opt.id}: ${opt.text}\n`
             })
@@ -162,7 +175,10 @@ export function serializeReadingToV1(test: ReadingMaterial): string {
           let ans = ''
           if (ansObj?.value) ans = String(ansObj.value)
           else if (ansObj?.optionId) ans = String(ansObj.optionId)
-          else if (Array.isArray(ansObj?.accepted) && ansObj.accepted.length > 0)
+          else if (
+            Array.isArray(ansObj?.accepted) &&
+            ansObj.accepted.length > 0
+          )
             ans = String(ansObj.accepted[0])
           if (ans) allAnswers.push({ num: qNum, ans })
         }
@@ -269,8 +285,13 @@ export function serializeListeningToV1(test: ListeningTest): string {
 
         out += `${qNum}. ${promptText}\n`
         const qContent = q.content as Record<string, any> | undefined
-        const qOptions = qContent?.options as Array<{ id: string; text: string }> | undefined
-        if (Array.isArray(qOptions) && qOptions.length > 0 && !config?.options) {
+        const qOptions = qContent?.options as
+          Array<{ id: string; text: string }> | undefined
+        if (
+          Array.isArray(qOptions) &&
+          qOptions.length > 0 &&
+          !config?.options
+        ) {
           qOptions.forEach((opt) => {
             out += `${opt.id}: ${opt.text}\n`
           })

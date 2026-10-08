@@ -1,111 +1,80 @@
-import { useQuery } from '@tanstack/react-query'
-import { Link, useParams } from '@tanstack/react-router'
-import { ArrowLeft, Profile } from 'iconsax-react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link, getRouteApi } from '@tanstack/react-router'
+import { DocumentText } from 'iconsax-react'
 
-import { blogMediaUrl, getPublishedPost } from '@/features/blog/api'
+import { BlogBackLink, BlogShell } from '@/components/blog/blog-shell'
+import { blogMediaUrl, publishedPostQueryOptions } from '@/features/blog/api'
+import { landingHref } from '@/features/blog/links'
+import { formatBlogDate } from '@/features/blog/seo'
 
-function formatDate(value: string | null) {
-  if (!value) return null
-  return new Date(value).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
+const routeApi = getRouteApi('/blog/$slug')
 
 export function BlogPostPage() {
-  const { slug } = useParams({ from: '/blog/$slug' })
-  const postQuery = useQuery({
-    queryKey: ['blog', 'posts', slug],
-    queryFn: ({ signal }) => getPublishedPost(slug, signal),
-  })
+  const { slug } = routeApi.useParams()
+  const { data: post } = useSuspenseQuery(publishedPostQueryOptions(slug))
 
-  if (postQuery.isPending) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-[#f7f7f5]">
-        <p className="text-sm text-[#69696d]">Загружаем статью…</p>
-      </div>
-    )
-  }
-
-  if (postQuery.isError) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-[#f7f7f5] px-6 text-center">
-        <div>
-          <p className="text-sm text-[#69696d]">
-            Статья не найдена или ещё не опубликована.
-          </p>
-          <Link
-            to="/blog"
-            className="mt-4 inline-flex rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white no-underline"
-          >
-            Все статьи
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  const post = postQuery.data
-  const published = formatDate(post.publishedAt)
+  const published = formatBlogDate(post.publishedAt)
   const updated =
     post.contentUpdatedAt &&
     post.publishedAt &&
     new Date(post.contentUpdatedAt).getTime() >
       new Date(post.publishedAt).getTime() + 60_000
-      ? formatDate(post.contentUpdatedAt)
+      ? formatBlogDate(post.contentUpdatedAt)
       : null
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
-      <header className="border-b border-[#e7e7e4] bg-white">
-        <div className="mx-auto flex min-h-16 max-w-[760px] items-center px-5 sm:px-7">
-          <Link
-            to="/blog"
-            className="flex items-center gap-2 text-sm font-semibold text-[#111111] no-underline"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Все статьи
-          </Link>
-        </div>
-      </header>
+    <BlogShell width="narrow">
+      <nav aria-label="Навигационная цепочка">
+        <BlogBackLink to="/blog">Все статьи</BlogBackLink>
+      </nav>
 
-      <article className="mx-auto max-w-[760px] px-5 py-10 sm:px-7">
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#eff6ff] text-sm font-semibold text-[#1d4ed8]">
-            {post.author.avatarInitial}
-          </span>
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-sm font-semibold text-[#111111]">
-              <Profile className="size-4 text-[#1d4ed8]" aria-hidden />
-              {post.author.displayName}
+      <article className="mt-5 rounded-[20px] border border-[#e7e7e4] bg-white px-5 py-8 sm:px-10 sm:py-10">
+        <header>
+          <h1 className="text-3xl leading-tight font-semibold tracking-[-0.04em] text-[#111111] sm:text-[2.6rem]">
+            {post.title}
+          </h1>
+          {post.description ? (
+            <p className="mt-4 text-lg leading-8 text-[#525256]">
+              {post.description}
             </p>
-            <p className="text-xs text-[#808084]">
-              Подтверждённый автор · IELTS 7.5+
-            </p>
+          ) : null}
+
+          <div className="mt-6 flex items-center gap-3 border-y border-[#e7e7e4] py-4">
+            <span
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-[#eff6ff] text-sm font-semibold text-[#1d4ed8]"
+              aria-hidden
+            >
+              {post.author.avatarInitial ||
+                post.author.displayName.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[#111111]">
+                {post.author.displayName}
+                <span className="ml-2 rounded-full bg-[#ecfdf5] px-2 py-0.5 text-[11px] font-medium text-[#047857]">
+                  IELTS 7.5+ подтверждён
+                </span>
+              </p>
+              <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-[#808084]">
+                {published && post.publishedAt ? (
+                  <time dateTime={post.publishedAt}>{published}</time>
+                ) : null}
+                {updated && post.contentUpdatedAt ? (
+                  <span>
+                    · обновлено{' '}
+                    <time dateTime={post.contentUpdatedAt}>{updated}</time>
+                  </span>
+                ) : null}
+                <span>· {post.readingTimeMinutes} мин чтения</span>
+              </p>
+            </div>
           </div>
-        </div>
-
-        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-[#111111] sm:text-4xl">
-          {post.title}
-        </h1>
-        {post.description ? (
-          <p className="mt-3 text-base leading-7 text-[#525256]">
-            {post.description}
-          </p>
-        ) : null}
-
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#808084]">
-          {published ? <span>Опубликовано {published}</span> : null}
-          {updated ? <span>· Обновлено {updated}</span> : null}
-          <span>· {post.readingTimeMinutes} мин чтения</span>
-        </div>
+        </header>
 
         {post.coverMediaId ? (
           <img
             src={blogMediaUrl(post.coverMediaId)}
             alt=""
-            className="mt-6 w-full rounded-[16px] object-cover"
+            className="mt-8 w-full rounded-[16px] object-cover"
           />
         ) : null}
 
@@ -116,6 +85,50 @@ export function BlogPostPage() {
           dangerouslySetInnerHTML={{ __html: post.bodyHtml }}
         />
       </article>
-    </div>
+
+      <section className="mt-6 rounded-[20px] border border-[#e7e7e4] bg-white p-6">
+        <h2 className="text-lg font-semibold tracking-[-0.02em]">
+          Готовитесь к IELTS?
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          Тренируйте Listening, Reading, Writing и Speaking на реальных форматах
+          заданий с AI-проверкой и разбором ошибок.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a
+            href={landingHref}
+            className="rounded-[10px] bg-[#3b82f6] px-4 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#2563eb]"
+          >
+            Начать подготовку
+          </a>
+          <Link
+            to="/blog"
+            className="rounded-[10px] border border-[#deded9] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] no-underline transition-colors hover:bg-[#f4f4f1]"
+          >
+            Другие статьи
+          </Link>
+        </div>
+      </section>
+    </BlogShell>
+  )
+}
+
+export function BlogPostNotFound() {
+  return (
+    <BlogShell width="narrow">
+      <div className="flex flex-col items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white px-6 py-14 text-center">
+        <DocumentText className="size-8 text-[#a0a0a4]" aria-hidden />
+        <h1 className="text-lg font-semibold">Статья не найдена</h1>
+        <p className="text-sm text-[#69696d]">
+          Возможно, её сняли с публикации или ссылка устарела.
+        </p>
+        <Link
+          to="/blog"
+          className="mt-2 rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white no-underline"
+        >
+          Все статьи
+        </Link>
+      </div>
+    </BlogShell>
   )
 }

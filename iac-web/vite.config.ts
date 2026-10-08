@@ -33,6 +33,11 @@ const config = defineConfig(({ mode }) => {
               target: env.VITE_API_BASE_URL,
               changeOrigin: true,
             },
+            // Blog HTML references media by same-origin relative URLs.
+            '/api/v1/blog/media': {
+              target: env.VITE_API_BASE_URL,
+              changeOrigin: true,
+            },
           }
         : undefined,
       watch: {

@@ -41,6 +41,8 @@ import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as BlogBecomeWriterRouteImport } from './routes/blog.become-writer'
+import { Route as BlogRssDotxmlRouteImport } from './routes/blog.rss[.]xml'
+import { Route as BlogSitemapDotxmlRouteImport } from './routes/blog.sitemap[.]xml'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AppAttemptsAttemptIdRouteImport } from './routes/_app.attempts.$attemptId'
 import { Route as AppFullMockSessionsSessionIdRouteImport } from './routes/_app.full-mock-sessions.$sessionId'
@@ -243,6 +245,16 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 const BlogBecomeWriterRoute = BlogBecomeWriterRouteImport.update({
   id: '/blog/become-writer',
   path: '/blog/become-writer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRssDotxmlRoute = BlogRssDotxmlRouteImport.update({
+  id: '/blog/rss.xml',
+  path: '/blog/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSitemapDotxmlRoute = BlogSitemapDotxmlRouteImport.update({
+  id: '/blog/sitemap.xml',
+  path: '/blog/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
@@ -513,6 +525,8 @@ export interface FileRoutesByFullPath {
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -587,6 +601,8 @@ export interface FileRoutesByTo {
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/': typeof AppIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -662,6 +678,8 @@ export interface FileRoutesById {
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/become-writer': typeof BlogBecomeWriterRoute
+  '/blog/rss.xml': typeof BlogRssDotxmlRoute
+  '/blog/sitemap.xml': typeof BlogSitemapDotxmlRoute
   '/register/verify': typeof RegisterVerifyRoute
   '/_app/': typeof AppIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -742,6 +760,8 @@ export interface FileRouteTypes {
     | '/admin/preview'
     | '/blog/$slug'
     | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/admin/'
     | '/blog/'
@@ -816,6 +836,8 @@ export interface FileRouteTypes {
     | '/admin/preview'
     | '/blog/$slug'
     | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/'
     | '/admin'
@@ -890,6 +912,8 @@ export interface FileRouteTypes {
     | '/admin_/preview'
     | '/blog/$slug'
     | '/blog/become-writer'
+    | '/blog/rss.xml'
+    | '/blog/sitemap.xml'
     | '/register/verify'
     | '/_app/'
     | '/admin/'
@@ -953,6 +977,8 @@ export interface RootRouteChildren {
   AdminPreviewRoute: typeof AdminPreviewRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
   BlogBecomeWriterRoute: typeof BlogBecomeWriterRoute
+  BlogRssDotxmlRoute: typeof BlogRssDotxmlRoute
+  BlogSitemapDotxmlRoute: typeof BlogSitemapDotxmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
 
@@ -1180,6 +1206,20 @@ declare module '@tanstack/react-router' {
       path: '/blog/become-writer'
       fullPath: '/blog/become-writer'
       preLoaderRoute: typeof BlogBecomeWriterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/rss.xml': {
+      id: '/blog/rss.xml'
+      path: '/blog/rss.xml'
+      fullPath: '/blog/rss.xml'
+      preLoaderRoute: typeof BlogRssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/sitemap.xml': {
+      id: '/blog/sitemap.xml'
+      path: '/blog/sitemap.xml'
+      fullPath: '/blog/sitemap.xml'
+      preLoaderRoute: typeof BlogSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register/verify': {
@@ -1793,6 +1833,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminPreviewRoute: AdminPreviewRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
   BlogBecomeWriterRoute: BlogBecomeWriterRoute,
+  BlogRssDotxmlRoute: BlogRssDotxmlRoute,
+  BlogSitemapDotxmlRoute: BlogSitemapDotxmlRoute,
   BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport

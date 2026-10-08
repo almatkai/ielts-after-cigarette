@@ -463,8 +463,15 @@ svg path[stroke-width]:not([stroke]) {
 .blog-editor .tiptap {
   min-height: 320px;
   outline: none;
-  font-size: 15px;
-  line-height: 1.7;
+}
+
+.blog-editor .tiptap > :first-child {
+  margin-top: 0;
+}
+
+.blog-editor .tiptap img.ProseMirror-selectednode {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .blog-editor .tiptap p.is-editor-empty:first-child::before {
@@ -524,10 +531,16 @@ svg path[stroke-width]:not([stroke]) {
 }
 
 .blog-article blockquote {
-  border-left: 3px solid #e7e7e4;
-  color: #525256;
+  background: #f8fbff;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0 10px 10px 0;
+  color: #34343a;
   margin: 1.4em 0;
-  padding-left: 1em;
+  padding: 0.6em 1em;
+}
+
+.blog-article blockquote p {
+  margin: 0.3em 0;
 }
 
 .blog-article ul,
@@ -546,4 +559,64 @@ svg path[stroke-width]:not([stroke]) {
 
 .blog-article li {
   margin: 0.35em 0;
+}
+
+.blog-article li > p {
+  margin: 0;
+}
+
+.blog-article strong {
+  font-weight: 650;
+}
+
+.blog-article em {
+  font-style: italic;
+  /* Manrope ships no italic face, so the slant has to be synthesized. */
+  font-synthesis: style;
+}
+
+.blog-article u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-article s {
+  text-decoration: line-through;
+}
+
+.blog-article mark {
+  background: #fef08a;
+  border-radius: 3px;
+  color: inherit;
+  padding: 0 0.15em;
+}
+
+.blog-article code {
+  background: #f4f4f1;
+  border-radius: 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+}
+
+.blog-article pre {
+  background: #f7f7f5;
+  border: 1px solid #e7e7e4;
+  border-radius: 12px;
+  margin: 1.4em 0;
+  overflow-x: auto;
+  padding: 1em 1.2em;
+  white-space: pre-wrap;
+}
+
+.blog-article pre code {
+  background: none;
+  font-size: 0.9em;
+  padding: 0;
+}
+
+.blog-article hr {
+  border: 0;
+  border-top: 1px solid #e7e7e4;
+  margin: 2em 0;
 }

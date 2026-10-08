@@ -1,4 +1,10 @@
-import { CloseSquare, Logout, ShieldTick } from 'iconsax-react'
+import {
+  CloseSquare,
+  DocumentText,
+  Edit2,
+  Logout,
+  ShieldTick,
+} from 'iconsax-react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -134,6 +140,43 @@ export function DashboardSidebar({
         <SidebarProgress onNavigate={onNavigate} />
 
         <div className="shrink-0 space-y-1 border-t border-[#eeeeeb] pt-4">
+          <Link
+            to="/blog"
+            onClick={onNavigate}
+            className={cn(
+              navigationLinkClassName,
+              'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+            )}
+          >
+            <DocumentText
+              className="size-[19px] shrink-0 text-[#8b8b8e] transition-colors"
+              strokeWidth={1.8}
+              aria-hidden
+            />
+            <span>Блог</span>
+          </Link>
+          {auth.hasAnyRole(['WRITER', 'EDITOR', 'ADMIN']) ? (
+            <Link
+              to="/writer/posts"
+              onClick={onNavigate}
+              className={navigationLinkClassName}
+              activeProps={{
+                className:
+                  'bg-[#eff6ff] font-semibold text-[#2563eb] [&_svg]:text-[#2563eb]',
+              }}
+              inactiveProps={{
+                className:
+                  'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+              }}
+            >
+              <Edit2
+                className="size-[19px] shrink-0 text-[#8b8b8e] transition-colors"
+                strokeWidth={1.8}
+                aria-hidden
+              />
+              <span>Мои статьи</span>
+            </Link>
+          ) : null}
           {auth.hasAnyRole(['EDITOR', 'ADMIN']) ? (
             <Link
               to="/admin"

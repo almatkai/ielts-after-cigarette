@@ -1,9 +1,11 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { DocumentUpload, TickCircle } from 'iconsax-react'
 import { useRef, useState } from 'react'
 
+import { BlogBackLink, BlogShell } from '@/components/blog/blog-shell'
 import {
+  blogQueryKeys,
   getMyApplication,
   submitWriterApplication,
   uploadBlogMedia,
@@ -59,7 +61,7 @@ function BandSelect({ id, label, value, onChange, min }: BandSelectProps) {
 }
 
 function ApplicationForm() {
-  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [overallBand, setOverallBand] = useState('')
   const [listeningBand, setListeningBand] = useState('')
   const [readingBand, setReadingBand] = useState('')
@@ -77,7 +79,9 @@ function ApplicationForm() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const uploadMutation = useMutation({
-    mutationFn: (file: File) => uploadBlogMedia(file),
+    // Certificates keep extra resolution so scores stay legible for review.
+    mutationFn: (file: File) =>
+      uploadBlogMedia(file, { maxDimension: 2560, quality: 0.9 }),
     onSuccess: (media) => {
       setCertificateMediaId(media.id)
       setCertificateName(media.originalName)
@@ -98,8 +102,11 @@ function ApplicationForm() {
         bio,
         certificateMediaId: certificateMediaId ?? '',
       }),
-    onSuccess: () => {
-      void navigate({ to: '/blog/become-writer' })
+    onSuccess: (application) => {
+      queryClient.setQueryData(blogQueryKeys.myApplication, {
+        application,
+        exists: true,
+      })
     },
   })
 
@@ -267,76 +274,126 @@ function ApplicationForm() {
 
 export function BecomeWriterPage() {
   const auth = useAuth()
+  const authenticated = Boolean(auth.user && auth.accessToken)
   const applicationQuery = useQuery({
-    queryKey: ['blog', 'writer-applications', 'mine'],
+    queryKey: blogQueryKeys.myApplication,
     queryFn: ({ signal }) => getMyApplication(signal),
+    enabled: authenticated,
   })
 
   const application = applicationQuery.data?.application ?? null
-  const alreadyWriter = auth.user?.role === 'WRITER'
-  const authenticated = Boolean(auth.user && auth.accessToken)
+  const alreadyWriter = auth.hasAnyRole(['WRITER', 'EDITOR', 'ADMIN'])
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
-      <header className="border-b border-[#e7e7e4] bg-white">
-        <div className="mx-auto flex min-h-16 max-w-[760px] items-center justify-between px-5 sm:px-7">
-          <Link to="/blog" className="text-sm font-semibold tracking-[-0.01em]">
-            IAC · Блог
-          </Link>
+    <BlogShell width="narrow">
+      <BlogBackLink to="/blog">Все статьи</BlogBackLink>
+
+      <p className="mt-6 text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+        Авторам
+      </p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+        Стать автором блога
+      </h1>
+      <p className="mt-3 text-sm leading-6 text-[#69696d]">
+        Публикации в блоге пишут авторы с подтверждённым официальным IELTS от
+        7.5. Заполните заявку — команда платформы проверит баллы и сертификат и
+        откроет доступ к редактору.
+      </p>
+
+      {!auth.initialized || (authenticated && applicationQuery.isPending) ? (
+        <p className="mt-8 text-sm text-[#69696d]">Проверяем аккаунт…</p>
+      ) : !authenticated ? (
+        <StatusCard title="Войдите, чтобы подать заявку">
+          <p>Заявка привязывается к вашему аккаунту на платформе.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild>
+              <Link to="/login" search={{ redirect: '/blog/become-writer' }}>
+                Войти
+              </Link>
+            </Button>
+          </div>
+        </StatusCard>
+      ) : alreadyWriter ? (
+        <StatusCard
+          title="Вы уже автор"
+          icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
+        >
+          <p>Редактор статей доступен в кабинете автора.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild>
+              <Link to="/writer/posts">Мои статьи</Link>
+            </Button>
+          </div>
+        </StatusCard>
+      ) : application?.status === 'PENDING' ? (
+        <StatusCard title="Заявка на проверке">
+          <p>
+            Вы отправили заявку с общим баллом {application.overallBand}. Мы
+            проверим сертификат и сообщим вам о решении.
+          </p>
+          <StatusActions />
+        </StatusCard>
+      ) : application?.status === 'APPROVED' ? (
+        <StatusCard
+          title="Заявка одобрена"
+          icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
+        >
+          <p>Обновите страницу, чтобы получить доступ к редактору.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button type="button" onClick={() => window.location.reload()}>
+              Обновить доступ
+            </Button>
+          </div>
+        </StatusCard>
+      ) : application?.status === 'REJECTED' ? (
+        <div className="mt-8 grid gap-6">
+          <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
+            <p className="font-semibold text-[#111111]">Заявка отклонена</p>
+            {application.reviewNotes ? (
+              <p className="mt-2">Причина: {application.reviewNotes}</p>
+            ) : null}
+            <p className="mt-2">Вы можете исправить данные и подать заново.</p>
+          </div>
+          <ApplicationForm />
         </div>
-      </header>
+      ) : (
+        <div className="mt-8">
+          <ApplicationForm />
+        </div>
+      )}
+    </BlogShell>
+  )
+}
 
-      <main className="mx-auto max-w-[760px] px-5 py-10 sm:px-7">
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-          Авторам
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Стать автором блога
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-[#69696d]">
-          Публикации в блоге пишут авторы с подтверждённым официальным IELTS от
-          7.5. Заполните заявку — команда платформы проверит баллы и сертификат
-          и откроет доступ к редактору.
-        </p>
+function StatusCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="mt-8 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
+      <p className="flex items-center gap-2 font-semibold text-[#111111]">
+        {icon}
+        {title}
+      </p>
+      <div className="mt-2">{children}</div>
+    </div>
+  )
+}
 
-        {!authenticated ? (
-          <div className="mt-8 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-            Чтобы отправить заявку, войдите в аккаунт платформы.
-          </div>
-        ) : alreadyWriter ? (
-          <div className="mt-8 flex items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm">
-            <TickCircle className="size-5 text-emerald-600" aria-hidden />У вас
-            уже есть роль автора — редактор статей доступен в кабинете.
-          </div>
-        ) : application?.status === 'PENDING' ? (
-          <div className="mt-8 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-            <p className="font-semibold text-[#111111]">Заявка на проверке</p>
-            <p className="mt-2">
-              Вы отправили заявку с общим баллом {application.overallBand}. Мы
-              проверим сертификат и сообщим вам о решении.
-            </p>
-          </div>
-        ) : application?.status === 'APPROVED' ? (
-          <div className="mt-8 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-            Заявка одобрена — обновите страницу, чтобы получить доступ к
-            редактору.
-          </div>
-        ) : application?.status === 'REJECTED' ? (
-          <div className="mt-8 grid gap-4">
-            <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-              <p className="font-semibold text-[#111111]">Заявка отклонена</p>
-              {application.reviewNotes ? (
-                <p className="mt-2">Причина: {application.reviewNotes}</p>
-              ) : null}
-            </div>
-            <ApplicationForm />
-          </div>
-        ) : (
-          <div className="mt-8">
-            <ApplicationForm />
-          </div>
-        )}
-      </main>
+function StatusActions() {
+  return (
+    <div className="mt-4 flex flex-wrap gap-3">
+      <Button asChild>
+        <Link to="/blog">Читать блог</Link>
+      </Button>
+      <Button asChild variant="outline">
+        <Link to="/">Вернуться к подготовке</Link>
+      </Button>
     </div>
   )
 }

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/popover'
 
 type DashboardHeaderProps = {
-  pageTitle: string
+  pageTitle: string | null
   onOpenNavigation: () => void
 }
 
@@ -45,14 +45,18 @@ export function DashboardHeader({
           <Brand to="/" />
         </div>
         <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
-        <div className="min-w-0 flex-1">
-          <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
-            Рабочее пространство
-          </p>
-          <h1 className="truncate text-sm sm:text-base font-semibold tracking-[-0.025em] text-[#111111]">
-            {pageTitle}
-          </h1>
-        </div>
+        {pageTitle ? (
+          <div className="min-w-0 flex-1">
+            <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
+              Рабочее пространство
+            </p>
+            <h1 className="truncate text-sm sm:text-base font-semibold tracking-[-0.025em] text-[#111111]">
+              {pageTitle}
+            </h1>
+          </div>
+        ) : (
+          <div className="flex-1" />
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">

@@ -60,94 +60,83 @@ export function WriterPostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
-      <header className="border-b border-[#e7e7e4] bg-white">
-        <div className="mx-auto flex min-h-16 max-w-[880px] items-center justify-between px-5 sm:px-7">
-          <Link to="/blog" className="text-sm font-semibold tracking-[-0.01em]">
-            IAC · Блог
+    <div className="mx-auto w-full max-w-[880px] min-w-0">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold tracking-[-0.03em]">
+          Мои статьи
+        </h1>
+        <Button asChild>
+          <Link to="/writer/posts/new">
+            <AddCircle className="size-4" aria-hidden />
+            Новая статья
           </Link>
-          <span className="text-sm text-[#69696d]">
-            {auth.user?.displayName}
-          </span>
-        </div>
-      </header>
+        </Button>
+      </div>
 
-      <main className="mx-auto max-w-[880px] px-5 py-10 sm:px-7">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-              Кабинет автора
+      {actionError ? (
+        <p className="mt-4 rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
+          {actionError}
+        </p>
+      ) : null}
+
+      <div className="mt-6 grid gap-3">
+        {postsQuery.isPending ? (
+          <p className="text-sm text-[#69696d]">Загружаем…</p>
+        ) : posts.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white px-6 py-14 text-center">
+            <DocumentText className="size-8 text-[#a0a0a4]" aria-hidden />
+            <p className="text-sm text-[#69696d]">
+              У вас пока нет статей. Создайте первую!
             </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">
-              Мои статьи
-            </h1>
           </div>
-          <Button asChild>
-            <Link to="/writer/posts/new">
-              <AddCircle className="size-4" aria-hidden />
-              Новая статья
-            </Link>
-          </Button>
-        </div>
-
-        {actionError ? (
-          <p className="mt-4 rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
-            {actionError}
-          </p>
-        ) : null}
-
-        <div className="mt-6 grid gap-3">
-          {postsQuery.isPending ? (
-            <p className="text-sm text-[#69696d]">Загружаем…</p>
-          ) : posts.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white px-6 py-14 text-center">
-              <DocumentText className="size-8 text-[#a0a0a4]" aria-hidden />
-              <p className="text-sm text-[#69696d]">
-                У вас пока нет статей. Создайте первую!
-              </p>
-            </div>
-          ) : (
-            posts.map((post) => {
-              const status = statusLabel(post.status)
-              return (
-                <div
-                  key={post.id}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[16px] border border-[#e7e7e4] bg-white p-5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
-                      >
-                        {status.text}
-                      </span>
-                      <span className="text-xs text-[#808084]">
-                        Изменена{' '}
-                        {new Date(post.updatedAt).toLocaleDateString('ru-RU')}
-                      </span>
-                    </div>
-                    <h2 className="mt-1.5 truncate text-base font-semibold text-[#111111]">
-                      {post.title}
-                    </h2>
+        ) : (
+          posts.map((post) => {
+            const status = statusLabel(post.status)
+            return (
+              <div
+                key={post.id}
+                className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[16px] border border-[#e7e7e4] bg-white p-5"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
+                    >
+                      {status.text}
+                    </span>
+                    <span className="text-xs text-[#808084]">
+                      Изменена{' '}
+                      {new Date(post.updatedAt).toLocaleDateString('ru-RU')}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button asChild variant="outline">
-                      <Link
-                        to="/writer/posts/$postId"
-                        params={{ postId: post.id }}
-                      >
-                        Редактировать
-                      </Link>
+                  <h2 className="mt-1.5 truncate text-base font-semibold text-[#111111]">
+                    {post.title}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button asChild variant="outline">
+                    <Link
+                      to="/writer/posts/$postId"
+                      params={{ postId: post.id }}
+                    >
+                      Редактировать
+                    </Link>
+                  </Button>
+                  {post.status === 'DRAFT' ? (
+                    <Button
+                      variant="outline"
+                      disabled={publishMutation.isPending}
+                      onClick={() => publishMutation.mutate(post.id)}
+                    >
+                      Опубликовать
                     </Button>
-                    {post.status === 'DRAFT' ? (
-                      <Button
-                        variant="outline"
-                        disabled={publishMutation.isPending}
-                        onClick={() => publishMutation.mutate(post.id)}
-                      >
-                        Опубликовать
+                  ) : post.status === 'PUBLISHED' ? (
+                    <>
+                      <Button asChild variant="ghost">
+                        <Link to="/blog/$slug" params={{ slug: post.slug }}>
+                          Открыть
+                        </Link>
                       </Button>
-                    ) : post.status === 'PUBLISHED' ? (
                       <Button
                         variant="ghost"
                         disabled={archiveMutation.isPending}
@@ -155,14 +144,14 @@ export function WriterPostsPage() {
                       >
                         В архив
                       </Button>
-                    ) : null}
-                  </div>
+                    </>
+                  ) : null}
                 </div>
-              )
-            })
-          )}
-        </div>
-      </main>
+              </div>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 }

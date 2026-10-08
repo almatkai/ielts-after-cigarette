@@ -1,3 +1,4 @@
+import { isPublicBlogEnabled } from '@/features/blog/visibility'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import {
@@ -14,6 +15,9 @@ import { ApiError } from '@/lib/api/client'
 import { BlogPostNotFound, BlogPostPage } from '@/pages/blog/blog-post-page'
 
 export const Route = createFileRoute('/blog/$slug')({
+  beforeLoad: () => {
+    if (!isPublicBlogEnabled()) throw notFound()
+  },
   ssr: true,
   loader: async ({ context, params }) => {
     try {
@@ -47,7 +51,12 @@ export const Route = createFileRoute('/blog/$slug')({
         { title },
         { name: 'description', content: description },
         { name: 'author', content: post.author.displayName },
-        { name: 'robots', content: 'index, follow, max-image-preview:large' },
+        {
+          name: 'robots',
+          content: isPublicBlogEnabled()
+            ? 'index, follow, max-image-preview:large'
+            : 'noindex, nofollow',
+        },
         { property: 'og:type', content: 'article' },
         { property: 'og:site_name', content: BLOG_SITE_NAME },
         { property: 'og:locale', content: 'ru_RU' },

@@ -4,6 +4,7 @@ import {
   ClipboardTick,
   Edit2,
   Headphone,
+  HambergerMenu,
   Logout,
   Microphone2,
   People,
@@ -21,6 +22,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const navigate = useNavigate()
   const [logoutIsPending, setLogoutIsPending] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
 
   const handleLogout = async () => {
     setLogoutIsPending(true)
@@ -48,6 +50,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="lg:hidden"
+              aria-label="Меню"
+              aria-expanded={navOpen}
+              aria-controls="admin-navigation"
+              onClick={() => setNavOpen(!navOpen)}
+            >
+              <HambergerMenu aria-hidden />
+            </Button>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link to="/">
                 <Category aria-hidden />
@@ -73,7 +85,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto grid max-w-[1280px] gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:py-8">
         <nav
           aria-label="Администрирование"
-          className="lg:sticky lg:top-6 lg:self-start"
+          id="admin-navigation"
+          onClick={(event) => {
+            if (event.target instanceof Element && event.target.closest('a'))
+              setNavOpen(false)
+          }}
+          className={`${navOpen ? 'block' : 'hidden'} lg:block lg:sticky lg:top-6 lg:self-start`}
         >
           <Link
             to="/admin"
@@ -176,6 +193,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
           {auth.user?.role === 'ADMIN' ? (
             <>
+              <Link
+                to="/admin/users"
+                activeProps={{
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <People className="size-[18px]" aria-hidden />
+                Пользователи
+              </Link>
               <Link
                 to="/admin/writers/applications"
                 activeProps={{

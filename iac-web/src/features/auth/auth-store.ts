@@ -10,7 +10,7 @@ import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 import { claimGuestResults, getGuestSession } from '@/features/auth/guest'
 import type { GuestSession } from '@/features/auth/guest'
 
-export type UserRole = 'STUDENT' | 'EDITOR' | 'ADMIN'
+export type UserRole = 'STUDENT' | 'WRITER' | 'EDITOR' | 'ADMIN'
 
 export type UserDto = {
   id: string

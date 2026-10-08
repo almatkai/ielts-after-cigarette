@@ -23,10 +23,11 @@ import { getErrorMessage } from '@/lib/api/client'
 
 import { GoogleCompleteForm } from './google-complete-form'
 import type { PendingGoogleRegistration } from './google-complete-form'
+import type { LoginReturnPath } from '@/features/auth/google-identity'
 
 type LoginFormProps = {
   search?: {
-    redirect?: '/admin' | '/'
+    redirect?: LoginReturnPath
     google?: 'success' | 'registration' | 'error'
   }
   onSuccess?: () => Promise<void>
@@ -140,7 +141,7 @@ function GoogleSignInCard({
   onCredential: (credential: string) => Promise<void>
   submissionError: string | null
   restoringGoogle: boolean
-  redirect?: '/admin' | '/'
+  redirect?: LoginReturnPath
 }) {
   const [googleFailed, setGoogleFailed] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)

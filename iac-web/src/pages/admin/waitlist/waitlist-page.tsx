@@ -1,10 +1,4 @@
-import {
-  DirectInbox,
-  People,
-  Refresh,
-  Tag,
-  Warning2,
-} from 'iconsax-react'
+import { DirectInbox, People, Refresh, Tag, Warning2 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { Badge } from '@/components/ui/badge'

@@ -1,9 +1,4 @@
-import {
-  Book,
-  Data,
-  ShieldTick,
-  TickCircle,
-} from 'iconsax-react'
+import { Book, Data, ShieldTick, TickCircle } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

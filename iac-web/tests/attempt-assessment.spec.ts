@@ -89,9 +89,7 @@ for (const skill of ['writing', 'speaking']) {
         return route.fulfill({ json: { items: [] } })
       })
       await page.goto('./attempts/test-attempt')
-      await expect(
-        page.getByText('Работа находится на проверке ИИ'),
-      ).toBeVisible()
+      await expect(page.getByText('Проверяется', { exact: true })).toBeVisible()
       await expect.poll(() => statusReads).toBe(1)
       // Dev StrictMode may abort the first mount's request and restart it.
       const initialReads = detailReads

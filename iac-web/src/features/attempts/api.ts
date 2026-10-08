@@ -40,7 +40,8 @@ export type AttemptReviewItem = {
   answer: StudentAnswer | null
   isCorrect: boolean
   pointsAwarded: number
-  correctAnswer: StudentAnswer
+  correctAnswer: StudentAnswer | null
+  locked?: boolean
   explanation: string
   quote?: string
   hint?: string

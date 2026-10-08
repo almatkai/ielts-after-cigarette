@@ -14,6 +14,10 @@ export function useAttemptDetail(attemptId: string) {
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attemptId),
     queryFn: ({ signal }) => getAttempt(attemptId, signal),
+    refetchOnMount: (query) =>
+      query.state.data?.reviewLocked ? 'always' : true,
+    refetchInterval: (query) =>
+      query.state.data?.reviewLocked ? 10_000 : false,
     refetchOnWindowFocus: (query) => query.state.data?.status !== 'PROCESSING',
     refetchOnReconnect: (query) => query.state.data?.status !== 'PROCESSING',
   })

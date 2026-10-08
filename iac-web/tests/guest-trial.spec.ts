@@ -241,10 +241,8 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   await expect(
     page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
   ).toHaveCount(4)
-  await page.getByRole('link', { name: 'Разобрать ошибки' }).nth(2).click()
-  await expect(
-    page.getByText('Разборов без входа: 3 из 10.', { exact: false }),
-  ).toBeVisible()
+  await page.getByRole('button', { name: 'Выбрать Writing' }).click()
+  await expect(page.getByText(/3 из 10 разборов/)).toBeVisible()
   await page
     .getByRole('button', { name: 'Разобрать рекомендацию 1', exact: true })
     .click()
@@ -257,7 +255,10 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   await expect(
     page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'К пробному тесту' }).click()
+  await expect(
+    page.getByRole('button', { name: 'Выбрать Writing' }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await page.goto('./try')
   await expect(
     page.getByRole('link', { name: 'Открыть мой тест и результаты' }),
   ).toBeVisible()
@@ -718,14 +719,30 @@ for (const registration of [false, true]) {
       page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
     ).toHaveCount(0)
     expect(claims).toEqual(['Bearer account-token'])
-    await page.getByRole('link', { name: 'Разбор попытки' }).nth(1).click()
+    await page.getByRole('button', { name: 'Выбрать Reading' }).click()
     await expect(
-      page.getByText('Explanation 10', { exact: true }),
+      page.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
+    ).toHaveCount(10)
+    await page
+      .getByRole('button', { name: 'Разобрать ошибку 10', exact: true })
+      .click()
+    const mistake = page.getByRole('dialog')
+    await mistake
+      .getByRole('textbox', { name: 'Ответ', exact: true })
+      .fill('correct-10')
+    await mistake
+      .getByRole('button', { name: 'Проверить', exact: true })
+      .click()
+    await expect(
+      mistake.getByText('Explanation 10', { exact: true }),
     ).toBeVisible()
     await page.reload()
     await expect(
-      page.getByText('Explanation 10', { exact: true }),
-    ).toBeVisible()
+      page.getByRole('button', { name: 'Выбрать Reading' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    await expect(
+      page.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
+    ).toHaveCount(10)
     await expect(
       page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),
     ).toHaveCount(0)
@@ -839,7 +856,20 @@ test('sign-in from a locked mistake opens the complete review on the same page',
     .getByRole('button', { name: 'Continue with Google' })
     .click()
   await expect(page).toHaveURL(/\/attempts\/reading-guest$/)
-  await expect(page.getByText('Explanation 10', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
+  ).toHaveCount(10)
+  await page
+    .getByRole('button', { name: 'Разобрать ошибку 10', exact: true })
+    .click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Показать решение', exact: true })
+    .click()
+  await expect(
+    page.getByRole('dialog').getByText('Explanation 10', { exact: true }),
+  ).toBeVisible()
+  await page.keyboard.press('Escape')
   await expect(
     page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),
   ).toHaveCount(0)
@@ -879,9 +909,7 @@ test('zero guest mistakes does not fabricate a free error', async ({
     }),
   )
   await page.goto('./attempts/reading-guest')
-  await expect(
-    page.getByText('В этой секции нет ошибок.', { exact: true }),
-  ).toBeVisible()
+  await expect(page.getByText('Нет ошибок', { exact: true })).toBeVisible()
   await expect(
     page.getByRole('button', { name: /^Разобрать ошибку/ }),
   ).toHaveCount(0)
@@ -911,8 +939,9 @@ for (const mobile of [false, true]) {
       .click()
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
     await expect(
-      page.getByText('Секции идут строго по порядку.', { exact: false }),
+      page.getByRole('link', { name: 'Продолжить', exact: true }),
     ).toBeVisible()
+    await expect(page.getByText('Закрыто', { exact: true })).toHaveCount(3)
     expect(starts).toEqual([
       {
         examType: 'academic',
@@ -925,7 +954,7 @@ for (const mobile of [false, true]) {
     ).toHaveCount(0)
     await page.reload()
     await expect(
-      page.getByText('Секции идут строго по порядку.', { exact: false }),
+      page.getByRole('link', { name: 'Продолжить', exact: true }),
     ).toBeVisible()
     await page.goto('./')
     await page
@@ -976,9 +1005,7 @@ test('guest can retake a mock completed without a grade', async ({ page }) => {
     }),
   )
   await page.goto('./exam/full-mock-sessions/guest-mock')
-  await expect(
-    page.getByText('Секция завершена без оценки', { exact: true }),
-  ).toHaveCount(4)
+  await expect(page.getByText('Без оценки', { exact: true })).toHaveCount(4)
   await page
     .getByRole('button', { name: 'Пересдать тест', exact: true })
     .click()
@@ -1063,6 +1090,188 @@ test('guest retake quota failure keeps the report and can be retried', async ({
   expect(calls).toBe(2)
   expect(starts).toHaveLength(1)
 })
+
+for (const mobile of [false, true]) {
+  test(`full mock reveals inline section review only after completion${mobile ? ' on mobile' : ''}`, async ({
+    page,
+  }, testInfo) => {
+    await guestAPI(page, true)
+    let complete = false
+    const report = {
+      id: 'guest-mock',
+      status: 'SUBMITTED',
+      currentSection: 5,
+      resultsLocked: true,
+      mockTest: { title: 'Полный пробный IELTS', examType: 'academic' },
+      overallBand: 6.5,
+      sections: ['listening', 'reading', 'writing', 'speaking'].map(
+        (skill, index) => ({
+          position: index + 1,
+          skill,
+          durationMinutes: [30, 60, 60, 15][index],
+          attempt: {
+            id: `${skill}-guest`,
+            materialType: skill,
+            status: 'SUBMITTED',
+            band: null,
+          },
+        }),
+      ),
+    }
+    await page.route('**/api/v1/full-mock-sessions/guest-mock', (route) =>
+      route.fulfill({
+        json: complete
+          ? report
+          : {
+              ...report,
+              status: 'IN_PROGRESS',
+              currentSection: 4,
+              overallBand: null,
+            },
+      }),
+    )
+    await page.route(
+      '**/api/v1/full-mock-sessions/guest-mock/advance',
+      (route) => {
+        complete = true
+        return route.fulfill({ json: report })
+      },
+    )
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('./exam/full-mock-sessions/guest-mock')
+    await expect(
+      page.getByRole('button', { name: 'Завершить и показать отчёт' }),
+    ).toBeVisible()
+    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    await expect(
+      page.getByRole('button', { name: /Разобрать ошибку/ }),
+    ).toHaveCount(0)
+    await expect(
+      page.getByRole('button', { name: 'Завершить досрочно' }),
+    ).toHaveCount(0)
+    await page
+      .getByRole('button', { name: 'Завершить и показать отчёт' })
+      .click()
+    await expect(page.getByRole('button', { name: /^Выбрать / })).toHaveCount(4)
+    await expect(
+      page.getByRole('button', { name: 'Выбрать Listening' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    await page.getByRole('button', { name: 'Выбрать Reading' }).click()
+    await expect(page).toHaveURL(/\/guest-mock\?section=2$/)
+    await expect(
+      page.getByRole('button', { name: 'Выбрать Reading' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    await expect(
+      page.getByRole('button', { name: 'Выбрать Listening' }),
+    ).toHaveAttribute('aria-pressed', 'false')
+    const review = page.getByRole('region', {
+      name: 'Работа над ошибками reading',
+    })
+    await expect(
+      review.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
+    ).toHaveCount(3)
+    await expect(
+      review.getByRole('button', {
+        name: /Разобрать ошибку .*войти в аккаунт/,
+      }),
+    ).toHaveCount(7)
+    await expect(
+      review.getByText('Ваш ответ:', { exact: false }).first(),
+    ).toBeVisible()
+    const heading = await page
+      .getByRole('heading', { name: 'Полный пробный IELTS' })
+      .boundingBox()
+    expect(heading!.y).toBeLessThan(110)
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true)
+    const lockedMistake = review.getByRole('button', {
+      name: 'Разобрать ошибку 4: войти в аккаунт',
+      exact: true,
+    })
+    await lockedMistake.click()
+    await expect(
+      page.getByRole('dialog', { name: 'Войти или создать аккаунт' }),
+    ).toBeVisible()
+    await expect(page).toHaveURL(/\/guest-mock\?section=2$/)
+    await page.keyboard.press('Escape')
+    await expect(lockedMistake).toBeFocused()
+    await review
+      .getByRole('button', { name: 'Разобрать ошибку 3', exact: true })
+      .click()
+    const retry = page.getByRole('dialog')
+    await retry
+      .getByRole('textbox', { name: 'Ответ', exact: true })
+      .fill('correct-3')
+    await retry.getByRole('button', { name: 'Проверить', exact: true }).click()
+    await expect(
+      retry.getByText('Explanation 3', { exact: true }),
+    ).toBeVisible()
+    await page.keyboard.press('Escape')
+    await page.screenshot({
+      path: testInfo.outputPath('full-mock-inline-review.png'),
+      fullPage: true,
+    })
+    await page.reload()
+    await expect(
+      page.getByRole('button', { name: 'Выбрать Reading' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    await expect(
+      review.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
+    ).toHaveCount(3)
+    await page.getByRole('button', { name: 'Выбрать Writing' }).click()
+    await expect(
+      page
+        .getByRole('region', { name: 'Работа над ошибками writing' })
+        .getByTestId('guest-improvement-1'),
+    ).toBeVisible()
+  })
+}
+
+for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
+  test(`${skill} direct attempt URL cannot expose a locked full mock review`, async ({
+    page,
+  }) => {
+    await guestAPI(page, true)
+    await page.route(`**/api/v1/attempts/${skill}-guest`, (route) =>
+      route.fulfill({
+        json: {
+          id: `${skill}-guest`,
+          status: 'SUBMITTED',
+          materialType: skill,
+          band: 8,
+          score: 40,
+          reviewLocked: true,
+          fullMockSessionId: 'guest-mock',
+          guestPreview: { totalMistakes: 10, availableMistakes: 3 },
+          review: [
+            {
+              questionId: 'private',
+              number: 1,
+              prompt: 'PRIVATE_QUESTION',
+              correctAnswer: { value: 'PRIVATE_ANSWER' },
+              explanation: 'PRIVATE_FEEDBACK',
+              isCorrect: false,
+            },
+          ],
+        },
+      }),
+    )
+    await page.goto(`./attempts/${skill}-guest`)
+    await expect(
+      page.getByRole('heading', { name: 'Секция завершена' }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'Продолжить Full Mock' }),
+    ).toBeVisible()
+    await expect(page.getByText(/PRIVATE_/)).toHaveCount(0)
+    await expect(
+      page.getByRole('button', { name: /Разобрать ошибку/ }),
+    ).toHaveCount(0)
+  })
+}
 
 test('mobile login dialog fits and can be dismissed without starting a trial', async ({
   page,

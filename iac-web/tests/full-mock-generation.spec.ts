@@ -122,7 +122,7 @@ test('opening a section renders the nested route and requests its material', asy
     },
   )
   await page.goto('./exam/full-mock-sessions/generated-session')
-  await page.getByRole('link', { name: 'Открыть секцию' }).click()
+  await page.getByRole('link', { name: 'Продолжить' }).click()
   await expect(
     page.getByRole('heading', { name: 'Не удалось открыть секцию Full Mock' }),
   ).toBeVisible()
@@ -464,7 +464,7 @@ for (const [index, skill] of skills.entries()) {
       { skill },
     )
     await page.goto('./exam/full-mock-sessions/generated-session')
-    const open = page.getByRole('link', { name: 'Открыть секцию' })
+    const open = page.getByRole('link', { name: 'Продолжить' })
     await open.hover()
     await page.clock.runFor(400)
     expect(reads).toBe(0)
@@ -535,6 +535,10 @@ for (const state of ['unopened', 'running', 'paused', 'completed']) {
       status: state === 'completed' ? 'SUBMITTED' : 'IN_PROGRESS',
       sections: mock.sections.map((section, index) => ({
         ...section,
+        attempt: {
+          ...section.attempt,
+          status: state === 'completed' ? 'ABANDONED' : section.attempt.status,
+        },
         deadlineAt:
           index === 0 && state === 'running' && !paused
             ? new Date(Date.now() + 600000).toISOString()

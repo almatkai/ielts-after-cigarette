@@ -8,6 +8,7 @@ import {
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -592,6 +593,10 @@ export function SpeakingAttemptResult({
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt
+  if (fullMockSessionId || effectiveAttempt.reviewLocked) {
+    const sessionId = fullMockSessionId ?? effectiveAttempt.fullMockSessionId
+    return sessionId ? <FullMockSectionComplete sessionId={sessionId} /> : null
+  }
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader

@@ -26,6 +26,7 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-review'
 import { useAuth } from '@/features/auth/auth-store'
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { GuestAttemptReview } from './guest-attempt-review'
 
 export { formatDateTime } from '@/lib/date'
@@ -44,7 +45,11 @@ export function AttemptReviewPage({
     attempt?.materialType === 'listening' || attempt?.materialType === 'reading'
   const materialQuery = useQuery<PublicListeningTest | PublicReadingMaterial>({
     queryKey: ['attempts', attemptId, 'material'],
-    enabled: isObjectiveAttempt && Boolean(user) && !attempt?.guestPreview,
+    enabled:
+      isObjectiveAttempt &&
+      Boolean(user) &&
+      !attempt.guestPreview &&
+      !attempt.reviewLocked,
     retry: false,
     queryFn: ({ signal }) => {
       if (!attempt || !isObjectiveAttempt) {
@@ -68,11 +73,15 @@ export function AttemptReviewPage({
     )
   }
 
+  if (attempt.reviewLocked && attempt.fullMockSessionId) {
+    return <FullMockSectionComplete sessionId={attempt.fullMockSessionId} />
+  }
+
   const material = materialQuery.data ?? null
   const aiEvaluation = evaluationFor(attempt)
 
   if (attempt.status === 'SUBMITTED' && (attempt.guestPreview || !user)) {
-    return <GuestAttemptReview attempt={attempt} />
+    return <GuestAttemptReview attempt={attempt} embedded={embedded} />
   }
 
   if (attempt.status === 'SUBMITTED' && isObjectiveAttempt) {

@@ -14,6 +14,8 @@ export type AttemptStatus =
 export type StudentAnswer = Record<string, unknown>
 
 export type Attempt = {
+  reviewLocked?: boolean
+  fullMockSessionId?: string
   id: string
   materialType: string
   materialId: string

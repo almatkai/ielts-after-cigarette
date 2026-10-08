@@ -40,7 +40,7 @@ export type AttemptReviewItem = {
   answer: StudentAnswer | null
   isCorrect: boolean
   pointsAwarded: number
-  correctAnswer: StudentAnswer
+  correctAnswer: StudentAnswer | null
   explanation: string
   quote?: string
   hint?: string
@@ -50,6 +50,18 @@ export type AttemptReviewItem = {
   timestampEnd?: number
   audioAssetId?: string
   transcript?: string
+  locked?: boolean
+}
+
+export type GuestReviewPreview = {
+  totalMistakes: number
+  availableMistakes: number
+  improvements?: {
+    number: number
+    label: string
+    text?: string
+    locked: boolean
+  }[]
 }
 
 // IN_PROGRESS — только сохранённые ответы, SUBMITTED — полный разбор.
@@ -61,6 +73,7 @@ export type AttemptDetail = Attempt & {
   recordings?: SpeakingRecording[]
   speakingAssessment?: SpeakingAssessmentJob
   writingAssessment?: WritingAssessmentJob
+  guestPreview?: GuestReviewPreview
 }
 
 // Lightweight snapshot; no answers, recordings or evaluation payloads.

@@ -39,16 +39,11 @@ export function GuestTrialCard() {
       className="grid gap-4 rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7"
     >
       <div>
-        <p className="text-xs font-semibold text-[#2563eb]">
-          Бесплатно · Academic · 4 секции
-        </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">
           Полный пробный IELTS
         </h2>
         <p className="mt-3 text-sm leading-6 text-[#69696d]">
-          Listening, Reading, Writing и Speaking. После сдачи — баллы, ошибки и
-          AI-разбор ответов. Один тест без регистрации; вернуться к нему и
-          разбору можно в этом браузере в течение 7 дней.
+          Проверьте свой уровень IELTS — пройдите полный пробный тест.
         </p>
       </div>
       {guest?.sessionId ? (

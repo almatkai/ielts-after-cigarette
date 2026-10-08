@@ -18,7 +18,7 @@ export function usePreviewSession(): AttemptSession {
     loadError: null,
     isSavingAndExiting: false,
     saveAndExit: async (onExit) => {
-      onExit?.()
+      await onExit?.()
     },
     flush: () => Promise.resolve(),
     retryLoad: () => {},

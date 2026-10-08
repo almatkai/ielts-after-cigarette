@@ -31,10 +31,12 @@ import { getErrorMessage } from '@/lib/api/client'
 import { formatDateTime } from '@/lib/date'
 import { CompletedBankNotice } from '@/features/fullmock/completed-bank-notice'
 import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
+import { useAuth } from '@/features/auth/auth-store'
 
 export { formatDateTime } from '@/lib/date'
 
 export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
+  const { guest } = useAuth()
   const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
@@ -91,9 +93,11 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/progress">
-            <ArrowLeft aria-hidden />К прогрессу
-          </Link>
+          {guest ? (
+            <Link to="/try"><ArrowLeft aria-hidden />К пробному тесту</Link>
+          ) : (
+            <Link to="/progress"><ArrowLeft aria-hidden />К прогрессу</Link>
+          )}
         </Button>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
           {title}
@@ -193,7 +197,7 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
         </p>
         <div className="rounded-xl bg-[#f7f7f5] p-3 text-xs text-slate-500 text-left w-full mt-2">
           💡 Проверка обычно занимает от 30 до 90 секунд. Вы можете подождать
-          здесь или вернуться к разбору позже из раздела «Прогресс».
+          здесь или вернуться к этой странице позже.
         </div>
       </CardContent>
     </Card>
@@ -201,6 +205,7 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
 }
 
 function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
+  const { guest } = useAuth()
   if (attempt.status === 'ABANDONED') {
     return (
       <Card>
@@ -221,6 +226,16 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
               </p>
             </div>
           ))}
+        </CardContent>
+      </Card>
+    )
+  }
+  if (guest) {
+    return (
+      <Card>
+        <CardContent className="grid gap-3 p-6">
+          <p>Разбор появится после сдачи секции.</p>
+          <Button asChild><Link to="/try">Вернуться к пробному тесту</Link></Button>
         </CardContent>
       </Card>
     )

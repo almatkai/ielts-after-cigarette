@@ -8,6 +8,7 @@ import {
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
+import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -59,6 +60,7 @@ const cardClassName =
   'gap-0 rounded-[16px] border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[#d7d7d2] hover:shadow-[0_14px_40px_rgba(17,17,17,0.055)]'
 
 export function PracticePage() {
+  const { user } = useAuth()
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-4 sm:gap-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -86,6 +88,7 @@ export function PracticePage() {
             <Card key={skill.id} className={cardClassName}>
               <Link
                 to={skill.to}
+                data-requires-account={!user || undefined}
                 className="group flex h-full flex-col justify-between p-4 sm:p-6 no-underline"
               >
                 <div>
@@ -137,7 +140,10 @@ export function PracticePage() {
         <div className="flex flex-col justify-between gap-4 sm:gap-5 sm:flex-row sm:items-center">
           <div className="flex items-start gap-3 sm:gap-4">
             <span className="grid size-10 sm:size-12 shrink-0 place-items-center rounded-[10px] sm:rounded-xl bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-              <ClipboardTick className="size-5 sm:size-6 transition-colors" aria-hidden />
+              <ClipboardTick
+                className="size-5 sm:size-6 transition-colors"
+                aria-hidden
+              />
             </span>
             <div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
@@ -152,9 +158,9 @@ export function PracticePage() {
                 </Badge>
               </div>
               <p className="mt-1 sm:mt-1.5 max-w-2xl text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
-                Мы автоматически подберём Listening, Reading, Writing и Speaking
-                из общей библиотеки — сначала непройденные тесты. Четыре секции
-                подряд, общий таймер и итоговый Band Score.
+                {user
+                  ? 'Мы автоматически подберём Listening, Reading, Writing и Speaking из общей библиотеки — сначала непройденные тесты. Четыре секции подряд, отдельные таймеры секций и итоговый Band Score.'
+                  : 'Один бесплатный Academic Full Mock: четыре секции, отдельные таймеры секций, итоговый Band Score и разбор ответов. Для следующих тестов войдите в аккаунт.'}
               </p>
             </div>
           </div>

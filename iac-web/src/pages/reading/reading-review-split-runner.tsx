@@ -7,6 +7,7 @@ import {
   InfoCircle,
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
+import { useAuth } from '@/features/auth/auth-store'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -28,6 +29,7 @@ export function ReadingReviewSplitRunner({
   attempt: AttemptDetail
   material: PublicReadingMaterial
 }) {
+  const { guest } = useAuth()
   const review = attempt.review ?? []
   const reviewByQuestionId = useMemo(
     () => new Map(review.map((item) => [item.questionId, item])),
@@ -111,10 +113,11 @@ export function ReadingReviewSplitRunner({
             size="sm"
             className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
           >
-            <Link to="/mistakes">
-              <ArrowLeft className="size-4" aria-hidden />
-              <span className="hidden sm:inline">К ошибкам</span>
-            </Link>
+            {guest ? (
+              <Link to="/try"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К пробному тесту</span></Link>
+            ) : (
+              <Link to="/mistakes"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К ошибкам</span></Link>
+            )}
           </Button>
           <div className="hidden md:block">
             <h1 className="text-sm font-semibold text-slate-900 truncate max-w-[240px] lg:max-w-[360px]">

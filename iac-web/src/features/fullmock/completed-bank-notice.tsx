@@ -7,7 +7,7 @@ import { fullMockKeys, getFullMockOverview } from './api'
 // Shown immediately on a submitted listening result, including the final test
 // in the bank. This does not block the student's score if the overview fails.
 export function CompletedBankNotice({ attemptId }: { attemptId: string }) {
-  const { user } = useAuth()
+  const { user, guest } = useAuth()
   const query = useQuery({
     queryKey: [
       ...fullMockKeys.overview(user?.id, user?.examType),
@@ -15,6 +15,7 @@ export function CompletedBankNotice({ attemptId }: { attemptId: string }) {
       attemptId,
     ],
     queryFn: ({ signal }) => getFullMockOverview(signal),
+    enabled: !guest,
     retry: false,
     staleTime: 0,
   })

@@ -25,7 +25,10 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { usePreviewSession } from '@/features/attempts/preview-session'
 import type { AttemptSession } from '@/features/attempts/preview-session'
 import { useExamTimer } from '@/features/attempts/exam-timer'
@@ -157,6 +160,7 @@ type ReadingRunnerProps = {
   attempt: Attempt
   material: PublicReadingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }
 
@@ -190,6 +194,7 @@ function ReadingTestRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
   session,
   preview = false,
@@ -279,6 +284,7 @@ function ReadingTestRunner({
     ready: isReady,
     enabled: timerEnabled,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   useEffect(() => {

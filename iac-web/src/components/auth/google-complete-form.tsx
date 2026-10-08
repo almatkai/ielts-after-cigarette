@@ -31,6 +31,7 @@ type GoogleCompleteFormProps = {
   pending: PendingGoogleRegistration
   onBack: () => void
   redirect?: '/admin' | '/'
+  onSuccess?: () => Promise<void>
 }
 
 function validateName(value: string) {
@@ -45,6 +46,7 @@ export function GoogleCompleteForm({
   pending,
   onBack,
   redirect,
+  onSuccess,
 }: GoogleCompleteFormProps) {
   const navigate = useNavigate()
   const { completeGoogleRegistration } = useAuth()
@@ -73,7 +75,8 @@ export function GoogleCompleteForm({
           phone: normalizePhone(value.phone),
           acceptedTerms: value.acceptedTerms,
         })
-        await navigate({ to: redirect ?? '/' })
+        if (onSuccess) await onSuccess()
+        else await navigate({ to: redirect ?? '/' })
       } catch (error) {
         if (error instanceof ApiError && error.details) {
           setFieldErrors(error.details)

@@ -31,9 +31,16 @@ export type FullMockSession = {
   currentSection: number
   startedAt: string
   submittedAt: string | null
-  deadlineAt: string
   mockTest: FullMockTest
-  sections: { position: number; skill: FullMockSkill; attempt: Attempt }[]
+  sections: {
+    position: number
+    skill: FullMockSkill
+    attempt: Attempt
+    durationMinutes?: number
+    startedAt?: string | null
+    deadlineAt?: string | null
+    remainingMilliseconds?: number | null
+  }[]
   overallBand: number | null
 }
 
@@ -42,6 +49,9 @@ export type FullMockSkill = 'listening' | 'reading' | 'writing' | 'speaking'
 type FullMockSectionBase = {
   position: number
   attempt: Attempt
+  durationMinutes?: number
+  startedAt?: string | null
+  deadlineAt?: string | null
 }
 
 export type FullMockSection =
@@ -108,6 +118,11 @@ export const advanceFullMockSession = (id: string) =>
       method: 'POST',
     },
   )
+
+export const pauseFullMockSession = (id: string) =>
+  apiClient.request<FullMockSession>(`/api/v1/full-mock-sessions/${id}/pause`, {
+    method: 'POST',
+  })
 
 export const finishFullMockSession = (id: string) =>
   apiClient.request<FullMockSession>(

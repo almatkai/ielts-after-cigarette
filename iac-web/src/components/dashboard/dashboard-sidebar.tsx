@@ -131,7 +131,14 @@ export function DashboardSidebar({
           })}
         </nav>
 
-        <SidebarProgress onNavigate={onNavigate} />
+        {auth.user ? (
+          <SidebarProgress onNavigate={onNavigate} />
+        ) : (
+          <section className="mt-auto px-3.5 py-8 text-xs leading-5 text-[#808084]">
+            Один Full Mock доступен бесплатно. Для других тестов и сохранения
+            прогресса войдите в аккаунт.
+          </section>
+        )}
 
         <div className="shrink-0 space-y-1 border-t border-[#eeeeeb] pt-4">
           {auth.hasAnyRole(['EDITOR', 'ADMIN']) ? (
@@ -177,45 +184,53 @@ export function DashboardSidebar({
             />
             <span>{settingsDashboardNavigation.label}</span>
           </Link>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center gap-3 rounded-[10px] px-4 text-sm font-medium text-[#69696d] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
-              >
-                <Logout
-                  className="size-[19px] shrink-0 text-[#8b8b8e]"
-                  strokeWidth={1.8}
-                  aria-hidden
-                />
-                <span>Выйти</span>
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#eff6ff] text-[#3b82f6]">
-                  <Logout className="size-5" strokeWidth={1.8} aria-hidden />
-                </span>
-                <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Чтобы продолжить подготовку, потребуется войти в аккаунт
-                  снова.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="h-10 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none">
-                  Отмена
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  disabled={logoutIsPending}
-                  onClick={() => void handleLogout()}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 text-white shadow-none hover:bg-[#2563eb]"
+          {auth.user ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  type="button"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-[10px] px-4 text-sm font-medium text-[#69696d] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111]"
                 >
-                  {logoutIsPending ? 'Выходим…' : 'Выйти'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  <Logout
+                    className="size-[19px] shrink-0 text-[#8b8b8e]"
+                    strokeWidth={1.8}
+                    aria-hidden
+                  />
+                  <span>Выйти</span>
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#eff6ff] text-[#3b82f6]">
+                    <Logout className="size-5" strokeWidth={1.8} aria-hidden />
+                  </span>
+                  <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Чтобы продолжить подготовку, потребуется войти в аккаунт
+                    снова.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="h-10 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none">
+                    Отмена
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={logoutIsPending}
+                    onClick={() => void handleLogout()}
+                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 text-white shadow-none hover:bg-[#2563eb]"
+                  >
+                    {logoutIsPending ? 'Выходим…' : 'Выйти'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button asChild className="mt-3 w-full">
+              <Link to="/login" onClick={onNavigate}>
+                Войти в аккаунт
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </aside>

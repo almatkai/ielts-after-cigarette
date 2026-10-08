@@ -8,19 +8,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   AttemptPerformanceReport,
-  EnhancedReviewQuestion,
   ErrorState,
-  ExamLoadingScreen,
   LoadingState,
 } from '@/features/attempts/attempt-ui'
-import type { Option } from '@/features/attempts/attempt-ui'
 import {
   getAttemptMaterial,
   getSpeakingRecordingBlob,
 } from '@/features/attempts/api'
 import type {
   AttemptDetail,
-  AttemptReviewItem,
   SpeakingRecording,
   SpeakingCriterion,
   WritingCriterion,
@@ -28,13 +24,17 @@ import type {
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { formatDateTime } from '@/lib/date'
-import { CompletedBankNotice } from '@/features/fullmock/completed-bank-notice'
-import { ReadingReviewSplitRunner } from '@/pages/reading/reading-review-split-runner'
+import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-review'
 
 export { formatDateTime } from '@/lib/date'
 
-export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
+export function AttemptReviewPage({
+  attemptId,
+  embedded = false,
+}: {
+  attemptId: string
+  embedded?: boolean
+}) {
   const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
@@ -52,15 +52,9 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   })
 
   if (detailQuery.isPending) {
-    return (
-      <ExamLoadingScreen
-        badge="Анализ попытки"
-        label="Загружаем разбор попытки…"
-        description="Подготавливаем детальный отчёт по ответам, баллам и критериям оценивания..."
-        showTimerTip={false}
-      />
-    )
+    return <LoadingState label="Загрузка…" />
   }
+
   if (!attempt) {
     return (
       <ErrorState
@@ -72,41 +66,52 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
   }
 
   const material = materialQuery.data ?? null
-  const review = attempt.status === 'SUBMITTED' ? (attempt.review ?? []) : null
   const aiEvaluation = evaluationFor(attempt)
-  const title =
-    material?.title ?? `${skillLabel(attempt.materialType)}: Разбор работы`
 
-  if (
-    attempt.status === 'SUBMITTED' &&
-    attempt.materialType === 'reading' &&
-    material &&
-    !('parts' in material) &&
-    review !== null
-  ) {
-    return <ReadingReviewSplitRunner attempt={attempt} material={material} />
+  if (attempt.status === 'SUBMITTED' && isObjectiveAttempt) {
+    return (
+      <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+        {!embedded ? (
+          <Button
+            asChild
+            variant="link"
+            className="h-auto justify-self-start p-0"
+          >
+            <Link to="/progress">
+              <ArrowLeft aria-hidden />К прогрессу
+            </Link>
+          </Button>
+        ) : null}
+        <ObjectiveAttemptReview
+          key={attempt.id}
+          attempt={attempt}
+          material={material}
+          title={material?.title}
+          showHeading={!embedded}
+        />
+      </div>
+    )
   }
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0">
-          <Link to="/progress">
-            <ArrowLeft aria-hidden />К прогрессу
-          </Link>
-        </Button>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-          {title}
-        </h1>
+        {!embedded ? (
+          <>
+            <Button asChild variant="link" className="h-auto p-0">
+              <Link to="/progress">
+                <ArrowLeft aria-hidden />К прогрессу
+              </Link>
+            </Button>
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+              Работа над ошибками
+            </h1>
+          </>
+        ) : null}
         <p className="mt-2 text-sm text-[#69696d]">
-          {skillLabel(attempt.materialType)} · попытка от{' '}
-          {formatDateTime(attempt.startedAt)}
+          {skillLabel(attempt.materialType)}
         </p>
       </div>
-      {attempt.status === 'SUBMITTED' &&
-      attempt.materialType === 'listening' ? (
-        <CompletedBankNotice attemptId={attempt.id} />
-      ) : null}
       {attempt.status === 'PROCESSING' ? (
         <ProcessingAttempt attempt={attempt} />
       ) : attempt.status !== 'SUBMITTED' ? (
@@ -122,79 +127,23 @@ export function AttemptReviewPage({ attemptId }: { attemptId: string }) {
             />
           ) : null}
         </>
-      ) : review === null ? (
-        <LoadingState label="Загружаем разбор ответов…" />
       ) : (
-        <>
-          <AttemptPerformanceReport
-            band={attempt.band}
-            score={attempt.score}
-            maxScore={attempt.maxScore}
-            correctCount={review.filter((item) => item.isCorrect).length}
-            totalQuestions={review.length}
-            startedAt={attempt.startedAt}
-            submittedAt={attempt.submittedAt}
-            durationMinutes={
-              material && 'durationMinutes' in material
-                ? (material as any).durationMinutes
-                : attempt.materialType === 'reading'
-                  ? 60
-                  : 30
-            }
-            paceUnit="вопрос"
-          />
-          {material !== null ? (
-            <StructuredReview material={material} review={review} />
-          ) : materialQuery.isPending ? (
-            <LoadingState label="Загружаем структуру материала…" />
-          ) : (
-            <FlatReview review={review} />
-          )}
-        </>
+        <p className="text-sm text-[#69696d]">Нет ошибок</p>
       )}
     </div>
   )
 }
 
 function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
-  const isSpeaking = attempt.materialType === 'speaking'
+  const assessment = attempt.writingAssessment ?? attempt.speakingAssessment
   return (
-    <Card className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-none">
-      <CardContent className="grid justify-items-center gap-3 p-10 text-center max-w-lg mx-auto">
-        <div className="size-12 rounded-full bg-blue-50 flex items-center justify-center text-[#3b82f6] mb-1">
-          <svg
-            className="size-6 animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        </div>
-        <p className="text-lg font-semibold text-slate-900">
-          Работа находится на проверке ИИ
+    <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+      <CardContent className="p-6">
+        <p className="text-sm text-[#69696d]">
+          {assessment?.status === 'FAILED'
+            ? 'Не удалось проверить'
+            : 'Проверяется'}
         </p>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          {isSpeaking
-            ? 'Расшифровываем аудио и анализируем беглость, словарный запас и грамматику (система пока не может определить произношение). Страница обновится автоматически после завершения.'
-            : 'Анализируем раскрытие темы, аргументацию, связность и грамматику. Страница обновится автоматически после выставления баллов.'}
-        </p>
-        <div className="rounded-xl bg-[#f7f7f5] p-3 text-xs text-slate-500 text-left w-full mt-2">
-          💡 Проверка обычно занимает от 30 до 90 секунд. Вы можете подождать
-          здесь или вернуться к разбору позже из раздела «Прогресс».
-        </div>
       </CardContent>
     </Card>
   )
@@ -515,134 +464,6 @@ function useBlobUrl(blob: Blob | undefined) {
     return () => URL.revokeObjectURL(next)
   }, [blob])
   return url
-}
-
-function StructuredReview({
-  material,
-  review,
-}: {
-  material: PublicListeningTest | PublicReadingMaterial
-  review: AttemptReviewItem[]
-}) {
-  const reviewByQuestionId = new Map(
-    review.map((item) => [item.questionId, item]),
-  )
-  if ('parts' in material) {
-    return (
-      <>
-        {material.parts.map((part) => (
-          <Card key={part.position} className="shadow-none">
-            <CardHeader>
-              <CardTitle>
-                Part {part.position}: {part.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-5">
-              {part.groups.map((group) => (
-                <section
-                  key={group.position}
-                  className="grid gap-3 rounded-xl border p-4"
-                >
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                      {group.type.replaceAll('_', ' ')}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">
-                      {group.instructions}
-                    </p>
-                  </div>
-                  <div className="grid gap-3">
-                    {group.questions.map((question) => {
-                      const item = question.id
-                        ? reviewByQuestionId.get(question.id)
-                        : undefined
-                      if (!item || !question.id) return null
-                      const options = (question.content.options ??
-                        group.config.options ??
-                        []) as Option[]
-                      return (
-                        <EnhancedReviewQuestion
-                          key={question.id}
-                          item={item}
-                          options={options}
-                        />
-                      )
-                    })}
-                  </div>
-                </section>
-              ))}
-            </CardContent>
-          </Card>
-        ))}
-      </>
-    )
-  }
-  const passages =
-    material.passages && material.passages.length > 0
-      ? material.passages
-      : [material]
-  return (
-    <div className="grid gap-5">
-      {passages.map((passage, passageIndex) => (
-        <Card key={passage.id} className="shadow-none">
-          <CardHeader>
-            <CardTitle>
-              Passage {passageIndex + 1}: {passage.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-5 p-5">
-            {passage.questionGroups.map((group) => (
-              <section
-                key={`${passage.id}-${group.position}`}
-                className="grid gap-3 rounded-xl border p-4"
-              >
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                    {group.type.replaceAll('_', ' ')}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap text-sm">
-                    {group.instructions}
-                  </p>
-                </div>
-                <div className="grid gap-3">
-                  {group.questions.map((question) => {
-                    const item = question.id
-                      ? reviewByQuestionId.get(question.id)
-                      : undefined
-                    if (!item || !question.id) return null
-                    const options = (question.content.options ?? []) as Option[]
-                    return (
-                      <EnhancedReviewQuestion
-                        key={question.id}
-                        item={item}
-                        options={options}
-                      />
-                    )
-                  })}
-                </div>
-              </section>
-            ))}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
-}
-
-function FlatReview({ review }: { review: AttemptReviewItem[] }) {
-  return (
-    <Card className="shadow-none">
-      <CardContent className="grid gap-3 p-5">
-        {review.map((item) => (
-          <EnhancedReviewQuestion
-            key={item.questionId}
-            item={item}
-            options={[]}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  )
 }
 
 function skillLabel(materialType: string) {

@@ -109,12 +109,14 @@ for (const skill of ['listening', 'reading']) {
 test('retake bypasses cached result and updates the library and sidebar after submission', async ({
   page,
 }) => {
+  await page.clock.install({ time: new Date('2026-10-06T10:01:00Z') })
   let starts = 0
   let retaking = false
   let saved = false
   const fresh = {
     ...completed,
     id: 'fresh',
+    startedAt: '2026-10-06T10:00:00Z',
     status: 'IN_PROGRESS',
     band: null,
     score: null,

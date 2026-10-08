@@ -1,20 +1,11 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  LampCharge,
-  MessageQuestion,
-} from 'iconsax-react'
+import { ArrowLeft, ArrowRight, MessageQuestion } from 'iconsax-react'
 import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getRouteApi, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  ErrorState,
-  LoadingState,
-  formatAnswer,
-} from '@/features/attempts/attempt-ui'
+import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import {
   attemptKeys,
   getMistakeDetail,
@@ -22,11 +13,11 @@ import {
 } from '@/features/attempts/api'
 import type {
   AttemptMaterialType,
-  AttemptReviewItem,
   MistakeAttempt,
   MistakeDetail,
 } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { MistakeRow } from '@/features/attempts/mistake-list'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
 import {
   mistakeDetailCache,
@@ -262,6 +253,13 @@ function AttemptMistakes({
   const materialType = detail?.attempt.materialType ?? skill
   const retryItem =
     detail && retryIndex !== null ? hydrateMistake(detail, retryIndex) : null
+  const nextIndex =
+    detail && retryIndex !== null
+      ? detail.review.findIndex(
+          (item, index) =>
+            index > retryIndex && !item.locked && Boolean(item.correctAnswer),
+        )
+      : -1
 
   return (
     <section className="grid gap-4">
@@ -304,6 +302,7 @@ function AttemptMistakes({
                   <MistakeRow
                     key={item.questionId}
                     item={item}
+                    attemptId={attemptId}
                     onRetry={() => setRetryIndex(index)}
                   />
                 ))}
@@ -329,6 +328,7 @@ function AttemptMistakes({
         testTitle={selected?.testTitle}
         attemptId={attemptId}
         materialType={materialType}
+        onNext={nextIndex >= 0 ? () => setRetryIndex(nextIndex) : undefined}
       />
     </section>
   )
@@ -497,41 +497,5 @@ function ReviewLink({ attemptId }: { attemptId: string }) {
         <ArrowRight className="size-3.5" aria-hidden />
       </Link>
     </Button>
-  )
-}
-
-function MistakeRow({
-  item,
-  onRetry,
-}: {
-  item: AttemptReviewItem
-  onRetry: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onRetry}
-      className="group grid w-full gap-2.5 rounded-[12px] border border-[#ededeb] bg-white p-4 text-left text-sm transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
-    >
-      <span className="flex flex-wrap items-center justify-between gap-3">
-        <span className="min-w-0 flex-1 basis-[200px] font-semibold text-slate-900 group-hover:text-blue-900">
-          <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
-          {item.prompt.replace('{{answer}}', '_____')}
-        </span>
-        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#1d4ed8]">
-          <LampCharge className="size-4" aria-hidden />
-          Разобрать ошибку
-        </span>
-      </span>
-      <span className="flex flex-wrap items-center gap-2.5 text-xs text-slate-600">
-        Ваш ответ:{' '}
-        <strong className="text-slate-900 line-through">
-          {formatAnswer(item.answer, [])}
-        </strong>
-        <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
-          Ошибка
-        </span>
-      </span>
-    </button>
   )
 }

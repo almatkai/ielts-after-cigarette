@@ -5,6 +5,15 @@
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
+/* Hover styles only for a real mouse, so a tap on iPhone never stops at a
+   hover state instead of activating the control. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
 
 @theme inline {
   --font-sans: 'Manrope Variable', 'Arial', sans-serif;
@@ -71,6 +80,7 @@ html {
 body {
   margin: 0;
   min-width: 0;
+  overflow-x: clip;
   background: #fafaf8;
   color: #111111;
   font-family: 'Manrope Variable', Arial, sans-serif;

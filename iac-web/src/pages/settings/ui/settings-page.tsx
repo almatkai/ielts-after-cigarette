@@ -21,8 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { authStore } from '@/features/auth/auth-store'
+import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import {
   getProfile,
   queryKeys,
@@ -92,6 +94,8 @@ function firstError(errors: unknown[]) {
 }
 
 export function SettingsPage() {
+  const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
+    useMascotVisibility()
   const queryClient = useQueryClient()
   const profileQuery = useQuery({
     queryKey: queryKeys.profile,
@@ -389,6 +393,40 @@ export function SettingsPage() {
             </goalForm.Subscribe>
           </CardFooter>
         </form>
+      </Card>
+
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <CardTitle className="text-base tracking-[-0.02em]">
+            Персонаж-помощник
+          </CardTitle>
+          <CardDescription className="mt-1 leading-5">
+            Управление отображением питомца Юки в интерфейсе.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <Label
+                htmlFor="mascot-toggle"
+                className="text-sm font-medium text-[#111111] cursor-pointer"
+              >
+                Показывать питомца (Юки)
+              </Label>
+              <p className="text-xs leading-5 text-[#69696d]">
+                Отображать анимированного лисёнка в правом нижнем углу экрана.
+                Если отключить, останется компактная кнопка быстрого перехода в
+                чат.
+              </p>
+            </div>
+            <Switch
+              id="mascot-toggle"
+              checked={isMascotVisible}
+              onCheckedChange={setMascotVisible}
+              className="data-[state=checked]:bg-[#3b82f6]"
+            />
+          </div>
+        </CardContent>
       </Card>
     </div>
   )

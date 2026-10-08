@@ -1,13 +1,19 @@
 import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
+import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { useAttemptSession } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
+import { useExamTimer } from '@/features/attempts/exam-timer'
+import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
   AttemptPerformanceReport,
   AttemptResultHeader,
@@ -17,11 +23,7 @@ import {
   SaveIndicator,
   TimeBadge,
 } from '@/features/attempts/attempt-ui'
-import {
-  attemptKeys,
-  getAttempt,
-  startWritingAttempt,
-} from '@/features/attempts/api'
+import { startWritingAttempt } from '@/features/attempts/api'
 import type { Attempt, WritingEvaluation } from '@/features/attempts/api'
 import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
@@ -39,7 +41,7 @@ export function WritingStudentPage({
       skillBadge="IELTS Writing"
       loadingLabel="Готовим задания Writing…"
       loadingDescription="Загружаем темы заданий, требования к объёму слов и подготавливаем редактор эссе."
-      queryKey={['writing', 'materials', materialId, 'attempt']}
+      queryKey={attemptStartQueryKey('writing', materialId)}
       startAttemptFn={(signal) => startWritingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
         <WritingAttemptRunner
@@ -93,6 +95,7 @@ export function WritingAttemptRunner({
       queryFn: () => getWritingMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      retry: false,
     })),
   })
 
@@ -101,68 +104,20 @@ export function WritingAttemptRunner({
   const isReady =
     session.answers !== null && isImagesReady && !session.loadError
 
+  const handleContinueLater = useContinueLater(session, { fullMockSessionId })
+
   const durationMinutes =
     material.durationMinutes > 0 ? material.durationMinutes : 60
   const durationSeconds = durationMinutes * 60
-  const totalDurationMs = durationSeconds * 1000
-  const storageKey = `iac_writing_deadline_${attempt.id}`
-
-  const [deadline, setDeadline] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null
-
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      const parsed = Number(saved)
-      if (parsed > 0 && !isNaN(parsed)) {
-        return parsed
-      }
-    }
-
-    const serverStartedAt = new Date(attempt.startedAt).getTime()
-    if (Date.now() - serverStartedAt > 2 * 60_000) {
-      return serverStartedAt + totalDurationMs
-    }
-
-    return null
+  // Same storage prefix as the previous hand-rolled deadline, so existing
+  // drafts keep their remaining time across the migration.
+  const { secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_writing_deadline_',
+    durationSeconds,
+    ready: isReady,
+    finished: Boolean(session.submitted),
   })
-
-  useEffect(() => {
-    if (isReady && deadline === null) {
-      const newDeadline = Date.now() + totalDurationMs
-      setDeadline(newDeadline)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, String(newDeadline))
-      }
-    }
-  }, [isReady, deadline, totalDurationMs, storageKey])
-
-  useEffect(() => {
-    if (session.submitted && typeof window !== 'undefined') {
-      localStorage.removeItem(storageKey)
-    }
-  }, [session.submitted, storageKey])
-
-  const [secondsLeft, setSecondsLeft] = useState(() => {
-    if (deadline === null) {
-      return durationSeconds
-    }
-    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
-  })
-
-  useEffect(() => {
-    if (deadline === null) {
-      setSecondsLeft(durationSeconds)
-      return
-    }
-
-    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-
-    const interval = window.setInterval(() => {
-      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [deadline, durationSeconds])
 
   useEffect(() => {
     if (session.submitted && onSubmitted) {
@@ -233,6 +188,16 @@ export function WritingAttemptRunner({
               label="Оставшееся время"
             />
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={session.isSavingAndExiting || session.isSubmitting}
+            onClick={handleContinueLater}
+            className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+          >
+            {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+          </Button>
         </div>
         <p className="sr-only">
           {material.examType === 'academic' ? 'Academic' : 'General Training'}
@@ -240,6 +205,14 @@ export function WritingAttemptRunner({
           автоматически.
         </p>
       </div>
+      {session.exitError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+        >
+          Не удалось сохранить черновик: {session.exitError}
+        </p>
+      ) : null}
       {session.submitError ? (
         <p
           role="alert"
@@ -281,6 +254,8 @@ export function WritingAttemptRunner({
         answeredCount={answeredCount}
         totalQuestions={material.tasks.length}
         isSubmitting={session.isSubmitting}
+        onContinueLater={handleContinueLater}
+        isSavingAndExiting={session.isSavingAndExiting}
         disabled={!allTasksAnswered}
         disabledMessage={
           allTasksAnswered
@@ -375,6 +350,7 @@ function ProtectedWritingImage({
     queryFn: () => getWritingMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -486,14 +462,7 @@ export function WritingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attempt.id),
-    queryFn: ({ signal }) => getAttempt(attempt.id, signal),
-    // A failed writing job resets attempts.status to IN_PROGRESS, so polling
-    // everything except SUBMITTED would loop forever next to the error card.
-    refetchInterval: (query) =>
-      query.state.data?.status === 'PROCESSING' ? 2500 : false,
-  })
+  const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt
@@ -509,12 +478,9 @@ export function WritingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {material.title}
+          Работа над ошибками
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Writing · {material.tasks.length} задания ·{' '}
-          {material.durationMinutes} минут
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (

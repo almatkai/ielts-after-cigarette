@@ -36,6 +36,13 @@ export function requestGoogleLogin(googleToken: string) {
   })
 }
 
+export function requestPendingGoogleRegistration() {
+  return apiClient.request<GoogleRegistrationRequired>(
+    '/api/v1/auth/google/pending',
+    { authenticated: false, retryAuthentication: false },
+  )
+}
+
 export function requestCompleteGoogleRegistration(
   input: CompleteGoogleRegistrationInput,
 ) {

@@ -60,25 +60,25 @@ const cardClassName =
 
 export function PracticePage() {
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-6">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-4 sm:gap-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-[-0.025em] text-[#111111]">
+          <h1 className="text-lg sm:text-xl font-semibold tracking-[-0.025em] text-[#111111]">
             Практика
           </h1>
-          <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
             Выберите секцию для тренировки или пройдите полный пробный экзамен.
           </p>
         </div>
         <Badge
           variant="outline"
-          className="w-fit border-[#deded9] bg-white px-2.5 py-1 text-xs text-[#69696d]"
+          className="w-fit border-[#deded9] bg-white px-2.5 py-0.5 sm:py-1 text-xs text-[#69696d]"
         >
           4 секции + Full Mock
         </Badge>
       </header>
 
-      <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-3 sm:gap-4 sm:grid-cols-2">
         {skills.map((skill) => {
           const Icon = skill.icon
 
@@ -86,44 +86,44 @@ export function PracticePage() {
             <Card key={skill.id} className={cardClassName}>
               <Link
                 to={skill.to}
-                className="group flex h-full flex-col justify-between p-6 no-underline"
+                className="group flex h-full flex-col justify-between p-4 sm:p-6 no-underline"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-4">
-                    <span className="grid size-11 place-items-center rounded-[11px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                  <div className="flex items-start justify-between gap-3 sm:gap-4">
+                    <span className="grid size-9 sm:size-11 place-items-center rounded-[9px] sm:rounded-[11px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
                       <Icon
-                        className="size-5 transition-colors"
+                        className="size-4.5 sm:size-5 transition-colors"
                         strokeWidth={1.8}
                         aria-hidden
                       />
                     </span>
                     <Badge
                       variant="outline"
-                      className="border-[#ededeb] bg-[#fafaf8] text-[11px] font-medium text-[#69696d]"
+                      className="border-[#ededeb] bg-[#fafaf8] px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-[#69696d]"
                     >
                       {skill.badge}
                     </Badge>
                   </div>
 
-                  <div className="mt-5">
-                    <div className="flex items-baseline gap-2">
-                      <h2 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+                  <div className="mt-3.5 sm:mt-5">
+                    <div className="flex items-baseline gap-1.5 sm:gap-2">
+                      <h2 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
                         {skill.title}
                       </h2>
-                      <span className="text-xs text-[#8b8b8e]">
+                      <span className="text-[11px] sm:text-xs text-[#8b8b8e]">
                         ({skill.subtitle})
                       </span>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-[#69696d]">
+                    <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
                       {skill.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-2 pt-2 text-sm font-semibold text-[#2563eb]">
+                <div className="mt-4 sm:mt-6 flex items-center gap-2 pt-1 sm:pt-2 text-xs sm:text-sm font-semibold text-[#2563eb]">
                   <span>Перейти к материалам</span>
                   <ArrowRight
-                    className="size-4 transition-transform group-hover:translate-x-1"
+                    className="size-3.5 sm:size-4 transition-transform group-hover:translate-x-1"
                     aria-hidden
                   />
                 </div>
@@ -133,36 +133,36 @@ export function PracticePage() {
         })}
       </div>
 
-      <Card className={cn(cardClassName, 'group p-6 sm:p-7')}>
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-              <ClipboardTick className="size-6 transition-colors" aria-hidden />
+      <Card className={cn(cardClassName, 'group p-4 sm:p-7')}>
+        <div className="flex flex-col justify-between gap-4 sm:gap-5 sm:flex-row sm:items-center">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <span className="grid size-10 sm:size-12 shrink-0 place-items-center rounded-[10px] sm:rounded-xl bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+              <ClipboardTick className="size-5 sm:size-6 transition-colors" aria-hidden />
             </span>
             <div>
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-base font-semibold tracking-[-0.02em] text-[#111111]">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <h2 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
                   Полный пробный экзамен (Full Mock)
                 </h2>
                 <Badge
                   variant="outline"
-                  className="border-blue-200 bg-blue-50/60 text-[11px] font-medium text-blue-700"
+                  className="border-blue-200 bg-blue-50/60 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-blue-700"
                 >
                   4 секции подряд
                 </Badge>
               </div>
-              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#69696d]">
-                Пройдите Listening, Reading, Writing и Speaking в единой
-                экзаменационной сессии с официальными таймерами и итоговым
-                расчётом общего Band Score.
+              <p className="mt-1 sm:mt-1.5 max-w-2xl text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
+                Мы автоматически подберём Listening, Reading, Writing и Speaking
+                из общей библиотеки — сначала непройденные тесты. Четыре секции
+                подряд, общий таймер и итоговый Band Score.
               </p>
             </div>
           </div>
           <Link
             to="/full-mocks"
-            className="inline-flex shrink-0 items-center justify-center rounded-[10px] bg-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+            className="inline-flex shrink-0 items-center justify-center rounded-[9px] sm:rounded-[10px] bg-[#2563eb] px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
           >
-            Перейти к Full Mock
+            Подготовить Full Mock
           </Link>
         </div>
       </Card>

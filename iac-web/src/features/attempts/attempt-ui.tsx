@@ -371,6 +371,8 @@ export function AttemptSubmitBar({
   disabled = false,
   disabledMessage,
   onSubmit,
+  onContinueLater,
+  isSavingAndExiting = false,
 }: {
   answeredCount: number
   totalQuestions: number
@@ -378,6 +380,8 @@ export function AttemptSubmitBar({
   disabled?: boolean
   disabledMessage?: string
   onSubmit: () => void
+  onContinueLater?: () => void
+  isSavingAndExiting?: boolean
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
@@ -385,27 +389,42 @@ export function AttemptSubmitBar({
         Отвечено на {answeredCount} из {totalQuestions} вопросов.
         {disabledMessage ? ` ${disabledMessage}` : ''}
       </p>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button disabled={isSubmitting || disabled}>
-            {isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+      <div className="flex items-center gap-2.5">
+        {onContinueLater ? (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting || isSavingAndExiting || disabled}
+            onClick={onContinueLater}
+            className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
+          >
+            {isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
           </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Завершить тест?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ответы будут отправлены на проверку, изменить их после завершения
-              нельзя. Без ответа останется {totalQuestions - answeredCount}{' '}
-              вопросов.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Продолжить</AlertDialogCancel>
-            <AlertDialogAction onClick={onSubmit}>Завершить</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        ) : null}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button disabled={isSubmitting || isSavingAndExiting || disabled}>
+              {isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Завершить тест?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ответы будут отправлены на проверку, изменить их после
+                завершения нельзя. Без ответа останется{' '}
+                {totalQuestions - answeredCount} вопросов.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Продолжить</AlertDialogCancel>
+              <AlertDialogAction onClick={onSubmit}>
+                Завершить
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   )
 }
@@ -633,7 +652,7 @@ export type PerformanceCriterion = {
 
 export function AttemptPerformanceReport({
   band,
-  bandNote = 'Балл рассчитан по стандарту академического IELTS',
+  bandNote,
   score,
   maxScore,
   correctCount,
@@ -705,10 +724,10 @@ export function AttemptPerformanceReport({
   const incorrectCount = Math.max(0, effectiveTotal - effectiveCorrect)
 
   return (
-    <div className="rounded-[20px] border border-[#e7e7e4] bg-white p-6 sm:p-7 shadow-xs">
-      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 gap-6 md:gap-0">
+    <div className="rounded-[20px] border border-[#e7e7e4] bg-white p-5 sm:p-7 shadow-xs">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 gap-0">
         {/* ЗОНА 1: IELTS Band Score */}
-        <div className="md:pr-8 flex flex-col justify-between">
+        <div className="pb-4 md:pb-0 md:pr-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -727,11 +746,13 @@ export function AttemptPerformanceReport({
               </span>
             </div>
           </div>
-          <p className="mt-4 text-xs text-slate-500">{bandNote}</p>
+          {bandNote ? (
+            <p className="mt-3 text-xs text-slate-500">{bandNote}</p>
+          ) : null}
         </div>
 
         {/* ЗОНА 2: Точность и баллы / Критерии */}
-        <div className="md:px-8 flex flex-col justify-between pt-6 md:pt-0">
+        <div className="py-4 md:py-0 md:px-8 flex flex-col justify-between">
           {criteria && criteria.length > 0 ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
@@ -829,7 +850,7 @@ export function AttemptPerformanceReport({
         </div>
 
         {/* ЗОНА 3: Время выполнения и темп */}
-        <div className="md:pl-8 flex flex-col justify-between pt-6 md:pt-0">
+        <div className="pt-4 md:pt-0 md:pl-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">

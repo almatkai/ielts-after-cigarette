@@ -5,7 +5,7 @@ import { ProfilePage } from '@/pages/profile/ui/profile-page'
 export const Route = createFileRoute('/_app/profile')({
   head: () => ({
     meta: [
-      { title: 'Профиль — IAC' },
+      { title: 'Профиль — Daiyndyq IELTS' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

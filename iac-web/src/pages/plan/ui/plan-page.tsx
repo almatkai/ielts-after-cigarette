@@ -35,7 +35,11 @@ const skillMeta: Record<
   {
     title: string
     subtitle: string
-    to: '/listening' | '/reading' | '/writing' | '/speaking'
+    to:
+      | '/listening'
+      | '/reading'
+      | '/writing'
+      | '/speaking'
     icon: typeof Headphone
     advice: string
   }
@@ -45,32 +49,28 @@ const skillMeta: Record<
     subtitle: 'Аудирование',
     to: '/listening',
     icon: Headphone,
-    advice:
-      'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
+    advice: 'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
   },
   reading: {
     title: 'Reading',
     subtitle: 'Чтение',
     to: '/reading',
     icon: Book,
-    advice:
-      'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
+    advice: 'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
   },
   writing: {
     title: 'Writing',
     subtitle: 'Письмо',
     to: '/writing',
     icon: Edit2,
-    advice:
-      'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
+    advice: 'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
   },
   speaking: {
     title: 'Speaking',
     subtitle: 'Устная речь',
     to: '/speaking',
     icon: Microphone,
-    advice:
-      'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
+    advice: 'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
   },
 }
 
@@ -125,42 +125,36 @@ export function PlanPage() {
 
   const weakestMeta = weakest ? skillMeta[weakest.skill] : undefined
   const weakestGap =
-    targetBand !== null &&
-    weakest?.estimatedBand !== null &&
-    weakest?.estimatedBand !== undefined
+    targetBand !== null && weakest?.estimatedBand !== null && weakest?.estimatedBand !== undefined
       ? targetBand - weakest.estimatedBand
       : null
 
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-6">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-4 sm:gap-6">
       {/* Заголовок страницы */}
       <div>
-        <h2 className="text-xl font-semibold tracking-[-0.025em] text-[#111111]">
+        <h2 className="text-lg sm:text-xl font-semibold tracking-[-0.025em] text-[#111111]">
           План подготовки к IELTS
         </h2>
-        <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Индивидуальная стратегия, фокус на самых слабых навыках и ежедневный
-          темп занятий.
-        </p>
       </div>
 
       {/* 1. Траектория цели с иллюстрацией */}
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5">
+        <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-[8px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6]">
-                <CalendarTick className="size-4" aria-hidden />
+              <span className="grid size-7 sm:size-8 place-items-center rounded-[7px] sm:rounded-[8px] bg-[#f4f4f1] text-[#69696d] transition-colors group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6]">
+                <CalendarTick className="size-3.5 sm:size-4" aria-hidden />
               </span>
               <div>
-                <CardTitle className="text-base tracking-[-0.02em]">
+                <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
                   Траектория цели
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  {targetBand && examDate
-                    ? 'Данные синхронизированы с вашим профилем'
-                    : 'Задайте цель, чтобы откалибровать расчет'}
-                </CardDescription>
+                {!(targetBand && examDate) ? (
+                  <CardDescription className="text-[11px] sm:text-xs">
+                    Задайте цель, чтобы откалибровать расчет
+                  </CardDescription>
+                ) : null}
               </div>
             </div>
 
@@ -168,13 +162,13 @@ export function PlanPage() {
               <Badge
                 variant="secondary"
                 className={cn(
-                  'gap-1.5 px-3 py-1 font-medium',
+                  'gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 text-xs font-medium',
                   daysLeft <= 14
                     ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : 'bg-[#eff6ff] text-[#3b82f6] border-[#dbeafe]',
                 )}
               >
-                <Calendar className="size-3.5" aria-hidden />
+                <Calendar className="size-3 sm:size-3.5" aria-hidden />
                 {daysLeft === 0
                   ? 'Экзамен сегодня!'
                   : `Осталось ${daysLeft} ${getDaysPlural(daysLeft)}`}
@@ -182,7 +176,7 @@ export function PlanPage() {
             ) : (
               <Badge
                 variant="outline"
-                className="gap-1.5 border-dashed border-[#deded9] text-[#8b8b8e]"
+                className="gap-1.5 border-dashed border-[#deded9] px-2.5 py-0.5 text-xs text-[#8b8b8e]"
               >
                 Дата экзамена не указана
               </Badge>
@@ -190,7 +184,7 @@ export function PlanPage() {
           </div>
         </CardHeader>
 
-        <CardContent className="p-5 sm:p-6">
+        <CardContent className="p-3.5 sm:p-6">
           <div className="flex gap-6 items-start">
             {/* Левая часть — иллюстрация */}
             <div className="hidden lg:flex shrink-0 items-center justify-center">
@@ -205,57 +199,48 @@ export function PlanPage() {
             <div className="flex flex-col gap-5 flex-1 min-w-0">
               {targetBand === null || examDate === null ? (
                 <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] p-5 text-center">
-                  <DirectRight
-                    className="mx-auto size-6 text-[#3b82f6]"
-                    aria-hidden
-                  />
+                  <DirectRight className="mx-auto size-6 text-[#3b82f6]" aria-hidden />
                   <p className="mt-2 text-sm font-semibold text-[#111111]">
                     Целевой балл или дата ещё не заданы
                   </p>
                   <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#69696d]">
-                    Укажите желаемый Overall Band и дату экзамена — алгоритм
-                    рассчитает необходимый темп и распределит нагрузку по дням.
+                    Укажите желаемый Overall Band и дату экзамена — алгоритм рассчитает
+                    необходимый темп и распределит нагрузку по дням.
                   </p>
                   <Button asChild size="sm" className="mt-4 shadow-none">
                     <Link to="/profile">Задать цель в профиле</Link>
                   </Button>
                 </div>
               ) : (
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#69696d]">
+                <div className="grid gap-2.5 sm:gap-4 sm:grid-cols-3">
+                  <div className="rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#69696d]">
                       Текущий балл
                     </p>
-                    <div className="mt-1.5 flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-[#111111]">
+                    <div className="mt-1 sm:mt-1.5 flex items-baseline gap-2">
+                      <span className="text-xl sm:text-2xl font-bold text-[#111111]">
                         {currentBand !== null ? currentBand.toFixed(1) : '—'}
                       </span>
                       {currentBand === null && (
-                        <span className="text-[11px] text-[#8b8b8e]">
-                          (после тестов)
-                        </span>
+                        <span className="text-[10px] sm:text-[11px] text-[#8b8b8e]">(после тестов)</span>
                       )}
                     </div>
-                    <p className="mt-1 text-[11px] text-[#69696d]">
-                      Расчётный Overall Band
-                    </p>
+                    <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-[#69696d]">Расчётный Overall Band</p>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#dbeafe] bg-[#eff6ff]/40 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#3b82f6]">
+                  <div className="rounded-[10px] sm:rounded-[12px] border border-[#dbeafe] bg-[#eff6ff]/40 p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#3b82f6]">
                       Целевой балл
                     </p>
-                    <div className="mt-1.5 flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-[#3b82f6]">
+                    <div className="mt-1 sm:mt-1.5 flex items-baseline gap-2">
+                      <span className="text-xl sm:text-2xl font-bold text-[#3b82f6]">
                         {targetBand.toFixed(1)}
                       </span>
                       {currentBand !== null && (
                         <span
                           className={cn(
                             'text-[11px] font-semibold',
-                            targetBand - currentBand <= 0
-                              ? 'text-emerald-600'
-                              : 'text-[#3b82f6]',
+                            targetBand - currentBand <= 0 ? 'text-emerald-600' : 'text-[#3b82f6]',
                           )}
                         >
                           {targetBand - currentBand <= 0
@@ -264,21 +249,19 @@ export function PlanPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-[11px] text-[#69696d]">
-                      Желаемый результат
-                    </p>
+                    <p className="mt-1 text-[11px] text-[#69696d]">Желаемый результат</p>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#69696d]">
+                  <div className="rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#69696d]">
                       Дата экзамена
                     </p>
-                    <p className="mt-1.5 text-xl font-bold text-[#111111]">
+                    <p className="mt-1 sm:mt-1.5 text-lg sm:text-xl font-bold text-[#111111]">
                       {formatExamDate(examDate)}
                     </p>
                     <Link
                       to="/profile"
-                      className="mt-1 inline-block text-[11px] text-[#3b82f6] hover:underline font-medium"
+                      className="mt-0.5 sm:mt-1 inline-block text-[10px] sm:text-[11px] text-[#3b82f6] hover:underline font-medium"
                     >
                       Изменить дату →
                     </Link>
@@ -287,11 +270,11 @@ export function PlanPage() {
               )}
 
               {/* Подсказка по темпу */}
-              <div className="flex items-start gap-3 rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
-                <span className="grid size-7 shrink-0 place-items-center rounded-[6px] bg-white text-[#3b82f6] shadow-xs">
-                  <LampOn className="size-4" aria-hidden />
+              <div className="flex items-start gap-2.5 sm:gap-3 rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4">
+                <span className="grid size-6 sm:size-7 shrink-0 place-items-center rounded-[6px] bg-white text-[#3b82f6] shadow-xs">
+                  <LampOn className="size-3.5 sm:size-4" aria-hidden />
                 </span>
-                <div className="text-xs leading-5">
+                <div className="text-[11px] sm:text-xs leading-4 sm:leading-5">
                   <span className="font-semibold text-[#111111]">
                     Рекомендуемый режим занятий:{' '}
                   </span>
@@ -305,32 +288,31 @@ export function PlanPage() {
 
       {/* 2. Главный фокус подготовки: самый уязвимый навык */}
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5">
+        <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="grid size-8 place-items-center rounded-[8px] bg-[#eff6ff] text-[#3b82f6]">
-                <DirectRight className="size-4" aria-hidden />
+              <span className="grid size-7 sm:size-8 place-items-center rounded-[7px] sm:rounded-[8px] bg-[#eff6ff] text-[#3b82f6]">
+                <DirectRight className="size-3.5 sm:size-4" aria-hidden />
               </span>
               <div>
-                <CardTitle className="text-base tracking-[-0.02em]">
+                <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
                   Зона максимального роста
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  Навык, улучшение которого даст наибольший прирост к общему
-                  баллу
+                <CardDescription className="text-[11px] sm:text-xs">
+                  Навык, улучшение которого даст наибольший прирост к общему баллу
                 </CardDescription>
               </div>
             </div>
 
             {weakest && (
-              <Badge className="bg-[#3b82f6] text-white hover:bg-[#2563eb] text-xs">
+              <Badge className="bg-[#3b82f6] text-white hover:bg-[#2563eb] px-2 py-0.5 text-[11px] sm:text-xs">
                 Приоритет №1 · {weakestMeta?.title}
               </Badge>
             )}
           </div>
         </CardHeader>
 
-        <CardContent className="p-5 sm:p-6">
+        <CardContent className="p-3.5 sm:p-6">
           {weakest === null ? (
             <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] p-6 text-center">
               <p className="text-sm font-semibold text-[#111111]">
@@ -338,8 +320,7 @@ export function PlanPage() {
               </p>
               <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#808084]">
                 Пока нет завершённых попыток. Начните с Listening или Reading —
-                алгоритм сразу вычислит текущий балл и выявит самое слабое
-                место.
+                алгоритм сразу вычислит текущий балл и выявит самое слабое место.
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
@@ -355,9 +336,7 @@ export function PlanPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
                 <div className="flex items-center gap-3">
                   <span className="grid size-10 place-items-center rounded-[10px] bg-white text-[#3b82f6] shadow-xs">
-                    {weakestMeta && (
-                      <weakestMeta.icon className="size-5" aria-hidden />
-                    )}
+                    {weakestMeta && <weakestMeta.icon className="size-5" aria-hidden />}
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-[#111111]">
@@ -379,59 +358,59 @@ export function PlanPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2 sm:gap-2.5">
                   {weakestMeta && (
-                    <Button asChild className="gap-2 shadow-none">
+                    <Button asChild className="h-9 sm:h-10 text-xs sm:text-sm gap-1.5 sm:gap-2 shadow-none">
                       <Link to={weakestMeta.to}>
                         Начать тренировку {weakestMeta.title}
-                        <ArrowRight className="size-4" aria-hidden />
+                        <ArrowRight className="size-3.5 sm:size-4" aria-hidden />
                       </Link>
                     </Button>
                   )}
-                  <Button asChild variant="outline" className="shadow-none">
+                  <Button asChild variant="outline" className="h-9 sm:h-10 text-xs sm:text-sm shadow-none">
                     <Link to="/mistakes">Банк ошибок</Link>
                   </Button>
                 </div>
               </div>
 
               {/* 3 шага для подтягивания навыка */}
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-[10px] border border-[#ededeb] p-3.5">
+              <div className="grid gap-2.5 sm:gap-3 sm:grid-cols-3">
+                <div className="rounded-[9px] sm:rounded-[10px] border border-[#ededeb] p-3 sm:p-3.5">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#111111]">
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       1
                     </span>
                     Регулярный спринт
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-[#69696d]">
+                  <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
                     Делайте хотя бы 1 задание {weakestMeta?.title} каждый день и
                     детально разбирайте каждое несовпадение.
                   </p>
                 </div>
 
-                <div className="rounded-[10px] border border-[#ededeb] p-3.5">
+                <div className="rounded-[9px] sm:rounded-[10px] border border-[#ededeb] p-3 sm:p-3.5">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#111111]">
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       2
                     </span>
                     Анализ ошибок
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-[#69696d]">
-                    {weakestMeta?.advice} Все ошибки сохраняются в разделе
-                    «Ошибки» для повторения.
+                  <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
+                    {weakestMeta?.advice} Все ошибки сохраняются в разделе «Ошибки»
+                    для повторения.
                   </p>
                 </div>
 
-                <div className="rounded-[10px] border border-[#ededeb] p-3.5">
+                <div className="rounded-[9px] sm:rounded-[10px] border border-[#ededeb] p-3 sm:p-3.5">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#111111]">
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       3
                     </span>
                     Контрольный замер
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-[#69696d]">
-                    Раз в неделю проходите полный модуль целиком с таймингом,
-                    чтобы отслеживать динамику в «Прогрессе».
+                  <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
+                    Раз в неделю проходите полный модуль целиком с таймингом, чтобы
+                    отслеживать динамику в «Прогрессе».
                   </p>
                 </div>
               </div>
@@ -439,6 +418,7 @@ export function PlanPage() {
           )}
         </CardContent>
       </Card>
+
     </div>
   )
 }
@@ -473,11 +453,10 @@ function getPacingInfo(
     return 'Оптимальный темп: 1 модуль ежедневно + 1 полный пробный тест (Full Mock) в неделю.'
   }
   const gap =
-    targetBand !== null && currentBand !== null
-      ? targetBand - currentBand
-      : null
+    targetBand !== null && currentBand !== null ? targetBand - currentBand : null
   if (gap !== null && gap > 1.5) {
     return 'До цели значительный шаг: уделяйте особое внимание слабому навыку и словарному запасу.'
   }
   return 'Планомерная подготовка: 1 модуль в день и еженедельный разбор накопленных ошибок.'
 }
+

@@ -5,6 +5,9 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 
+import { useEffect } from 'react'
+import { PresenceBeacon } from '@/features/analytics/presence-beacon'
+import { reportError } from '@/lib/error-reporting'
 import { NotFoundPage } from '@/pages/not-found/ui/not-found-page'
 
 import appCss from '../styles.css?url'
@@ -28,7 +31,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'IAC — современная подготовка к IELTS',
+        title: 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза',
       },
       {
         name: 'theme-color',
@@ -38,12 +41,31 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     links: [
       {
         rel: 'icon',
-        type: 'image/x-icon',
-        href: `${import.meta.env.BASE_URL}favicon.ico`,
+        type: 'image/png',
+        sizes: '32x32',
+        href: `${import.meta.env.BASE_URL}favicon-32.png?v=2`,
       },
       {
-        rel: 'alternate icon',
-        href: `${import.meta.env.BASE_URL}favicon.ico`,
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: `${import.meta.env.BASE_URL}favicon-16.png?v=2`,
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '256x256',
+        href: `${import.meta.env.BASE_URL}favicon.png?v=2`,
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: `${import.meta.env.BASE_URL}favicon.ico?v=2`,
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: `${import.meta.env.BASE_URL}apple-touch-icon.png?v=2`,
       },
       {
         rel: 'stylesheet',
@@ -56,7 +78,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 })
 
-function RootErrorComponent({ reset }: { reset: () => void }) {
+function RootErrorComponent({
+  error,
+  reset,
+}: {
+  error: Error
+  reset: () => void
+}) {
+  useEffect(() => reportError(error, 'route'), [error])
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAFAF8] px-6 text-center">
       <h1 className="text-xl font-semibold text-[#111111]">
@@ -93,6 +122,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <PresenceBeacon />
         <Scripts />
       </body>
     </html>

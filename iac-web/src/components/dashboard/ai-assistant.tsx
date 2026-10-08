@@ -7,12 +7,12 @@ import {
 } from 'iconsax-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { FoxMascot } from './fox-mascot'
 import { MarkdownContent } from './markdown-content'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { sendAssistantChat } from '@/features/assistant/api'
+import { getErrorMessage } from '@/lib/api/client'
+import { streamAssistantChat } from '@/features/assistant/stream'
 import type { ChatMessageDto } from '@/features/assistant/api'
 import { extractPageAsReadme } from '@/features/assistant/page-reader'
 
@@ -33,6 +33,7 @@ type Message = {
   text: string
   time: string
   isError?: boolean
+  isPending?: boolean
 }
 
 const STORAGE_KEY = 'iac_yuki_chat_messages_v1'
@@ -78,6 +79,8 @@ export function AiAssistantChatWindow({
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  useEffect(() => () => requestRef.current?.abort(), [])
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Resizable state from top-left corner
@@ -213,7 +216,10 @@ export function AiAssistantChatWindow({
   // Save messages to sessionStorage
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(messages.filter((message) => !message.isPending)),
+      )
     } catch {
       // Ignore sessionStorage errors
     }
@@ -323,7 +329,7 @@ export function AiAssistantChatWindow({
 
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend ?? input).trim()
-    if (!text || isTyping) return
+    if (!text || isTyping || requestRef.current) return
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -336,7 +342,16 @@ export function AiAssistantChatWindow({
     }
 
     const nextMessages = [...messages, userMsg]
-    setMessages(nextMessages)
+    const controller = new AbortController()
+    requestRef.current = controller
+    const botMsg: Message = {
+      id: `${userMsg.id}-reply`,
+      isPending: true,
+      sender: 'fox',
+      text: '',
+      time: userMsg.time,
+    }
+    setMessages([...nextMessages, botMsg])
     setInput('')
     setIsTyping(true)
 
@@ -345,50 +360,79 @@ export function AiAssistantChatWindow({
       const pageReadme = extractPageAsReadme()
 
       const historyForApi: ChatMessageDto[] = nextMessages
-        .filter((m) => !m.isError && m.id !== 'welcome')
+        .filter(
+          (m) =>
+            !m.isError && !m.isPending && m.id !== 'welcome' && m.text.trim(),
+        )
+        .slice(-20)
         .map((m) => ({
           role: m.sender === 'user' ? 'user' : 'assistant',
           content: m.text,
         }))
 
-      const response = await sendAssistantChat({
-        messages: historyForApi,
-        pageContext: {
-          url: pageReadme.url,
-          title: pageReadme.title,
-          content: pageReadme.markdown,
+      const response = await streamAssistantChat(
+        {
+          messages: historyForApi,
+          pageContext: {
+            url: pageReadme.url,
+            title: pageReadme.title,
+            content: pageReadme.markdown,
+          },
         },
-      })
-
-      const botMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'fox',
-        text: response.message.content,
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        (event) => {
+          if (controller.signal.aborted) return
+          setMessages((prev) =>
+            prev.map((message) =>
+              message.id === botMsg.id
+                ? {
+                    ...message,
+                    text:
+                      event.type === 'reset' ? '' : message.text + event.text,
+                  }
+                : message,
+            ),
+          )
+        },
+        controller.signal,
+      )
+      if (!controller.signal.aborted) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === botMsg.id
+              ? { ...message, text: response.message.content, isPending: false }
+              : message,
+          ),
+        )
       }
-
-      setMessages((prev) => [...prev, botMsg])
-    } catch {
-      const errorMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'fox',
-        text: 'Не удалось связаться с сервером AI. Пожалуйста, проверь подключение или повтори попытку через несколько секунд.',
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        isError: true,
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === botMsg.id
+              ? {
+                  ...message,
+                  text:
+                    getErrorMessage(err) ||
+                    'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                  isError: true,
+                  isPending: false,
+                }
+              : message,
+          ),
+        )
       }
-      setMessages((prev) => [...prev, errorMsg])
     } finally {
-      setIsTyping(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        setIsTyping(false)
+      }
     }
   }
 
   const handleReset = () => {
+    requestRef.current?.abort()
+    requestRef.current = null
+    setIsTyping(false)
     setMessages(getInitialMessages())
     setInput('')
     try {
@@ -509,52 +553,54 @@ export function AiAssistantChatWindow({
 
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-gradient-to-b from-slate-50/40 via-white to-slate-50/20 text-slate-800">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={cn(
-              'flex items-end gap-2',
-              msg.sender === 'user' ? 'justify-end' : 'justify-start',
-            )}
-          >
-            {msg.sender === 'fox' ? (
-              <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
-                <img
-                  src={foxSrc}
-                  alt="Юки"
-                  className="size-full object-contain"
-                />
-              </div>
-            ) : null}
-
+        {messages
+          .filter((msg) => msg.text.trim())
+          .map((msg) => (
             <div
+              key={msg.id}
               className={cn(
-                'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
-                msg.sender === 'user'
-                  ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
-                  : msg.isError
-                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
-                    : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
+                'flex items-end gap-2',
+                msg.sender === 'user' ? 'justify-end' : 'justify-start',
               )}
             >
-              {/* Message body with Markdown support */}
               {msg.sender === 'fox' ? (
-                <MarkdownContent content={msg.text} />
-              ) : (
-                <div className="whitespace-pre-wrap">{msg.text}</div>
-              )}
+                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
+                  <img
+                    src={foxSrc}
+                    alt="Юки"
+                    className="size-full object-contain"
+                  />
+                </div>
+              ) : null}
 
               <div
                 className={cn(
-                  'mt-1 text-[9px] font-medium text-right select-none',
-                  msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400',
+                  'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
+                  msg.sender === 'user'
+                    ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
+                    : msg.isError
+                      ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
+                      : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
                 )}
               >
-                {msg.time}
+                {/* Message body with Markdown support */}
+                {msg.sender === 'fox' ? (
+                  <MarkdownContent content={msg.text} />
+                ) : (
+                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                )}
+
+                <div
+                  className={cn(
+                    'mt-1 text-[9px] font-medium text-right select-none',
+                    msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400',
+                  )}
+                >
+                  {msg.time}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {isTyping ? (
           <div className="flex items-end gap-2">
@@ -664,152 +710,5 @@ export function AiAssistantChatWindow({
         </button>
       </form>
     </div>
-  )
-}
-
-export function AiAssistantFloatingWidget({
-  className,
-}: {
-  className?: string
-}) {
-  const [bubbleDismissed, setBubbleDismissed] = useState(false)
-  const [chatIsOpen, setChatIsOpen] = useState(false)
-  const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 })
-  const mascotRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let rafId: number | null = null
-    const PROXIMITY_RADIUS = 520 // px proximity threshold on screen
-    const MAX_SVG_OFFSET = 14 // SVG coordinate displacement
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (chatIsOpen) return
-      if (rafId !== null) return
-      rafId = requestAnimationFrame(() => {
-        rafId = null
-        if (!mascotRef.current) return
-        const rect = mascotRef.current.getBoundingClientRect()
-        const eyeX = rect.left + rect.width * 0.43
-        const eyeY = rect.top + rect.height * 0.38
-
-        const dx = e.clientX - eyeX
-        const dy = e.clientY - eyeY
-        const dist = Math.hypot(dx, dy)
-
-        if (dist < PROXIMITY_RADIUS && dist > 3) {
-          const factor = Math.min(1, Math.max(0, 1 - dist / PROXIMITY_RADIUS))
-          const angle = Math.atan2(dy, dx)
-          const strength = 0.35 + 0.65 * factor
-          const targetX = Math.cos(angle) * MAX_SVG_OFFSET * strength
-          const targetY = Math.sin(angle) * MAX_SVG_OFFSET * strength
-          setEyeOffset({
-            x: Math.round(targetX * 10) / 10,
-            y: Math.round(targetY * 10) / 10,
-          })
-        } else {
-          setEyeOffset((prev) =>
-            prev.x === 0 && prev.y === 0 ? prev : { x: 0, y: 0 },
-          )
-        }
-      })
-    }
-
-    const handleMouseLeave = () => {
-      setEyeOffset({ x: 0, y: 0 })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    document.addEventListener('mouseleave', handleMouseLeave)
-
-    return () => {
-      if (rafId !== null) cancelAnimationFrame(rafId)
-      window.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseleave', handleMouseLeave)
-    }
-  }, [chatIsOpen])
-
-  return (
-    <>
-      {/* 1. In-page Floating Chat Messenger at bottom-right (in place of Yuki) */}
-      <AiAssistantChatWindow
-        isOpen={chatIsOpen}
-        onClose={() => setChatIsOpen(false)}
-      />
-
-      {/* 2. Floating Mascot & Comic Speech Bubble (smoothly hidden when chat is open) */}
-      <div
-        className={cn(
-          'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end select-none origin-bottom-right transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)',
-          chatIsOpen
-            ? 'opacity-0 scale-75 translate-y-6 pointer-events-none'
-            : 'opacity-100 scale-100 translate-y-0 pointer-events-auto',
-          className,
-        )}
-      >
-        {/* Comic Speech Bubble */}
-        {!bubbleDismissed ? (
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setChatIsOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setChatIsOpen(true)
-              }
-            }}
-            className="group/bubble relative mb-2 cursor-pointer max-w-[240px] sm:max-w-[280px] rounded-2xl bg-white/95 p-3.5 shadow-[0_12px_32px_rgba(29,39,61,0.16)] border border-blue-100/90 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-300 hover:shadow-[0_16px_40px_rgba(37,99,235,0.22)] animate-speech-bubble outline-none after:absolute after:-bottom-2.5 after:right-8 sm:after:right-12 after:size-0 after:border-x-8 after:border-x-transparent after:border-t-10 after:border-t-white after:filter after:drop-shadow-[0_2px_1px_rgba(29,39,61,0.06)]"
-            aria-label="Открыть чат с Юки"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-1.5">
-                <span className="rounded-full bg-blue-50 px-1.5 py-0.2 text-[9px] font-bold text-[#2563eb]">
-                  IELTS AI
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setBubbleDismissed(true)
-                }}
-                className="text-[#94a3b8] hover:text-[#0f172a] -mr-1 -mt-1 p-0.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
-                title="Скрыть подсказку"
-                aria-label="Скрыть подсказку"
-              >
-                <CloseCircle className="size-4" variant="Outline" />
-              </button>
-            </div>
-
-            <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-[#334155]">
-              Привет! Меня зовут <strong>Юки</strong> — я твой наставник по
-              IELTS.
-            </p>
-
-            <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb]">
-              <span>Открыть чат</span>
-              <span className="text-xs transition-transform duration-200 group-hover/bubble:translate-x-1">
-                →
-              </span>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Large Animated Fox Mascot */}
-        <button
-          type="button"
-          onClick={() => setChatIsOpen(true)}
-          className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-2xl"
-          aria-label="Открыть чат с Юки"
-        >
-          <div ref={mascotRef} className="relative animate-fox-float">
-            <FoxMascot
-              eyeOffset={eyeOffset}
-              className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36"
-            />
-          </div>
-        </button>
-      </div>
-    </>
   )
 }

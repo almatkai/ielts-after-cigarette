@@ -28,34 +28,34 @@ export function DashboardHeader({
   const accountName = user?.displayName.trim() || 'Аккаунт'
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center border-b border-[#eeeeeb] bg-white/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center border-b border-[#eeeeeb] bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-xl">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onOpenNavigation}
-          className="rounded-[9px] text-[#69696d] lg:hidden"
+          className="shrink-0 rounded-[9px] text-[#69696d] lg:hidden"
           aria-label="Открыть меню"
           aria-controls="dashboard-mobile-navigation"
         >
           <HambergerMenu aria-hidden />
         </Button>
-        <div className="lg:hidden">
+        <div className="shrink-0 lg:hidden">
           <Brand to="/" />
         </div>
         <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
             Рабочее пространство
           </p>
-          <h1 className="truncate text-base font-semibold tracking-[-0.025em] text-[#111111]">
+          <h1 className="truncate text-sm sm:text-base font-semibold tracking-[-0.025em] text-[#111111]">
             {pageTitle}
           </h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -99,7 +99,7 @@ export function DashboardHeader({
         <Button
           asChild
           variant="ghost"
-          className="h-11 gap-2 rounded-[10px] px-2.5 text-[#111111] sm:px-3"
+          className="h-9 sm:h-11 gap-1.5 sm:gap-2 rounded-[10px] px-2 text-[#111111] sm:px-3"
         >
           <Link to="/profile" aria-label="Открыть профиль">
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">

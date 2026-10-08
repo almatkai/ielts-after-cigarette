@@ -40,7 +40,8 @@ export type AttemptReviewItem = {
   answer: StudentAnswer | null
   isCorrect: boolean
   pointsAwarded: number
-  correctAnswer: StudentAnswer
+  correctAnswer: StudentAnswer | null
+  locked?: boolean
   explanation: string
   quote?: string
   hint?: string
@@ -59,6 +60,14 @@ export type AttemptDetail = Attempt & {
   writingEvaluation?: WritingEvaluation
   speakingEvaluation?: SpeakingEvaluation
   recordings?: SpeakingRecording[]
+  speakingAssessment?: SpeakingAssessmentJob
+  writingAssessment?: WritingAssessmentJob
+}
+
+// Lightweight snapshot; no answers, recordings or evaluation payloads.
+export type AttemptStatusDetail = {
+  id: string
+  status: AttemptStatus
   speakingAssessment?: SpeakingAssessmentJob
   writingAssessment?: WritingAssessmentJob
 }
@@ -189,6 +198,9 @@ export type AttemptListItem = Omit<Attempt, 'materialType'> & {
   materialType: AttemptMaterialType
   testTitle: string
   testSlug: string
+  // Set when the attempt is a section of a Full Mock session, so the drafts
+  // banner can resume the session instead of the practice routes.
+  fullMockSessionId: string | null
 }
 
 export type MistakeReport = {
@@ -221,9 +233,11 @@ export type AttemptMaterialType =
 
 export const attemptKeys = {
   detail: (id: string) => ['attempts', id] as const,
+  status: (id: string) => ['attempts', id, 'status'] as const,
   list: (materialType: AttemptMaterialType) =>
     ['attempts', 'list', materialType] as const,
   listAll: ['attempts', 'list'] as const,
+  history: ['attempts', 'list', 'history'] as const,
   mistakes: mistakeKeys.all,
   mistakeList: mistakeKeys.list,
   mistakeDetail: mistakeKeys.detail,
@@ -237,6 +251,17 @@ export const listAttempts = (
     materialType
       ? `/api/v1/attempts?materialType=${materialType}`
       : '/api/v1/attempts',
+    { signal },
+  )
+
+export type AttemptHistoryPage = {
+  items: AttemptListItem[]
+  nextCursor?: string
+}
+
+export const listAttemptHistory = (cursor?: string, signal?: AbortSignal) =>
+  apiClient.request<AttemptHistoryPage>(
+    `/api/v1/attempts?limit=50${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`,
     { signal },
   )
 
@@ -302,12 +327,14 @@ export const getSpeakingRecordingBlob = (attemptId: string, partId: string) =>
 export const saveAttemptAnswers = (
   attemptId: string,
   answers: AttemptAnswer[],
+  options?: { keepalive?: boolean },
 ) =>
   apiClient.request<{ saved: number }>(
     `/api/v1/attempts/${attemptId}/answers`,
     {
       method: 'PUT',
       body: { answers },
+      keepalive: options?.keepalive,
     },
   )
 export const submitAttempt = (attemptId: string, answers: AttemptAnswer[]) =>
@@ -315,5 +342,11 @@ export const submitAttempt = (attemptId: string, answers: AttemptAnswer[]) =>
     method: 'POST',
     body: { answers },
   })
+export const getAttemptStatus = (attemptId: string, signal?: AbortSignal) =>
+  apiClient.request<AttemptStatusDetail>(
+    `/api/v1/attempts/${attemptId}/status`,
+    { signal },
+  )
+
 export const getAttempt = (attemptId: string, signal?: AbortSignal) =>
   apiClient.request<AttemptDetail>(`/api/v1/attempts/${attemptId}`, { signal })

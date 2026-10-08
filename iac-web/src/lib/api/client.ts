@@ -1,27 +1,15 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '')
+import { ApiError } from './error.ts'
+import type { ApiErrorBody } from './error.ts'
 
-export type ApiErrorBody = {
-  code?: string
-  message?: string
-  details?: Record<string, string>
-  requestId?: string
+export { ApiError } from './error.ts'
+export type { ApiErrorBody } from './error.ts'
+
+// Native Node regression tests have no Vite environment. Keeping the direct
+// import.meta.env reference lets Vite replace it correctly in production.
+function resolveApiBaseUrl(env: ImportMetaEnv | undefined) {
+  return env?.VITE_API_BASE_URL?.replace(/\/+$/, '')
 }
-
-export class ApiError extends Error {
-  readonly status: number
-  readonly code: string
-  readonly details?: Record<string, string>
-  readonly requestId?: string
-
-  constructor(status: number, body: ApiErrorBody) {
-    super(body.message || 'Не удалось выполнить запрос')
-    this.name = 'ApiError'
-    this.status = status
-    this.code = body.code || 'UNKNOWN_ERROR'
-    this.details = body.details
-    this.requestId = body.requestId
-  }
-}
+const apiBaseUrl = resolveApiBaseUrl(import.meta.env)
 
 type AuthBridge = {
   getAccessToken: () => string | null
@@ -33,9 +21,15 @@ type ApiRequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
   authenticated?: boolean
   retryAuthentication?: boolean
+  responseBody?: 'json' | 'raw'
 }
 
-class ApiClient {
+export class ApiClient {
+  private readonly baseUrl: string | undefined
+
+  constructor(baseUrl = apiBaseUrl) {
+    this.baseUrl = baseUrl
+  }
   private auth: AuthBridge | null = null
   private refreshPromise: Promise<string | null> | null = null
 
@@ -44,7 +38,7 @@ class ApiClient {
   }
 
   async request<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
-    if (!apiBaseUrl) {
+    if (!this.baseUrl) {
       throw new ApiError(0, {
         code: 'API_URL_MISSING',
         message: 'Адрес API не настроен',
@@ -55,6 +49,7 @@ class ApiClient {
       body,
       authenticated = true,
       retryAuthentication = true,
+      responseBody = 'json',
       headers: initialHeaders,
       ...requestInit
     } = options
@@ -73,7 +68,7 @@ class ApiClient {
 
     let response: Response
     try {
-      response = await fetch(`${apiBaseUrl}${path}`, {
+      response = await fetch(`${this.baseUrl}${path}`, {
         ...requestInit,
         headers,
         body:
@@ -84,7 +79,9 @@ class ApiClient {
               : JSON.stringify(body),
         credentials: 'include',
       })
-    } catch {
+    } catch (error) {
+      // Cancellation is not an outage and should not trigger telemetry/retry UI.
+      if (error instanceof Error && error.name === 'AbortError') throw error
       throw new ApiError(0, {
         code: 'NETWORK_ERROR',
         message: 'Не удалось связаться с сервером',
@@ -110,10 +107,15 @@ class ApiClient {
     if (!response.ok) {
       throw await parseApiError(response)
     }
+    if (responseBody === 'raw') return response as T
     if (response.status === 204) {
       return undefined as T
     }
     return (await response.json()) as T
+  }
+
+  async stream(path: string, options: ApiRequestOptions): Promise<Response> {
+    return this.request<Response>(path, { ...options, responseBody: 'raw' })
   }
 
   async upload<T>(path: string, form: FormData): Promise<T> {
@@ -124,7 +126,7 @@ class ApiClient {
     const headers = new Headers()
     const accessToken = this.auth?.getAccessToken()
     if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
-    const response = await fetch(`${apiBaseUrl}${path}`, {
+    const response = await fetch(`${this.baseUrl}${path}`, {
       headers,
       credentials: 'include',
     })
@@ -150,7 +152,11 @@ async function parseApiError(response: Response) {
   } catch {
     body = {}
   }
-  return new ApiError(response.status, body)
+  return new ApiError(response.status, {
+    ...body,
+    requestId:
+      body.requestId || response.headers.get('X-Request-ID') || undefined,
+  })
 }
 
 export function getErrorMessage(error: unknown) {
@@ -187,6 +193,11 @@ export function getErrorMessage(error: unknown) {
       return 'Подтверждение через WhatsApp скоро будет доступно.'
     case 'RATE_LIMITED':
       return 'Слишком много попыток. Подождите минуту и попробуйте снова.'
+    case 'DAILY_LIMIT_EXCEEDED':
+      return (
+        error.message ||
+        'Достигнут дневной лимит использования. Лимит обновится в полночь.'
+      )
     case 'NETWORK_ERROR':
       return 'Сервер недоступен. Проверьте, что backend запущен.'
     case 'API_URL_MISSING':

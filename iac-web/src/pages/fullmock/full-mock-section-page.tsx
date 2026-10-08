@@ -25,7 +25,10 @@ export function FullMockSectionPage({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
     refetchInterval: (query) =>
-      query.state.data?.status === 'SUBMITTED' ? false : 5000,
+      query.state.data?.status === 'SUBMITTED' ||
+      query.state.data?.status === 'ABANDONED'
+        ? false
+        : 5000,
   })
   const query = useQuery({
     queryKey: fullMockKeys.section(sessionId, sectionPosition),

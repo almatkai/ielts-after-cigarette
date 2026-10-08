@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   ExportCurve,
+  Eye,
   Save2,
   Send2,
   TickCircle,
@@ -127,7 +128,10 @@ export function ReadingMaterialEditorPage({
     },
   })
   const publishMutation = useMutation({
-    mutationFn: () => publishReadingMaterial(materialId!, form.revision),
+    mutationFn: async () => {
+      const saved = await saveDraft()
+      return publishReadingMaterial(saved.id, saved.revision)
+    },
     onSuccess: async (material) => {
       setForm(materialToForm(material))
       queryClient.setQueryData(
@@ -210,20 +214,39 @@ export function ReadingMaterialEditorPage({
       })),
     }))
 
+  const saveDraft = async () => {
+    if (form.title.trim().length < 3 || form.body.trim().length < 50) {
+      throw new Error('Добавьте название и текст длиной не менее 50 символов.')
+    }
+    return saveMutation.mutateAsync({
+      ...form,
+      sourceTitle: form.sourceTitle?.trim() || null,
+      sourceUrl: form.sourceUrl?.trim() || null,
+      questionGroups: parseQuestionJSON(form.questionGroups),
+      revision: editing ? form.revision : undefined,
+    })
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage(null)
-    if (form.title.trim().length < 3 || form.body.trim().length < 50) {
-      setMessage('Добавьте название и текст длиной не менее 50 символов.')
-      return
-    }
     try {
-      await saveMutation.mutateAsync({
-        ...form,
-        sourceTitle: form.sourceTitle?.trim() || null,
-        sourceUrl: form.sourceUrl?.trim() || null,
-        questionGroups: parseQuestionJSON(form.questionGroups),
-        revision: editing ? form.revision : undefined,
+      await saveDraft()
+    } catch (error) {
+      setMessage(getErrorMessage(error))
+    }
+  }
+
+  const dirty =
+    !materialQuery.data ||
+    JSON.stringify(form) !== JSON.stringify(materialToForm(materialQuery.data))
+  const handlePreview = async () => {
+    setMessage(null)
+    try {
+      const saved = dirty ? await saveDraft() : materialQuery.data
+      await navigate({
+        to: '/admin/preview/reading/$materialId',
+        params: { materialId: saved.id },
       })
     } catch (error) {
       setMessage(getErrorMessage(error))
@@ -287,6 +310,17 @@ export function ReadingMaterialEditorPage({
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
+          {auth.user?.role === 'ADMIN' ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => void handlePreview()}
+            >
+              <Eye aria-hidden />
+              {dirty ? 'Сохранить и открыть тест' : 'Предпросмотр теста'}
+            </Button>
+          ) : null}
           {material ? (
             <Button
               type="button"

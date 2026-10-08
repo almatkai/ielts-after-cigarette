@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "test:regression": "node --test scripts/*.test.mjs",
+    "test:preview": "playwright test",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
@@ -18,8 +19,12 @@
     "postinstall": "node scripts/patch-iconsax.mjs"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/manrope": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
+    "@sentry/react": "^11.4.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "latest",
@@ -37,6 +42,7 @@
     "@tiptap/starter-kit": "^3.31.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "h3-rules": "^0.1.0",
     "iconsax-react": "^0.0.8",
     "motion": "^12.42.2",
     "radix-ui": "^1.6.4",
@@ -48,6 +54,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/eslint-config": "latest",

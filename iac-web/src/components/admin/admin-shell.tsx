@@ -8,6 +8,7 @@ import {
   Microphone2,
   People,
   ShieldTick,
+  TrendUp,
   UserEdit,
 } from 'iconsax-react'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -77,11 +78,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/admin"
             activeOptions={{ exact: true }}
-            className="flex min-h-11 items-center gap-3 rounded-[10px] bg-[#eff6ff] px-4 text-sm font-semibold text-[#1d4ed8] no-underline"
+            activeProps={{
+              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+            }}
+            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
+            className="flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
             <ShieldTick className="size-[18px]" aria-hidden />
             Обзор
           </Link>
+          {auth.user?.role === 'ADMIN' ? (
+            <Link
+              to="/admin/analytics"
+              activeProps={{
+                className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+              }}
+              inactiveProps={{
+                className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+              }}
+              className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+            >
+              <TrendUp className="size-[18px]" aria-hidden />
+              Аналитика
+            </Link>
+          ) : null}
           <Link
             to="/admin/reading/materials"
             activeProps={{
@@ -139,7 +159,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
           >
             <ClipboardTick className="size-[18px]" aria-hidden />
-            Full Mock
+            Архив Full Mock
           </Link>
           <Link
             to="/admin/blog/posts"
@@ -168,6 +188,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               >
                 <People className="size-[18px]" aria-hidden />
                 Заявки авторов
+              </Link>
+              <Link
+                to="/admin/ai-providers"
+                activeProps={{
+                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                }}
+                inactiveProps={{
+                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                }}
+                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
+              >
+                <ClipboardTick className="size-[18px]" aria-hidden />
+                AI-провайдеры
               </Link>
               <Link
                 to="/admin/waitlist"

@@ -3,6 +3,7 @@ import {
   DocumentForward,
   DocumentUpload,
   Edit,
+  Eye,
   ExportCurve,
   Warning2,
 } from 'iconsax-react'
@@ -21,6 +22,7 @@ import {
   listReadingMaterials,
 } from '@/features/admin/api'
 import type { ReadingMaterial } from '@/features/admin/api'
+import { useAuth } from '@/features/auth/auth-store'
 
 const difficultyLabels = {
   foundation: 'Foundation',
@@ -29,6 +31,7 @@ const difficultyLabels = {
 } as const
 
 export function ReadingMaterialsPage() {
+  const auth = useAuth()
   const navigate = useNavigate()
   const [exportMaterial, setExportMaterial] = useState<ReadingMaterial | null>(
     null,
@@ -63,7 +66,7 @@ export function ReadingMaterialsPage() {
             Библиотека материалов
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
-            Тексты, на основе которых будут собираться задания.
+            Материалы и полные тесты. Проверяйте черновики перед публикацией.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -113,8 +116,8 @@ export function ReadingMaterialsPage() {
             <Book className="size-8 text-[#9a9a9d]" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
-              Создайте первый passage. После него добавим группы вопросов и
-              preview студенческого режима.
+              Создайте или импортируйте материал, добавьте вопросы и проверьте
+              тест перед публикацией.
             </p>
           </CardContent>
         </Card>
@@ -154,7 +157,19 @@ export function ReadingMaterialsPage() {
                     /{material.slug} · версия {material.currentVersionNumber}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {auth.user?.role === 'ADMIN' ? (
+                    <Button asChild variant="outline">
+                      <Link
+                        to="/admin/preview/reading/$materialId"
+                        params={{ materialId: material.id }}
+                        preload={false}
+                      >
+                        <Eye aria-hidden />
+                        Предпросмотр теста
+                      </Link>
+                    </Button>
+                  ) : null}
                   <Button
                     type="button"
                     variant="outline"

@@ -1,17 +1,23 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/features/auth/auth-store'
-import { isGoogleRegistrationRequired } from '@/features/auth/google-auth'
 import {
-  GOOGLE_CLIENT_ID,
+  isGoogleRegistrationRequired,
+  requestPendingGoogleRegistration,
+} from '@/features/auth/google-auth'
+import {
+  getGoogleReturnPath,
+  googleSignInOptions,
   loadGoogleIdentityScript,
+  rememberGoogleReturnPath,
 } from '@/features/auth/google-identity'
 import { getErrorMessage } from '@/lib/api/client'
 
@@ -22,11 +28,43 @@ export function LoginForm() {
   const navigate = useNavigate()
   const search = useSearch({ from: '/login' })
   const { loginWithGoogle } = useAuth()
-  const [googleFailed, setGoogleFailed] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
+  const [restoringGoogle, setRestoringGoogle] = useState(
+    search.google === 'registration',
+  )
   const [pendingGoogle, setPendingGoogle] =
     useState<PendingGoogleRegistration | null>(null)
-  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const googleRedirect =
+    search.redirect ??
+    (search.google === 'registration' ? getGoogleReturnPath() : undefined)
+
+  useEffect(() => {
+    if (search.google === 'error' || search.google === 'success') {
+      setSubmissionError(
+        'Не удалось завершить вход через Google. Попробуйте ещё раз.',
+      )
+    }
+    if (search.google !== 'registration') return
+    let cancelled = false
+    requestPendingGoogleRegistration()
+      .then((response) => {
+        if (!cancelled) {
+          setPendingGoogle({
+            registrationToken: response.registrationToken,
+            profile: response.profile,
+          })
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) setSubmissionError(getErrorMessage(error))
+      })
+      .finally(() => {
+        if (!cancelled) setRestoringGoogle(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [search.google, search.redirect])
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
@@ -48,37 +86,6 @@ export function LoginForm() {
     [loginWithGoogle, navigate, search.redirect],
   )
 
-  useEffect(() => {
-    let cancelled = false
-    loadGoogleIdentityScript()
-      .then(() => {
-        if (cancelled || !window.google || !googleButtonRef.current) return
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => {
-            if (response.credential) {
-              void handleGoogleCredential(response.credential)
-            }
-          },
-        })
-        const container = googleButtonRef.current
-        window.google.accounts.id.renderButton(container, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'rectangular',
-          width: Math.min(400, Math.max(200, container.clientWidth || 320)),
-        })
-      })
-      .catch(() => {
-        if (!cancelled) setGoogleFailed(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [handleGoogleCredential])
-
   if (pendingGoogle) {
     return (
       <GoogleCompleteForm
@@ -87,10 +94,66 @@ export function LoginForm() {
           setPendingGoogle(null)
           setSubmissionError(null)
         }}
-        redirect={search.redirect}
+        redirect={googleRedirect}
       />
     )
   }
+
+  return (
+    <GoogleSignInCard
+      onCredential={handleGoogleCredential}
+      submissionError={submissionError}
+      restoringGoogle={restoringGoogle}
+      redirect={googleRedirect}
+    />
+  )
+}
+
+function GoogleSignInCard({
+  onCredential,
+  submissionError,
+  restoringGoogle,
+  redirect,
+}: {
+  onCredential: (credential: string) => Promise<void>
+  submissionError: string | null
+  restoringGoogle: boolean
+  redirect?: '/admin' | '/'
+}) {
+  const [googleFailed, setGoogleFailed] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (restoringGoogle) return
+    let cancelled = false
+    loadGoogleIdentityScript()
+      .then(() => {
+        if (cancelled || !window.google || !googleButtonRef.current) return
+        window.google.accounts.id.initialize(
+          googleSignInOptions((response) => {
+            if (response.credential) {
+              void onCredential(response.credential)
+            }
+          }),
+        )
+        const container = googleButtonRef.current
+        window.google.accounts.id.renderButton(container, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'rectangular',
+          width: Math.min(400, Math.max(200, container.clientWidth || 320)),
+          click_listener: () => rememberGoogleReturnPath(redirect),
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setGoogleFailed(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [onCredential, redirect, restoringGoogle])
 
   return (
     <>
@@ -104,6 +167,15 @@ export function LoginForm() {
       </CardHeader>
       <CardContent className="px-6 pt-6 pb-8 sm:px-8">
         <div ref={googleButtonRef} className="flex min-h-11 justify-center" />
+        {restoringGoogle ? (
+          <p className="text-center text-sm text-[#475569]" role="status">
+            Завершаем вход через Google…
+          </p>
+        ) : null}
+        <p className="mt-3 text-center text-xs leading-5 text-[#64748b]">
+          Если вы открыли сайт из Telegram или Instagram, используйте меню
+          браузера «Открыть в Safari» или «Открыть в браузере» для входа.
+        </p>
         {googleFailed ? (
           <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
             Не удалось загрузить вход через Google. Проверьте подключение и
@@ -116,6 +188,29 @@ export function LoginForm() {
           </p>
         ) : null}
       </CardContent>
+      <CardFooter className="justify-center border-t border-[#f1f5f9] px-6 py-4 text-center text-xs leading-5 text-[#64748b] sm:px-8">
+        <p>
+          Входя в систему, вы соглашаетесь с{' '}
+          <Link
+            to="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+          >
+            условиями использования
+          </Link>{' '}
+          и{' '}
+          <Link
+            to="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+          >
+            политикой конфиденциальности
+          </Link>
+          .
+        </p>
+      </CardFooter>
     </>
   )
 }

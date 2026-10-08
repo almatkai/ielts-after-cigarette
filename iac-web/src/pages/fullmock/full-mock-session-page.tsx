@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
+import { Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -28,8 +28,29 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
-    refetchInterval: 10_000,
+    refetchInterval: (query) => {
+      const session = query.state.data
+      return session?.status === 'IN_PROGRESS' ||
+        session?.sections.some(
+          (section) => section.attempt.status === 'PROCESSING',
+        )
+        ? 10_000
+        : false
+    },
   })
+  // Keep cross-tab/AI updates, but request expiration at the actual deadline
+  // rather than waiting for the next 10-second polling tick.
+  const deadline = query.data?.deadlineAt
+  const sessionStatus = query.data?.status
+  const refetchSession = query.refetch
+  useEffect(() => {
+    if (sessionStatus !== 'IN_PROGRESS' || !deadline) return
+    const timer = window.setTimeout(
+      () => void refetchSession(),
+      Math.max(0, new Date(deadline).getTime() - Date.now()) + 50,
+    )
+    return () => window.clearTimeout(timer)
+  }, [deadline, sessionStatus, refetchSession])
   const advance = useMutation({
     mutationFn: () => advanceFullMockSession(sessionId),
     onSuccess: (session) =>
@@ -238,31 +259,24 @@ function FullMockReport({ session }: { session: FullMockSession }) {
           </span>
           <div>
             <p className="font-semibold">Итоговый IELTS band</p>
-            <p className="mt-1 text-sm text-[#4b5563]">
-              Среднее значение четырёх навыков, округлённое до 0,5.
-            </p>
           </div>
         </CardContent>
       </Card>
       <div className="grid gap-3 sm:grid-cols-2">
         {session.sections.map((section) => (
-          <Card key={section.position} className="shadow-none">
-            <CardContent className="flex items-center justify-between p-5">
-              <div>
-                <p className="font-semibold">{labels[section.skill]}</p>
-                <Link
-                  to="/attempts/$attemptId"
-                  params={{ attemptId: section.attempt.id }}
-                  className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
-                >
-                  Разбор попытки <ArrowRight className="size-3.5" aria-hidden />
-                </Link>
-              </div>
-              <span className="text-2xl font-semibold text-[#3b82f6]">
-                {section.attempt.band?.toFixed(1) ?? '—'}
-              </span>
-            </CardContent>
-          </Card>
+          <Link
+            key={section.position}
+            to="/attempts/$attemptId"
+            params={{ attemptId: section.attempt.id }}
+            search={{ session: session.id }}
+            aria-label={`${labels[section.skill]}: работа над ошибками`}
+            className="flex min-h-28 items-center justify-between rounded-[16px] border border-[#e7e7e4] bg-white p-5 transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
+          >
+            <p className="font-semibold">{labels[section.skill]}</p>
+            <span className="text-2xl font-semibold text-[#3b82f6]">
+              {section.attempt.band?.toFixed(1) ?? '—'}
+            </span>
+          </Link>
         ))}
       </div>
     </>

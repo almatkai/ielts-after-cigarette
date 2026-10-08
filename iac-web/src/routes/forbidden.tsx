@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 export const Route = createFileRoute('/forbidden')({
   head: () => ({
     meta: [
-      { title: 'Доступ запрещён — IAC' },
+      { title: 'Доступ запрещён — Daiyndyq IELTS' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

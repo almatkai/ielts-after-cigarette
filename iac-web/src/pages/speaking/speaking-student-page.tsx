@@ -7,14 +7,19 @@ import {
   Timer1,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
+import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { useAttemptSession } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
+import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
   AttemptPerformanceReport,
   AttemptResultHeader,
@@ -55,7 +60,7 @@ export function SpeakingStudentPage({
       skillBadge="IELTS Speaking"
       loadingLabel="Готовим Speaking-тренировку…"
       loadingDescription="Формируем карточки заданий Parts 1–3 и инициализируем модуль записи голоса."
-      queryKey={['speaking', 'materials', materialId, 'attempt']}
+      queryKey={attemptStartQueryKey('speaking', materialId)}
       startAttemptFn={(signal) => startSpeakingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
         <SpeakingAttemptRunner
@@ -96,6 +101,31 @@ export function SpeakingAttemptRunner({
     queryFn: ({ signal }) => getAttempt(attempt.id, signal),
   })
   const [activeIndex, setActiveIndex] = useState(0)
+  // The mounted part runner publishes its stop-and-flush hook here, so an exit
+  // can wait for the in-progress recording upload instead of abandoning it.
+  const stopRecorderRef = useRef<(() => Promise<void>) | null>(null)
+  const [isWaitingForAudio, setIsWaitingForAudio] = useState(false)
+
+  const beforeExit = useCallback(async () => {
+    const stop = stopRecorderRef.current
+    if (!stop) return true
+    setIsWaitingForAudio(true)
+    try {
+      await stop()
+      return true
+    } catch {
+      // Upload failure is surfaced by the part runner; keep the student here.
+      return false
+    } finally {
+      setIsWaitingForAudio(false)
+    }
+  }, [])
+
+  const handleContinueLater = useContinueLater(session, {
+    fullMockSessionId,
+    beforeExit,
+  })
+  const isExiting = session.isSavingAndExiting || isWaitingForAudio
 
   useEffect(() => {
     if (session.submitted && onSubmitted) {
@@ -157,9 +187,29 @@ export function SpeakingAttemptRunner({
               {' · '}Part {activeIndex + 1} of {material.parts.length}
             </p>
           </div>
-          <SaveIndicator state={session.saveState} />
+          <div className="flex items-center gap-3">
+            <SaveIndicator state={session.saveState} />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isExiting || session.isSubmitting}
+              onClick={handleContinueLater}
+              className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+            >
+              {isExiting ? 'Сохраняем…' : 'Продолжить позже'}
+            </Button>
+          </div>
         </div>
       </div>
+      {session.exitError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+        >
+          Не удалось сохранить черновик: {session.exitError}
+        </p>
+      ) : null}
       {session.submitError ? (
         <p
           role="alert"
@@ -217,10 +267,13 @@ export function SpeakingAttemptRunner({
             ? () => setActiveIndex((index) => index + 1)
             : undefined
         }
+        onContinueLater={handleContinueLater}
+        isExiting={isExiting}
         onSubmit={session.submit}
         isSubmitting={session.isSubmitting}
         completedCount={completed}
         totalParts={material.parts.length}
+        stopRecorderRef={stopRecorderRef}
       />
     </div>
   )
@@ -235,10 +288,13 @@ function SpeakingPartRunner({
   onRecordingUploaded,
   onPrevious,
   onNext,
+  onContinueLater,
+  isExiting = false,
   onSubmit,
   isSubmitting,
   completedCount,
   totalParts,
+  stopRecorderRef,
 }: {
   attemptId: string
   part: SpeakingPart
@@ -248,10 +304,13 @@ function SpeakingPartRunner({
   onRecordingUploaded: () => void
   onPrevious?: () => void
   onNext?: () => void
+  onContinueLater?: () => void
+  isExiting?: boolean
   onSubmit: () => void
   isSubmitting: boolean
   completedCount: number
   totalParts: number
+  stopRecorderRef: React.RefObject<(() => Promise<void>) | null>
 }) {
   const [phase, setPhase] = useState<PartPhase>('ready')
   const [remaining, setRemaining] = useState(part.responseSeconds)
@@ -278,6 +337,16 @@ function SpeakingPartRunner({
     recorder.stop()
     setPhase('uploading')
   }
+
+  // Publish the stop-and-flush hook so an exit can wait for the upload of a
+  // running or just-finished recording instead of dropping the audio.
+  const { stopAndFlush } = recorder
+  useEffect(() => {
+    stopRecorderRef.current = stopAndFlush
+    return () => {
+      stopRecorderRef.current = null
+    }
+  }, [stopAndFlush, stopRecorderRef])
 
   useEffect(() => {
     if (phase !== 'preparing' && phase !== 'recording') return
@@ -409,7 +478,7 @@ function SpeakingPartRunner({
             грамматической точности.
           </p>
         </div>
-        <div className="flex flex-wrap justify-between gap-3 border-t pt-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5">
           {onPrevious ? (
             <Button type="button" variant="outline" onClick={onPrevious}>
               Назад
@@ -417,27 +486,40 @@ function SpeakingPartRunner({
           ) : (
             <span />
           )}
-          {onNext ? (
-            <Button
-              type="button"
-              disabled={!responseReady || recorder.isUploading}
-              onClick={onNext}
-            >
-              К следующей части
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              disabled={
-                completedCount < totalParts ||
-                recorder.isUploading ||
-                isSubmitting
-              }
-              onClick={onSubmit}
-            >
-              {isSubmitting ? 'Проверяем работу…' : 'Отправить на проверку'}
-            </Button>
-          )}
+          <div className="flex items-center gap-2.5">
+            {onContinueLater ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting || isExiting}
+                onClick={onContinueLater}
+              >
+                {isExiting ? 'Сохраняем…' : 'Продолжить позже'}
+              </Button>
+            ) : null}
+            {onNext ? (
+              <Button
+                type="button"
+                disabled={!responseReady || recorder.isUploading}
+                onClick={onNext}
+              >
+                К следующей части
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                disabled={
+                  completedCount < totalParts ||
+                  recorder.isUploading ||
+                  isSubmitting ||
+                  isExiting
+                }
+                onClick={onSubmit}
+              >
+                {isSubmitting ? 'Проверяем работу…' : 'Отправить на проверку'}
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -486,14 +568,7 @@ export function SpeakingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attempt.id),
-    queryFn: ({ signal }) => getAttempt(attempt.id, signal),
-    // A failed speaking job resets attempts.status to IN_PROGRESS, so polling
-    // everything except SUBMITTED would loop forever next to the error card.
-    refetchInterval: (query) =>
-      query.state.data?.status === 'PROCESSING' ? 2500 : false,
-  })
+  const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt
@@ -508,12 +583,9 @@ export function SpeakingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {material.title}
+          Работа над ошибками
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Speaking · Parts 1–{material.parts.length} ·
-          аудио-тренировка
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (
@@ -705,6 +777,8 @@ function useAudioRecorder({
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<Blob[]>([])
+  const uploadRef = useRef<Promise<boolean> | null>(null)
+  const settledRef = useRef<((ok: boolean) => void) | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   const stopTracks = useCallback(() => {
@@ -713,6 +787,24 @@ function useAudioRecorder({
   }, [])
   const stop = useCallback(() => {
     if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
+  }, [])
+  // Stops the recorder (if needed) and waits until the recording upload
+  // finishes. Resolves on success, rejects when the audio was not saved, so an
+  // exit that depends on this hook can stay on the page.
+  const stopAndFlush = useCallback(async () => {
+    if (recorderRef.current?.state === 'recording') {
+      const settled = new Promise<boolean>((resolve) => {
+        settledRef.current = resolve
+      })
+      recorderRef.current.stop()
+      const ok = await settled
+      if (!ok) throw new Error('recording upload failed')
+      return
+    }
+    const upload = uploadRef.current
+    if (!upload) return
+    const ok = await upload
+    if (!ok) throw new Error('recording upload failed')
   }, [])
   const start = useCallback(async () => {
     if (typeof MediaRecorder === 'undefined') {
@@ -752,13 +844,29 @@ function useAudioRecorder({
         stopTracks()
         if (file.size === 0) {
           onError('Запись получилась пустой. Попробуйте ещё раз.')
+          settledRef.current?.(false)
+          settledRef.current = null
           return
         }
         setIsUploading(true)
-        void uploadSpeakingRecording(attemptId, partId, file)
-          .then(onUploaded)
-          .catch((error: unknown) => onError(getErrorMessage(error)))
-          .finally(() => setIsUploading(false))
+        const upload = uploadSpeakingRecording(attemptId, partId, file)
+          .then(() => {
+            onUploaded()
+            return true
+          })
+          .catch((error: unknown) => {
+            onError(getErrorMessage(error))
+            return false
+          })
+          .finally(() => {
+            setIsUploading(false)
+            if (uploadRef.current === upload) uploadRef.current = null
+          })
+        uploadRef.current = upload
+        void upload.then((ok) => {
+          settledRef.current?.(ok)
+          settledRef.current = null
+        })
       }
       recorderRef.current = mediaRecorder
       mediaRecorder.start()
@@ -780,7 +888,7 @@ function useAudioRecorder({
     },
     [stop, stopTracks],
   )
-  return { start, stop, isUploading }
+  return { start, stop, stopAndFlush, isUploading }
 }
 
 function answerText(answer: Record<string, unknown> | undefined) {

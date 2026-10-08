@@ -1,9 +1,7 @@
-import { Add, ClipboardTick } from 'iconsax-react'
+import { ClipboardTick } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { fullMockKeys, listFullMocks } from '@/features/fullmock/api'
@@ -31,20 +29,16 @@ export function FullMockListPage() {
             Full Mock
           </h1>
           <p className="mt-1 text-sm text-[#69696d]">
-            Соберите один экзамен из четырёх опубликованных материалов.
+            Архив ручных наборов. Новые Full Mock собираются автоматически из
+            опубликованных тестов Listening, Reading, Writing и Speaking.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/admin/full-mocks/new">
-            <Add aria-hidden />
-            Создать Full Mock
-          </Link>
-        </Button>
       </div>
       {query.data.items.length === 0 ? (
         <Card className="shadow-none">
           <CardContent className="p-8 text-sm text-[#69696d]">
-            Пока нет Full Mock. Создайте первый набор.
+            В архиве нет ручных наборов. Создавать отдельные Full Mock больше не
+            нужно.
           </CardContent>
         </Card>
       ) : (
@@ -70,16 +64,6 @@ export function FullMockListPage() {
                   {item.status}
                 </Badge>
               </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline">
-                  <Link
-                    to="/admin/full-mocks/$mockId"
-                    params={{ mockId: item.id }}
-                  >
-                    Редактировать
-                  </Link>
-                </Button>
-              </CardContent>
             </Card>
           ))}
         </div>

@@ -1,4 +1,5 @@
-import { ArrowLeft, Clock, CloseCircle, TickCircle } from 'iconsax-react'
+import { ObjectiveAttemptResult } from '@/features/attempts/objective-attempt-review'
+import { ArrowLeft, Clock } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -7,27 +8,26 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useAttemptSession } from '@/features/attempts/attempt-session'
-import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import {
-  AttemptPerformanceReport,
-  AttemptResultHeader,
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
+import { usePreviewSession } from '@/features/attempts/preview-session'
+import type { AttemptSession } from '@/features/attempts/preview-session'
+import { useExamTimer } from '@/features/attempts/exam-timer'
+import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
+import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
+import {
   AttemptSubmitBar,
   ChoiceOptions,
-  EnhancedReviewQuestion,
   ErrorState,
   ExamLoadingScreen,
-  LoadingState,
   SaveIndicator,
   TimeBadge,
   multiSelectLimit,
 } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
-import {
-  attemptKeys,
-  getAttempt,
-  startListeningAttempt,
-} from '@/features/attempts/api'
+import { startListeningAttempt } from '@/features/attempts/api'
 import type { Attempt, StudentAnswer } from '@/features/attempts/api'
 import { getListeningMediaBlob } from '@/features/listening/api'
 import type {
@@ -35,7 +35,16 @@ import type {
   PublicListeningQuestion,
   PublicListeningTest,
 } from '@/features/listening/api'
-import { getErrorMessage } from '@/lib/api/client'
+import type { PreviewAnswerKeys } from '@/features/admin/preview-api'
+import {
+  PreviewAnswer,
+  PreviewEvidenceText,
+} from '@/features/admin/preview-answer'
+
+import {
+  completionQuestionNumbers,
+  ListeningCompletionText,
+} from './listening-completion-text'
 
 const TIMER_DANGER_SECONDS = 300
 
@@ -51,7 +60,7 @@ export function ListeningStudentPage({
       skillBadge="IELTS Listening"
       loadingLabel="Готовим аудирование…"
       loadingDescription="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
-      queryKey={['listening', 'tests', testId, 'attempt']}
+      queryKey={attemptStartQueryKey('listening', testId)}
       startAttemptFn={(signal) => startListeningAttempt(testId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
         <ListeningAttemptRunner
@@ -75,20 +84,61 @@ export function ListeningStudentPage({
   )
 }
 
-export function ListeningAttemptRunner({
-  attempt,
-  test,
-  fullMockSessionId,
-  onSubmitted,
-}: {
+type ListeningRunnerProps = {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
   onSubmitted?: (attempt: Attempt) => void
+}
+
+export function ListeningAttemptRunner(props: ListeningRunnerProps) {
+  const session = useAttemptSession(props.attempt.id)
+  return <ListeningTestRunner {...props} session={session} />
+}
+
+export function ListeningPreviewRunner({
+  test,
+  timerEnabled,
+  answerKeys,
+}: {
+  test: PublicListeningTest
+  timerEnabled: boolean
+  answerKeys: PreviewAnswerKeys
 }) {
-  const session = useAttemptSession(attempt.id)
+  const session = usePreviewSession()
+  return (
+    <ListeningTestRunner
+      test={test}
+      session={session}
+      answerKeys={answerKeys}
+      preview
+      timerEnabled={timerEnabled}
+    />
+  )
+}
+
+function ListeningTestRunner({
+  attempt,
+  test,
+  fullMockSessionId,
+  onSubmitted,
+  session,
+  preview = false,
+  timerEnabled = true,
+  answerKeys,
+}: Omit<ListeningRunnerProps, 'attempt'> & {
+  attempt?: Attempt
+  session: AttemptSession
+  preview?: boolean
+  timerEnabled?: boolean
+  answerKeys?: PreviewAnswerKeys
+}) {
+  const [revealedQuestionId, setRevealedQuestionId] = useState<string | null>(
+    null,
+  )
   const autoSubmitStarted = useRef(false)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const [emptyPartIndex, setEmptyPartIndex] = useState(0)
 
   const sharedAudioAssetId = useMemo(
     () =>
@@ -119,6 +169,9 @@ export function ListeningAttemptRunner({
       queryFn: () => getListeningMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      // Media blobs either exist or they don't: a retry storm on 4xx/5xx
+      // hammers the API (see the 15-request waterfall on missing audio).
+      retry: false,
     })),
   })
 
@@ -140,6 +193,7 @@ export function ListeningAttemptRunner({
       queryFn: () => getListeningMediaBlob(id),
       staleTime: Infinity,
       gcTime: 1000 * 60 * 60,
+      retry: false,
     })),
   })
 
@@ -156,75 +210,21 @@ export function ListeningAttemptRunner({
 
   const durationMinutes = test.durationMinutes > 0 ? test.durationMinutes : 40
   const totalDurationSeconds = durationMinutes * 60
-  const totalDurationMs = totalDurationSeconds * 1000
-  const storageKey = `iac_listening_deadline_${attempt.id}`
-
-  const [deadline, setDeadline] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null
-
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      const parsed = Number(saved)
-      if (parsed > 0 && !isNaN(parsed)) {
-        return parsed
-      }
-    }
-
-    const serverStartedAt = new Date(attempt.startedAt).getTime()
-    if (Date.now() - serverStartedAt > 2 * 60_000) {
-      return serverStartedAt + totalDurationMs
-    }
-
-    if (!hasAudio) {
-      const d = Date.now() + totalDurationMs
-      localStorage.setItem(storageKey, String(d))
-      return d
-    }
-
-    return null
+  const { deadline, secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_listening_deadline_',
+    durationSeconds: totalDurationSeconds,
+    ready: isReady,
+    enabled: timerEnabled,
+    finished: Boolean(session.submitted),
   })
 
-  useEffect(() => {
-    if (isReady && deadline === null) {
-      const newDeadline = Date.now() + totalDurationMs
-      setDeadline(newDeadline)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, String(newDeadline))
-      }
-    }
-  }, [isReady, deadline, totalDurationMs, storageKey])
-
-  useEffect(() => {
-    if (session.submitted && typeof window !== 'undefined') {
-      localStorage.removeItem(storageKey)
-    }
-  }, [session.submitted, storageKey])
-
-  const [secondsLeft, setSecondsLeft] = useState(() => {
-    if (deadline === null) {
-      return totalDurationSeconds
-    }
-    return Math.max(0, Math.floor((deadline - Date.now()) / 1000))
-  })
-
-  useEffect(() => {
-    if (deadline === null) {
-      setSecondsLeft(totalDurationSeconds)
-      return
-    }
-
-    setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-
-    const interval = window.setInterval(() => {
-      setSecondsLeft(Math.max(0, Math.floor((deadline - Date.now()) / 1000)))
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [deadline, totalDurationSeconds])
+  const handleContinueLater = useContinueLater(session, { fullMockSessionId })
 
   // Авто-submit по истечении времени.
   useEffect(() => {
     if (
+      !preview &&
       deadline !== null &&
       secondsLeft === 0 &&
       session.answers !== null &&
@@ -235,6 +235,7 @@ export function ListeningAttemptRunner({
       session.submit()
     }
   }, [
+    preview,
     deadline,
     secondsLeft,
     session.answers,
@@ -282,7 +283,8 @@ export function ListeningAttemptRunner({
       group.questions.map((question) => ({ group, part, question })),
     ),
   )
-  const currentQuestion = questions[activeQuestionIndex]
+  const currentQuestion = questions.at(activeQuestionIndex)
+  const currentPart = currentQuestion?.part ?? test.parts[emptyPartIndex]
   const totalQuestions = questions.length
   const answeredCount = Object.keys(answers).length
 
@@ -290,26 +292,62 @@ export function ListeningAttemptRunner({
     <div className="mx-auto flex min-h-dvh w-full max-w-[1180px] flex-col gap-3 px-3 py-3 sm:px-5 sm:py-5">
       <div>
         <Button asChild variant="link" className="sr-only">
-          <Link to="/listening">
-            <ArrowLeft aria-hidden />К Listening
-          </Link>
+          {preview ? (
+            <Link
+              to="/admin/listening/tests/$testId"
+              params={{ testId: test.id }}
+            >
+              <ArrowLeft aria-hidden />К редактору
+            </Link>
+          ) : (
+            <Link to="/listening">
+              <ArrowLeft aria-hidden />К Listening
+            </Link>
+          )}
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <h1 className="sr-only">{test.title}</h1>
           <div className="flex items-center gap-3">
-            <SaveIndicator state={session.saveState} />
-            <TimeBadge
-              seconds={secondsLeft}
-              danger={deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS}
-              label="Оставшееся время"
-            />
+            {!preview ? <SaveIndicator state={session.saveState} /> : null}
+            {timerEnabled ? (
+              <TimeBadge
+                seconds={secondsLeft}
+                danger={
+                  deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS
+                }
+                label="Оставшееся время"
+              />
+            ) : null}
           </div>
+          {!preview ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={session.isSavingAndExiting || session.isSubmitting}
+              onClick={handleContinueLater}
+              className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+            >
+              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+            </Button>
+          ) : null}
         </div>
         <p className="sr-only">
           <Clock className="size-4" aria-hidden />
-          {test.durationMinutes} минут · ответы сохраняются автоматически
+          {test.durationMinutes} минут ·{' '}
+          {preview
+            ? 'пробные ответы не сохраняются'
+            : 'ответы сохраняются автоматически'}
         </p>
       </div>
+      {session.exitError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+        >
+          Не удалось сохранить черновик: {session.exitError}
+        </p>
+      ) : null}
       {session.submitError ? (
         <p
           role="alert"
@@ -326,11 +364,35 @@ export function ListeningAttemptRunner({
           </CardContent>
         </Card>
       ) : null}
+      {test.parts.length === 0 ? (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+        >
+          В тесте ещё нет частей. Добавьте их в редакторе.
+        </p>
+      ) : null}
+      <nav aria-label="Части Listening" className="flex flex-wrap gap-2">
+        {test.parts.map((part, index) => (
+          <Button
+            key={part.position}
+            type="button"
+            variant={part === currentPart ? 'default' : 'outline'}
+            onClick={() => {
+              setEmptyPartIndex(index)
+              const target = questions.findIndex((item) => item.part === part)
+              setActiveQuestionIndex(target >= 0 ? target : questions.length)
+            }}
+          >
+            Part {part.position}
+          </Button>
+        ))}
+      </nav>
       {test.parts.map((part) => (
         <Card
           key={part.position}
           className={
-            part === currentQuestion.part
+            part === currentPart
               ? 'flex min-h-0 flex-1 flex-col overflow-hidden shadow-none'
               : 'hidden'
           }
@@ -348,13 +410,38 @@ export function ListeningAttemptRunner({
             ) : null}
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto">
+            {part.groups.every((group) => group.questions.length === 0) ? (
+              <p role="status" className="text-sm text-amber-700">
+                В этой части ещё нет вопросов. Добавьте их в редакторе.
+              </p>
+            ) : null}
             {part.groups.map((group) => (
               <StudentGroup
                 key={group.position}
                 group={group}
-                activeQuestionId={currentQuestion.question.id}
+                activeQuestionId={currentQuestion?.question.id}
                 answers={answers}
                 onAnswer={session.updateAnswer}
+                onActivate={(questionId) => {
+                  const index = questions.findIndex(
+                    (item) => item.question.id === questionId,
+                  )
+                  if (index >= 0) setActiveQuestionIndex(index)
+                }}
+                preview={preview}
+                answerKeys={answerKeys}
+                evidenceText={
+                  part.transcript ||
+                  part.transcriptSegments
+                    ?.map((segment) => segment.text)
+                    .join('\n')
+                }
+                revealedQuestionId={revealedQuestionId}
+                onToggleExplanation={(questionId) =>
+                  setRevealedQuestionId((current) =>
+                    current === questionId ? null : questionId,
+                  )
+                }
               />
             ))}
           </CardContent>
@@ -364,28 +451,35 @@ export function ListeningAttemptRunner({
         <Button
           type="button"
           variant="outline"
-          disabled={activeQuestionIndex === 0}
+          disabled={!currentQuestion || activeQuestionIndex === 0}
           onClick={() => setActiveQuestionIndex((index) => index - 1)}
         >
           Назад
         </Button>
         <p className="text-sm text-[#69696d]">
-          Вопрос {activeQuestionIndex + 1} из {totalQuestions}
+          Вопрос {currentQuestion ? activeQuestionIndex + 1 : '—'} из{' '}
+          {totalQuestions}
         </p>
         <Button
           type="button"
-          disabled={activeQuestionIndex === totalQuestions - 1}
+          disabled={
+            !currentQuestion || activeQuestionIndex === totalQuestions - 1
+          }
           onClick={() => setActiveQuestionIndex((index) => index + 1)}
         >
           Далее
         </Button>
       </div>
-      <AttemptSubmitBar
-        answeredCount={answeredCount}
-        totalQuestions={totalQuestions}
-        isSubmitting={session.isSubmitting}
-        onSubmit={session.submit}
-      />
+      {!preview ? (
+        <AttemptSubmitBar
+          answeredCount={answeredCount}
+          totalQuestions={totalQuestions}
+          isSubmitting={session.isSubmitting}
+          onContinueLater={handleContinueLater}
+          isSavingAndExiting={session.isSavingAndExiting}
+          onSubmit={session.submit}
+        />
+      ) : null}
     </div>
   )
 }
@@ -403,226 +497,14 @@ export function ListeningAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const detailQuery = useQuery({
-    queryKey: attemptKeys.detail(attempt.id),
-    queryFn: ({ signal }) => getAttempt(attempt.id, signal),
-  })
-  const review =
-    detailQuery.data?.status === 'SUBMITTED'
-      ? (detailQuery.data.review ?? [])
-      : null
-  const reviewByQuestionId = useMemo(
-    () => new Map((review ?? []).map((item) => [item.questionId, item])),
-    [review],
-  )
-
-  const [filterStatus, setFilterStatus] = useState<
-    'all' | 'errors' | 'correct'
-  >('all')
-
-  const totalQuestions = review ? review.length : (attempt.maxScore ?? 40)
-  const correctCount = review
-    ? review.filter((i) => i.isCorrect).length
-    : (attempt.score ?? 0)
-  const incorrectCount = review ? review.filter((i) => !i.isCorrect).length : 0
-
-  const scrollToQuestion = (questionId: string) => {
-    const el = document.getElementById(`review-q-${questionId}`)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }
-
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
-      <AttemptResultHeader
-        skill="listening"
-        fullMockSessionId={fullMockSessionId}
-        onRetake={onRetake}
-        isRetaking={isRetaking}
-      />
-
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {test.title}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Listening · {test.parts.length} секции ·{' '}
-          {totalQuestions} вопросов
-        </p>
-      </div>
-
-      <AttemptPerformanceReport
-        band={attempt.band}
-        bandNote="Балл рассчитан по стандарту аудирования IELTS"
-        correctCount={correctCount}
-        totalQuestions={totalQuestions}
-        startedAt={attempt.startedAt}
-        submittedAt={attempt.submittedAt}
-        durationMinutes={test.durationMinutes}
-        paceUnit="вопрос"
-      />
-
-      {/* ПАНЕЛЬ ФИЛЬТРОВ И БЫСТРОГО ПЕРЕХОДА */}
-      <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-4 sm:p-5 shadow-xs space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setFilterStatus('all')}
-              className={cn(
-                'rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
-                filterStatus === 'all'
-                  ? 'bg-[#3b82f6] text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-              )}
-            >
-              Все вопросы ({totalQuestions})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterStatus('errors')}
-              className={cn(
-                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
-                filterStatus === 'errors'
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'text-rose-700 bg-rose-50 hover:bg-rose-100',
-              )}
-            >
-              <CloseCircle className="size-3.5" />
-              <span>Ошибки ({incorrectCount})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterStatus('correct')}
-              className={cn(
-                'flex items-center gap-1 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all',
-                filterStatus === 'correct'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100',
-              )}
-            >
-              <TickCircle className="size-3.5" />
-              <span>Верные ({correctCount})</span>
-            </button>
-          </div>
-        </div>
-
-        {review && review.length > 0 && (
-          <div className="pt-2 border-t border-[#ededeb]">
-            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Навигация по номерам вопросов (клик для перехода):
-            </span>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {review.map((item) => {
-                const isCorrect = item.isCorrect
-                return (
-                  <button
-                    key={item.questionId}
-                    type="button"
-                    onClick={() => scrollToQuestion(item.questionId)}
-                    className={cn(
-                      'flex size-7 items-center justify-center rounded-[7px] border text-xs font-semibold transition-all select-none',
-                      isCorrect
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
-                        : 'border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100',
-                    )}
-                    title={`Вопрос ${item.number}: ${isCorrect ? 'Верно' : 'Ошибка'}`}
-                  >
-                    {item.number}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
-      </Card>
-
-      {detailQuery.isError ? (
-        <ErrorState
-          title="Не удалось загрузить разбор"
-          message={getErrorMessage(detailQuery.error)}
-          onRetry={() => void detailQuery.refetch()}
-        />
-      ) : review === null ? (
-        <LoadingState label="Загружаем разбор ответов…" />
-      ) : (
-        test.parts.map((part) => {
-          const partHasMatchingQuestions = part.groups.some((group) =>
-            group.questions.some((q) => {
-              if (!q.id) return false
-              const item = reviewByQuestionId.get(q.id)
-              if (!item) return false
-              if (filterStatus === 'errors') return !item.isCorrect
-              if (filterStatus === 'correct') return item.isCorrect
-              return true
-            }),
-          )
-          if (!partHasMatchingQuestions) return null
-
-          return (
-            <div key={part.position} className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-900">
-                Part {part.position}: {part.title}
-              </h2>
-              {part.groups.map((group) => {
-                const matchingQuestions = group.questions.filter((q) => {
-                  if (!q.id) return false
-                  const item = reviewByQuestionId.get(q.id)
-                  if (!item) return false
-                  if (filterStatus === 'errors') return !item.isCorrect
-                  if (filterStatus === 'correct') return item.isCorrect
-                  return true
-                })
-                if (matchingQuestions.length === 0) return null
-
-                return (
-                  <Card
-                    key={group.position}
-                    className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs space-y-4"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-                        {group.type.replaceAll('_', ' ')}
-                      </p>
-                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">
-                        {group.instructions}
-                      </p>
-                    </div>
-                    {group.imageAssetId ? (
-                      <ProtectedImage assetId={group.imageAssetId} />
-                    ) : null}
-                    {group.context ? (
-                      <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm text-slate-800">
-                        {group.context}
-                      </div>
-                    ) : null}
-                    <div className="space-y-3.5">
-                      {matchingQuestions.map((question) => {
-                        const item = question.id
-                          ? reviewByQuestionId.get(question.id)
-                          : undefined
-                        if (!item || !question.id) return null
-                        const options = (question.content.options ??
-                          group.config.options ??
-                          []) as Option[]
-                        return (
-                          <EnhancedReviewQuestion
-                            key={question.id}
-                            item={item}
-                            options={options}
-                          />
-                        )
-                      })}
-                    </div>
-                  </Card>
-                )
-              })}
-            </div>
-          )
-        })
-      )}
-    </div>
+    <ObjectiveAttemptResult
+      attemptId={attempt.id}
+      material={test}
+      fullMockSessionId={fullMockSessionId}
+      onRetake={onRetake}
+      isRetaking={isRetaking}
+    />
   )
 }
 
@@ -632,6 +514,7 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
     queryFn: () => getListeningMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -647,7 +530,7 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
     return (
       <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
         <span className="inline-block size-2 animate-pulse rounded-full bg-blue-500" />
-        <span>Загружаем аудио… Таймер начнётся после загрузки.</span>
+        <span>Загружаем аудио…</span>
       </div>
     )
   }
@@ -664,6 +547,7 @@ function ProtectedImage({ assetId }: { assetId: string }) {
     queryFn: () => getListeningMediaBlob(assetId),
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60,
+    retry: false,
   })
   const url = useMemo(
     () => (query.data ? URL.createObjectURL(query.data) : null),
@@ -681,7 +565,13 @@ function ProtectedImage({ assetId }: { assetId: string }) {
       src={url}
       alt="Схема задания Listening"
     />
-  ) : null
+  ) : (
+    <p role="status" className="text-sm text-amber-700">
+      {query.isPending
+        ? 'Загружаем изображение…'
+        : 'Изображение недоступно. Проверьте файл в редакторе.'}
+    </p>
+  )
 }
 
 function StudentGroup({
@@ -689,44 +579,122 @@ function StudentGroup({
   activeQuestionId,
   answers,
   onAnswer,
+  onActivate,
+  preview = false,
+  answerKeys,
+  evidenceText,
+  revealedQuestionId,
+  onToggleExplanation,
 }: {
   group: PublicListeningGroup
   activeQuestionId?: string
   answers: Record<string, StudentAnswer>
   onAnswer: (questionId: string, answer: StudentAnswer) => void
+  onActivate?: (questionId: string) => void
+  preview?: boolean
+  answerKeys?: PreviewAnswerKeys
+  evidenceText?: string
+  revealedQuestionId?: string | null
+  onToggleExplanation?: (questionId: string) => void
 }) {
   const questions = activeQuestionId
     ? group.questions.filter((question) => question.id === activeQuestionId)
     : group.questions
   if (questions.length === 0) return null
   const shared = (group.config.options ?? []) as Option[]
+  const isCompletion = group.type.endsWith('_completion')
+  const contextNumbers = isCompletion
+    ? completionQuestionNumbers(group.context)
+    : new Set<number>()
   return (
-    <section className="grid gap-3 rounded-xl border p-4">
+    <section
+      className={
+        isCompletion ? 'grid gap-3' : 'grid gap-3 rounded-xl border p-4'
+      }
+    >
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
-          {group.type.replaceAll('_', ' ')}
+        {!isCompletion ? (
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+            {group.type.replaceAll('_', ' ')}
+          </p>
+        ) : null}
+        <p
+          className={cn('whitespace-pre-wrap text-sm', !isCompletion && 'mt-1')}
+        >
+          {group.instructions}
         </p>
-        <p className="mt-1 whitespace-pre-wrap text-sm">{group.instructions}</p>
       </div>
       {group.imageAssetId ? (
         <ProtectedImage assetId={group.imageAssetId} />
       ) : null}
       {group.context ? (
-        <div className="whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm">
-          {group.context}
+        <div
+          className={
+            isCompletion
+              ? 'whitespace-pre-wrap text-sm leading-loose'
+              : 'whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm'
+          }
+        >
+          {isCompletion ? (
+            <ListeningCompletionText
+              text={group.context}
+              questions={group.questions}
+              answers={answers}
+              activeQuestionId={activeQuestionId}
+              onAnswer={onAnswer}
+              onActivate={onActivate}
+            />
+          ) : (
+            group.context
+          )}
         </div>
       ) : null}
       <div className="grid gap-4">
-        {questions.map((question) => (
-          <StudentQuestion
-            key={question.id ?? question.number}
-            group={group}
-            question={question}
-            sharedOptions={shared}
-            value={question.id ? answers[question.id] : undefined}
-            onAnswer={onAnswer}
-          />
-        ))}
+        {questions.map((question) => {
+          const answerKey = question.id ? answerKeys?.[question.id] : undefined
+          const open = Boolean(
+            question.id && revealedQuestionId === question.id,
+          )
+          return (
+            <div key={question.id ?? question.number}>
+              {!contextNumbers.has(question.number) ? (
+                <StudentQuestion
+                  group={group}
+                  question={question}
+                  sharedOptions={shared}
+                  value={question.id ? answers[question.id] : undefined}
+                  onAnswer={onAnswer}
+                />
+              ) : null}
+              {preview ? (
+                <>
+                  <PreviewAnswer
+                    answerKey={answerKey}
+                    options={(question.content.options ?? shared) as Option[]}
+                    open={open}
+                    onToggle={() => {
+                      if (question.id) onToggleExplanation?.(question.id)
+                    }}
+                    evidenceText={evidenceText}
+                  />
+                  {open && evidenceText && answerKey?.quote.trim() ? (
+                    <div className="mt-3 rounded-xl border p-4">
+                      <p className="mb-2 text-sm font-semibold">
+                        Текст аудио — место ответа
+                      </p>
+                      <div className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed">
+                        <PreviewEvidenceText
+                          body={evidenceText}
+                          quote={answerKey.quote}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+            </div>
+          )
+        })}
       </div>
     </section>
   )
@@ -758,6 +726,22 @@ function StudentQuestion({
       {question.prompt.replace('{{answer}}', '_____')}
     </p>
   )
+
+  if (options.length === 0 && group.type.endsWith('_completion')) {
+    const hasGap = /\{\{\s*(?:\d+|answer)\s*\}\}|_{3,}/.test(question.prompt)
+    return (
+      <p className="text-sm leading-loose">
+        <span className="mr-2 text-[#3b82f6]">{question.number}.</span>
+        <ListeningCompletionText
+          text={hasGap ? question.prompt : `${question.prompt} {{answer}}`}
+          questions={[question]}
+          defaultQuestion={question}
+          answers={questionId && value ? { [questionId]: value } : {}}
+          onAnswer={onAnswer}
+        />
+      </p>
+    )
+  }
 
   if (!questionId || options.length === 0) {
     const text = typeof value?.value === 'string' ? value.value : ''

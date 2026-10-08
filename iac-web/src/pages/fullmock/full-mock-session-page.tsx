@@ -1,6 +1,13 @@
-import { ArrowRight, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Clock,
+  Lock,
+  PlayCircle,
+  TickCircle,
+} from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +19,7 @@ import {
   finishFullMockSession,
   fullMockKeys,
   getFullMockSession,
+  pauseFullMockSession,
 } from '@/features/fullmock/api'
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
@@ -25,11 +33,12 @@ const labels: Record<FullMockSkill, string> = {
 
 export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
-    refetchInterval: (query) => {
-      const session = query.state.data
+    refetchInterval: (cachedQuery) => {
+      const session = cachedQuery.state.data
       return session?.status === 'IN_PROGRESS' ||
         session?.sections.some(
           (section) => section.attempt.status === 'PROCESSING',
@@ -38,9 +47,10 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
         : false
     },
   })
-  // Keep cross-tab/AI updates, but request expiration at the actual deadline
-  // rather than waiting for the next 10-second polling tick.
-  const deadline = query.data?.deadlineAt
+  const currentSection = query.data?.currentSection
+  const deadline = query.data?.sections.find(
+    (section) => section.position === currentSection,
+  )?.deadlineAt
   const sessionStatus = query.data?.status
   const refetchSession = query.refetch
   useEffect(() => {
@@ -60,6 +70,26 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     mutationFn: () => finishFullMockSession(sessionId),
     onSuccess: (session) =>
       queryClient.setQueryData(fullMockKeys.session(sessionId), session),
+  })
+  const returnToSite = useMutation({
+    mutationFn: async () => {
+      const session = query.data
+      const current = session?.sections.find(
+        (section) => section.position === session.currentSection,
+      )
+      if (
+        session?.status === 'IN_PROGRESS' &&
+        current?.attempt.status === 'IN_PROGRESS' &&
+        current.deadlineAt
+      ) {
+        const paused = await pauseFullMockSession(sessionId)
+        queryClient.setQueryData(fullMockKeys.session(sessionId), paused)
+        queryClient.removeQueries({
+          queryKey: [...fullMockKeys.session(sessionId), 'sections'],
+        })
+      }
+    },
+    onSuccess: () => navigate({ to: '/' }),
   })
   if (query.isPending) {
     return (
@@ -83,20 +113,35 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     (section) => section.position === session.currentSection,
   )
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[980px] gap-5">
+    <div className="mx-auto grid min-h-dvh w-full min-w-0 max-w-[980px] content-center gap-5 px-4 py-8 sm:px-6 sm:py-12">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Badge variant="secondary">
-            Full Mock · {session.mockTest.examType}
+            Full Mock ·{' '}
+            {session.mockTest.examType === 'academic'
+              ? 'Academic'
+              : 'General Training'}
           </Badge>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
             {session.mockTest.title}
           </h1>
         </div>
-        {session.status === 'IN_PROGRESS' ? (
-          <ExamTimer deadlineAt={session.deadlineAt} />
-        ) : null}
+        <Button
+          variant="outline"
+          disabled={
+            returnToSite.isPending || advance.isPending || finish.isPending
+          }
+          onClick={() => returnToSite.mutate()}
+        >
+          <ArrowLeft aria-hidden />
+          {returnToSite.isPending ? 'Сохраняем…' : 'Вернуться на сайт'}
+        </Button>
       </div>
+      {returnToSite.isError ? (
+        <p role="alert" className="text-sm text-[#e23b3b]">
+          Не удалось приостановить тест: {getErrorMessage(returnToSite.error)}
+        </p>
+      ) : null}
       {session.status === 'SUBMITTED' ? (
         <FullMockReport session={session} />
       ) : (
@@ -115,14 +160,17 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               />
             ))}
           </div>
-          {current?.attempt.status === 'SUBMITTED' ? (
+          {current &&
+          ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
+            current.attempt.status,
+          ) ? (
             <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} сдан. Можно перейти дальше.
+                  {labels[current.skill]} завершён. Можно перейти дальше.
                 </p>
                 <Button
-                  disabled={advance.isPending}
+                  disabled={advance.isPending || returnToSite.isPending}
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
@@ -142,7 +190,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               </p>
               <Button
                 variant="outline"
-                disabled={finish.isPending}
+                disabled={finish.isPending || returnToSite.isPending}
                 onClick={() => {
                   if (
                     window.confirm(
@@ -182,8 +230,16 @@ function SectionCard({
   currentSection: number
   sessionId: string
 }) {
+  const client = useQueryClient()
+  const pause = useMutation({
+    mutationFn: () => pauseFullMockSession(sessionId),
+    onSuccess: (session) =>
+      client.setQueryData(fullMockKeys.session(sessionId), session),
+  })
   const isCurrent = section.position === currentSection
-  const completed = section.attempt.status === 'SUBMITTED'
+  const completed = ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
+    section.attempt.status,
+  )
   const locked = section.position > currentSection
   return (
     <Card
@@ -197,7 +253,11 @@ function SectionCard({
           {completed ? (
             <Badge className="bg-emerald-600">
               <TickCircle aria-hidden />
-              Сдано
+              {section.attempt.status === 'ABANDONED'
+                ? 'Время вышло'
+                : section.attempt.status === 'PROCESSING'
+                  ? 'Проверяется'
+                  : 'Сдано'}
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
@@ -210,8 +270,40 @@ function SectionCard({
         </div>
       </CardHeader>
       <CardContent>
+        <p className="mb-4 text-sm text-[#69696d]">
+          {section.durationMinutes ??
+            (section.skill === 'listening'
+              ? 30
+              : section.skill === 'speaking'
+                ? 15
+                : 60)}{' '}
+          минут
+          {isCurrent && !section.deadlineAt && !completed
+            ? section.remainingMilliseconds != null
+              ? ' · Таймер остановлен'
+              : ' · Таймер начнётся при открытии'
+            : ''}
+        </p>
         {isCurrent && !completed ? (
-          <SectionLink section={section} sessionId={sessionId} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionLink section={section} sessionId={sessionId} />
+            {section.remainingMilliseconds != null ? (
+              <Badge variant="outline">
+                На паузе · {formatRemainingTime(section.remainingMilliseconds)}
+              </Badge>
+            ) : section.deadlineAt ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={pause.isPending}
+                  onClick={() => pause.mutate()}
+                >
+                  На паузу
+                </Button>
+                <ExamTimer deadlineAt={section.deadlineAt} />
+              </div>
+            ) : null}
+          </div>
         ) : (
           <p className="text-sm text-[#69696d]">
             {completed
@@ -219,6 +311,11 @@ function SectionCard({
               : 'Станет доступна после предыдущей секции.'}
           </p>
         )}
+        {pause.isError ? (
+          <p role="alert" className="mt-3 text-sm text-red-600">
+            {getErrorMessage(pause.error)}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   )
@@ -242,6 +339,7 @@ function SectionLink({
       <Link
         to="/exam/full-mock-sessions/$sessionId/sections/$sectionPosition"
         params={{ sessionId, sectionPosition: String(section.position) }}
+        preload={false}
       >
         {content}
       </Link>
@@ -271,13 +369,20 @@ function FullMockReport({ session }: { session: FullMockSession }) {
             <CardContent className="flex items-center justify-between p-5">
               <div>
                 <p className="font-semibold">{labels[section.skill]}</p>
-                <Link
-                  to="/attempts/$attemptId"
-                  params={{ attemptId: section.attempt.id }}
-                  className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
-                >
-                  Разбор попытки <ArrowRight className="size-3.5" aria-hidden />
-                </Link>
+                {section.attempt.status !== 'ABANDONED' ? (
+                  <Link
+                    to="/attempts/$attemptId"
+                    params={{ attemptId: section.attempt.id }}
+                    className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
+                  >
+                    Разбор попытки{' '}
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </Link>
+                ) : (
+                  <p className="mt-1 text-sm text-[#69696d]">
+                    Секция завершена без оценки
+                  </p>
+                )}
               </div>
               <span className="text-2xl font-semibold text-[#3b82f6]">
                 {section.attempt.band?.toFixed(1) ?? '—'}
@@ -288,6 +393,11 @@ function FullMockReport({ session }: { session: FullMockSession }) {
       </div>
     </>
   )
+}
+
+function formatRemainingTime(milliseconds: number) {
+  const seconds = Math.max(0, Math.ceil(milliseconds / 1000))
+  return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
 
 function ExamTimer({ deadlineAt }: { deadlineAt: string }) {

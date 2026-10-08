@@ -14,7 +14,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
@@ -42,6 +45,7 @@ import type {
   SpeakingPart,
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useExamTimer } from '@/features/attempts/exam-timer'
 
 type PartPhase = 'ready' | 'preparing' | 'recording' | 'uploading' | 'finished'
 
@@ -85,11 +89,13 @@ export function SpeakingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
 }: {
   attempt: Attempt
   material: PublicSpeakingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
@@ -132,6 +138,16 @@ export function SpeakingAttemptRunner({
 
   const isReady =
     session.answers !== null && !detailQuery.isPending && !session.loadError
+
+  const { secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_speaking_deadline_',
+    durationSeconds: 15 * 60,
+    ready: isReady,
+    enabled: Boolean(sectionDeadlineAt),
+    deadlineAt: sectionDeadlineAt,
+    finished: Boolean(session.submitted),
+  })
 
   if (session.submitted) {
     return (
@@ -185,6 +201,13 @@ export function SpeakingAttemptRunner({
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {sectionDeadlineAt ? (
+              <TimeBadge
+                seconds={secondsLeft}
+                danger={secondsLeft <= 60}
+                label="Время секции Speaking"
+              />
+            ) : null}
             <SaveIndicator state={session.saveState} />
             <Button
               type="button"

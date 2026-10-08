@@ -1,5 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { useAuth } from '@/features/auth/auth-store'
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { Button } from '@/components/ui/button'
 import { attemptKeys, listAttempts } from './api'
 import type { AttemptListItem } from './api'
@@ -8,8 +10,10 @@ import { BandChange } from './band-change'
 import { formatDateTime } from '@/lib/date'
 
 export function useLibraryAttempts(skill: 'listening' | 'reading') {
+  const { user } = useAuth()
   return useQuery({
     queryKey: attemptKeys.list(skill),
+    enabled: Boolean(user),
     queryFn: ({ signal }) => listAttempts(skill, signal),
   })
 }
@@ -52,6 +56,7 @@ export function LibraryAttemptActions({
   items: AttemptListItem[]
   pending: boolean
 }) {
+  const { user } = useAuth()
   const client = useQueryClient()
   const { latest, active } = summarizeMaterialAttempts(items)
   const prepareAttempt = () => {
@@ -65,6 +70,12 @@ export function LibraryAttemptActions({
       exact: true,
     })
   }
+  if (!user)
+    return (
+      <div className="flex justify-end border-t border-[#ededeb] pt-3">
+        <LoginToContinue />
+      </div>
+    )
   const label = pending
     ? 'Загружаем…'
     : active?.status === 'PROCESSING'

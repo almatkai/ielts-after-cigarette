@@ -13,6 +13,9 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
+import { useAuth } from '@/features/auth/auth-store'
+import { GuestTrialCard } from '@/components/auth/guest-trial-card'
+import { PracticePage } from '@/pages/practice/ui/practice-page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -66,6 +69,18 @@ function formatExamDate(value: string | null) {
 }
 
 export function OverviewPage() {
+  const { user } = useAuth()
+  return user ? (
+    <AccountOverviewPage />
+  ) : (
+    <div className="mx-auto grid max-w-[1120px] gap-6">
+      <GuestTrialCard />
+      <PracticePage />
+    </div>
+  )
+}
+
+function AccountOverviewPage() {
   const dashboardQuery = useQuery({
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),

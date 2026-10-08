@@ -1,12 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import { FullMockSessionPage } from '@/pages/fullmock/full-mock-session-page'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/exam/full-mock-sessions/$sessionId')({
-  component: MockSessionRoute,
+  component: Outlet,
 })
-
-function MockSessionRoute() {
-  const { sessionId } = Route.useParams()
-  return <FullMockSessionPage sessionId={sessionId} />
-}

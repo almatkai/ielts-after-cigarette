@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { usePreviewSession } from '@/features/attempts/preview-session'
 import type { AttemptSession } from '@/features/attempts/preview-session'
 import { useExamTimer } from '@/features/attempts/exam-timer'
@@ -94,6 +97,7 @@ type ListeningRunnerProps = {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }
 
@@ -127,6 +131,7 @@ function ListeningTestRunner({
   attempt,
   test,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
   session,
   preview = false,
@@ -223,6 +228,7 @@ function ListeningTestRunner({
     ready: isReady,
     enabled: timerEnabled,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   const handleContinueLater = useContinueLater(session, { fullMockSessionId })

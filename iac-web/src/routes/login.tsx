@@ -78,7 +78,7 @@ function LoginPage() {
           Завершаем вход через Google…
         </p>
       ) : (
-        <LoginForm />
+        <LoginForm search={search} />
       )}
     </AuthShell>
   )

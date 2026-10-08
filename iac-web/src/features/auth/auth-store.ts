@@ -7,6 +7,8 @@ import {
 } from '@/features/auth/google-auth'
 import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-auth'
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
+import { getGuestSession } from '@/features/auth/guest'
+import type { GuestSession } from '@/features/auth/guest'
 
 export type UserRole = 'STUDENT' | 'EDITOR' | 'ADMIN'
 
@@ -34,6 +36,7 @@ export type AuthResponse = {
 
 type AuthSnapshot = {
   user: UserDto | null
+  guest: GuestSession | null
   accessToken: string | null
   initialized: boolean
   loading: boolean
@@ -42,6 +45,7 @@ type AuthSnapshot = {
 
 const initialSnapshot: AuthSnapshot = {
   user: null,
+  guest: null,
   accessToken: null,
   initialized: false,
   loading: false,
@@ -72,6 +76,14 @@ export class AuthStore {
 
   isAuthenticated = () =>
     Boolean(this.snapshot.accessToken && this.snapshot.user)
+
+  hasGuestSession = () => Boolean(this.snapshot.guest)
+
+  restoreGuest = async () => {
+    const guest = await getGuestSession()
+    this.patch({ guest })
+    return guest
+  }
 
   hasAnyRole = (roles: readonly UserRole[]) => {
     const role = this.snapshot.user?.role
@@ -137,6 +149,13 @@ export class AuthStore {
   private restore = async () => {
     this.patch({ loading: true, error: null })
     const token = await this.refreshForRequest()
+    if (!token) {
+      try {
+        await this.restoreGuest()
+      } catch {
+        // A visitor can browse the login/trial entry without a guest cookie.
+      }
+    }
     this.patch({ initialized: true, loading: false })
     return Boolean(token)
   }
@@ -165,6 +184,7 @@ export class AuthStore {
   private accept(response: AuthResponse) {
     this.set({
       user: response.user,
+      guest: null,
       accessToken: response.accessToken,
       initialized: true,
       loading: false,

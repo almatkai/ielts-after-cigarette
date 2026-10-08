@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import {
@@ -20,7 +21,7 @@ export function FullMockSectionPage({
   sessionId: string
   sectionPosition: string
 }) {
-  // Keep the server deadline active while the student is inside a section.
+  // Refresh the server's section state while the student works.
   const sessionQuery = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
@@ -36,7 +37,27 @@ export function FullMockSectionPage({
       getFullMockSection(sessionId, sectionPosition, signal),
   })
 
-  if (sessionQuery.data?.status === 'SUBMITTED') {
+  const deadline = query.data?.deadlineAt
+  const refetchSession = sessionQuery.refetch
+  useEffect(() => {
+    if (!deadline) return
+    const timer = window.setTimeout(
+      () => void refetchSession(),
+      Math.max(0, new Date(deadline).getTime() - Date.now()) + 50,
+    )
+    return () => window.clearTimeout(timer)
+  }, [deadline, refetchSession])
+
+  const current = sessionQuery.data?.sections.find(
+    (section) => section.position === Number(sectionPosition),
+  )
+  const expired =
+    current?.deadlineAt && new Date(current.deadlineAt).getTime() <= Date.now()
+
+  if (
+    sessionQuery.data?.status === 'SUBMITTED' ||
+    (expired && current.attempt.status !== 'IN_PROGRESS')
+  ) {
     return <FullMockSessionPage sessionId={sessionId} />
   }
 
@@ -68,6 +89,7 @@ export function FullMockSectionPage({
           attempt={section.attempt}
           test={section.material}
           fullMockSessionId={sessionId}
+          sectionDeadlineAt={section.deadlineAt}
         />
       )
     case 'reading':
@@ -77,6 +99,7 @@ export function FullMockSectionPage({
           attempt={section.attempt}
           material={section.material}
           fullMockSessionId={sessionId}
+          sectionDeadlineAt={section.deadlineAt}
         />
       )
     case 'writing':
@@ -86,6 +109,7 @@ export function FullMockSectionPage({
           attempt={section.attempt}
           material={section.material}
           fullMockSessionId={sessionId}
+          sectionDeadlineAt={section.deadlineAt}
         />
       )
     case 'speaking':
@@ -95,6 +119,7 @@ export function FullMockSectionPage({
           attempt={section.attempt}
           material={section.material}
           fullMockSessionId={sessionId}
+          sectionDeadlineAt={section.deadlineAt}
         />
       )
   }

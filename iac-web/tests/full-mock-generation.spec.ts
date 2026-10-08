@@ -106,6 +106,33 @@ async function mockAPI(page: Page, data: object, role = 'STUDENT') {
   return { posts, legacyReads }
 }
 
+test('opening a section renders the nested route and requests its material', async ({
+  page,
+}) => {
+  await mockAPI(page, overview())
+  let sectionReads = 0
+  await page.route(
+    '**/api/v1/full-mock-sessions/generated-session/sections/1',
+    (route) => {
+      sectionReads++
+      return route.fulfill({
+        status: 403,
+        json: { code: 'FORBIDDEN', message: 'Section route probe' },
+      })
+    },
+  )
+  await page.goto('./exam/full-mock-sessions/generated-session')
+  await page.getByRole('link', { name: 'Открыть секцию' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Не удалось открыть секцию Full Mock' }),
+  ).toBeVisible()
+  expect(sectionReads).toBeGreaterThan(0)
+  await page.reload()
+  await expect(
+    page.getByRole('heading', { name: 'Не удалось открыть секцию Full Mock' }),
+  ).toBeVisible()
+})
+
 test('new student sees one launch action, no catalog; start sends no mock ID', async ({
   page,
 }) => {
@@ -290,4 +317,283 @@ test('launch overview fits on a narrow mobile viewport', async ({
     path: testInfo.outputPath('full-mock-mobile.png'),
     fullPage: true,
   })
+})
+
+for (const [index, skill] of skills.entries()) {
+  test(`${skill} opens with its server timer and preserves it across reload`, async ({
+    page,
+  }) => {
+    const now = new Date()
+    await page.clock.install({ time: now })
+    await mockAPI(page, overview())
+    const mock = session()
+    mock.currentSection = index + 1
+    mock.startedAt = new Date(now.getTime() - 4 * 3600000).toISOString()
+    const attempt = {
+      ...mock.sections[index].attempt,
+      startedAt: mock.startedAt,
+    }
+    let deadlineAt = new Date(now.getTime() + 600000).toISOString()
+    let remainingMilliseconds: number | null = null
+    let resumeTime = now.getTime()
+    let pauses = 0
+    let failPause = true
+    const sessionState = () => ({
+      ...mock,
+      sections: mock.sections.map((section, position) =>
+        position === index
+          ? {
+              ...section,
+              deadlineAt: remainingMilliseconds === null ? deadlineAt : null,
+              remainingMilliseconds,
+            }
+          : section,
+      ),
+    })
+    const material = {
+      id: `${skill}-material`,
+      title: `${skill} section material`,
+      slug: skill,
+      examType: 'academic',
+      difficulty: 'intermediate',
+      description: '',
+      durationMinutes: 60,
+      parts:
+        skill === 'speaking'
+          ? [
+              {
+                id: 'part-1',
+                position: 1,
+                type: 'part1',
+                title: 'Interview',
+                instructions: 'Speak',
+                preparationSeconds: 0,
+                responseSeconds: 120,
+                cueCard: [],
+                questions: [
+                  {
+                    id: 'question-1',
+                    position: 1,
+                    prompt: 'Describe your home',
+                  },
+                ],
+              },
+            ]
+          : [],
+      body: 'Reading passage',
+      kind: 'PASSAGE',
+      questionGroups: [],
+      tasks: [
+        {
+          id: 'task-1',
+          position: 1,
+          type: 'task1',
+          prompt: 'Describe this chart',
+          minimumWords: 150,
+        },
+        {
+          id: 'task-2',
+          position: 2,
+          type: 'task2',
+          prompt: 'Discuss education',
+          minimumWords: 250,
+        },
+      ],
+    }
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session',
+      (route) => route.fulfill({ json: sessionState() }),
+    )
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session/pause',
+      (route) => {
+        pauses++
+        if (failPause)
+          return route.fulfill({
+            status: 503,
+            json: { code: 'DEPENDENCY_UNAVAILABLE', message: 'Pause failed' },
+          })
+        remainingMilliseconds = 480000
+        return route.fulfill({ json: sessionState() })
+      },
+    )
+    let reads = 0
+    await page.route(
+      `**/api/v1/full-mock-sessions/generated-session/sections/${index + 1}`,
+      (route) => {
+        reads++
+        if (remainingMilliseconds !== null) {
+          deadlineAt = new Date(
+            resumeTime + remainingMilliseconds,
+          ).toISOString()
+          remainingMilliseconds = null
+        }
+        return route.fulfill({
+          json: { skill, position: index + 1, attempt, material, deadlineAt },
+        })
+      },
+    )
+    await page.route(`**/api/v1/attempts/${skill}-attempt`, (route) =>
+      route.fulfill({ json: { ...attempt, answers: [], recordings: [] } }),
+    )
+    if (skill === 'listening') {
+      await page.route('**/api/v1/auth/refresh', (route) =>
+        route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } }),
+      )
+      await page.route('**/api/v1/guest/config', (route) =>
+        route.fulfill({
+          json: { enabled: true, siteKey: '', examTypes: ['academic'] },
+        }),
+      )
+      await page.route('**/api/v1/guest/session', (route) =>
+        route.fulfill({
+          json: {
+            id: 'guest-actor',
+            sessionId: mock.id,
+            expiresAt: new Date(now.getTime() + 7 * 86400000).toISOString(),
+          },
+        }),
+      )
+    }
+    await page.addInitScript(
+      ({ skill: timerSkill }) => {
+        localStorage.setItem(
+          `iac_${timerSkill}_deadline_${timerSkill}-attempt_remaining`,
+          '18000',
+        )
+      },
+      { skill },
+    )
+    await page.goto('./exam/full-mock-sessions/generated-session')
+    const open = page.getByRole('link', { name: 'Открыть секцию' })
+    await open.hover()
+    await page.clock.runFor(400)
+    expect(reads).toBe(0)
+    await open.click()
+    await expect(
+      page.getByRole('heading', { name: material.title }).first(),
+    ).toBeAttached()
+    const timer = page.locator(
+      `[aria-label="${skill === 'speaking' ? 'Время секции Speaking' : skill === 'reading' ? 'Осталось' : 'Оставшееся время'}"]`,
+    )
+    await expect(timer).toBeVisible()
+    await page.clock.pauseAt(new Date(now.getTime() + 60000))
+    await expect(timer).toHaveText('09:00')
+    await page.clock.runFor(10000)
+    await expect(timer).toHaveText('08:50')
+    await page.clock.resume()
+    await page.reload()
+    await expect(timer).toBeVisible()
+    await page.clock.pauseAt(new Date(now.getTime() + 120000))
+    await expect(timer).toHaveText('08:00')
+
+    await page.getByRole('button', { name: 'Продолжить позже' }).first().click()
+    await expect(
+      page
+        .getByRole('alert')
+        .filter({ hasText: 'Не удалось сохранить черновик' }),
+    ).toBeVisible()
+    await expect(page).toHaveURL(new RegExp(`/sections/${index + 1}$`))
+    expect(pauses).toBe(1)
+    failPause = false
+    await page.getByRole('button', { name: 'Продолжить позже' }).first().click()
+    await expect(page).toHaveURL(/full-mock-sessions\/generated-session$/)
+    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await page.clock.runFor(120000)
+    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await page.clock.resume()
+    await page.reload()
+    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await page.clock.pauseAt(
+      new Date((await page.evaluate(() => Date.now())) + 1000),
+    )
+    await open.hover()
+    expect(remainingMilliseconds).toBe(480000)
+    await page.clock.resume()
+    resumeTime = await page.evaluate(() => Date.now())
+    await open.click()
+    await expect(timer).toBeVisible()
+    await expect(timer).toHaveText(/^(08:00|07:5\d)$/)
+    await page.clock.pauseAt(new Date(new Date(deadlineAt).getTime() - 470000))
+    await expect(timer).toHaveText('07:50')
+    await page.clock.runFor(10000)
+    await expect(timer).toHaveText('07:40')
+    expect(pauses).toBe(2)
+  })
+}
+
+for (const state of ['unopened', 'running', 'paused', 'completed']) {
+  test(`return to site preserves a ${state} mock without finishing it`, async ({
+    page,
+  }) => {
+    await mockAPI(page, overview())
+    const mock = session()
+    let paused = state === 'paused'
+    let pauseCalls = 0
+    let finishCalls = 0
+    const data = () => ({
+      ...mock,
+      status: state === 'completed' ? 'SUBMITTED' : 'IN_PROGRESS',
+      sections: mock.sections.map((section, index) => ({
+        ...section,
+        deadlineAt:
+          index === 0 && state === 'running' && !paused
+            ? new Date(Date.now() + 600000).toISOString()
+            : null,
+        remainingMilliseconds: index === 0 && paused ? 600000 : null,
+      })),
+    })
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session',
+      (route) => route.fulfill({ json: data() }),
+    )
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session/pause',
+      (route) => {
+        pauseCalls++
+        paused = true
+        return route.fulfill({ json: data() })
+      },
+    )
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session/finish',
+      (route) => {
+        finishCalls++
+        return route.fulfill({ json: data() })
+      },
+    )
+    await page.goto('./exam/full-mock-sessions/generated-session')
+    if (state === 'paused')
+      await page.setViewportSize({ width: 390, height: 844 })
+    await page.getByRole('button', { name: 'Вернуться на сайт' }).click()
+    await expect(page).toHaveURL(/\/app\/$/)
+    expect(pauseCalls).toBe(state === 'running' ? 1 : 0)
+    expect(finishCalls).toBe(0)
+  })
+}
+
+test('return to site stays in the mock if pausing fails', async ({ page }) => {
+  await mockAPI(page, overview())
+  const mock = session()
+  await page.route('**/api/v1/full-mock-sessions/generated-session', (route) =>
+    route.fulfill({
+      json: {
+        ...mock,
+        sections: mock.sections.map((section, index) => ({
+          ...section,
+          deadlineAt:
+            index === 0 ? new Date(Date.now() + 600000).toISOString() : null,
+        })),
+      },
+    }),
+  )
+  await page.route(
+    '**/api/v1/full-mock-sessions/generated-session/pause',
+    (route) =>
+      route.fulfill({ status: 503, json: { code: 'DEPENDENCY_UNAVAILABLE' } }),
+  )
+  await page.goto('./exam/full-mock-sessions/generated-session')
+  await page.getByRole('button', { name: 'Вернуться на сайт' }).click()
+  await expect(page.getByRole('alert')).toBeVisible()
+  await expect(page).toHaveURL(/full-mock-sessions\/generated-session$/)
 })

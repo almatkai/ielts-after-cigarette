@@ -18,6 +18,7 @@ import {
 import { invalidateMistakeResults } from '@/features/attempts/mistake-cache'
 import { getErrorMessage } from '@/lib/api/client'
 import { reportError } from '@/lib/error-reporting'
+import { fullMockKeys, pauseFullMockSession } from '@/features/fullmock/api'
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -77,17 +78,16 @@ export function useAttemptSession(attemptId: string) {
     // Only unsynchronized changes may shadow server answers: entries the
     // server already returns are treated as synced, so a draft saved from
     // another device is never overwritten by a stale local snapshot.
-    const dirty = extractDirtyDraft(
-      serverAnswers,
-      readAttemptDraft(attemptId),
-    )
+    const dirty = extractDirtyDraft(serverAnswers, readAttemptDraft(attemptId))
     for (const [questionId, answer] of Object.entries(dirty)) {
       pending.current.set(questionId, answer)
     }
     writeAttemptDraft(attemptId, dirty)
 
     const initial =
-      Object.keys(dirty).length > 0 ? { ...serverAnswers, ...dirty } : serverAnswers
+      Object.keys(dirty).length > 0
+        ? { ...serverAnswers, ...dirty }
+        : serverAnswers
 
     answersRef.current = initial
     setAnswers(initial)
@@ -230,9 +230,9 @@ export function useAttemptSession(attemptId: string) {
   }
 
   const saveAndExit = useCallback(
-    async (onExit?: () => void) => {
+    async (onExit?: () => void | Promise<void>) => {
       if (closed.current || submitting.current) {
-        onExit?.()
+        await onExit?.()
         return
       }
       if (debounceTimer.current !== null) {
@@ -250,7 +250,7 @@ export function useAttemptSession(attemptId: string) {
           queryKey: attemptKeys.detail(attemptId),
         })
         setSaveState('saved')
-        onExit?.()
+        await onExit?.()
       } catch (error) {
         // The draft never reached the server: keep the student on the page and
         // surface the failure instead of presenting the exit as successful.
@@ -335,13 +335,16 @@ export function useAttemptSession(attemptId: string) {
 // Shared "Продолжить позже" flow: an optional pre-exit step (for example
 // finishing an audio upload), then saving the draft and leaving the attempt.
 export function useContinueLater(
-  session: { saveAndExit: (onExit?: () => void) => Promise<void> },
+  session: {
+    saveAndExit: (onExit?: () => void | Promise<void>) => Promise<void>
+  },
   options: {
     fullMockSessionId?: string
     beforeExit?: () => Promise<boolean>
   } = {},
 ) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { saveAndExit } = session
   const { fullMockSessionId, beforeExit } = options
   return useCallback(() => {
@@ -350,18 +353,26 @@ export function useContinueLater(
         const ok = await beforeExit()
         if (!ok) return
       }
-      await saveAndExit(() => {
+      await saveAndExit(async () => {
         // Full Mock sections must return to their session, not to the skill
         // hub: the practice routes would start a different attempt.
         if (fullMockSessionId) {
-          void navigate({
+          // Cancel in-flight section reads before pausing: reads open/resume
+          // clocks. Remove the cached runner so the next opening gets a fresh
+          // deadline, while the overview immediately uses the paused state.
+          const key = fullMockKeys.session(fullMockSessionId)
+          await queryClient.cancelQueries({ queryKey: key })
+          const paused = await pauseFullMockSession(fullMockSessionId)
+          queryClient.setQueryData(key, paused)
+          queryClient.removeQueries({ queryKey: [...key, 'sections'] })
+          await navigate({
             to: '/exam/full-mock-sessions/$sessionId',
             params: { sessionId: fullMockSessionId },
           })
           return
         }
-        void navigate({ to: '/' })
+        await navigate({ to: '/' })
       })
     })()
-  }, [saveAndExit, beforeExit, fullMockSessionId, navigate])
+  }, [saveAndExit, beforeExit, fullMockSessionId, navigate, queryClient])
 }

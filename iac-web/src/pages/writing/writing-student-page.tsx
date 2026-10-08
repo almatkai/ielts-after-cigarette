@@ -7,7 +7,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { useAttemptSession, useContinueLater } from '@/features/attempts/attempt-session'
+import {
+  useAttemptSession,
+  useContinueLater,
+} from '@/features/attempts/attempt-session'
 import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import { useExamTimer } from '@/features/attempts/exam-timer'
 import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
@@ -66,11 +69,13 @@ export function WritingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
@@ -114,6 +119,7 @@ export function WritingAttemptRunner({
     durationSeconds,
     ready: isReady,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   useEffect(() => {

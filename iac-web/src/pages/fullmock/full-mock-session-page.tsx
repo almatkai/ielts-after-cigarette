@@ -28,6 +28,7 @@ import {
 } from '@/features/fullmock/api'
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { FullMockRetake } from './full-mock-retake'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -151,7 +152,10 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
         </p>
       ) : null}
       {session.status === 'SUBMITTED' ? (
-        <FullMockReport session={session} />
+        <>
+          <FullMockReport session={session} />
+          <FullMockRetake key={session.id} sessionId={session.id} />
+        </>
       ) : (
         <>
           <p className="text-sm leading-6 text-[#69696d]">

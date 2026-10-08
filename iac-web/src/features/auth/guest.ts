@@ -30,6 +30,18 @@ export const startGuestMock = (
     body: { examType, turnstileToken, acceptedTerms: true },
   })
 
+export const retakeGuestMock = (sessionId: string) =>
+  apiClient.request<FullMockSession>('/api/v1/guest/start', {
+    method: 'POST',
+    authenticated: false,
+    retryAuthentication: false,
+    body: {
+      examType: 'academic',
+      acceptedTerms: true,
+      retakeSessionId: sessionId,
+    },
+  })
+
 export const claimGuestResults = (accessToken: string) =>
   apiClient.request<{ sessionId: string | null }>('/api/v1/guest/claim', {
     method: 'POST',

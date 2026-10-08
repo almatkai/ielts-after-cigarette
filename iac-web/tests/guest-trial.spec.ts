@@ -10,6 +10,7 @@ async function guestAPI(
 ) {
   let active = restored
   let claimed = false
+  let currentSessionId = 'guest-mock'
   const claims: string[] = []
   const starts: unknown[] = []
   const privateReads: string[] = []
@@ -53,7 +54,7 @@ async function guestAPI(
             json: {
               id: 'guest-actor',
               expiresAt: new Date(Date.now() + 7 * 86400000).toISOString(),
-              sessionId: 'guest-mock',
+              sessionId: currentSessionId,
             },
           })
         : route.fulfill({ status: 401, json: { code: 'GUEST_EXPIRED' } })
@@ -77,11 +78,37 @@ async function guestAPI(
             },
           })),
         }
+    const retake = {
+      ...report,
+      id: 'guest-retake',
+      status: 'IN_PROGRESS',
+      currentSection: 1,
+      submittedAt: null,
+      overallBand: null,
+      sections: report.sections.map((section) => ({
+        ...section,
+        startedAt: null,
+        deadlineAt: null,
+        attempt: {
+          ...section.attempt,
+          id: `${section.skill}-retake`,
+          status: 'IN_PROGRESS',
+          band: null,
+        },
+      })),
+    }
     if (path.endsWith('/guest/start')) {
-      starts.push(route.request().postDataJSON())
+      const input = route.request().postDataJSON()
+      starts.push(input)
       active = true
+      if (input.retakeSessionId) {
+        currentSessionId = retake.id
+        return route.fulfill({ json: retake })
+      }
       return route.fulfill({ json: report })
     }
+    if (path.endsWith('/full-mock-sessions/guest-retake'))
+      return route.fulfill({ json: retake })
     if (path.endsWith('/full-mock-sessions/guest-mock'))
       return route.fulfill({ json: report })
     if (path.endsWith('/attempts/writing-guest'))
@@ -192,7 +219,10 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   })
   await expect(start).toBeEnabled()
   await expect(
-    page.getByText('Бесплатно · Academic · 4 секции', { exact: true }),
+    page.getByText(
+      'Проверьте свой уровень IELTS — пройдите полный пробный тест.',
+      { exact: true },
+    ),
   ).toBeVisible()
   await expect(
     page.getByText(/Таймер каждой секции начнётся при её открытии/),
@@ -855,6 +885,183 @@ test('zero guest mistakes does not fabricate a free error', async ({
   await expect(
     page.getByRole('button', { name: /^Разобрать ошибку/ }),
   ).toHaveCount(0)
+})
+
+for (const mobile of [false, true]) {
+  test(`guest can retake a completed mock${mobile ? ' on mobile' : ''}`, async ({
+    page,
+  }) => {
+    const { starts } = await guestAPI(page, true)
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('./exam/full-mock-sessions/guest-mock')
+    await page
+      .getByRole('button', { name: 'Пересдать тест', exact: true })
+      .click()
+    const dialog = page.getByRole('alertdialog', {
+      name: 'Пересдать полный тест?',
+    })
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Отмена', exact: true }).click()
+    expect(starts).toEqual([])
+    await page
+      .getByRole('button', { name: 'Пересдать тест', exact: true })
+      .click()
+    await dialog
+      .getByRole('button', { name: 'Начать заново', exact: true })
+      .click()
+    await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
+    await expect(
+      page.getByText('Секции идут строго по порядку.', { exact: false }),
+    ).toBeVisible()
+    expect(starts).toEqual([
+      {
+        examType: 'academic',
+        acceptedTerms: true,
+        retakeSessionId: 'guest-mock',
+      },
+    ])
+    await expect(
+      page.getByRole('button', { name: 'Пересдать тест', exact: true }),
+    ).toHaveCount(0)
+    await page.reload()
+    await expect(
+      page.getByText('Секции идут строго по порядку.', { exact: false }),
+    ).toBeVisible()
+    await page.goto('./')
+    await page
+      .getByRole('link', { name: 'Открыть мой тест и результаты', exact: true })
+      .click()
+    await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
+    await page.goto('./exam/full-mock-sessions/guest-mock')
+    await expect(page.getByText('6.5', { exact: true })).toHaveCount(1)
+    await expect(
+      page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
+    ).toHaveCount(4)
+    await page
+      .getByRole('link', { name: 'Открыть последнюю попытку', exact: true })
+      .click()
+    await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
+    expect(starts).toHaveLength(1)
+  })
+}
+
+test('guest can retake a mock completed without a grade', async ({ page }) => {
+  await guestAPI(page, true)
+  await page.route('**/api/v1/full-mock-sessions/guest-mock', (route) =>
+    route.fulfill({
+      json: {
+        id: 'guest-mock',
+        status: 'SUBMITTED',
+        currentSection: 5,
+        mockTest: {
+          title: 'Полный пробный IELTS',
+          examType: 'academic',
+          durationMinutes: 165,
+        },
+        overallBand: null,
+        resultsLocked: true,
+        sections: ['listening', 'reading', 'writing', 'speaking'].map(
+          (skill, index) => ({
+            position: index + 1,
+            skill,
+            attempt: {
+              id: `${skill}-guest`,
+              materialType: skill,
+              status: 'ABANDONED',
+              band: null,
+            },
+          }),
+        ),
+      },
+    }),
+  )
+  await page.goto('./exam/full-mock-sessions/guest-mock')
+  await expect(
+    page.getByText('Секция завершена без оценки', { exact: true }),
+  ).toHaveCount(4)
+  await page
+    .getByRole('button', { name: 'Пересдать тест', exact: true })
+    .click()
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Начать заново', exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/guest-retake$/)
+})
+
+test('signed-in student can retake a completed mock without using the guest API', async ({
+  page,
+}) => {
+  const { starts } = await guestAPI(page, true)
+  await page.route('**/api/v1/auth/refresh', (route) =>
+    route.fulfill({ json: modalAccount }),
+  )
+  const fresh = {
+    id: 'account-retake',
+    status: 'IN_PROGRESS',
+    currentSection: 1,
+    mockTest: { title: 'Полный пробный IELTS', examType: 'academic' },
+    sections: [],
+    overallBand: null,
+  }
+  const accountStarts: unknown[] = []
+  await page.route('**/api/v1/full-mocks/start', (route) => {
+    accountStarts.push(route.request().postDataJSON())
+    return route.fulfill({ json: fresh })
+  })
+  await page.route('**/api/v1/full-mock-sessions/account-retake', (route) =>
+    route.fulfill({ json: fresh }),
+  )
+  await page.goto('./exam/full-mock-sessions/guest-mock')
+  await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+  await page
+    .getByRole('button', { name: 'Пересдать тест', exact: true })
+    .click()
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Начать заново', exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/account-retake$/)
+  expect(accountStarts).toEqual([{ restart: true }])
+  expect(starts).toEqual([])
+})
+
+test('guest retake quota failure keeps the report and can be retried', async ({
+  page,
+}) => {
+  const { starts } = await guestAPI(page, true)
+  let calls = 0
+  await page.route('**/api/v1/guest/start', async (route) => {
+    calls++
+    if (calls === 1)
+      return route.fulfill({
+        status: 429,
+        json: { code: 'GUEST_LIMIT_EXCEEDED', message: 'Попробуйте позже' },
+      })
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    return route.fallback()
+  })
+  await page.goto('./exam/full-mock-sessions/guest-mock')
+  await page
+    .getByRole('button', { name: 'Пересдать тест', exact: true })
+    .click()
+  const dialog = page.getByRole('alertdialog', {
+    name: 'Пересдать полный тест?',
+  })
+  await dialog
+    .getByRole('button', { name: 'Начать заново', exact: true })
+    .click()
+  await expect(dialog.getByRole('alert')).toContainText('Попробуйте позже')
+  await expect(page).toHaveURL(/\/guest-mock$/)
+  await dialog
+    .getByRole('button', { name: 'Начать заново', exact: true })
+    .click()
+  await expect(
+    dialog.getByRole('button', { name: 'Готовим тест…', exact: true }),
+  ).toBeDisabled()
+  await expect(page).toHaveURL(/\/guest-retake$/)
+  expect(calls).toBe(2)
+  expect(starts).toHaveLength(1)
 })
 
 test('mobile login dialog fits and can be dismissed without starting a trial', async ({

@@ -227,7 +227,9 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   await expect(
     page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'К пробному тесту' }).click()
+  await page.getByRole('link', { name: 'К результату' }).click()
+  await expect(page.getByText('Итоговый IELTS band')).toBeVisible()
+  await page.goto('./try')
   await expect(
     page.getByRole('link', { name: 'Открыть мой тест и результаты' }),
   ).toBeVisible()
@@ -688,11 +690,27 @@ for (const registration of [false, true]) {
       page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
     ).toHaveCount(0)
     expect(claims).toEqual(['Bearer account-token'])
-    await page.getByRole('link', { name: 'Разбор попытки' }).nth(1).click()
+    await page
+      .getByRole('link', { name: 'Reading: работа над ошибками', exact: true })
+      .click()
+    await page
+      .getByRole('button', { name: 'Разобрать ошибку 10', exact: true })
+      .click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Показать решение', exact: true })
+      .click()
     await expect(
       page.getByText('Explanation 10', { exact: true }),
     ).toBeVisible()
     await page.reload()
+    await page
+      .getByRole('button', { name: 'Разобрать ошибку 10', exact: true })
+      .click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Показать решение', exact: true })
+      .click()
     await expect(
       page.getByText('Explanation 10', { exact: true }),
     ).toBeVisible()
@@ -809,6 +827,13 @@ test('sign-in from a locked mistake opens the complete review on the same page',
     .getByRole('button', { name: 'Continue with Google' })
     .click()
   await expect(page).toHaveURL(/\/attempts\/reading-guest$/)
+  await page
+    .getByRole('button', { name: 'Разобрать ошибку 10', exact: true })
+    .click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Показать решение', exact: true })
+    .click()
   await expect(page.getByText('Explanation 10', { exact: true })).toBeVisible()
   await expect(
     page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),

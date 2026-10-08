@@ -603,12 +603,9 @@ export function SpeakingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {material.title}
+          Работа над ошибками
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Speaking · Parts 1–{material.parts.length} ·
-          аудио-тренировка
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (

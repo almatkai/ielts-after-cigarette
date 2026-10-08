@@ -985,7 +985,7 @@ test('Listening completion without context renders prompt gaps inline', async ({
   await expect(first).toHaveValue('engine')
 })
 
-test('Listening submitted review replaces note templates with underlined student answers', async ({
+test('Listening submitted review opens only mistakes with the selected note prompt', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 426, height: 900 })
@@ -1042,6 +1042,7 @@ test('Listening submitted review replaces note templates with underlined student
   await page.route('**/api/v1/**', (route) => {
     const path = new URL(route.request().url()).pathname
     if (!path.includes('/attempts')) return route.fallback()
+    if (path.endsWith('/material')) return route.fulfill({ json: material })
     if (path.endsWith('/attempts'))
       return route.fulfill({ json: { attempt, test: material } })
     return route.fulfill({
@@ -1064,34 +1065,40 @@ test('Listening submitted review replaces note templates with underlined student
   })
   await page.goto('exam/listening/listening-id')
   await expect(
-    page.getByRole('heading', { name: 'Part 4: Inclusive design' }),
+    page.getByRole('heading', { name: 'Работа над ошибками' }),
   ).toBeVisible()
-  await expect(page.getByText(/\{\{31\}\}/)).toHaveCount(0)
-  await expect(page.getByText('note completion', { exact: true })).toHaveCount(
-    0,
+  const mistake = page.getByRole('button', {
+    name: 'Разобрать ошибку 31',
+    exact: true,
+  })
+  await expect(mistake).toBeVisible()
+  await expect(mistake).toContainText(
+    'Products accessible without need for _____.',
   )
-  const first = page.locator('span[title="Вопрос 31"]')
-  const second = page.locator('span[title="Вопрос 32"]')
-  await expect(first).toHaveAttribute(
-    'aria-label',
-    'Ответ на вопрос 31: не отвечено',
-  )
-  await expect(first).toHaveCSS('border-bottom-width', '1px')
-  await expect(second).toHaveText('mobility')
-  await expect(second).toHaveCSS('border-bottom-width', '1px')
-  await expect(first.locator('..')).toHaveCSS(
-    'background-color',
-    'rgba(0, 0, 0, 0)',
-  )
-  await expect(first.locator('../..')).toHaveCSS('border-top-width', '0px')
-  await expect(page.getByRole('textbox')).toHaveCount(0)
-  await expect(page.getByText('adaptation', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Разобрать ошибку 32', exact: true }),
+  ).toHaveCount(0)
+  await expect(page.getByText('adaptation', { exact: true })).toHaveCount(0)
+  await mistake.click()
+  const dialog = page.getByRole('dialog')
+  await expect(
+    dialog.getByText('Products accessible without need for _____.', {
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(dialog).not.toContainText('Universal design also caters')
+  await expect(dialog).not.toContainText('{{')
+  await dialog
+    .getByRole('button', { name: 'Показать решение', exact: true })
+    .click()
+  await expect(dialog.getByText('adaptation', { exact: true })).toBeVisible()
+  await expect(
+    dialog.getByText('Stored explanation', { exact: true }),
+  ).toBeVisible()
   await page.screenshot({
-    path: testInfo.outputPath('listening-review-gaps.png'),
+    path: testInfo.outputPath('listening-review-mistake.png'),
     fullPage: true,
   })
-  await page.getByRole('button', { name: /Ошибки/ }).click()
-  await expect(second).toHaveText('mobility')
 })
 
 for (const skill of ['reading', 'listening']) {

@@ -20,11 +20,26 @@ import type { Option } from '@/features/attempts/attempt-ui'
 import type { AttemptDetail, AttemptReviewItem } from '@/features/attempts/api'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
 
-export function GuestAttemptReview({ attempt }: { attempt: AttemptDetail }) {
+export function GuestAttemptReview({
+  attempt,
+  embedded = false,
+}: {
+  attempt: AttemptDetail
+  embedded?: boolean
+}) {
   const [selected, setSelected] = useState<AttemptReviewItem | null>(null)
   const [improvement, setImprovement] = useState<string | null>(null)
   const preview = attempt.guestPreview
   const mistakes = (attempt.review ?? []).filter((item) => !item.isCorrect)
+  const selectedIndex = mistakes.findIndex(
+    (item) => item.questionId === selected?.questionId,
+  )
+  const nextMistake =
+    selectedIndex < 0
+      ? undefined
+      : mistakes
+          .slice(selectedIndex + 1)
+          .find((item) => !item.locked && Boolean(item.correctAnswer))
   const skill =
     attempt.materialType.charAt(0).toUpperCase() + attempt.materialType.slice(1)
   const buttonClass =
@@ -33,19 +48,23 @@ export function GuestAttemptReview({ attempt }: { attempt: AttemptDetail }) {
   return (
     <GuestResultsAccess>
       <div className="mx-auto grid w-full min-w-0 max-w-[900px] gap-5">
-        <Button
-          asChild
-          variant="link"
-          className="h-auto justify-self-start p-0"
-        >
-          <Link to="/try">
-            <ArrowLeft aria-hidden />К пробному тесту
-          </Link>
-        </Button>
+        {!embedded && (
+          <Button
+            asChild
+            variant="link"
+            className="h-auto justify-self-start p-0"
+          >
+            <Link to="/try">
+              <ArrowLeft aria-hidden />К пробному тесту
+            </Link>
+          </Button>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-            {skill}: разбор ошибок
-          </h1>
+          {!embedded && (
+            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+              Работа над ошибками
+            </h1>
+          )}
           <GuestLockedBand skill={skill} />
         </div>
         <div className="border-l-2 border-[#3b82f6] pl-4 text-sm leading-6">
@@ -160,6 +179,7 @@ export function GuestAttemptReview({ attempt }: { attempt: AttemptDetail }) {
           }}
           attemptId={attempt.id}
           materialType={attempt.materialType}
+          onNext={nextMistake ? () => setSelected(nextMistake) : undefined}
         />
         <Dialog
           open={improvement !== null}

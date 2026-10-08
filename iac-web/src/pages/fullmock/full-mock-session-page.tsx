@@ -367,9 +367,6 @@ function FullMockReport({ session }: { session: FullMockSession }) {
           </span>
           <div>
             <p className="font-semibold">Итоговый IELTS band</p>
-            <p className="mt-1 text-sm text-[#4b5563]">
-              Среднее значение четырёх навыков, округлённое до 0,5.
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -380,36 +377,53 @@ function FullMockReport({ session }: { session: FullMockSession }) {
         </p>
       ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
-        {session.sections.map((section) => (
-          <Card key={section.position} className="shadow-none">
-            <CardContent className="flex items-center justify-between p-5">
-              <div>
-                <p className="font-semibold">{labels[section.skill]}</p>
+        {session.sections.map((section) =>
+          locked ? (
+            <Card key={section.position} className="shadow-none">
+              <CardContent className="flex items-center justify-between p-5">
+                <div>
+                  <p className="font-semibold">{labels[section.skill]}</p>
+                  {section.attempt.status !== 'ABANDONED' ? (
+                    <Link
+                      to="/attempts/$attemptId"
+                      params={{ attemptId: section.attempt.id }}
+                      search={{ session: session.id }}
+                      className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
+                    >
+                      Разобрать ошибки{' '}
+                      <ArrowRight className="size-3.5" aria-hidden />
+                    </Link>
+                  ) : (
+                    <p className="mt-1 text-sm text-[#69696d]">
+                      Секция завершена без оценки
+                    </p>
+                  )}
+                </div>
                 {section.attempt.status !== 'ABANDONED' ? (
-                  <Link
-                    to="/attempts/$attemptId"
-                    params={{ attemptId: section.attempt.id }}
-                    className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
-                  >
-                    {locked ? 'Разобрать ошибки' : 'Разбор попытки'}{' '}
-                    <ArrowRight className="size-3.5" aria-hidden />
-                  </Link>
+                  <GuestLockedBand skill={labels[section.skill]} />
                 ) : (
-                  <p className="mt-1 text-sm text-[#69696d]">
-                    Секция завершена без оценки
-                  </p>
+                  <span className="text-2xl font-semibold text-[#3b82f6]">
+                    {section.attempt.band?.toFixed(1) ?? '—'}
+                  </span>
                 )}
-              </div>
-              {locked && section.attempt.status !== 'ABANDONED' ? (
-                <GuestLockedBand skill={labels[section.skill]} />
-              ) : (
-                <span className="text-2xl font-semibold text-[#3b82f6]">
-                  {section.attempt.band?.toFixed(1) ?? '—'}
-                </span>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <Link
+              key={section.position}
+              to="/attempts/$attemptId"
+              params={{ attemptId: section.attempt.id }}
+              search={{ session: session.id }}
+              aria-label={`${labels[section.skill]}: работа над ошибками`}
+              className="flex min-h-28 items-center justify-between rounded-[16px] border border-[#e7e7e4] bg-white p-5 transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
+            >
+              <p className="font-semibold">{labels[section.skill]}</p>
+              <span className="text-2xl font-semibold text-[#3b82f6]">
+                {section.attempt.band?.toFixed(1) ?? '—'}
+              </span>
+            </Link>
+          ),
+        )}
       </div>
     </GuestResultsAccess>
   )

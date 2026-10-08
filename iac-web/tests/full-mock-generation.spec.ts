@@ -252,19 +252,18 @@ test('old mock links redirect to automatic generation without loading a chosen t
   expect(legacyReads).toEqual([])
 })
 
-test('final listening result immediately explains that mock tests will repeat', async ({
+test('final listening result immediately opens work on mistakes', async ({
   page,
 }) => {
   await mockAPI(page, overview(10))
   await page.goto('./attempts/final-listening')
   await expect(
-    page.getByText('Вы выполнили все доступные тесты Listening (10 из 10).', {
-      exact: true,
-    }),
+    page.getByRole('heading', { name: 'Работа над ошибками' }),
   ).toBeVisible()
   await expect(
-    page.getByText(/тесты Listening будут повторяться и выбираться случайно/),
+    page.getByRole('heading', { name: 'Listening Test 10' }),
   ).toBeVisible()
+  await expect(page.getByText('Нет ошибок', { exact: true })).toBeVisible()
 })
 
 test('manual creation is retired in admin; archive remains read-only', async ({

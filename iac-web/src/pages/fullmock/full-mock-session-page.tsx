@@ -371,9 +371,6 @@ function FullMockReport({ session }: { session: FullMockSession }) {
           </span>
           <div>
             <p className="font-semibold">Итоговый IELTS band</p>
-            <p className="mt-1 text-sm text-[#4b5563]">
-              Среднее значение четырёх навыков, округлённое до 0,5.
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -393,6 +390,7 @@ function FullMockReport({ session }: { session: FullMockSession }) {
                   <Link
                     to="/attempts/$attemptId"
                     params={{ attemptId: section.attempt.id }}
+                    search={{ session: session.id }}
                     className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
                   >
                     {locked ? 'Разобрать ошибки' : 'Разбор попытки'}{' '}

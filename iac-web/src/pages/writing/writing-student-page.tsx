@@ -481,12 +481,9 @@ export function WritingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {material.title}
+          Работа над ошибками
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          IELTS Academic Writing · {material.tasks.length} задания ·{' '}
-          {material.durationMinutes} минут
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (

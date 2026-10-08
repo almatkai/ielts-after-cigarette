@@ -2,19 +2,21 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   Book1,
   CloseCircle,
+  CloseSquare,
   LampCharge,
   TickCircle,
   Eye,
   TextalignLeft,
-  ExportSquare,
   InfoCircle,
   Play,
   VolumeHigh,
+  ArrowRight,
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -28,7 +30,11 @@ import { getAttemptMaterial } from '@/features/attempts/api'
 import type { AttemptReviewItem, StudentAnswer } from '@/features/attempts/api'
 import { getListeningMediaBlob } from '@/features/listening/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
-import type { Option } from '@/features/attempts/attempt-ui'
+import { reviewOptions } from './mistake-list'
+import { withReviewMaterial } from './review-material'
+import { evaluateRetryAnswer } from './retry-answer'
+import { getReviewAudioRange } from './review-audio-range'
+import { useMistakeReviewStatus } from './use-mistake-review-status'
 
 function formatSeconds(sec?: number): string {
   if (typeof sec !== 'number' || isNaN(sec)) return '--:--'
@@ -44,6 +50,7 @@ type MistakeRetryDialogProps = {
   testTitle?: string
   attemptId?: string
   materialType?: string
+  onNext?: () => void
 }
 
 export function MistakeRetryDialog({
@@ -53,19 +60,23 @@ export function MistakeRetryDialog({
   testTitle,
   attemptId,
   materialType,
+  onNext,
 }: MistakeRetryDialogProps) {
   if (!item || item.locked || !item.correctAnswer) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[1440px] w-[97vw] max-h-[94vh] h-[92vh] p-0 overflow-hidden flex flex-col gap-0 border-[#e7e7e4] bg-white rounded-[20px] shadow-2xl">
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-[1440px] w-[97vw] max-h-[94vh] h-[92vh] p-0 overflow-hidden flex flex-col gap-0 border-[#e7e7e4] bg-white rounded-[20px] shadow-2xl"
+      >
         <MistakeRetryContent
           key={item.questionId}
           item={{ ...item, correctAnswer: item.correctAnswer }}
           testTitle={testTitle}
           attemptId={attemptId}
           materialType={materialType}
-          onClose={() => onOpenChange(false)}
+          onNext={onNext}
         />
       </DialogContent>
     </Dialog>
@@ -73,19 +84,24 @@ export function MistakeRetryDialog({
 }
 
 function MistakeRetryContent({
-  item,
+  item: initialItem,
   testTitle,
   attemptId,
   materialType,
-  onClose,
+  onNext,
 }: {
   item: AttemptReviewItem & { correctAnswer: StudentAnswer }
   testTitle?: string
   attemptId?: string
   materialType?: string
-  onClose: () => void
+  onNext?: () => void
 }) {
+  const { markReviewed } = useMistakeReviewStatus(
+    attemptId,
+    initialItem.questionId,
+  )
   const [selectedAnswer, setSelectedAnswer] = useState<string>('')
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [revealed, setRevealed] = useState(false)
@@ -93,19 +109,28 @@ function MistakeRetryContent({
   const [attemptCount, setAttemptCount] = useState(0)
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md')
   const [mobileTab, setMobileTab] = useState<'text' | 'question'>('question')
+  const [audioDuration, setAudioDuration] = useState<number>()
 
   const isListening =
     materialType === 'listening' ||
-    Boolean(item.audioAssetId) ||
-    typeof item.timestampStart === 'number' ||
-    Boolean(item.transcript)
+    Boolean(initialItem.audioAssetId) ||
+    typeof initialItem.timestampStart === 'number' ||
+    Boolean(initialItem.transcript)
 
   // Fallback material query if item.passageBody was not embedded
   const materialQuery = useQuery({
-    queryKey: ['attempt-material', attemptId],
+    queryKey: ['attempts', attemptId, 'material'],
     queryFn: () => getAttemptMaterial(attemptId!),
-    enabled: Boolean(attemptId && (!item.passageBody || isListening)),
+    enabled: Boolean(attemptId && (!initialItem.passageBody || isListening)),
   })
+
+  const item = useMemo(
+    () => ({
+      ...withReviewMaterial(initialItem, materialQuery.data),
+      correctAnswer: initialItem.correctAnswer,
+    }),
+    [initialItem, materialQuery.data],
+  )
 
   // For Listening: find corresponding part
   const listeningPart = useMemo(() => {
@@ -113,44 +138,50 @@ function MistakeRetryContent({
     const listMat = materialQuery.data
     for (const part of listMat.parts) {
       for (const group of part.groups) {
-        if (
-          group.questions.some(
-            (q) => q.number === item.number || q.id === item.questionId,
-          )
-        ) {
+        if (group.questions.some((q) => q.id === item.questionId)) {
           return part
         }
       }
     }
-    return listMat.parts[0] ?? null
+    return null
   }, [materialQuery.data, item.number, item.questionId])
 
   const audioAssetId = item.audioAssetId || listeningPart?.audioAssetId || null
   const transcript = (item.transcript || listeningPart?.transcript || '').trim()
 
-  const timestampStart =
+  const sourceTimestampStart =
     typeof item.timestampStart === 'number'
       ? item.timestampStart
       : typeof item.content?.timestampStart === 'number'
         ? item.content.timestampStart
         : undefined
 
-  const timestampEnd =
+  const sourceTimestampEnd =
     typeof item.timestampEnd === 'number'
       ? item.timestampEnd
       : typeof item.content?.timestampEnd === 'number'
         ? item.content.timestampEnd
         : undefined
 
+  const audioRange = getReviewAudioRange(
+    sourceTimestampStart,
+    sourceTimestampEnd,
+    audioDuration,
+  )
+  const timestampStart = audioRange?.start
+  const timestampEnd = audioRange?.end
+
   // Rewind audio 3-5 passages / dialogue segments back (with pseudo-random offset)
   // so student hears context before the answer and has to identify it
   const hintAudioStart = useMemo(() => {
-    if (typeof timestampStart !== 'number') return undefined
+    if (typeof sourceTimestampStart !== 'number') return undefined
 
     const segments = listeningPart?.transcriptSegments
     if (segments && segments.length > 0) {
       const idx = segments.findIndex(
-        (s) => timestampStart >= s.start - 0.5 && timestampStart <= s.end + 0.5,
+        (s) =>
+          sourceTimestampStart >= s.start - 0.5 &&
+          sourceTimestampStart <= s.end + 0.5,
       )
       if (idx !== -1) {
         const offsetCount = 3 + (item.number % 3) // 3, 4, or 5 segments back
@@ -160,8 +191,13 @@ function MistakeRetryContent({
     }
 
     const offsetSec = 16 + (item.number % 7) // 16 to 22 seconds back
-    return Math.max(0, timestampStart - offsetSec)
-  }, [item.questionId, item.number, timestampStart, listeningPart?.transcriptSegments])
+    return Math.max(0, Math.floor(sourceTimestampStart - offsetSec))
+  }, [
+    item.questionId,
+    item.number,
+    sourceTimestampStart,
+    listeningPart?.transcriptSegments,
+  ])
 
   const audioQuery = useQuery({
     queryKey: ['listening', 'media', audioAssetId],
@@ -181,54 +217,45 @@ function MistakeRetryContent({
     [audioUrl],
   )
 
+  const imageAssetId =
+    typeof item.content?.imageAssetId === 'string'
+      ? item.content.imageAssetId
+      : null
+  const imageQuery = useQuery({
+    queryKey: ['listening', 'media', imageAssetId],
+    queryFn: () => getListeningMediaBlob(imageAssetId!),
+    enabled: Boolean(imageAssetId),
+  })
+  const imageUrl = useMemo(
+    () => (imageQuery.data ? URL.createObjectURL(imageQuery.data) : null),
+    [imageQuery.data],
+  )
+  useEffect(
+    () => () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl)
+    },
+    [imageUrl],
+  )
+
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const snippetEnd = useRef<number | null>(null)
+  useEffect(() => {
+    const audio = audioRef.current
+    return () => {
+      audio?.pause()
+    }
+  }, [audioUrl])
 
   const playAudioSnippet = (start?: number) => {
     if (!audioRef.current) return
     if (typeof start === 'number') {
-      audioRef.current.currentTime = Math.max(0, start - 0.2)
+      audioRef.current.currentTime = start
     }
-    void audioRef.current.play()
+    snippetEnd.current = typeof timestampEnd === 'number' ? timestampEnd : null
+    void audioRef.current.play().catch(() => {})
   }
 
-  // Extract passage body
-  const passageBody = useMemo(() => {
-    if (item.passageBody && item.passageBody.trim().length > 0) {
-      return item.passageBody.trim()
-    }
-    if (materialQuery.data && 'body' in materialQuery.data) {
-      const readingMat = materialQuery.data
-      // Check nested passages
-      if (readingMat.passages && readingMat.passages.length > 0) {
-        if (item.passageTitle) {
-          const match = readingMat.passages.find(
-            (p) =>
-              p.title.toLowerCase() === item.passageTitle?.toLowerCase() ||
-              item.passageTitle
-                ?.toLowerCase()
-                .includes(p.title.toLowerCase() || ''),
-          )
-          if (match?.body) return match.body
-        }
-        // Match by question number
-        if (item.number <= 13 && readingMat.passages[0]?.body) {
-          return readingMat.passages[0].body
-        }
-        if (
-          item.number > 13 &&
-          item.number <= 26 &&
-          readingMat.passages[1]?.body
-        ) {
-          return readingMat.passages[1].body
-        }
-        if (readingMat.passages[2]?.body) {
-          return readingMat.passages[2].body
-        }
-      }
-      return readingMat.body
-    }
-    return ''
-  }, [item.passageBody, item.passageTitle, item.number, materialQuery.data])
+  const passageBody = item.passageBody?.trim() ?? ''
 
   const passageTitle = item.passageTitle || 'Текст для чтения'
   const quote = extractQuote(item)
@@ -237,54 +264,40 @@ function MistakeRetryContent({
   const hasListeningMedia =
     isListening && Boolean(audioAssetId || transcript.length > 0)
   const hasLeftColumn = hasPassage || hasListeningMedia
-  const hasAudioSnippet =
-    isListening && typeof timestampStart === 'number' && Boolean(audioUrl)
-  const hasTranscript = isListening && transcript.length > 0
   const leftColumnTitle = isListening
     ? listeningPart?.title
       ? `Listening: ${listeningPart.title}`
       : 'Аудиозапись и стенограмма'
     : passageTitle
 
-  // Options if provided in content
-  const options = (item.content?.options as Option[] | undefined) ?? []
-
-  // Detect question category
+  const options = reviewOptions(item)
   const isYNNG =
     item.type === 'yes_no_not_given' ||
-    item.correctAnswer.value === 'YES' ||
-    item.correctAnswer.value === 'NO' ||
-    (item.correctAnswer.value === 'NOT_GIVEN' && item.prompt.toLowerCase().includes('statement'))
+    (!item.type &&
+      (item.correctAnswer.value === 'YES' || item.correctAnswer.value === 'NO'))
   const isTFNG =
     item.type === 'true_false_not_given' ||
-    item.correctAnswer.value === 'TRUE' ||
-    item.correctAnswer.value === 'FALSE'
-
+    (!item.type &&
+      !isYNNG &&
+      ['TRUE', 'FALSE', 'NOT_GIVEN'].includes(String(item.correctAnswer.value)))
+  const isMultipleChoice = Array.isArray(item.correctAnswer.optionIds)
   const isChoice =
-    item.type === 'multiple_choice' ||
-    typeof item.correctAnswer.optionId === 'string' ||
-    options.length > 0
-
-  const choiceOptions: Option[] =
-    options.length > 0
-      ? options
-      : isChoice && typeof item.correctAnswer.optionId === 'string'
-        ? [
-            { id: 'A', text: 'Option A' },
-            { id: 'B', text: 'Option B' },
-            { id: 'C', text: 'Option C' },
-            { id: 'D', text: 'Option D' },
-          ]
-        : []
+    typeof item.correctAnswer.optionId === 'string' || isMultipleChoice
+  const choiceOptions = options
 
   const handleCheck = () => {
-    if (!selectedAnswer.trim()) return
-    const correct = evaluateAnswer(selectedAnswer, item.correctAnswer)
+    if (isChoice && !options.length) return
+    if (!selectedAnswer.trim() && !selectedOptions.length) return
+    const given: StudentAnswer = isMultipleChoice
+      ? { optionIds: selectedOptions }
+      : typeof item.correctAnswer.optionId === 'string'
+        ? { optionId: selectedAnswer }
+        : { value: selectedAnswer }
+    const correct = evaluateRetryAnswer(given, item.correctAnswer)
+    if (correct) markReviewed()
     setIsCorrect(correct)
     setAttemptCount((prev) => prev + 1)
-    if (!correct) {
-      setShowHint(true)
-    }
+    if (!correct) setShowHint(true)
   }
 
   // Ref to passage scroll container
@@ -295,13 +308,22 @@ function MistakeRetryContent({
   useEffect(() => {
     if (revealed || isCorrect) {
       if (quoteMarkerRef.current) {
-        quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        quoteMarkerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
       }
     } else if (showHint || isCorrect === false) {
       if (isListening && broadRegionRef.current) {
-        broadRegionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        broadRegionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
       } else if (quoteMarkerRef.current) {
-        quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        quoteMarkerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
       }
     }
   }, [showHint, isCorrect, revealed, isListening])
@@ -309,11 +331,20 @@ function MistakeRetryContent({
   const scrollToQuote = () => {
     setShowHint(true)
     if (revealed || isCorrect) {
-      quoteMarkerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      quoteMarkerRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
     } else if (isListening && broadRegionRef.current) {
-      broadRegionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      broadRegionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
     } else if (quoteMarkerRef.current) {
-      quoteMarkerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      quoteMarkerRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
     }
   }
 
@@ -321,41 +352,13 @@ function MistakeRetryContent({
     <div className="flex flex-col h-full min-h-0 bg-white">
       {/* Top Header */}
       <DialogHeader className="px-5 sm:px-6 py-3.5 border-b border-[#e7e7e4] bg-white flex flex-row items-center justify-between gap-4 shrink-0">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Badge
-            variant="outline"
-            className="text-xs font-bold text-[#2563eb] border-[#bfdbfe] bg-[#eff6ff] px-2.5 py-0.5"
-          >
-            Вопрос {item.number}
-          </Badge>
-          {item.passageTitle ? (
-            <Badge
-              variant="secondary"
-              className="text-xs font-medium text-slate-700 bg-slate-100 max-w-[260px] truncate"
-            >
-              📖 {item.passageTitle}
-            </Badge>
-          ) : null}
-          {testTitle ? (
-            <span className="text-xs text-slate-500 font-medium truncate max-w-[280px] hidden sm:inline">
-              {testTitle}
-            </span>
-          ) : null}
-        </div>
-
-        <div className="flex items-center">
-          {attemptId ? (
-            <a
-              href={`/app/attempts/${attemptId}/review`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1d4ed8] bg-[#eff6ff] hover:bg-[#dbeafe] border border-[#bfdbfe] px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs mr-9"
-            >
-              <ExportSquare className="size-3.5 text-[#2563eb]" />
-              <span>Полный разбор теста</span>
-            </a>
-          ) : null}
-        </div>
+        <span className="min-w-0 flex-1 truncate text-xs text-slate-500 font-medium">
+          {testTitle}
+        </span>
+        <DialogClose className="shrink-0 rounded-[8px] p-1 text-[#8b8b8e] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]">
+          <CloseSquare className="size-5" aria-hidden />
+          <span className="sr-only">Закрыть</span>
+        </DialogClose>
       </DialogHeader>
 
       {/* Mobile Tab Switcher (< md) */}
@@ -401,6 +404,48 @@ function MistakeRetryContent({
         </div>
       )}
 
+      {audioQuery.isError && !audioUrl ? (
+        <p className="px-5 py-3 text-sm text-[#69696d]">
+          Не удалось загрузить аудио
+        </p>
+      ) : null}
+      {/* Audio Player Bar (for Listening) */}
+      {isListening && audioUrl && (
+        <div className="px-5 py-2.5 bg-blue-50/60 border-b border-[#e5e7eb] flex flex-col gap-1.5 shrink-0">
+          <audio
+            ref={audioRef}
+            aria-label="Аудио"
+            className="w-full h-8"
+            controls
+            preload="metadata"
+            src={audioUrl}
+            onLoadedMetadata={(event) => {
+              setAudioDuration(event.currentTarget.duration)
+            }}
+            onSeeked={() => {
+              if (
+                snippetEnd.current !== null &&
+                audioRef.current &&
+                audioRef.current.currentTime >= snippetEnd.current
+              ) {
+                audioRef.current.pause()
+                snippetEnd.current = null
+              }
+            }}
+            onTimeUpdate={() => {
+              if (
+                snippetEnd.current !== null &&
+                audioRef.current &&
+                audioRef.current.currentTime >= snippetEnd.current
+              ) {
+                audioRef.current.pause()
+                snippetEnd.current = null
+              }
+            }}
+          />
+        </div>
+      )}
+
       {/* Main Split Body */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* LEFT COLUMN: Passage or Listening Transcript Viewer */}
@@ -425,32 +470,34 @@ function MistakeRetryContent({
               </div>
 
               <div className="flex items-center gap-2">
-                {isListening && typeof timestampStart === 'number' && audioUrl ? (
+                {isListening &&
+                !revealed &&
+                !isCorrect &&
+                typeof timestampStart === 'number' &&
+                audioUrl ? (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      if (revealed || isCorrect) {
-                        scrollToQuote()
-                        playAudioSnippet(timestampStart)
-                      } else {
-                        scrollToQuote()
-                        playAudioSnippet(hintAudioStart ?? timestampStart)
-                      }
+                      scrollToQuote()
+                      playAudioSnippet(hintAudioStart ?? timestampStart)
                     }}
                     className="h-7 text-[11px] font-semibold text-[#2563eb] hover:bg-blue-50 px-2 gap-1 rounded-md"
                   >
                     <Play className="size-3 text-[#2563eb]" />
                     <span>
-                      {revealed || isCorrect
-                        ? `Ответ [${formatSeconds(timestampStart)} - ${formatSeconds(timestampEnd)}]`
-                        : showHint || isCorrect === false
-                          ? `Фрагмент [${formatSeconds(hintAudioStart ?? timestampStart)} - ${formatSeconds(timestampEnd)}]`
-                          : `Слушать аудио`}
+                      {showHint || isCorrect === false
+                        ? `Фрагмент [${formatSeconds(hintAudioStart ?? timestampStart)} - ${formatSeconds(timestampEnd)}]`
+                        : `Слушать аудио`}
                     </span>
                   </Button>
-                ) : quote ? (
+                ) : isListening && (revealed || isCorrect) && audioRange ? (
+                  <span className="whitespace-nowrap text-[11px] text-slate-500">
+                    {formatSeconds(timestampStart)} –{' '}
+                    {formatSeconds(timestampEnd)}
+                  </span>
+                ) : !isListening && quote ? (
                   <Button
                     type="button"
                     variant="ghost"
@@ -504,36 +551,6 @@ function MistakeRetryContent({
               </div>
             </div>
 
-            {/* Audio Player Bar (for Listening) */}
-            {isListening && audioUrl && (
-              <div className="px-5 py-2.5 bg-blue-50/60 border-b border-[#e5e7eb] flex flex-col gap-1.5 shrink-0">
-                <div className="flex items-center justify-between text-xs text-slate-700">
-                  <span className="font-semibold flex items-center gap-1.5">
-                    <VolumeHigh className="size-3.5 text-blue-600" />
-                    Аудиотрек задания
-                  </span>
-                  {typeof timestampStart === 'number' && (revealed || isCorrect) ? (
-                    <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded">
-                      Ответ: {formatSeconds(timestampStart)} –{' '}
-                      {formatSeconds(timestampEnd)}
-                    </span>
-                  ) : typeof timestampStart === 'number' && (showHint || isCorrect === false) ? (
-                    <span className="text-[11px] font-mono font-medium text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded">
-                      Фрагмент: {formatSeconds(hintAudioStart ?? timestampStart)} –{' '}
-                      {formatSeconds(timestampEnd)}
-                    </span>
-                  ) : null}
-                </div>
-                <audio
-                  ref={audioRef}
-                  className="w-full h-8"
-                  controls
-                  preload="metadata"
-                  src={audioUrl}
-                />
-              </div>
-            )}
-
             {/* Scrollable Passage / Transcript Body */}
             <div
               ref={passageContainerRef}
@@ -560,10 +577,11 @@ function MistakeRetryContent({
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
                     <VolumeHigh className="size-8 text-slate-400" />
                     <p className="text-sm font-medium text-slate-700">
-                      Аудиозапись доступна в плеере выше
-                    </p>
-                    <p className="text-xs text-slate-400 max-w-sm">
-                      Включите плеер и слушайте ключевую реплику спикера.
+                      {audioUrl
+                        ? 'Аудиозапись'
+                        : audioQuery.isPending && audioAssetId
+                          ? 'Загрузка аудио…'
+                          : 'Нет стенограммы'}
                     </p>
                   </div>
                 )
@@ -583,494 +601,459 @@ function MistakeRetryContent({
         {/* RIGHT COLUMN: Question, Retry & Feedback */}
         <div
           className={cn(
-            'flex-1 bg-white p-5 sm:p-6 overflow-y-auto flex flex-col space-y-4 min-h-0',
+            'flex-1 min-w-0 min-h-0 bg-white flex flex-col overflow-hidden',
             hasLeftColumn && mobileTab === 'text' && 'hidden md:flex',
           )}
         >
-          {/* Header Title */}
-          <div>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-bold tracking-tight text-slate-900">
-                Работа над ошибкой
-              </DialogTitle>
-              {hasPassage && (
-                <button
-                  type="button"
-                  onClick={() => setMobileTab('text')}
-                  className="md:hidden text-xs text-[#2563eb] font-semibold underline underline-offset-2 flex items-center gap-1"
-                >
-                  <Book1 className="size-3" />
-                  Читать текст
-                </button>
-              )}
-            </div>
-            <DialogDescription className="text-xs text-slate-500 mt-0.5">
-              Внимательно найдите ответ в тексте. Попробуйте решить без подсказки!
-            </DialogDescription>
-          </div>
-
-          {/* Question Box */}
-          <div className="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm font-medium text-slate-900 leading-relaxed shadow-2xs space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-bold text-[#2563eb]">Вопрос {item.number}</span>
-              {typeof item.content?.completionRule === 'object' && item.content.completionRule ? (
-                <Badge variant="outline" className="text-[10.5px] font-semibold bg-white text-slate-600 border-slate-200">
-                  {`NO MORE THAN ${String((item.content.completionRule as Record<string, unknown>).maxWords ?? 2)} WORDS`}
-                </Badge>
-              ) : null}
-            </div>
-
-            {/* Optional diagram / illustration */}
-            {typeof item.content?.imageUrl === 'string' && item.content.imageUrl ? (
-              <div className="rounded-lg border border-slate-200 bg-white p-2.5 flex items-center justify-center">
-                <img
-                  src={item.content.imageUrl}
-                  alt="Diagram"
-                  className="max-h-52 max-w-full object-contain rounded"
-                />
+          <div
+            role="region"
+            aria-label="Разбор ошибки"
+            className="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6 space-y-4"
+          >
+            {/* Header Title */}
+            <div>
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-lg font-bold tracking-tight text-slate-900">
+                  Работа над ошибкой
+                </DialogTitle>
+                {hasPassage && (
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab('text')}
+                    className="md:hidden text-xs text-[#2563eb] font-semibold underline underline-offset-2 flex items-center gap-1"
+                  >
+                    <Book1 className="size-3" />
+                    Читать текст
+                  </button>
+                )}
               </div>
-            ) : null}
-
-            <p className="text-slate-900 leading-relaxed">
-              {item.prompt === '{{answer}}' ? (
-                <span className="italic text-slate-600">Заполните пропуск: [ _____ ]</span>
-              ) : (
-                item.prompt.replace('{{answer}}', '_____')
-              )}
-            </p>
-          </div>
-
-          {/* Previous Student Answer Notice */}
-          <div className="flex items-center justify-between rounded-[10px] border border-rose-100 bg-rose-50/70 px-3.5 py-2 text-xs text-rose-900">
-            <div className="flex items-center gap-2">
-              <CloseCircle className="size-4 shrink-0 text-rose-600" />
-              <span>
-                Ваш прошлый ответ:{' '}
-                <strong className="line-through">{formatAnswer(item.answer, options)}</strong>
-              </span>
+              <DialogDescription className="sr-only">
+                Вопрос {item.number}
+              </DialogDescription>
             </div>
-            <span className="font-semibold text-rose-700">Неверно (0 б.)</span>
-          </div>
 
-          {/* Retry Inputs (Level 1) */}
-          {!revealed && !isCorrect && (
-            <div className="space-y-3 pt-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Выберите или введите верный ответ:
-              </p>
+            {/* Question Box */}
+            <div className="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm font-medium text-slate-900 leading-relaxed shadow-2xs space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-[#2563eb]">
+                  Вопрос {item.number}
+                </span>
+                {typeof item.content?.completionRule === 'object' &&
+                item.content.completionRule ? (
+                  <Badge
+                    variant="outline"
+                    className="text-[10.5px] font-semibold bg-white text-slate-600 border-slate-200"
+                  >
+                    {`NO MORE THAN ${String((item.content.completionRule as Record<string, unknown>).maxWords ?? 2)} WORDS`}
+                  </Badge>
+                ) : null}
+              </div>
 
-              {isYNNG ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {(['YES', 'NO', 'NOT_GIVEN'] as const).map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setSelectedAnswer(val)}
-                      className={cn(
-                        'flex h-11 items-center justify-center rounded-[10px] border text-xs font-bold transition-all select-none',
-                        selectedAnswer === val
-                          ? 'border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8] shadow-xs ring-1 ring-[#2563eb]'
-                          : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
-                      )}
-                    >
-                      {val.replace('_', ' ')}
-                    </button>
-                  ))}
-                </div>
-              ) : isTFNG ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {(['TRUE', 'FALSE', 'NOT_GIVEN'] as const).map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setSelectedAnswer(val)}
-                      className={cn(
-                        'flex h-11 items-center justify-center rounded-[10px] border text-xs font-bold transition-all select-none',
-                        selectedAnswer === val
-                          ? 'border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8] shadow-xs ring-1 ring-[#2563eb]'
-                          : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
-                      )}
-                    >
-                      {val.replace('_', ' ')}
-                    </button>
-                  ))}
-                </div>
-              ) : choiceOptions.length > 0 ? (
-                <div className="grid gap-2">
-                  {choiceOptions.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setSelectedAnswer(opt.id)}
-                      className={cn(
-                        'flex items-center gap-3 rounded-[12px] border p-3 text-left text-xs sm:text-sm transition-all',
-                        selectedAnswer === opt.id
-                          ? 'border-[#2563eb] bg-[#eff6ff] text-slate-900 shadow-xs ring-1 ring-[#2563eb]'
-                          : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                          selectedAnswer === opt.id
-                            ? 'bg-[#2563eb] text-white'
-                            : 'bg-slate-100 text-slate-600',
-                        )}
-                      >
-                        {opt.id}
-                      </span>
-                      <span className="flex-1 font-medium">{opt.text}</span>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Введите правильный ответ..."
-                    value={selectedAnswer}
-                    onChange={(e) => setSelectedAnswer(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleCheck()
-                    }}
-                    className="h-11 rounded-[10px]"
+              {typeof item.content?.instructions === 'string' &&
+              item.content.instructions ? (
+                <p className="text-sm font-normal text-[#69696d]">
+                  {item.content.instructions}
+                </p>
+              ) : null}
+              {/* Optional diagram / illustration */}
+              {imageUrl ||
+              (typeof item.content?.imageUrl === 'string' &&
+                item.content.imageUrl) ? (
+                <div className="rounded-lg border border-slate-200 bg-white p-2.5 flex items-center justify-center">
+                  <img
+                    src={imageUrl ?? String(item.content?.imageUrl)}
+                    alt="Diagram"
+                    className="max-h-52 max-w-full object-contain rounded"
                   />
                 </div>
-              )}
+              ) : null}
 
-              {/* Feedback on incorrect try */}
-              {isCorrect === false && (
-                <div className="flex items-start gap-2.5 rounded-[12px] border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-950">
-                  <LampCharge className="size-4 shrink-0 text-amber-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-amber-900">Пока неверно!</p>
-                    <p className="mt-0.5 text-amber-800 leading-relaxed">
-                      Внимательно изучите подсвеченный участок текста и обратите внимание на синонимы в вопросе.
-                    </p>
+              <p className="text-slate-900 leading-relaxed">
+                {item.prompt === '{{answer}}' ? (
+                  <span className="italic text-slate-600">
+                    Заполните пропуск: [ _____ ]
+                  </span>
+                ) : (
+                  item.prompt.replace('{{answer}}', '_____')
+                )}
+              </p>
+            </div>
+
+            {/* Previous Student Answer Notice */}
+            <div className="flex items-center justify-between rounded-[10px] border border-rose-100 bg-rose-50/70 px-3.5 py-2 text-xs text-rose-900">
+              <div className="flex items-center gap-2">
+                <CloseCircle className="size-4 shrink-0 text-rose-600" />
+                <span>
+                  Ваш ответ:{' '}
+                  <strong className="line-through">
+                    {formatAnswer(item.answer, options)}
+                  </strong>
+                </span>
+              </div>
+              <span className="font-semibold text-rose-700">Ошибка</span>
+            </div>
+
+            {/* Retry Inputs (Level 1) */}
+            {!revealed && !isCorrect && (
+              <div className="space-y-3 pt-1">
+                {isYNNG ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['YES', 'NO', 'NOT_GIVEN'] as const).map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setSelectedAnswer(val)}
+                        className={cn(
+                          'flex h-11 items-center justify-center rounded-[10px] border text-xs font-bold transition-all select-none',
+                          selectedAnswer === val
+                            ? 'border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8] shadow-xs ring-1 ring-[#2563eb]'
+                            : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
+                        )}
+                      >
+                        {val.replace('_', ' ')}
+                      </button>
+                    ))}
                   </div>
-                </div>
-              )}
+                ) : isTFNG ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['TRUE', 'FALSE', 'NOT_GIVEN'] as const).map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setSelectedAnswer(val)}
+                        className={cn(
+                          'flex h-11 items-center justify-center rounded-[10px] border text-xs font-bold transition-all select-none',
+                          selectedAnswer === val
+                            ? 'border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8] shadow-xs ring-1 ring-[#2563eb]'
+                            : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
+                        )}
+                      >
+                        {val.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                ) : choiceOptions.length > 0 ? (
+                  <div className="grid gap-2">
+                    {choiceOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() =>
+                          isMultipleChoice
+                            ? setSelectedOptions((current) =>
+                                current.includes(opt.id)
+                                  ? current.filter((id) => id !== opt.id)
+                                  : [...current, opt.id],
+                              )
+                            : setSelectedAnswer(opt.id)
+                        }
+                        aria-pressed={
+                          isMultipleChoice
+                            ? selectedOptions.includes(opt.id)
+                            : selectedAnswer === opt.id
+                        }
+                        className={cn(
+                          'flex items-center gap-3 rounded-[12px] border p-3 text-left text-xs sm:text-sm transition-all',
+                          (
+                            isMultipleChoice
+                              ? selectedOptions.includes(opt.id)
+                              : selectedAnswer === opt.id
+                          )
+                            ? 'border-[#2563eb] bg-[#eff6ff] text-slate-900 shadow-xs ring-1 ring-[#2563eb]'
+                            : 'border-[#e7e7e4] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                            (
+                              isMultipleChoice
+                                ? selectedOptions.includes(opt.id)
+                                : selectedAnswer === opt.id
+                            )
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-slate-100 text-slate-600',
+                          )}
+                        >
+                          {opt.id}
+                        </span>
+                        <span className="flex-1 font-medium">{opt.text}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : isChoice ? (
+                  <p className="text-sm text-[#69696d]">Нет вариантов ответа</p>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Ответ"
+                      aria-label="Ответ"
+                      value={selectedAnswer}
+                      onChange={(e) => setSelectedAnswer(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleCheck()
+                      }}
+                      className="h-11 rounded-[10px]"
+                    />
+                  </div>
+                )}
 
-              {/* Action buttons */}
-              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-                <Button
-                  type="button"
-                  onClick={handleCheck}
-                  disabled={!selectedAnswer.trim()}
-                  className="bg-[#2563eb] hover:bg-blue-600 text-white font-medium px-5 shadow-xs"
-                >
-                  Проверить ответ
-                </Button>
+                {/* Feedback on incorrect try */}
+                {isCorrect === false && (
+                  <div className="flex items-start gap-2.5 rounded-[12px] border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-950">
+                    <LampCharge className="size-4 shrink-0 text-amber-600 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-amber-900">Неверно</p>
+                      <p className="mt-0.5 text-amber-800 leading-relaxed">
+                        Попробуйте ещё раз.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-                {!showHint && (
+                {/* Action buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                  <Button
+                    type="button"
+                    onClick={handleCheck}
+                    disabled={
+                      (!selectedAnswer.trim() && !selectedOptions.length) ||
+                      (isChoice && !options.length)
+                    }
+                    className="bg-[#2563eb] hover:bg-blue-600 text-white font-medium px-5 shadow-xs"
+                  >
+                    Проверить
+                  </Button>
+
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={scrollToQuote}
-                    className="text-xs text-slate-600 hover:text-slate-900 gap-1.5"
+                    onClick={() => {
+                      setRevealed(true)
+                      setUnblurTranscript(true)
+                    }}
                   >
-                    <LampCharge className="size-3.5 text-amber-500" />
-                    Нужна подсказка
+                    Показать решение
                   </Button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Level 2: Scaffolding (Clue & Quote Reference) */}
-          {(showHint || isCorrect === false) && !revealed && !isCorrect && (
-            <div className="rounded-[16px] border border-amber-200/80 bg-gradient-to-b from-amber-50/70 via-amber-50/20 to-white p-4.5 space-y-3.5 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300">
-              {/* Header row */}
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/90 px-2.5 py-1 text-xs font-semibold text-amber-900 border border-amber-200/70">
-                  <LampCharge className="size-3.5 text-amber-600" />
-                  <span>
-                    {isListening
-                      ? 'Подсказка к прослушиванию'
-                      : 'Подсказка к поиску'}
-                  </span>
-                </div>
-
-                {isListening && typeof timestampStart === 'number' && audioUrl ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      scrollToQuote()
-                      playAudioSnippet(hintAudioStart ?? timestampStart)
-                    }}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200/80 border border-amber-300 px-3 py-1 rounded-full shadow-2xs transition-all"
-                  >
-                    <Play className="size-3 text-amber-700" />
-                    <span>
-                      Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)} -{' '}
-                      {formatSeconds(timestampEnd)}]
-                    </span>
-                  </button>
-                ) : quote ? (
-                  <button
-                    type="button"
-                    onClick={scrollToQuote}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
-                  >
-                    <Eye className="size-3 text-[#2563eb]" />
-                    <span>Показать в тексте</span>
-                  </button>
-                ) : null}
-              </div>
-
-              {/* Guiding Question / Clue */}
-              {item.hint ? (
-                <div className="space-y-1">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-900/70">
-                    На что обратить внимание:
-                  </p>
-                  <p className="text-[13.5px] leading-relaxed text-slate-800 font-medium">
-                    {item.hint}
-                  </p>
-                </div>
-              ) : null}
-
-              {/* Listening context card vs Reading quote */}
-              {isListening ? (
-                hasAudioSnippet || hasTranscript ? (
-                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-2.5">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
-                        <VolumeHigh className="size-3.5 text-amber-600" />
-                        Аудиофрагмент с контекстом
-                      </span>
-                      {typeof timestampStart === 'number' && (
-                        <span className="text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200 text-[10.5px]">
-                          {formatSeconds(hintAudioStart ?? timestampStart)} – {formatSeconds(timestampEnd)}
-                        </span>
-                      )}
-                    </div>
-                    {hasAudioSnippet && (
-                      <p className="text-xs text-slate-700 leading-relaxed">
-                        Аудиозапись перемотана на 3–5 реплик назад до ответа, чтобы вы могли услышать контекст диалога и найти ответ на слух.
-                      </p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      {hasAudioSnippet && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => {
-                            scrollToQuote()
-                            playAudioSnippet(hintAudioStart ?? timestampStart)
-                          }}
-                          className="h-8 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-lg shadow-2xs"
-                        >
-                          <Play className="size-3" />
-                          <span>
-                            Слушать фрагмент [{formatSeconds(hintAudioStart ?? timestampStart)}]
-                          </span>
-                        </Button>
-                      )}
-
-                      {hasTranscript && (
-                        !unblurTranscript ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setUnblurTranscript(true)
-                              scrollToQuote()
-                            }}
-                            className="h-8 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-white bg-white/90 gap-1.5 rounded-lg shadow-2xs"
-                          >
-                            <Eye className="size-3 text-slate-500" />
-                            <span>Показать стенограмму фрагмента</span>
-                          </Button>
-                        ) : (
-                          <span className="text-[11px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                            ✓ Стенограмма фрагмента открыта слева
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-amber-200/90 bg-amber-50/60 p-3.5 shadow-2xs space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-900">
-                      <VolumeHigh className="size-3.5 text-amber-600" />
-                      Аудиозапись задания
-                    </div>
-                    <p className="text-xs text-slate-700 leading-relaxed">
-                      Включите плеер сверху и слушайте реплики спикера, чтобы найти ответ на вопрос.
-                    </p>
-                  </div>
-                )
-              ) : quote ? (
-                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="font-semibold uppercase tracking-wider flex items-center gap-1 text-slate-500">
-                      <Book1 className="size-3.5 text-slate-400" />
-                      Цитата из текста
-                    </span>
-                    <span className="text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 text-[10.5px]">
-                      Подсвечена слева
-                    </span>
-                  </div>
-                  <p className="text-[13px] font-serif italic text-slate-700 leading-relaxed pl-2 border-l-2 border-amber-400">
-                    «{quote}»
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-600 italic">
-                  Ответ находится в абзаце, обсуждающем ключевые тезисы вопроса. Сопоставьте утверждение с деталями.
-                </p>
-              )}
-
-              {/* Surrender / Reveal Action */}
-              <div className="pt-1 flex items-center justify-center border-t border-amber-100/80">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRevealed(true)
-                    setUnblurTranscript(true)
-                  }}
-                  className="text-xs text-slate-500 hover:text-rose-600 py-1 px-2.5 transition-colors inline-flex items-center gap-1.5 font-medium"
-                >
-                  <span>Не удается найти ответ?</span>
-                  <span className="underline underline-offset-2 font-semibold">
-                    Показать решение →
-                  </span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Level 3: Revealed Solution & Detailed Explanation */}
-          {(revealed || isCorrect) && (
-            <div className="rounded-[16px] border border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 via-emerald-50/20 to-white p-4.5 space-y-3.5 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300">
-              {/* Header row */}
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/90 px-2.5 py-1 text-xs font-semibold text-emerald-900 border border-emerald-200/70">
-                  <TickCircle className="size-3.5 text-emerald-600" />
-                  <span>
-                    {isCorrect ? 'Верный ответ найден! 🎉' : 'Правильное решение'}
-                  </span>
-                </div>
-
-                {isListening && typeof timestampStart === 'number' && audioUrl ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      scrollToQuote()
-                      playAudioSnippet(timestampStart)
-                    }}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-900 bg-emerald-100 hover:bg-emerald-200/80 border border-emerald-300 px-3 py-1 rounded-full shadow-2xs transition-all"
-                  >
-                    <Play className="size-3 text-emerald-700" />
-                    <span>
-                      Слушать ответ [{formatSeconds(timestampStart)} -{' '}
-                      {formatSeconds(timestampEnd)}]
-                    </span>
-                  </button>
-                ) : quote ? (
-                  <button
-                    type="button"
-                    onClick={scrollToQuote}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
-                  >
-                    <Eye className="size-3 text-[#2563eb]" />
-                    <span>Показать в тексте</span>
-                  </button>
-                ) : null}
-              </div>
-
-              {/* Correct Answer Display */}
-              <div className="space-y-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-900/70">
-                  Правильный ответ:
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="text-base sm:text-lg font-bold text-emerald-950">
-                    {formatAnswer(item.correctAnswer, options)}
-                  </span>
-                  {isCorrect && (
-                    <span className="text-xs font-medium text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                      {attemptCount > 1
-                        ? `со ${attemptCount}-й попытки`
-                        : 'с 1-й попытки'}
-                    </span>
+                  {!showHint && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={scrollToQuote}
+                      className="text-xs text-slate-600 hover:text-slate-900 gap-1.5"
+                    >
+                      <LampCharge className="size-3.5 text-amber-500" />
+                      Подсказка
+                    </Button>
                   )}
                 </div>
               </div>
+            )}
 
-              {/* Quote from text / audio */}
-              {quote ? (
-                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="font-semibold uppercase tracking-wider flex items-center gap-1 text-slate-500">
-                      {isListening ? (
-                        <VolumeHigh className="size-3.5 text-slate-400" />
-                      ) : (
-                        <Book1 className="size-3.5 text-slate-400" />
-                      )}
-                      {isListening
-                        ? 'Цитата-доказательство из аудио'
-                        : 'Цитата-доказательство из текста'}
+            {/* Level 2: Scaffolding (Clue & Quote Reference) */}
+            {(showHint || isCorrect === false) && !revealed && !isCorrect && (
+              <div className="rounded-[16px] border border-amber-200/80 bg-gradient-to-b from-amber-50/70 via-amber-50/20 to-white p-4.5 space-y-3.5 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300">
+                {/* Header row */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-amber-100/90 px-2.5 py-1 text-xs font-semibold text-amber-900 border border-amber-200/70">
+                    <LampCharge className="size-3.5 text-amber-600" />
+                    <span>
+                      {isListening ? 'Подсказка' : 'Подсказка к поиску'}
                     </span>
-                    {isListening &&
-                    typeof timestampStart === 'number' &&
-                    audioUrl ? (
-                      <button
-                        type="button"
-                        onClick={() => playAudioSnippet(timestampStart)}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-900 hover:text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2 py-0.5 rounded transition-colors"
-                      >
-                        <Play className="size-2.5 text-emerald-700" />
-                        <span>
-                          {formatSeconds(timestampStart)} -{' '}
-                          {formatSeconds(timestampEnd)}
-                        </span>
-                      </button>
-                    ) : (
-                      <span className="text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[10.5px]">
+                  </div>
+
+                  {isListening &&
+                  typeof timestampStart === 'number' &&
+                  audioUrl ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        scrollToQuote()
+                        playAudioSnippet(hintAudioStart ?? timestampStart)
+                      }}
+                      className="h-8 shrink-0 gap-1.5 whitespace-nowrap rounded-[8px] border-amber-200 bg-white text-xs font-semibold text-amber-900 shadow-none hover:bg-amber-50"
+                    >
+                      <Play className="size-3 text-amber-700" />
+                      Слушать фрагмент
+                    </Button>
+                  ) : quote ? (
+                    <button
+                      type="button"
+                      onClick={scrollToQuote}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
+                    >
+                      <Eye className="size-3 text-[#2563eb]" />
+                      <span>Показать в тексте</span>
+                    </button>
+                  ) : null}
+                </div>
+
+                {/* Guiding Question / Clue */}
+                {item.hint ? (
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-900/70">
+                      На что обратить внимание:
+                    </p>
+                    <p className="text-[13.5px] leading-relaxed text-slate-800 font-medium">
+                      {item.hint}
+                    </p>
+                  </div>
+                ) : null}
+
+                {/* Reading quote */}
+                {isListening ? null : quote ? (
+                  <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="font-semibold uppercase tracking-wider flex items-center gap-1 text-slate-500">
+                        <Book1 className="size-3.5 text-slate-400" />
+                        Цитата из текста
+                      </span>
+                      <span className="text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 text-[10.5px]">
                         Подсвечена слева
+                      </span>
+                    </div>
+                    <p className="text-[13px] font-serif italic text-slate-700 leading-relaxed pl-2 border-l-2 border-amber-400">
+                      «{quote}»
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-600 italic">
+                    Подсказки нет.
+                  </p>
+                )}
+
+                {/* Surrender / Reveal Action */}
+                <div className="pt-1 flex items-center justify-center border-t border-amber-100/80">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRevealed(true)
+                      setUnblurTranscript(true)
+                    }}
+                    className="text-xs text-slate-500 hover:text-rose-600 py-1 px-2.5 transition-colors inline-flex items-center gap-1.5 font-medium"
+                  >
+                    <span></span>
+                    <span className="underline underline-offset-2 font-semibold">
+                      Показать решение
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Level 3: Revealed Solution & Detailed Explanation */}
+            {(revealed || isCorrect) && (
+              <div className="rounded-[16px] border border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 via-emerald-50/20 to-white p-4.5 space-y-3.5 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300">
+                {/* Header row */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-100/90 px-2.5 py-1 text-xs font-semibold text-emerald-900 border border-emerald-200/70">
+                    <TickCircle className="size-3.5 text-emerald-600" />
+                    <span>{isCorrect ? 'Верно' : 'Решение'}</span>
+                  </div>
+
+                  {isListening &&
+                  typeof timestampStart === 'number' &&
+                  audioUrl ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        scrollToQuote()
+                        playAudioSnippet(timestampStart)
+                      }}
+                      className="h-8 shrink-0 gap-1.5 whitespace-nowrap rounded-[8px] border-emerald-200 bg-white text-xs font-semibold text-emerald-900 shadow-none hover:bg-emerald-50"
+                    >
+                      <Play className="size-3 text-emerald-700" />
+                      Слушать ответ
+                    </Button>
+                  ) : !isListening && quote ? (
+                    <button
+                      type="button"
+                      onClick={scrollToQuote}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
+                    >
+                      <Eye className="size-3 text-[#2563eb]" />
+                      <span>Показать в тексте</span>
+                    </button>
+                  ) : null}
+                </div>
+
+                {/* Correct Answer Display */}
+                <div className="space-y-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-900/70">
+                    Правильный ответ:
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base sm:text-lg font-bold text-emerald-950">
+                      {formatAnswer(item.correctAnswer, options)}
+                    </span>
+                    {isCorrect && (
+                      <span className="text-xs font-medium text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                        {attemptCount > 1
+                          ? `со ${attemptCount}-й попытки`
+                          : 'с 1-й попытки'}
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] font-serif italic text-slate-700 leading-relaxed pl-2 border-l-2 border-emerald-500">
-                    «{quote}»
-                  </p>
                 </div>
-              ) : null}
 
-              {/* Detailed Explanation */}
-              {item.explanation ? (
-                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
-                  <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                    <InfoCircle className="size-3.5 text-slate-400" />
-                    <span>Подробное объяснение:</span>
+                {/* Quote from text / audio */}
+                {quote ? (
+                  <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+                      <span className="font-semibold uppercase tracking-wider flex items-center gap-1 text-slate-500">
+                        {isListening ? (
+                          <VolumeHigh className="size-3.5 text-slate-400" />
+                        ) : (
+                          <Book1 className="size-3.5 text-slate-400" />
+                        )}
+                        Цитата
+                      </span>
+                      {!isListening ? (
+                        <span className="text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[10.5px]">
+                          Подсвечена слева
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-[13px] font-serif italic text-slate-700 leading-relaxed pl-2 border-l-2 border-emerald-500">
+                      «{quote}»
+                    </p>
                   </div>
-                  <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-slate-800 font-normal">
-                    {item.explanation}
-                  </p>
-                </div>
-              ) : null}
-            </div>
-          )}
+                ) : null}
 
-          {/* Footer Spacer & Done button */}
-          <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
-            {hasPassage ? (
-              <span className="text-[11px] text-slate-400">
-                IELTS Reading Scaffolded Review
-              </span>
-            ) : <span />}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="rounded-[10px]"
-            >
-              {isCorrect || revealed ? 'Готово' : 'Закрыть'}
-            </Button>
+                {/* Detailed Explanation */}
+                {item.explanation ? (
+                  <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
+                    <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                      <InfoCircle className="size-3.5 text-slate-400" />
+                      <span>Подробное объяснение:</span>
+                    </div>
+                    <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-slate-800 font-normal">
+                      {item.explanation}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
+          {onNext ? (
+            <div className="shrink-0 flex justify-end border-t border-[#ededeb] bg-white px-5 py-3 sm:px-6">
+              <Button
+                type="button"
+                size="sm"
+                onClick={onNext}
+                className="gap-2 whitespace-nowrap rounded-[10px]"
+              >
+                Следующая ошибка
+                <ArrowRight className="size-4" aria-hidden />
+              </Button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -1113,7 +1096,10 @@ function findBroadRegion(body: string, quote?: string) {
 
   // Look forward 1-2 sentences / ~180 chars after matchIndex + matchLen
   const targetLookforward = 180
-  let broadEnd = Math.min(body.length, matchIndex + matchLen + targetLookforward)
+  let broadEnd = Math.min(
+    body.length,
+    matchIndex + matchLen + targetLookforward,
+  )
   if (broadEnd < body.length) {
     const candidates: number[] = []
     for (const punct of ['. ', '? ', '! ', '\n']) {
@@ -1182,7 +1168,7 @@ function ListeningTranscriptRender({
       >
         {!isRevealed && !unblurTranscript && (
           <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/90 p-3 flex items-center justify-between text-xs text-blue-950">
-            <span>🎧 Стенограмма скрыта для тренировки восприятия на слух.</span>
+            <span>Стенограмма скрыта</span>
             <Button
               type="button"
               size="sm"
@@ -1213,15 +1199,6 @@ function ListeningTranscriptRender({
   if (!isHint && !isRevealed) {
     return (
       <div className="relative">
-        <div className="sticky top-0 z-10 mb-4 rounded-xl border border-blue-200/80 bg-blue-50/95 backdrop-blur-xs p-3.5 flex items-center justify-between gap-3 text-xs text-blue-950 shadow-2xs">
-          <div className="flex items-center gap-2">
-            <VolumeHigh className="size-4 text-blue-600 shrink-0" />
-            <span>
-              <strong>Тренировка восприятия на слух:</strong> слушайте аудиотрек в плеере сверху и постарайтесь ответить без чтения текста.
-            </span>
-          </div>
-        </div>
-
         <div
           className={cn(
             'whitespace-pre-wrap font-serif text-slate-800 space-y-4 filter blur-[6px] select-none pointer-events-none opacity-40 transition-all duration-300',
@@ -1461,62 +1438,24 @@ function PassageBodyRender({
   )
 }
 
-function evaluateAnswer(
-  selected: string,
-  correctAnswer: StudentAnswer,
-): boolean {
-  if (!selected.trim()) return false
-  const normSelected = selected.trim().toUpperCase()
-
-  // 1. Option ID (Multiple choice, matching)
-  if (typeof correctAnswer.optionId === 'string') {
-    return normSelected === correctAnswer.optionId.trim().toUpperCase()
-  }
-
-  // 2. TFNG / YNNG value
-  if (typeof correctAnswer.value === 'string') {
-    const normCorrect = correctAnswer.value.trim().toUpperCase()
-    if (normSelected === normCorrect) return true
-    if (
-      (normSelected === 'YES' && normCorrect === 'TRUE') ||
-      (normSelected === 'TRUE' && normCorrect === 'YES')
-    )
-      return true
-    if (
-      (normSelected === 'NO' && normCorrect === 'FALSE') ||
-      (normSelected === 'FALSE' && normCorrect === 'NO')
-    )
-      return true
-    return false
-  }
-
-  // 3. Accepted array
-  if (Array.isArray(correctAnswer.accepted)) {
-    return correctAnswer.accepted.some(
-      (acc) => typeof acc === 'string' && acc.trim().toUpperCase() === normSelected,
-    )
-  }
-
-  // 4. Option IDs array
-  if (Array.isArray(correctAnswer.optionIds)) {
-    return correctAnswer.optionIds.some(
-      (id) => typeof id === 'string' && id.trim().toUpperCase() === normSelected,
-    )
-  }
-
-  return false
-}
-
 function extractQuote(item: AttemptReviewItem): string {
   if (item.quote && item.quote.trim().length > 0) {
     return item.quote.trim()
   }
 
   // Try extracting from content
-  if (item.content && typeof item.content.quote === 'string' && item.content.quote.trim().length > 0) {
+  if (
+    item.content &&
+    typeof item.content.quote === 'string' &&
+    item.content.quote.trim().length > 0
+  ) {
     return item.content.quote.trim()
   }
-  if (item.content && typeof item.content.textReference === 'string' && item.content.textReference.trim().length > 0) {
+  if (
+    item.content &&
+    typeof item.content.textReference === 'string' &&
+    item.content.textReference.trim().length > 0
+  ) {
     return item.content.textReference.trim()
   }
 

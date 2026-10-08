@@ -1,19 +1,8 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  Clock,
-  Lock,
-  PlayCircle,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowLeft, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
-import {
-  GuestLockedBand,
-  GuestResultsAccess,
-} from '@/components/auth/guest-results-access'
 import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,14 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import {
   advanceFullMockSession,
-  finishFullMockSession,
   fullMockKeys,
   getFullMockSession,
   pauseFullMockSession,
 } from '@/features/fullmock/api'
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { FullMockRetake } from './full-mock-retake'
+import { FullMockReport } from './full-mock-report'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -75,11 +63,6 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     onSuccess: (session) =>
       queryClient.setQueryData(fullMockKeys.session(sessionId), session),
   })
-  const finish = useMutation({
-    mutationFn: () => finishFullMockSession(sessionId),
-    onSuccess: (session) =>
-      queryClient.setQueryData(fullMockKeys.session(sessionId), session),
-  })
   const returnToSite = useMutation({
     mutationFn: async () => {
       const session = query.data
@@ -122,7 +105,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     (section) => section.position === session.currentSection,
   )
   return (
-    <div className="mx-auto grid min-h-dvh w-full min-w-0 max-w-[980px] content-center gap-5 px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] content-start gap-5 px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Badge variant="secondary">
@@ -131,15 +114,13 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               ? 'Academic'
               : 'General Training'}
           </Badge>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
             {session.mockTest.title}
           </h1>
         </div>
         <Button
           variant="outline"
-          disabled={
-            returnToSite.isPending || advance.isPending || finish.isPending
-          }
+          disabled={returnToSite.isPending || advance.isPending}
           onClick={() => returnToSite.mutate()}
         >
           <ArrowLeft aria-hidden />
@@ -152,17 +133,10 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
         </p>
       ) : null}
       {session.status === 'SUBMITTED' ? (
-        <>
-          <FullMockReport session={session} />
-          <FullMockRetake key={session.id} sessionId={session.id} />
-        </>
+        <FullMockReport key={session.id} session={session} />
       ) : (
         <>
-          <p className="text-sm leading-6 text-[#69696d]">
-            Секции идут строго по порядку. Вернуться к прошлой секции через эту
-            сессию нельзя.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {session.sections.map((section) => (
               <SectionCard
                 key={section.position}
@@ -194,37 +168,9 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               </CardContent>
             </Card>
           ) : null}
-          <Card className="border-[#f1e2c7] bg-[#fffaf0] shadow-none">
-            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-              <p className="text-sm text-[#69696d]">
-                Можно завершить Full Mock сейчас. Пустые секции останутся без
-                band и не попадут в общий результат.
-              </p>
-              <Button
-                variant="outline"
-                disabled={finish.isPending || returnToSite.isPending}
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      'Завершить Full Mock с незаполненными секциями?',
-                    )
-                  ) {
-                    finish.mutate()
-                  }
-                }}
-              >
-                {finish.isPending ? 'Завершаем…' : 'Завершить досрочно'}
-              </Button>
-            </CardContent>
-          </Card>
           {advance.isError ? (
             <p className="text-sm text-[#e23b3b]">
               {getErrorMessage(advance.error)}
-            </p>
-          ) : null}
-          {finish.isError ? (
-            <p className="text-sm text-[#e23b3b]">
-              {getErrorMessage(finish.error)}
             </p>
           ) : null}
         </>
@@ -258,8 +204,8 @@ function SectionCard({
       className={isCurrent ? 'border-[#93c5fd] shadow-none' : 'shadow-none'}
     >
       <CardHeader>
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle>
+        <div className="flex flex-col items-start gap-2">
+          <CardTitle className="text-base">
             0{section.position} · {labels[section.skill]}
           </CardTitle>
           {completed ? (
@@ -290,11 +236,6 @@ function SectionCard({
                 ? 15
                 : 60)}{' '}
           минут
-          {isCurrent && !section.deadlineAt && !completed
-            ? section.remainingMilliseconds != null
-              ? ' · Таймер остановлен'
-              : ' · Таймер начнётся при открытии'
-            : ''}
         </p>
         {isCurrent && !completed ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -316,13 +257,7 @@ function SectionCard({
               </div>
             ) : null}
           </div>
-        ) : (
-          <p className="text-sm text-[#69696d]">
-            {completed
-              ? 'Результат сохранён в сессии.'
-              : 'Станет доступна после предыдущей секции.'}
-          </p>
-        )}
+        ) : null}
         {pause.isError ? (
           <p role="alert" className="mt-3 text-sm text-red-600">
             {getErrorMessage(pause.error)}
@@ -343,7 +278,7 @@ function SectionLink({
   const content = (
     <>
       <PlayCircle aria-hidden />
-      Открыть секцию
+      Продолжить
     </>
   )
   return (
@@ -356,80 +291,6 @@ function SectionLink({
         {content}
       </Link>
     </Button>
-  )
-}
-
-function FullMockReport({ session }: { session: FullMockSession }) {
-  const { user } = useAuth()
-  const locked = Boolean(session.resultsLocked || !user)
-  return (
-    <GuestResultsAccess>
-      <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
-        <CardContent className="flex flex-wrap items-center gap-5 p-6">
-          <span className="grid size-14 place-items-center rounded-full bg-[#3b82f6] text-2xl font-semibold text-white">
-            {session.overallBand?.toFixed(1) ?? '—'}
-          </span>
-          <div>
-            <p className="font-semibold">Итоговый IELTS band</p>
-          </div>
-        </CardContent>
-      </Card>
-      {locked ? (
-        <p className="text-sm leading-6 text-[#69696d]">
-          Общая оценка открыта. Нажмите на скрытую оценку секции, чтобы войти и
-          увидеть её. Без аккаунта доступны 30% ошибок в каждой секции.
-        </p>
-      ) : null}
-      <div className="grid gap-3 sm:grid-cols-2">
-        {session.sections.map((section) =>
-          locked ? (
-            <Card key={section.position} className="shadow-none">
-              <CardContent className="flex items-center justify-between p-5">
-                <div>
-                  <p className="font-semibold">{labels[section.skill]}</p>
-                  {section.attempt.status !== 'ABANDONED' ? (
-                    <Link
-                      to="/attempts/$attemptId"
-                      params={{ attemptId: section.attempt.id }}
-                      search={{ session: session.id }}
-                      className="mt-1 inline-flex items-center gap-1 text-sm text-[#2563eb] hover:underline"
-                    >
-                      Разобрать ошибки{' '}
-                      <ArrowRight className="size-3.5" aria-hidden />
-                    </Link>
-                  ) : (
-                    <p className="mt-1 text-sm text-[#69696d]">
-                      Секция завершена без оценки
-                    </p>
-                  )}
-                </div>
-                {section.attempt.status !== 'ABANDONED' ? (
-                  <GuestLockedBand skill={labels[section.skill]} />
-                ) : (
-                  <span className="text-2xl font-semibold text-[#3b82f6]">
-                    {section.attempt.band?.toFixed(1) ?? '—'}
-                  </span>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <Link
-              key={section.position}
-              to="/attempts/$attemptId"
-              params={{ attemptId: section.attempt.id }}
-              search={{ session: session.id }}
-              aria-label={`${labels[section.skill]}: работа над ошибками`}
-              className="flex min-h-28 items-center justify-between rounded-[16px] border border-[#e7e7e4] bg-white p-5 transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
-            >
-              <p className="font-semibold">{labels[section.skill]}</p>
-              <span className="text-2xl font-semibold text-[#3b82f6]">
-                {section.attempt.band?.toFixed(1) ?? '—'}
-              </span>
-            </Link>
-          ),
-        )}
-      </div>
-    </GuestResultsAccess>
   )
 }
 

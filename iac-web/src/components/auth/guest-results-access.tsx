@@ -11,10 +11,12 @@ const AccessContext = createContext<((trigger: HTMLElement) => void) | null>(
 )
 
 export function GuestResultsAccess({ children }: { children: ReactNode }) {
+  const parentAccess = useContext(AccessContext)
   const router = useRouter()
   const client = useQueryClient()
   const [open, setOpen] = useState(false)
   const [trigger, setTrigger] = useState<HTMLElement | null>(null)
+  if (parentAccess) return <>{children}</>
   return (
     <AccessContext.Provider
       value={(element) => {

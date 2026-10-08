@@ -705,22 +705,25 @@ test('submission immediately shows this test’s mistake cards', async ({
   ).toHaveCount(0)
 })
 
-test('Full Mock cards select the section; tabs stay in this exam after reload', async ({
+test('Full Mock cards select inline review and retain the section after reload', async ({
   page,
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-  await page
-    .getByRole('link', { name: 'Reading: работа над ошибками', exact: true })
+  const cards = page.getByRole('group', { name: 'Секции Full Mock' })
+  await cards
+    .getByRole('button', { name: 'Выбрать Reading', exact: true })
     .click()
-  const tabs = page.getByRole('navigation', { name: 'Секции Full Mock' })
   await expect(
-    tabs.getByRole('link', { name: 'Reading', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
+    cards.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page).toHaveURL(/\/mock-session\?section=2$/)
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Listening', exact: true }).click()
+  await cards
+    .getByRole('button', { name: 'Выбрать Listening', exact: true })
+    .click()
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
   ).toBeVisible()
@@ -729,17 +732,23 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   ).toHaveCount(0)
   await page.reload()
   await expect(
-    tabs.getByRole('link', { name: 'Listening', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
-  await tabs.getByRole('link', { name: 'Writing', exact: true }).click()
+    cards.getByRole('button', { name: 'Выбрать Listening', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await cards
+    .getByRole('button', { name: 'Выбрать Writing', exact: true })
+    .click()
   await expect(
     page.getByText('Writing suggestion', { exact: false }),
   ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Speaking', exact: true }).click()
+  await cards
+    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
+    .click()
   await expect(
     page.getByText('Speaking suggestion', { exact: false }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'К результату', exact: true }).click()
+  await expect(
+    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+  ).toHaveCount(0)
   await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
   ).toBeVisible()

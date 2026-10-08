@@ -1,6 +1,7 @@
 import { LampCharge, Lock } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
+import { GuestSignInButton } from '@/components/auth/guest-results-access'
 import { formatAnswer } from './attempt-ui'
 import { useMistakeReviewStatus } from './use-mistake-review-status'
 import type { Option } from './attempt-ui'
@@ -23,10 +24,12 @@ export function MistakeRow({
   item,
   attemptId,
   onRetry,
+  guestPreview = false,
 }: {
   item: AttemptReviewItem
   attemptId: string
   onRetry: () => void
+  guestPreview?: boolean
 }) {
   const { reviewed } = useMistakeReviewStatus(attemptId, item.questionId)
   const content = (
@@ -60,7 +63,14 @@ export function MistakeRow({
   )
   const className =
     'group grid w-full gap-2.5 rounded-[12px] border border-[#ededeb] bg-white p-4 text-left text-sm transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]'
-  return item.locked ? (
+  return item.locked && guestPreview ? (
+    <GuestSignInButton
+      className={className}
+      label={`Разобрать ошибку ${item.number}: войти в аккаунт`}
+    >
+      {content}
+    </GuestSignInButton>
+  ) : item.locked ? (
     <Link to="/login" className={className}>
       {content}
     </Link>

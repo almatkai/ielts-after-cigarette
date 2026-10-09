@@ -1,3 +1,4 @@
+import { isPublicBlogEnabled } from '@/features/blog/visibility'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { listPublishedPosts } from '@/features/blog/api'
@@ -12,6 +13,11 @@ export const Route = createFileRoute('/blog/rss.xml')({
   server: {
     handlers: {
       GET: async () => {
+        if (!isPublicBlogEnabled())
+          return new Response(null, {
+            status: 404,
+            headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
+          })
         const { items } = await listPublishedPosts(50, 0)
         const blogUrl = siteUrl('/blog')
         const body = [

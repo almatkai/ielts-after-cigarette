@@ -4,7 +4,7 @@ import type { UserRole } from '@/features/auth/auth-store'
 
 export type AdminAccessDto = {
   userId: string
-  role: Extract<UserRole, 'EDITOR' | 'ADMIN'>
+  role: UserRole
 }
 
 export const adminQueryKeys = {

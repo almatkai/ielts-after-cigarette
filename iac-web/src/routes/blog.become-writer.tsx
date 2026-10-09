@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { isPublicBlogEnabled } from '@/features/blog/visibility'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { BLOG_SITE_NAME, siteUrl } from '@/features/blog/seo'
 import { BecomeWriterPage } from '@/pages/blog/become-writer-page'
@@ -8,12 +9,18 @@ const description =
   'Пишите статьи о подготовке к IELTS: подтвердите официальный балл 7.5+ и получите доступ к редактору блога.'
 
 export const Route = createFileRoute('/blog/become-writer')({
+  beforeLoad: () => {
+    if (!isPublicBlogEnabled()) throw notFound()
+  },
   ssr: true,
   head: () => ({
     meta: [
       { title },
       { name: 'description', content: description },
-      { name: 'robots', content: 'index, follow' },
+      {
+        name: 'robots',
+        content: isPublicBlogEnabled() ? 'index, follow' : 'noindex, nofollow',
+      },
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: BLOG_SITE_NAME },
       { property: 'og:title', content: title },

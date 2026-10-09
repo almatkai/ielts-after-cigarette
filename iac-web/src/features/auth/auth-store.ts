@@ -9,6 +9,7 @@ import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-aut
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
 
 export type UserRole = 'STUDENT' | 'WRITER' | 'EDITOR' | 'ADMIN'
+export type AdminPermission = 'BLOG_MODERATOR' | 'CONTENT_EDITOR'
 
 export type UserDto = {
   id: string
@@ -16,6 +17,7 @@ export type UserDto = {
   phone: string | null
   displayName: string
   role: UserRole
+  permissions?: AdminPermission[]
   currentBand: number | null
   targetBand: number | null
   examDate: string | null
@@ -77,6 +79,17 @@ export class AuthStore {
     const role = this.snapshot.user?.role
     return role !== undefined && roles.includes(role)
   }
+
+  hasAnyPermission = (permissions: readonly AdminPermission[]) => {
+    if (this.snapshot.user?.role === 'ADMIN') return true
+    return (this.snapshot.user?.permissions ?? []).some((permission) =>
+      permissions.includes(permission),
+    )
+  }
+
+  canAccessAdmin = () =>
+    this.hasAnyRole(['EDITOR', 'ADMIN']) ||
+    this.hasAnyPermission(['BLOG_MODERATOR', 'CONTENT_EDITOR'])
 
   initialize = async () => {
     if (this.snapshot.initialized) return this.isAuthenticated()
@@ -204,5 +217,7 @@ export function useAuth() {
     completeGoogleRegistration: authStore.completeGoogleRegistration,
     logout: authStore.logout,
     hasAnyRole: authStore.hasAnyRole,
+    hasAnyPermission: authStore.hasAnyPermission,
+    canAccessAdmin: authStore.canAccessAdmin,
   }
 }

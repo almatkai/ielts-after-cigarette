@@ -310,7 +310,7 @@ export function ReadingMaterialEditorPage({
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
-          {auth.user?.role === 'ADMIN' ? (
+          {auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -331,7 +331,7 @@ export function ReadingMaterialEditorPage({
               Экспорт V1
             </Button>
           ) : null}
-          {materialId && auth.user?.role === 'ADMIN' ? (
+          {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -342,7 +342,7 @@ export function ReadingMaterialEditorPage({
               Опубликовать текущую версию
             </Button>
           ) : null}
-          {materialId && auth.user?.role === 'ADMIN' ? (
+          {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"

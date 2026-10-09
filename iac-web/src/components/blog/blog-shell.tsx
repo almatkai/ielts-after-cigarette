@@ -131,7 +131,7 @@ function BlogHeaderActions() {
 
   return (
     <div className="flex shrink-0 items-center gap-2">
-      {auth.hasAnyRole(['WRITER', 'EDITOR', 'ADMIN']) ? (
+      {auth.hasAnyRole(['WRITER', 'ADMIN']) ? (
         <Link
           to="/writer/posts"
           className="hidden rounded-[10px] border border-[#deded9] bg-white px-3.5 py-2 text-sm font-semibold text-[#111111] no-underline transition-colors hover:bg-[#f4f4f1] sm:inline-flex"

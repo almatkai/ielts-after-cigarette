@@ -232,7 +232,7 @@ export function WritingMaterialEditorPage({
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
-          {materialId && auth.user?.role === 'ADMIN' ? (
+          {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -246,7 +246,7 @@ export function WritingMaterialEditorPage({
               {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
             </Button>
           ) : null}
-          {materialId && auth.user?.role === 'ADMIN' ? (
+          {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"

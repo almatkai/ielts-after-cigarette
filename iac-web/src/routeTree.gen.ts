@@ -37,6 +37,7 @@ import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AdminAiProvidersRouteImport } from './routes/admin.ai-providers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -62,6 +63,8 @@ import { Route as AdminReadingImportRouteImport } from './routes/admin.reading.i
 import { Route as AdminReadingMaterialsRouteImport } from './routes/admin.reading.materials'
 import { Route as AdminSpeakingImportRouteImport } from './routes/admin.speaking.import'
 import { Route as AdminSpeakingMaterialsRouteImport } from './routes/admin.speaking.materials'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin.users.$userId'
 import { Route as AdminWritersApplicationsRouteImport } from './routes/admin.writers.applications'
 import { Route as AdminWritingImportRouteImport } from './routes/admin.writing.import'
 import { Route as AdminWritingMaterialsRouteImport } from './routes/admin.writing.materials'
@@ -229,6 +232,11 @@ const AdminFullMocksRoute = AdminFullMocksRouteImport.update({
   path: '/full-mocks',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
@@ -354,6 +362,16 @@ const AdminSpeakingMaterialsRoute = AdminSpeakingMaterialsRouteImport.update({
   id: '/speaking/materials',
   path: '/speaking/materials',
   getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminUsersRoute,
 } as any)
 const AdminWritersApplicationsRoute =
   AdminWritersApplicationsRouteImport.update({
@@ -535,6 +553,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
@@ -560,6 +579,7 @@ export interface FileRoutesByFullPath {
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
@@ -569,6 +589,7 @@ export interface FileRoutesByFullPath {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
   '/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
@@ -636,6 +657,7 @@ export interface FileRoutesByTo {
   '/admin/listening/import': typeof AdminListeningImportRoute
   '/admin/reading/import': typeof AdminReadingImportRoute
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/exam/listening/$testId': typeof ExamListeningTestIdRoute
@@ -643,6 +665,7 @@ export interface FileRoutesByTo {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks': typeof AdminFullMocksIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
   '/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
@@ -691,6 +714,7 @@ export interface FileRoutesById {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
@@ -717,6 +741,7 @@ export interface FileRoutesById {
   '/admin/reading/materials': typeof AdminReadingMaterialsRouteWithChildren
   '/admin/speaking/import': typeof AdminSpeakingImportRoute
   '/admin/speaking/materials': typeof AdminSpeakingMaterialsRouteWithChildren
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/writers/applications': typeof AdminWritersApplicationsRoute
   '/admin/writing/import': typeof AdminWritingImportRoute
   '/admin/writing/materials': typeof AdminWritingMaterialsRouteWithChildren
@@ -726,6 +751,7 @@ export interface FileRoutesById {
   '/exam/speaking/$materialId': typeof ExamSpeakingMaterialIdRoute
   '/exam/writing/$materialId': typeof ExamWritingMaterialIdRoute
   '/admin/full-mocks/': typeof AdminFullMocksIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/_app/writer/posts/$postId': typeof AppWriterPostsPostIdRoute
   '/_app/writer/posts/new': typeof AppWriterPostsNewRoute
   '/admin/listening/tests/$testId': typeof AdminListeningTestsTestIdRoute
@@ -775,6 +801,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/analytics'
     | '/admin/full-mocks'
+    | '/admin/users'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/blog/$slug'
@@ -800,6 +827,7 @@ export interface FileRouteTypes {
     | '/admin/reading/materials'
     | '/admin/speaking/import'
     | '/admin/speaking/materials'
+    | '/admin/users/$userId'
     | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/admin/writing/materials'
@@ -809,6 +837,7 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
+    | '/admin/users/'
     | '/writer/posts/$postId'
     | '/writer/posts/new'
     | '/admin/listening/tests/$testId'
@@ -876,6 +905,7 @@ export interface FileRouteTypes {
     | '/admin/listening/import'
     | '/admin/reading/import'
     | '/admin/speaking/import'
+    | '/admin/users/$userId'
     | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/exam/listening/$testId'
@@ -883,6 +913,7 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks'
+    | '/admin/users'
     | '/writer/posts/$postId'
     | '/writer/posts/new'
     | '/admin/listening/tests/$testId'
@@ -930,6 +961,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/analytics'
     | '/admin/full-mocks'
+    | '/admin/users'
     | '/admin/waitlist'
     | '/admin_/preview'
     | '/blog/$slug'
@@ -956,6 +988,7 @@ export interface FileRouteTypes {
     | '/admin/reading/materials'
     | '/admin/speaking/import'
     | '/admin/speaking/materials'
+    | '/admin/users/$userId'
     | '/admin/writers/applications'
     | '/admin/writing/import'
     | '/admin/writing/materials'
@@ -965,6 +998,7 @@ export interface FileRouteTypes {
     | '/exam/speaking/$materialId'
     | '/exam/writing/$materialId'
     | '/admin/full-mocks/'
+    | '/admin/users/'
     | '/_app/writer/posts/$postId'
     | '/_app/writer/posts/new'
     | '/admin/listening/tests/$testId'
@@ -1204,6 +1238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFullMocksRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/waitlist': {
       id: '/admin/waitlist'
       path: '/waitlist'
@@ -1378,6 +1419,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/speaking/materials'
       preLoaderRoute: typeof AdminSpeakingMaterialsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminUsersRoute
     }
     '/admin/writers/applications': {
       id: '/admin/writers/applications'
@@ -1689,6 +1744,20 @@ const AdminFullMocksRouteWithChildren = AdminFullMocksRoute._addFileChildren(
   AdminFullMocksRouteChildren,
 )
 
+interface AdminUsersRouteChildren {
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 interface AdminListeningTestsRouteChildren {
   AdminListeningTestsTestIdRoute: typeof AdminListeningTestsTestIdRoute
   AdminListeningTestsNewRoute: typeof AdminListeningTestsNewRoute
@@ -1762,6 +1831,7 @@ interface AdminRouteChildren {
   AdminAiProvidersRoute: typeof AdminAiProvidersRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBlogPostsRoute: typeof AdminBlogPostsRoute
@@ -1781,6 +1851,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiProvidersRoute: AdminAiProvidersRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBlogPostsRoute: AdminBlogPostsRoute,

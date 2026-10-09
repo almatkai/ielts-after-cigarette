@@ -282,7 +282,7 @@ export function BecomeWriterPage() {
   })
 
   const application = applicationQuery.data?.application ?? null
-  const alreadyWriter = auth.hasAnyRole(['WRITER', 'EDITOR', 'ADMIN'])
+  const alreadyWriter = auth.hasAnyRole(['WRITER', 'ADMIN'])
 
   return (
     <BlogShell width="narrow">

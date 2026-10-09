@@ -4,6 +4,7 @@ import {
   ClipboardTick,
   Edit2,
   Headphone,
+  HambergerMenu,
   Logout,
   Microphone2,
   People,
@@ -11,7 +12,7 @@ import {
   TrendUp,
   UserEdit,
 } from 'iconsax-react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, linkOptions, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,97 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const navigate = useNavigate()
   const [logoutIsPending, setLogoutIsPending] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
+  const isAdmin = auth.hasAnyRole(['ADMIN'])
+  const groups = [
+    {
+      id: 'overview',
+      label: 'Обзор',
+      visible: true,
+      items: linkOptions([
+        {
+          to: '/admin',
+          label: 'Обзор',
+          icon: ShieldTick,
+          visible: true,
+          activeOptions: { exact: true },
+        },
+        {
+          to: '/admin/analytics',
+          label: 'Аналитика',
+          icon: TrendUp,
+          visible: isAdmin,
+        },
+      ]),
+    },
+    {
+      id: 'materials',
+      label: 'Учебные материалы',
+      visible: auth.hasAnyPermission(['CONTENT_EDITOR']),
+      items: linkOptions([
+        {
+          to: '/admin/reading/materials',
+          label: 'Reading материалы',
+          icon: Book,
+        },
+        {
+          to: '/admin/listening/tests',
+          label: 'Listening тесты',
+          icon: Headphone,
+        },
+        {
+          to: '/admin/writing/materials',
+          label: 'Writing материалы',
+          icon: Edit2,
+        },
+        {
+          to: '/admin/speaking/materials',
+          label: 'Speaking материалы',
+          icon: Microphone2,
+        },
+        {
+          to: '/admin/full-mocks',
+          label: 'Архив Full Mock',
+          icon: ClipboardTick,
+        },
+      ]),
+    },
+    {
+      id: 'blog',
+      label: 'Блог и авторы',
+      visible: auth.hasAnyPermission(['BLOG_MODERATOR']),
+      items: linkOptions([
+        { to: '/admin/blog/posts', label: 'Статьи блога', icon: Edit2 },
+        {
+          to: '/admin/writers/applications',
+          label: 'Заявки авторов',
+          icon: People,
+        },
+      ]),
+    },
+    {
+      id: 'users',
+      label: 'Пользователи',
+      visible: isAdmin,
+      items: linkOptions([
+        { to: '/admin/users', label: 'Пользователи', icon: People },
+        { to: '/admin/waitlist', label: 'Waitlist', icon: People },
+      ]),
+    },
+    {
+      id: 'system',
+      label: 'Система',
+      visible: isAdmin,
+      items: linkOptions([
+        {
+          to: '/admin/ai-providers',
+          label: 'AI-провайдеры',
+          icon: ClipboardTick,
+        },
+        { to: '/admin/admins', label: 'Администраторы', icon: UserEdit },
+      ]),
+    },
+  ]
 
   const handleLogout = async () => {
     setLogoutIsPending(true)
@@ -43,11 +135,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">IAC Admin</p>
               <p className="truncate text-xs text-[#808084]">
-                {auth.user?.displayName} · {auth.user?.role}
+                {auth.user?.displayName} ·{' '}
+                {auth.user?.role === 'EDITOR' ? 'Сотрудник' : auth.user?.role}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="lg:hidden"
+              aria-label="Меню"
+              aria-expanded={navOpen}
+              aria-controls="admin-navigation"
+              onClick={() => setNavOpen(!navOpen)}
+            >
+              <HambergerMenu aria-hidden />
+            </Button>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link to="/">
                 <Category aria-hidden />
@@ -73,163 +176,52 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto grid max-w-[1280px] gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:py-8">
         <nav
           aria-label="Администрирование"
-          className="lg:sticky lg:top-6 lg:self-start"
+          id="admin-navigation"
+          onClick={(event) => {
+            if (event.target instanceof Element && event.target.closest('a'))
+              setNavOpen(false)
+          }}
+          className={`${navOpen ? 'block' : 'hidden'} space-y-5 lg:block lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto`}
         >
-          <Link
-            to="/admin"
-            activeOptions={{ exact: true }}
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
-            className="flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <ShieldTick className="size-[18px]" aria-hidden />
-            Обзор
-          </Link>
-          {auth.user?.role === 'ADMIN' ? (
-            <Link
-              to="/admin/analytics"
-              activeProps={{
-                className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-              }}
-              inactiveProps={{
-                className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-              }}
-              className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-            >
-              <TrendUp className="size-[18px]" aria-hidden />
-              Аналитика
-            </Link>
-          ) : null}
-          <Link
-            to="/admin/reading/materials"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{
-              className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-            }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <Book className="size-[18px]" aria-hidden />
-            Reading материалы
-          </Link>
-          <Link
-            to="/admin/listening/tests"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <Headphone className="size-[18px]" aria-hidden />
-            Listening тесты
-          </Link>
-          <Link
-            to="/admin/writing/materials"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <Edit2 className="size-[18px]" aria-hidden />
-            Writing материалы
-          </Link>
-          <Link
-            to="/admin/speaking/materials"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{ className: 'text-[#69696d] hover:bg-[#f4f4f1]' }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <Microphone2 className="size-[18px]" aria-hidden />
-            Speaking материалы
-          </Link>
-          <Link
-            to="/admin/full-mocks"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{
-              className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-            }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <ClipboardTick className="size-[18px]" aria-hidden />
-            Архив Full Mock
-          </Link>
-          <Link
-            to="/admin/blog/posts"
-            activeProps={{
-              className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-            }}
-            inactiveProps={{
-              className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-            }}
-            className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-          >
-            <Edit2 className="size-[18px]" aria-hidden />
-            Статьи блога
-          </Link>
-          {auth.user?.role === 'ADMIN' ? (
-            <>
-              <Link
-                to="/admin/writers/applications"
-                activeProps={{
-                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-                }}
-                inactiveProps={{
-                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-                }}
-                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-              >
-                <People className="size-[18px]" aria-hidden />
-                Заявки авторов
-              </Link>
-              <Link
-                to="/admin/ai-providers"
-                activeProps={{
-                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-                }}
-                inactiveProps={{
-                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-                }}
-                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-              >
-                <ClipboardTick className="size-[18px]" aria-hidden />
-                AI-провайдеры
-              </Link>
-              <Link
-                to="/admin/waitlist"
-                activeProps={{
-                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-                }}
-                inactiveProps={{
-                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-                }}
-                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-              >
-                <People className="size-[18px]" aria-hidden />
-                Waitlist
-              </Link>
-              <Link
-                to="/admin/admins"
-                activeProps={{
-                  className: 'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
-                }}
-                inactiveProps={{
-                  className: 'text-[#69696d] hover:bg-[#f4f4f1]',
-                }}
-                className="mt-2 flex min-h-11 items-center gap-3 rounded-[10px] px-4 text-sm no-underline transition-colors"
-              >
-                <UserEdit className="size-[18px]" aria-hidden />
-                Администраторы
-              </Link>
-            </>
-          ) : null}
+          {groups
+            .filter((group) => group.visible)
+            .map((group) => (
+              <section key={group.id} aria-labelledby={`admin-nav-${group.id}`}>
+                <h2
+                  id={`admin-nav-${group.id}`}
+                  className="mb-2 px-4 text-xs font-medium text-[#808084]"
+                >
+                  {group.label}
+                </h2>
+                <ul className="space-y-1">
+                  {group.items
+                    .filter((item) => !('visible' in item) || item.visible)
+                    .map(({ label, icon: Icon, ...options }) => (
+                      <li key={options.to}>
+                        <Link
+                          to={options.to}
+                          activeOptions={
+                            'activeOptions' in options
+                              ? options.activeOptions
+                              : undefined
+                          }
+                          activeProps={{
+                            className:
+                              'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                          }}
+                          inactiveProps={{
+                            className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                          }}
+                          className="flex min-h-10 items-center gap-3 rounded-[10px] px-4 py-2 text-sm no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
+                        >
+                          <Icon className="size-[18px] shrink-0" aria-hidden />
+                          {label}
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </section>
+            ))}
         </nav>
 
         <main className="min-w-0">{children}</main>

@@ -356,7 +356,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {auth.user?.role === 'ADMIN' ? (
+          {auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -367,7 +367,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               {dirty ? 'Сохранить и открыть тест' : 'Предпросмотр теста'}
             </Button>
           ) : null}
-          {testId && auth.user?.role === 'ADMIN' ? (
+          {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -397,7 +397,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 : 'AI STT Расшифровка'}
             </Button>
           ) : null}
-          {testId && auth.user?.role === 'ADMIN' ? (
+          {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"
@@ -416,7 +416,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
             </Button>
           ) : null}
-          {testId && auth.user?.role === 'ADMIN' ? (
+          {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
             <Button
               type="button"
               variant="outline"

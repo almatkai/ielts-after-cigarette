@@ -9,7 +9,7 @@ export const Route = createFileRoute('/_app/writer/posts/new')({
     if (!context.auth.isAuthenticated()) {
       throw redirect({ to: '/login' })
     }
-    if (!context.auth.hasAnyRole(['WRITER', 'EDITOR', 'ADMIN'])) {
+    if (!context.auth.hasAnyRole(['WRITER', 'ADMIN'])) {
       throw redirect({ to: '/blog/become-writer' })
     }
   },

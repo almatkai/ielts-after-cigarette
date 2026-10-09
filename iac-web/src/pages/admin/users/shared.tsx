@@ -4,7 +4,7 @@ import type { AdminUser } from '@/features/admin/users-api'
 export const roles = {
   STUDENT: 'Студент',
   WRITER: 'Автор',
-  EDITOR: 'Редактор',
+  EDITOR: 'Сотрудник',
   ADMIN: 'Администратор',
 }
 export const statusText: Record<string, string> = {

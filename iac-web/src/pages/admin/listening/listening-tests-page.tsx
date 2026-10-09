@@ -100,7 +100,7 @@ export function ListeningTestsPage() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {auth.user?.role === 'ADMIN' ? (
+                {auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
                   <Button asChild variant="outline">
                     <Link
                       to="/admin/preview/listening/$testId"

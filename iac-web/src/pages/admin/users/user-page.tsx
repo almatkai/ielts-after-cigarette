@@ -72,6 +72,7 @@ function UserProfile({ user }: { user: UserDetail }) {
     email: user.email,
     phone: user.phone ?? '',
     role: user.role,
+    permissions: user.permissions,
     blocked: user.blocked,
   })
   const refresh = async () => {
@@ -88,6 +89,7 @@ function UserProfile({ user }: { user: UserDetail }) {
           displayName: result.displayName,
           email: result.email,
           phone: result.phone,
+          permissions: result.permissions,
         })
     },
   })
@@ -195,7 +197,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   }
                 />
               </Field>
-              <Field label="Роль" id="userRole">
+              <Field label="Роль аккаунта" id="userRole">
                 <select
                   id="userRole"
                   disabled={self}
@@ -236,6 +238,62 @@ function UserProfile({ user }: { user: UserDetail }) {
                 />
               </Field>
             </div>
+            <fieldset className="grid gap-3 border-t border-[#e7e7e4] pt-4">
+              <legend className="px-1 text-sm font-medium">Доступы</legend>
+              <p className="text-xs leading-5 text-muted-foreground">
+                {form.role === 'ADMIN'
+                  ? 'Администратору доступны все разделы.'
+                  : 'Выберите один или оба доступа. Они дополняют роль аккаунта; остальные разделы админки останутся закрыты.'}
+              </p>
+              <AccessCheckbox
+                checked={
+                  form.role === 'ADMIN' ||
+                  form.permissions.includes('BLOG_MODERATOR')
+                }
+                disabled={form.role === 'ADMIN' || self}
+                onChange={(checked) =>
+                  setForm({
+                    ...form,
+                    permissions: checked
+                      ? [
+                          ...new Set([
+                            ...form.permissions,
+                            'BLOG_MODERATOR' as const,
+                          ]),
+                        ]
+                      : form.permissions.filter(
+                          (permission) => permission !== 'BLOG_MODERATOR',
+                        ),
+                  })
+                }
+                title="Авторы и блог"
+                description="Заявки авторов, проверка и публикация статей"
+              />
+              <AccessCheckbox
+                checked={
+                  form.role === 'ADMIN' ||
+                  form.permissions.includes('CONTENT_EDITOR')
+                }
+                disabled={form.role === 'ADMIN' || self}
+                onChange={(checked) =>
+                  setForm({
+                    ...form,
+                    permissions: checked
+                      ? [
+                          ...new Set([
+                            ...form.permissions,
+                            'CONTENT_EDITOR' as const,
+                          ]),
+                        ]
+                      : form.permissions.filter(
+                          (permission) => permission !== 'CONTENT_EDITOR',
+                        ),
+                  })
+                }
+                title="Учебные материалы и тесты"
+                description="Создание, проверка и публикация Reading, Listening, Writing, Speaking; архив Full Mock"
+              />
+            </fieldset>
             <label className="flex w-fit items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -572,6 +630,38 @@ function Field({
       </Label>
       {children}
     </div>
+  )
+}
+
+function AccessCheckbox({
+  checked,
+  disabled,
+  onChange,
+  title,
+  description,
+}: {
+  checked: boolean
+  disabled: boolean
+  onChange: (checked: boolean) => void
+  title: string
+  description: string
+}) {
+  return (
+    <label className="flex items-start gap-3 text-sm">
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 size-4 accent-[#3b82f6]"
+      />
+      <span>
+        <span className="block font-medium">{title}</span>
+        <span className="mt-0.5 block text-xs text-muted-foreground">
+          {description}
+        </span>
+      </span>
+    </label>
   )
 }
 function Info({ label, value }: { label: string; value?: string | null }) {

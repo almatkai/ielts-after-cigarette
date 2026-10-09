@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adminQueryKeys, getAdminAccess } from '@/features/admin/api'
 
 const milestones = [
-  'Роли STUDENT, EDITOR и ADMIN',
-  'Защита admin API на backend',
-  'Проверка роли до отрисовки маршрута',
+  'Доступ к блогу отдельно от тестов',
+  'Права проверяются на сервере',
+  'Публикация материалов доступна редакторам тестов',
 ] as const
 
 export function AdminOverviewPage() {
@@ -23,11 +23,10 @@ export function AdminOverviewPage() {
           Администрирование
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Основа для управления контентом
+          Рабочее пространство
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69696d]">
-          Ролевой доступ готовит безопасный контур, внутри которого появятся
-          библиотека материалов и конструктор Reading.
+          Материалы, статьи и пользователи доступны по выданным правам.
         </p>
       </div>
 
@@ -65,12 +64,12 @@ export function AdminOverviewPage() {
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
                 <Book className="size-[18px]" aria-hidden />
               </span>
-              <CardTitle className="text-base">Далее: Reading</CardTitle>
+              <CardTitle className="text-base">Раздельные доступы</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5 text-sm leading-6 text-[#69696d]">
-            Следующий слой — миграции материалов, версии черновиков и первый
-            конструктор True / False / Not Given.
+            Редактор тестов работает с учебными материалами. Модератор блога — с
+            авторами и статьями.
           </CardContent>
         </Card>
       </div>

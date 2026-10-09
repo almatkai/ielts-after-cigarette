@@ -7,6 +7,7 @@ const user = {
   email: 'aigerim@example.test',
   phone: '+77012345678',
   role: 'STUDENT',
+  permissions: [] as string[],
   status: 'REGISTERED',
   blocked: false,
   createdAt: '2026-09-12T09:30:00Z',
@@ -42,9 +43,10 @@ const user = {
     },
   ],
 }
-async function mock(page: Page, role = 'ADMIN') {
+async function mock(page: Page, role = 'ADMIN', permissions: string[] = []) {
   const state = {
     user: structuredClone(user),
+    reads: [] as string[],
     writes: [] as {
       method: string
       path: string
@@ -63,7 +65,13 @@ async function mock(page: Page, role = 'ADMIN') {
         accessToken: 'mock-token',
         tokenType: 'Bearer',
         expiresIn: 3600,
-        user: { ...user, id: 'admin-id', role, displayName: 'Almat Kairatov' },
+        user: {
+          ...user,
+          id: 'admin-id',
+          role,
+          permissions,
+          displayName: 'Almat Kairatov',
+        },
       })
     if (method !== 'GET') {
       state.writes.push({ method, path, body: request.postDataJSON() ?? {} })
@@ -73,6 +81,9 @@ async function mock(page: Page, role = 'ADMIN') {
       }
       return route.fulfill({ status: 204 })
     }
+    state.reads.push(path)
+    if (path.endsWith('/admin/access'))
+      return json({ userId: 'admin-id', role })
     if (path.endsWith('/dashboard'))
       return json({
         profile: { currentBand: 6.5, targetBand: 7.5, examDate: '2026-12-04' },
@@ -194,7 +205,7 @@ test('search, author role, password, sessions and confirmed deletion', async ({
   const state = await mock(page)
   await page.goto('admin/users')
   await expect(
-    page.getByRole('heading', { name: 'Пользователи', exact: true }),
+    page.getByRole('heading', { name: 'Пользователи', exact: true, level: 1 }),
   ).toBeVisible()
   await expect(page.getByText('Данияр Омаров')).toBeVisible()
   await page.screenshot({
@@ -214,7 +225,7 @@ test('search, author role, password, sessions and confirmed deletion', async ({
     path: testInfo.outputPath('ielts-user-profile.png'),
     fullPage: true,
   })
-  await page.getByLabel('Роль', { exact: true }).selectOption('WRITER')
+  await page.getByLabel('Роль аккаунта', { exact: true }).selectOption('WRITER')
   await page.getByRole('button', { name: 'Сохранить', exact: true }).click()
   await expect(page.getByRole('status')).toHaveText('Сохранено')
   expect(state.writes.at(-1)?.body.role).toBe('WRITER')
@@ -261,6 +272,172 @@ test('search, author role, password, sessions and confirmed deletion', async ({
   await expect(page).toHaveURL(/admin\/users\/?$/)
   expect(state.writes.at(-1)?.method).toBe('DELETE')
 })
+test('admin can combine, narrow and remove editorial access', async ({
+  page,
+}) => {
+  const state = await mock(page)
+  await page.goto('admin/users/student-id')
+  await page.getByLabel('Роль аккаунта', { exact: true }).selectOption('WRITER')
+  const blog = page.getByRole('checkbox', { name: /Авторы и блог/ })
+  const content = page.getByRole('checkbox', {
+    name: /Учебные материалы и тесты/,
+  })
+  await blog.check()
+  await content.check()
+  const save = async (permissions: string[]) => {
+    await page.getByRole('button', { name: 'Сохранить', exact: true }).click()
+    await expect(page.getByRole('status')).toHaveText('Сохранено')
+    expect(state.writes.at(-1)?.body.role).toBe('WRITER')
+    expect(state.writes.at(-1)?.body.permissions).toEqual(permissions)
+  }
+  await save(['BLOG_MODERATOR', 'CONTENT_EDITOR'])
+  await blog.uncheck()
+  await save(['CONTENT_EDITOR'])
+  await content.uncheck()
+  await save([])
+  await page.getByLabel('Роль аккаунта', { exact: true }).selectOption('ADMIN')
+  await expect(blog).toBeChecked()
+  await expect(content).toBeChecked()
+  await expect(blog).toBeDisabled()
+  await expect(content).toBeDisabled()
+})
+
+for (const access of [
+  {
+    name: 'test editor',
+    role: 'EDITOR',
+    permissions: ['CONTENT_EDITOR'],
+    groups: ['Обзор', 'Учебные материалы'],
+    links: [
+      'Обзор',
+      'Reading материалы',
+      'Listening тесты',
+      'Writing материалы',
+      'Speaking материалы',
+      'Архив Full Mock',
+    ],
+  },
+  {
+    name: 'blog editor',
+    role: 'EDITOR',
+    permissions: ['BLOG_MODERATOR'],
+    groups: ['Обзор', 'Блог и авторы'],
+    links: ['Обзор', 'Статьи блога', 'Заявки авторов'],
+  },
+  {
+    name: 'combined writer',
+    role: 'WRITER',
+    permissions: ['BLOG_MODERATOR', 'CONTENT_EDITOR'],
+    groups: ['Обзор', 'Учебные материалы', 'Блог и авторы'],
+    links: [
+      'Обзор',
+      'Reading материалы',
+      'Listening тесты',
+      'Writing материалы',
+      'Speaking материалы',
+      'Архив Full Mock',
+      'Статьи блога',
+      'Заявки авторов',
+    ],
+  },
+  {
+    name: 'editor without capabilities',
+    role: 'EDITOR',
+    permissions: [],
+    groups: ['Обзор'],
+    links: ['Обзор'],
+  },
+  {
+    name: 'administrator',
+    role: 'ADMIN',
+    permissions: [],
+    groups: [
+      'Обзор',
+      'Учебные материалы',
+      'Блог и авторы',
+      'Пользователи',
+      'Система',
+    ],
+    links: [
+      'Обзор',
+      'Аналитика',
+      'Reading материалы',
+      'Listening тесты',
+      'Writing материалы',
+      'Speaking материалы',
+      'Архив Full Mock',
+      'Статьи блога',
+      'Заявки авторов',
+      'Пользователи',
+      'Waitlist',
+      'AI-провайдеры',
+      'Администраторы',
+    ],
+  },
+]) {
+  test(`${access.name}: only accessible sidebar groups`, async ({
+    page,
+  }, testInfo) => {
+    await mock(page, access.role, access.permissions)
+    await page.goto('admin')
+    const nav = page.getByRole('navigation', { name: 'Администрирование' })
+    await expect(nav).toBeVisible()
+    await expect(nav.getByRole('heading')).toHaveText(access.groups)
+    await expect(nav.getByRole('link')).toHaveText(access.links)
+    await expect(
+      nav.getByRole('link', { name: 'Обзор', exact: true }),
+    ).toHaveAttribute('aria-current', 'page')
+    await page.screenshot({
+      path: testInfo.outputPath('grouped-sidebar.png'),
+      fullPage: true,
+    })
+  })
+}
+
+for (const entry of [
+  {
+    permission: 'CONTENT_EDITOR',
+    path: 'admin/blog/posts',
+    endpoint: '/admin/blog/posts',
+  },
+  {
+    permission: 'BLOG_MODERATOR',
+    path: 'admin/reading/materials',
+    endpoint: '/admin/reading/materials',
+  },
+  {
+    permission: 'CONTENT_EDITOR',
+    path: 'admin/users',
+    endpoint: '/admin/users',
+  },
+  {
+    permission: 'CONTENT_EDITOR',
+    path: 'admin/analytics',
+    endpoint: '/admin/analytics',
+  },
+  {
+    permission: 'BLOG_MODERATOR',
+    path: 'admin/ai-providers',
+    endpoint: '/admin/ai-providers',
+  },
+  {
+    permission: 'BLOG_MODERATOR',
+    path: 'admin/reading/import',
+    endpoint: '/admin/reading/import',
+  },
+]) {
+  test(`${entry.permission} cannot deep-link to ${entry.path}`, async ({
+    page,
+  }) => {
+    const state = await mock(page, 'EDITOR', [entry.permission])
+    await page.goto(entry.path)
+    await expect(page).toHaveURL(/forbidden/)
+    expect(state.reads.some((path) => path.includes(entry.endpoint))).toBe(
+      false,
+    )
+  })
+}
+
 test('mobile profile stays within viewport', async ({ page }, testInfo) => {
   await mock(page)
   await page.setViewportSize({ width: 390, height: 844 })

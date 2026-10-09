@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client'
-import type { UserRole } from '@/features/auth/auth-store'
+import type { AdminPermission, UserRole } from '@/features/auth/auth-store'
 
 export type AdminUser = {
   id: string
@@ -9,6 +9,7 @@ export type AdminUser = {
   firstName: string | null
   lastName: string | null
   role: UserRole
+  permissions: AdminPermission[]
   status: string
   blocked: boolean
   createdAt: string
@@ -81,7 +82,7 @@ export function getUser(id: string, signal?: AbortSignal) {
 export type UserUpdate = Pick<
   AdminUser,
   'displayName' | 'email' | 'role' | 'blocked'
-> & { phone: string }
+> & { phone: string; permissions: AdminPermission[] }
 export function updateUser(id: string, body: UserUpdate) {
   return apiClient.request<UserDetail>(`/api/v1/admin/users/${id}`, {
     method: 'PUT',

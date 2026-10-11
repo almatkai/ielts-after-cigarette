@@ -15,8 +15,10 @@ import {
 import { useAuth } from '@/features/auth/auth-store'
 import { listPublicReadingMaterials, readingKeys } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function ReadingLibraryPage() {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const attemptsQuery = useLibraryAttempts('reading')
   const query = useQuery({
@@ -30,13 +32,13 @@ export function ReadingLibraryPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Выберите текст для тренировки
+          {t('Выберите текст для тренировки')}
         </h2>
       </div>
       {attemptsQuery.isError ? (
         <ErrorState
-          title="Не удалось загрузить результаты"
-          message={getErrorMessage(attemptsQuery.error)}
+          title={t('Не удалось загрузить результаты')}
+          message={t(getErrorMessage(attemptsQuery.error))}
           onRetry={() => void attemptsQuery.refetch()}
         />
       ) : null}
@@ -44,8 +46,8 @@ export function ReadingLibraryPage() {
         <LibraryCardsSkeleton />
       ) : query.isError ? (
         <ErrorState
-          title="Не удалось загрузить материалы"
-          message={getErrorMessage(query.error)}
+          title={t('Не удалось загрузить материалы')}
+          message={t(getErrorMessage(query.error))}
           onRetry={() => void query.refetch()}
         />
       ) : materials.length === 0 ? (
@@ -74,7 +76,7 @@ export function ReadingLibraryPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
-                      Сложность: {material.difficulty}
+                      {t('Сложность')}: {material.difficulty}
                     </p>
                     {material.description ? (
                       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#69696d]">

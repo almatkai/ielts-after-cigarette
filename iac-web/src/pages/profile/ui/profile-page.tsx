@@ -32,6 +32,7 @@ import {
 } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { GoalFields } from '@/features/ielts/goal-form'
+import { useLanguage } from '@/lib/i18n'
 
 import type { ProfileForm } from '@/features/ielts/api'
 
@@ -48,6 +49,7 @@ const emptyProfileForm: ProfileForm = {
 }
 
 export function ProfilePage() {
+  const { t } = useLanguage()
   const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
     useMascotVisibility()
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -65,7 +67,7 @@ export function ProfilePage() {
     onSuccess: (profile) => {
       authStore.updateUser(profile)
       queryClient.setQueryData(queryKeys.profile, profile)
-      setProfileMessage('Личные данные сохранены.')
+      setProfileMessage(t('Личные данные сохранены.'))
     },
   })
   const goalMutation = useMutation({
@@ -74,7 +76,7 @@ export function ProfilePage() {
       authStore.updateUser(profile)
       queryClient.setQueryData(queryKeys.profile, profile)
       await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
-      setGoalMessage('Цель обновлена — dashboard уже получил новые данные.')
+      setGoalMessage(t('Цель обновлена — dashboard уже получил новые данные.'))
     },
   })
 
@@ -97,13 +99,13 @@ export function ProfilePage() {
     event.preventDefault()
     setProfileMessage(null)
     if (`${form.firstName} ${form.lastName}`.trim().length < 2) {
-      setProfileMessage('Укажите имя длиной не менее двух символов.')
+      setProfileMessage(t('Укажите имя длиной не менее двух символов.'))
       return
     }
     try {
       await profileMutation.mutateAsync()
     } catch (error) {
-      setProfileMessage(getErrorMessage(error))
+      setProfileMessage(t(getErrorMessage(error)))
     }
   }
 
@@ -116,7 +118,7 @@ export function ProfilePage() {
     try {
       await goalMutation.mutateAsync()
     } catch (error) {
-      setGoalMessage(getErrorMessage(error))
+      setGoalMessage(t(getErrorMessage(error)))
     }
   }
 
@@ -124,7 +126,7 @@ export function ProfilePage() {
     return (
       <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
         <CardContent className="p-8 text-center text-sm text-[#69696d]">
-          Загружаем профиль…
+          {t('Загружаем профиль…')}
         </CardContent>
       </Card>
     )
@@ -135,7 +137,7 @@ export function ProfilePage() {
       <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
         <CardContent className="flex flex-col items-center p-8 text-center">
           <p className="text-sm font-semibold text-[#111111]">
-            Не удалось загрузить профиль
+            {t('Не удалось загрузить профиль')}
           </p>
           <Button
             type="button"
@@ -143,7 +145,7 @@ export function ProfilePage() {
             className="mt-4"
             onClick={() => void profileQuery.refetch()}
           >
-            Повторить
+            {t('Повторить')}
           </Button>
         </CardContent>
       </Card>
@@ -165,11 +167,12 @@ export function ProfilePage() {
 
           <div className="min-w-0 flex-1">
             <h3 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
-              Фото профиля
+              {t('Фото профиля')}
             </h3>
             <p className="mt-0.5 sm:mt-1 max-w-lg text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
-              Загрузите JPG, PNG или WebP. Рекомендуемый размер — от 400 × 400
-              пикселей.
+              {t(
+                'Загрузите JPG, PNG или WebP. Рекомендуемый размер — от 400 × 400 пикселей.',
+              )}
             </p>
           </div>
 
@@ -179,7 +182,7 @@ export function ProfilePage() {
             type="file"
             accept="image/jpeg,image/png,image/webp"
             className="hidden"
-            aria-label="Выбрать фото профиля"
+            aria-label={t('Выбрать фото профиля')}
           />
           <Button
             type="button"
@@ -191,7 +194,7 @@ export function ProfilePage() {
               className="transition-colors group-hover:text-blue-600"
               aria-hidden
             />
-            Загрузить фото
+            {t('Загрузить фото')}
           </Button>
         </CardContent>
       </Card>
@@ -203,14 +206,17 @@ export function ProfilePage() {
             <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
-                  <User className="size-4 sm:size-[18px] transition-colors" aria-hidden />
+                  <User
+                    className="size-4 sm:size-[18px] transition-colors"
+                    aria-hidden
+                  />
                 </span>
                 <div>
                   <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    Личные данные
+                    {t('Личные данные')}
                   </CardTitle>
                   <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
-                    Основная информация вашего аккаунта.
+                    {t('Основная информация вашего аккаунта.')}
                   </CardDescription>
                 </div>
               </div>
@@ -219,12 +225,12 @@ export function ProfilePage() {
             <form className="min-w-0" onSubmit={handleProfileSubmit}>
               <CardContent className="grid min-w-0 gap-3.5 p-3.5 sm:gap-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
                 <div className="grid gap-2">
-                  <Label htmlFor="first-name">Имя</Label>
+                  <Label htmlFor="first-name">{t('Имя')}</Label>
                   <Input
                     id="first-name"
                     name="firstName"
                     autoComplete="given-name"
-                    placeholder="Введите имя"
+                    placeholder={t('Введите имя')}
                     value={form.firstName}
                     onChange={(event) =>
                       updateForm('firstName', event.target.value)
@@ -233,12 +239,12 @@ export function ProfilePage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="last-name">Фамилия</Label>
+                  <Label htmlFor="last-name">{t('Фамилия')}</Label>
                   <Input
                     id="last-name"
                     name="lastName"
                     autoComplete="family-name"
-                    placeholder="Введите фамилию"
+                    placeholder={t('Введите фамилию')}
                     value={form.lastName}
                     onChange={(event) =>
                       updateForm('lastName', event.target.value)
@@ -247,7 +253,7 @@ export function ProfilePage() {
                   />
                 </div>
                 <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor="email">Электронная почта</Label>
+                  <Label htmlFor="email">{t('Электронная почта')}</Label>
                   <div className="relative">
                     <Sms
                       className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d] transition-colors group-hover:text-[#3b82f6]"
@@ -259,14 +265,14 @@ export function ProfilePage() {
                       type="email"
                       autoComplete="email"
                       inputMode="email"
-                      placeholder="Введите электронную почту"
+                      placeholder={t('Введите электронную почту')}
                       value={form.email}
                       disabled
                       className={`${fieldClassName} pl-10`}
                     />
                   </div>
                   <p className="text-xs text-[#808084]">
-                    Изменение email пока не поддерживается backend.
+                    {t('Изменение email пока не поддерживается backend.')}
                   </p>
                 </div>
                 {profileMessage ? (
@@ -274,7 +280,7 @@ export function ProfilePage() {
                     className="text-sm text-[#69696d] sm:col-span-2"
                     role="status"
                   >
-                    {profileMessage}
+                    {t(profileMessage)}
                   </p>
                 ) : null}
               </CardContent>
@@ -285,8 +291,8 @@ export function ProfilePage() {
                   className="h-9 sm:h-10 rounded-[9px] bg-[#3b82f6] px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-[#2563eb]"
                 >
                   {profileMutation.isPending
-                    ? 'Сохраняем…'
-                    : 'Сохранить изменения'}
+                    ? t('Сохраняем…')
+                    : t('Сохранить изменения')}
                 </Button>
               </CardFooter>
             </form>
@@ -304,10 +310,10 @@ export function ProfilePage() {
                 </span>
                 <div>
                   <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    Параметры подготовки
+                    {t('Параметры подготовки')}
                   </CardTitle>
                   <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
-                    Цель и формат, под которые будет строиться план.
+                    {t('Цель и формат, под которые будет строиться план.')}
                   </CardDescription>
                 </div>
               </div>
@@ -323,7 +329,7 @@ export function ProfilePage() {
                 />
                 {goalMessage ? (
                   <p className="text-sm text-[#69696d]" role="status">
-                    {goalMessage}
+                    {t(goalMessage)}
                   </p>
                 ) : null}
               </CardContent>
@@ -334,8 +340,8 @@ export function ProfilePage() {
                   className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
                   {goalMutation.isPending
-                    ? 'Сохраняем…'
-                    : 'Сохранить параметры'}
+                    ? t('Сохраняем…')
+                    : t('Сохранить параметры')}
                 </Button>
               </CardFooter>
             </form>
@@ -355,10 +361,10 @@ export function ProfilePage() {
                 </span>
                 <div>
                   <CardTitle className="text-base tracking-[-0.02em]">
-                    Уведомления
+                    {t('Уведомления')}
                   </CardTitle>
                   <CardDescription className="mt-1 leading-5">
-                    Выберите полезные напоминания.
+                    {t('Выберите полезные напоминания.')}
                   </CardDescription>
                 </div>
               </div>
@@ -370,15 +376,15 @@ export function ProfilePage() {
                     htmlFor="lesson-reminders"
                     className="leading-5 text-[#111111]"
                   >
-                    Напоминания о занятиях
+                    {t('Напоминания о занятиях')}
                   </Label>
                   <p className="mt-1 text-xs leading-5 text-[#808084]">
-                    Перед запланированной практикой.
+                    {t('Перед запланированной практикой.')}
                   </p>
                 </div>
                 <Switch
                   id="lesson-reminders"
-                  aria-label="Напоминания о занятиях"
+                  aria-label={t('Напоминания о занятиях')}
                   className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>
@@ -388,15 +394,15 @@ export function ProfilePage() {
                     htmlFor="weekly-report"
                     className="leading-5 text-[#111111]"
                   >
-                    Еженедельный отчёт
+                    {t('Еженедельный отчёт')}
                   </Label>
                   <p className="mt-1 text-xs leading-5 text-[#808084]">
-                    Краткая сводка прогресса за неделю.
+                    {t('Краткая сводка прогресса за неделю.')}
                   </p>
                 </div>
                 <Switch
                   id="weekly-report"
-                  aria-label="Еженедельный отчёт"
+                  aria-label={t('Еженедельный отчёт')}
                   className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>
@@ -405,9 +411,11 @@ export function ProfilePage() {
 
           <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
             <CardHeader className="p-5">
-              <CardTitle className="text-base">Персонаж-помощник</CardTitle>
+              <CardTitle className="text-base">
+                {t('Персонаж-помощник')}
+              </CardTitle>
               <CardDescription>
-                Отображение лисёнка Юки на экране.
+                {t('Отображение лисёнка Юки на экране.')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -417,17 +425,17 @@ export function ProfilePage() {
                     htmlFor="profile-mascot-toggle"
                     className="leading-5 text-[#111111] cursor-pointer"
                   >
-                    Показывать питомца (Юки)
+                    {t('Показывать питомца (Юки)')}
                   </Label>
                   <p className="mt-1 text-xs leading-5 text-[#808084]">
-                    Если скрыть, останется маленькая кнопка чата.
+                    {t('Если скрыть, останется маленькая кнопка чата.')}
                   </p>
                 </div>
                 <Switch
                   id="profile-mascot-toggle"
                   checked={isMascotVisible}
                   onCheckedChange={setMascotVisible}
-                  aria-label="Показывать питомца"
+                  aria-label={t('Показывать питомца')}
                   className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
                 />
               </div>
@@ -436,9 +444,9 @@ export function ProfilePage() {
 
           <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
             <CardHeader className="p-5">
-              <CardTitle className="text-base">Безопасность</CardTitle>
+              <CardTitle className="text-base">{t('Безопасность')}</CardTitle>
               <CardDescription>
-                Вход в аккаунт доступен только через Google.
+                {t('Вход в аккаунт доступен только через Google.')}
               </CardDescription>
             </CardHeader>
           </Card>

@@ -3,25 +3,32 @@ import { Link } from '@tanstack/react-router'
 
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
+import { LanguagePicker } from '@/components/ui/language-picker'
+import { useLanguage } from '@/lib/i18n'
 
 export function NotFoundPage() {
+  const { t } = useLanguage()
   return (
     <div className="min-h-screen overflow-hidden bg-[#fafaf8] text-[#111111]">
-      <header className="container-shell flex h-20 items-center">
+      <header className="container-shell flex h-20 items-center justify-between">
         <Brand />
+        <div className="w-36">
+          <LanguagePicker compact />
+        </div>
       </header>
 
       <main className="container-shell grid min-h-[calc(100vh-80px)] items-center gap-8 py-10 lg:grid-cols-12 lg:gap-14 lg:py-14">
         <div className="relative z-10 lg:col-span-6">
           <p className="text-xs font-semibold tracking-[0.1em] text-[#3b82f6] uppercase">
-            Ошибка 404
+            {t('Ошибка 404')}
           </p>
           <h1 className="mt-5 max-w-[650px] text-[clamp(3.25rem,7vw,6.8rem)] leading-[0.92] font-medium tracking-[-0.07em] text-balance">
-            Кажется, эта страница потерялась.
+            {t('Кажется, эта страница потерялась.')}
           </h1>
           <p className="mt-7 max-w-lg text-base leading-7 text-[#69696d] sm:text-lg sm:leading-8">
-            Здесь ничего нет. Вернитесь на главную или продолжите подготовку в
-            личном кабинете.
+            {t(
+              'Здесь ничего нет. Вернитесь на главную или продолжите подготовку в личном кабинете.',
+            )}
           </p>
 
           <div className="mt-9 flex flex-col gap-3 min-[430px]:flex-row">
@@ -32,7 +39,7 @@ export function NotFoundPage() {
             >
               <Link to="/">
                 <ArrowLeft aria-hidden />
-                На главную
+                {t('На главную')}
               </Link>
             </Button>
             <Button
@@ -42,7 +49,8 @@ export function NotFoundPage() {
               className="h-12 rounded-[10px] border-[#dededb] bg-white px-5 text-sm font-semibold hover:bg-[#f4f4f1]"
             >
               <Link to="/">
-                <Category aria-hidden />В личный кабинет
+                <Category aria-hidden />
+                {t('В личный кабинет')}
               </Link>
             </Button>
           </div>
@@ -59,7 +67,7 @@ export function NotFoundPage() {
           />
           <img
             src={`${import.meta.env.BASE_URL}fox_404_transparent.webp`}
-            alt="Растерянная красная лиса"
+            alt={t('Растерянная красная лиса')}
             width={1600}
             height={1600}
             className="relative z-10 h-auto w-full max-w-[520px] object-contain"

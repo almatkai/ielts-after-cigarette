@@ -20,6 +20,7 @@ import {
   rememberGoogleReturnPath,
 } from '@/features/auth/google-identity'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import { GoogleCompleteForm } from './google-complete-form'
 import type { PendingGoogleRegistration } from './google-complete-form'
@@ -143,6 +144,7 @@ function GoogleSignInCard({
   restoringGoogle: boolean
   redirect?: LoginReturnPath
 }) {
+  const { t } = useLanguage()
   const [googleFailed, setGoogleFailed] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
 
@@ -182,10 +184,10 @@ function GoogleSignInCard({
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
         <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
-          Войти или создать аккаунт
+          {t('Войти или создать аккаунт')}
         </CardTitle>
         <CardDescription className="mt-2 text-sm text-[#475569]">
-          {description}
+          {t(description)}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pt-6 pb-8 sm:px-8">
@@ -207,44 +209,46 @@ function GoogleSignInCard({
         </p>
         {restoringGoogle ? (
           <p className="text-center text-sm text-[#475569]" role="status">
-            Завершаем вход через Google…
+            {t('Завершаем вход через Google…')}
           </p>
         ) : null}
         <p className="mt-3 text-center text-xs leading-5 text-[#64748b]">
-          Если вы открыли сайт из Telegram или Instagram, используйте меню
-          браузера «Открыть в Safari» или «Открыть в браузере» для входа.
+          {t(
+            'Если вы открыли сайт из Telegram или Instagram, используйте меню браузера «Открыть в Safari» или «Открыть в браузере» для входа.',
+          )}
         </p>
         {googleFailed ? (
           <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
-            Не удалось загрузить вход через Google. Проверьте подключение и
-            обновите страницу.
+            {t(
+              'Не удалось загрузить вход через Google. Проверьте подключение и обновите страницу.',
+            )}
           </p>
         ) : null}
         {submissionError ? (
           <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
-            {submissionError}
+            {t(submissionError)}
           </p>
         ) : null}
       </CardContent>
       <CardFooter className="justify-center border-t border-[#f1f5f9] px-6 py-4 text-center text-xs leading-5 text-[#64748b] sm:px-8">
         <p>
-          Входя в систему, вы соглашаетесь с{' '}
+          {t('Входя в систему, вы соглашаетесь с')}{' '}
           <Link
             to="/terms"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
           >
-            условиями использования
+            {t('условиями использования')}
           </Link>{' '}
-          и{' '}
+          {t('и')}{' '}
           <Link
             to="/privacy"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
           >
-            политикой конфиденциальности
+            {t('политикой конфиденциальности')}
           </Link>
           .
         </p>

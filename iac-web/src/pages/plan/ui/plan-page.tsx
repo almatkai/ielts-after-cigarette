@@ -26,6 +26,7 @@ import { getDashboard, queryKeys } from '@/features/ielts/api'
 import type { SkillId } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 const cardClassName =
   'group gap-0 rounded-[16px] border border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all duration-200 hover:border-slate-300'
@@ -35,11 +36,7 @@ const skillMeta: Record<
   {
     title: string
     subtitle: string
-    to:
-      | '/listening'
-      | '/reading'
-      | '/writing'
-      | '/speaking'
+    to: '/listening' | '/reading' | '/writing' | '/speaking'
     icon: typeof Headphone
     advice: string
   }
@@ -49,44 +46,49 @@ const skillMeta: Record<
     subtitle: 'Аудирование',
     to: '/listening',
     icon: Headphone,
-    advice: 'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
+    advice:
+      'Тренируйте предвосхищение ответов и внимательность к окончаниям -s и числительным.',
   },
   reading: {
     title: 'Reading',
     subtitle: 'Чтение',
     to: '/reading',
     icon: Book,
-    advice: 'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
+    advice:
+      'Фокусируйтесь на сканировании ключевых синонимов и различении False vs Not Given.',
   },
   writing: {
     title: 'Writing',
     subtitle: 'Письмо',
     to: '/writing',
     icon: Edit2,
-    advice: 'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
+    advice:
+      'Соблюдайте структуру эссе (4 абзаца) и отрабатывайте академические связки.',
   },
   speaking: {
     title: 'Speaking',
     subtitle: 'Устная речь',
     to: '/speaking',
     icon: Microphone,
-    advice: 'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
+    advice:
+      'Отвечайте развёрнуто по формуле «Тезис + Пример/Объяснение», избегая пауз.',
   },
 }
 
 export function PlanPage() {
+  const { language, t } = useLanguage()
   const dashboardQuery = useQuery({
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
   })
 
   if (dashboardQuery.isPending) {
-    return <LoadingState label="Собираем ваш план подготовки…" />
+    return <LoadingState label={t('Собираем ваш план подготовки…')} />
   }
   if (dashboardQuery.isError) {
     return (
       <ErrorState
-        title="Не удалось загрузить план"
+        title={t('Не удалось загрузить план')}
         message={getErrorMessage(dashboardQuery.error)}
         onRetry={() => void dashboardQuery.refetch()}
       />
@@ -125,7 +127,9 @@ export function PlanPage() {
 
   const weakestMeta = weakest ? skillMeta[weakest.skill] : undefined
   const weakestGap =
-    targetBand !== null && weakest?.estimatedBand !== null && weakest?.estimatedBand !== undefined
+    targetBand !== null &&
+    weakest?.estimatedBand !== null &&
+    weakest?.estimatedBand !== undefined
       ? targetBand - weakest.estimatedBand
       : null
 
@@ -134,7 +138,7 @@ export function PlanPage() {
       {/* Заголовок страницы */}
       <div>
         <h2 className="text-lg sm:text-xl font-semibold tracking-[-0.025em] text-[#111111]">
-          План подготовки к IELTS
+          {t('План подготовки к IELTS')}
         </h2>
       </div>
 
@@ -148,11 +152,11 @@ export function PlanPage() {
               </span>
               <div>
                 <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                  Траектория цели
+                  {t('Траектория цели')}
                 </CardTitle>
                 {!(targetBand && examDate) ? (
                   <CardDescription className="text-[11px] sm:text-xs">
-                    Задайте цель, чтобы откалибровать расчет
+                    {t('Задайте цель, чтобы откалибровать расчет')}
                   </CardDescription>
                 ) : null}
               </div>
@@ -170,15 +174,19 @@ export function PlanPage() {
               >
                 <Calendar className="size-3 sm:size-3.5" aria-hidden />
                 {daysLeft === 0
-                  ? 'Экзамен сегодня!'
-                  : `Осталось ${daysLeft} ${getDaysPlural(daysLeft)}`}
+                  ? t('Экзамен сегодня!')
+                  : language === 'en'
+                    ? `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} remaining`
+                    : language === 'kk'
+                      ? `${daysLeft} күн қалды`
+                      : `Осталось ${daysLeft} ${getDaysPlural(daysLeft)}`}
               </Badge>
             ) : (
               <Badge
                 variant="outline"
                 className="gap-1.5 border-dashed border-[#deded9] px-2.5 py-0.5 text-xs text-[#8b8b8e]"
               >
-                Дата экзамена не указана
+                {t('Дата экзамена не указана')}
               </Badge>
             )}
           </div>
@@ -199,38 +207,46 @@ export function PlanPage() {
             <div className="flex flex-col gap-5 flex-1 min-w-0">
               {targetBand === null || examDate === null ? (
                 <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] p-5 text-center">
-                  <DirectRight className="mx-auto size-6 text-[#3b82f6]" aria-hidden />
+                  <DirectRight
+                    className="mx-auto size-6 text-[#3b82f6]"
+                    aria-hidden
+                  />
                   <p className="mt-2 text-sm font-semibold text-[#111111]">
-                    Целевой балл или дата ещё не заданы
+                    {t('Целевой балл или дата ещё не заданы')}
                   </p>
                   <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#69696d]">
-                    Укажите желаемый Overall Band и дату экзамена — алгоритм рассчитает
-                    необходимый темп и распределит нагрузку по дням.
+                    {t(
+                      'Укажите желаемый Overall Band и дату экзамена — алгоритм рассчитает необходимый темп и распределит нагрузку по дням.',
+                    )}
                   </p>
                   <Button asChild size="sm" className="mt-4 shadow-none">
-                    <Link to="/profile">Задать цель в профиле</Link>
+                    <Link to="/profile">{t('Задать цель в профиле')}</Link>
                   </Button>
                 </div>
               ) : (
                 <div className="grid gap-2.5 sm:gap-4 sm:grid-cols-3">
                   <div className="rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4">
                     <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#69696d]">
-                      Текущий балл
+                      {t('Текущий балл')}
                     </p>
                     <div className="mt-1 sm:mt-1.5 flex items-baseline gap-2">
                       <span className="text-xl sm:text-2xl font-bold text-[#111111]">
                         {currentBand !== null ? currentBand.toFixed(1) : '—'}
                       </span>
                       {currentBand === null && (
-                        <span className="text-[10px] sm:text-[11px] text-[#8b8b8e]">(после тестов)</span>
+                        <span className="text-[10px] sm:text-[11px] text-[#8b8b8e]">
+                          ({t('после тестов')})
+                        </span>
                       )}
                     </div>
-                    <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-[#69696d]">Расчётный Overall Band</p>
+                    <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-[#69696d]">
+                      {t('Расчётный Overall Band')}
+                    </p>
                   </div>
 
                   <div className="rounded-[10px] sm:rounded-[12px] border border-[#dbeafe] bg-[#eff6ff]/40 p-3 sm:p-4">
                     <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#3b82f6]">
-                      Целевой балл
+                      {t('Целевой балл')}
                     </p>
                     <div className="mt-1 sm:mt-1.5 flex items-baseline gap-2">
                       <span className="text-xl sm:text-2xl font-bold text-[#3b82f6]">
@@ -240,21 +256,29 @@ export function PlanPage() {
                         <span
                           className={cn(
                             'text-[11px] font-semibold',
-                            targetBand - currentBand <= 0 ? 'text-emerald-600' : 'text-[#3b82f6]',
+                            targetBand - currentBand <= 0
+                              ? 'text-emerald-600'
+                              : 'text-[#3b82f6]',
                           )}
                         >
                           {targetBand - currentBand <= 0
-                            ? 'Цель достигнута! 🎉'
-                            : `+${(targetBand - currentBand).toFixed(1)} балла`}
+                            ? t('Цель достигнута! 🎉')
+                            : language === 'en'
+                              ? `+${(targetBand - currentBand).toFixed(1)} band points`
+                              : language === 'kk'
+                                ? `+${(targetBand - currentBand).toFixed(1)} балл`
+                                : `+${(targetBand - currentBand).toFixed(1)} балла`}
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-[11px] text-[#69696d]">Желаемый результат</p>
+                    <p className="mt-1 text-[11px] text-[#69696d]">
+                      {t('Желаемый результат')}
+                    </p>
                   </div>
 
                   <div className="rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4">
                     <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.08em] sm:tracking-[0.1em] text-[#69696d]">
-                      Дата экзамена
+                      {t('Дата экзамена')}
                     </p>
                     <p className="mt-1 sm:mt-1.5 text-lg sm:text-xl font-bold text-[#111111]">
                       {formatExamDate(examDate)}
@@ -263,7 +287,7 @@ export function PlanPage() {
                       to="/profile"
                       className="mt-0.5 sm:mt-1 inline-block text-[10px] sm:text-[11px] text-[#3b82f6] hover:underline font-medium"
                     >
-                      Изменить дату →
+                      {t('Изменить дату →')}
                     </Link>
                   </div>
                 </div>
@@ -276,9 +300,9 @@ export function PlanPage() {
                 </span>
                 <div className="text-[11px] sm:text-xs leading-4 sm:leading-5">
                   <span className="font-semibold text-[#111111]">
-                    Рекомендуемый режим занятий:{' '}
+                    {t('Рекомендуемый режим занятий:')}{' '}
                   </span>
-                  <span className="text-[#69696d]">{pacingInfo}</span>
+                  <span className="text-[#69696d]">{t(pacingInfo)}</span>
                 </div>
               </div>
             </div>
@@ -296,17 +320,19 @@ export function PlanPage() {
               </span>
               <div>
                 <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                  Зона максимального роста
+                  {t('Зона максимального роста')}
                 </CardTitle>
                 <CardDescription className="text-[11px] sm:text-xs">
-                  Навык, улучшение которого даст наибольший прирост к общему баллу
+                  {t(
+                    'Навык, улучшение которого даст наибольший прирост к общему баллу',
+                  )}
                 </CardDescription>
               </div>
             </div>
 
             {weakest && (
               <Badge className="bg-[#3b82f6] text-white hover:bg-[#2563eb] px-2 py-0.5 text-[11px] sm:text-xs">
-                Приоритет №1 · {weakestMeta?.title}
+                {t('Приоритет №1')} · {weakestMeta?.title}
               </Badge>
             )}
           </div>
@@ -316,11 +342,12 @@ export function PlanPage() {
           {weakest === null ? (
             <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] p-6 text-center">
               <p className="text-sm font-semibold text-[#111111]">
-                Пройдите первый тест для калибровки
+                {t('Пройдите первый тест для калибровки')}
               </p>
               <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#808084]">
-                Пока нет завершённых попыток. Начните с Listening или Reading —
-                алгоритм сразу вычислит текущий балл и выявит самое слабое место.
+                {t(
+                  'Пока нет завершённых попыток. Начните с Listening или Reading — алгоритм сразу вычислит текущий балл и выявит самое слабое место.',
+                )}
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
@@ -336,22 +363,28 @@ export function PlanPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-4">
                 <div className="flex items-center gap-3">
                   <span className="grid size-10 place-items-center rounded-[10px] bg-white text-[#3b82f6] shadow-xs">
-                    {weakestMeta && <weakestMeta.icon className="size-5" aria-hidden />}
+                    {weakestMeta && (
+                      <weakestMeta.icon className="size-5" aria-hidden />
+                    )}
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-[#111111]">
-                      {weakestMeta?.title} ({weakestMeta?.subtitle})
+                      {weakestMeta?.title} ({t(weakestMeta?.subtitle ?? '')})
                     </p>
                     <p className="text-xs text-[#69696d]">
-                      Текущий результат: band{' '}
+                      {t('Текущий результат: band')}{' '}
                       <strong className="text-[#111111]">
                         {weakest.estimatedBand?.toFixed(1) ?? '—'}
                       </strong>
                       {weakestGap !== null && (
                         <span>
                           {weakestGap <= 0
-                            ? ' · цель достигнута, закрепите результат'
-                            : ` · до цели не хватает ${weakestGap.toFixed(1)} балла`}
+                            ? ` · ${t('цель достигнута, закрепите результат')}`
+                            : language === 'en'
+                              ? ` · ${weakestGap.toFixed(1)} band points to your goal`
+                              : language === 'kk'
+                                ? ` · мақсатқа ${weakestGap.toFixed(1)} балл жетіспейді`
+                                : ` · до цели не хватает ${weakestGap.toFixed(1)} балла`}
                         </span>
                       )}
                     </p>
@@ -360,15 +393,25 @@ export function PlanPage() {
 
                 <div className="flex flex-wrap gap-2 sm:gap-2.5">
                   {weakestMeta && (
-                    <Button asChild className="h-9 sm:h-10 text-xs sm:text-sm gap-1.5 sm:gap-2 shadow-none">
+                    <Button
+                      asChild
+                      className="h-9 sm:h-10 text-xs sm:text-sm gap-1.5 sm:gap-2 shadow-none"
+                    >
                       <Link to={weakestMeta.to}>
-                        Начать тренировку {weakestMeta.title}
-                        <ArrowRight className="size-3.5 sm:size-4" aria-hidden />
+                        {t('Начать тренировку')} {weakestMeta.title}
+                        <ArrowRight
+                          className="size-3.5 sm:size-4"
+                          aria-hidden
+                        />
                       </Link>
                     </Button>
                   )}
-                  <Button asChild variant="outline" className="h-9 sm:h-10 text-xs sm:text-sm shadow-none">
-                    <Link to="/mistakes">Банк ошибок</Link>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-9 sm:h-10 text-xs sm:text-sm shadow-none"
+                  >
+                    <Link to="/mistakes">{t('Банк ошибок')}</Link>
                   </Button>
                 </div>
               </div>
@@ -380,11 +423,14 @@ export function PlanPage() {
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       1
                     </span>
-                    Регулярный спринт
+                    {t('Регулярный спринт')}
                   </div>
                   <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
-                    Делайте хотя бы 1 задание {weakestMeta?.title} каждый день и
-                    детально разбирайте каждое несовпадение.
+                    {language === 'en'
+                      ? `Complete at least one ${weakestMeta?.title} task daily and review every mistake in detail.`
+                      : language === 'kk'
+                        ? `Күн сайын кемінде бір ${weakestMeta?.title} тапсырмасын орындап, әр қатені мұқият талдаңыз.`
+                        : `Делайте хотя бы 1 задание ${weakestMeta?.title} каждый день и детально разбирайте каждое несовпадение.`}
                   </p>
                 </div>
 
@@ -393,11 +439,13 @@ export function PlanPage() {
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       2
                     </span>
-                    Анализ ошибок
+                    {t('Анализ ошибок')}
                   </div>
                   <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
-                    {weakestMeta?.advice} Все ошибки сохраняются в разделе «Ошибки»
-                    для повторения.
+                    {t(weakestMeta.advice)}{' '}
+                    {t(
+                      'Все ошибки сохраняются в разделе «Ошибки» для повторения.',
+                    )}
                   </p>
                 </div>
 
@@ -406,11 +454,12 @@ export function PlanPage() {
                     <span className="grid size-5 place-items-center rounded-full bg-[#eff6ff] text-[11px] font-bold text-[#3b82f6]">
                       3
                     </span>
-                    Контрольный замер
+                    {t('Контрольный замер')}
                   </div>
                   <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
-                    Раз в неделю проходите полный модуль целиком с таймингом, чтобы
-                    отслеживать динамику в «Прогрессе».
+                    {t(
+                      'Раз в неделю проходите полный модуль целиком с таймингом, чтобы отслеживать динамику в «Прогрессе».',
+                    )}
                   </p>
                 </div>
               </div>
@@ -418,7 +467,6 @@ export function PlanPage() {
           )}
         </CardContent>
       </Card>
-
     </div>
   )
 }
@@ -453,10 +501,11 @@ function getPacingInfo(
     return 'Оптимальный темп: 1 модуль ежедневно + 1 полный пробный тест (Full Mock) в неделю.'
   }
   const gap =
-    targetBand !== null && currentBand !== null ? targetBand - currentBand : null
+    targetBand !== null && currentBand !== null
+      ? targetBand - currentBand
+      : null
   if (gap !== null && gap > 1.5) {
     return 'До цели значительный шаг: уделяйте особое внимание слабому навыку и словарному запасу.'
   }
   return 'Планомерная подготовка: 1 модуль в день и еженедельный разбор накопленных ошибок.'
 }
-

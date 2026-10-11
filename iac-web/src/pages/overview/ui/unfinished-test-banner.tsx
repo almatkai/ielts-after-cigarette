@@ -14,6 +14,7 @@ import {
   attemptStartQueryKey,
   examAttemptLink,
 } from '@/features/attempts/exam-attempt-routes'
+import { useLanguage } from '@/lib/i18n'
 
 const skillLabels: Record<AttemptMaterialType, string> = {
   listening: 'Listening',
@@ -23,6 +24,7 @@ const skillLabels: Record<AttemptMaterialType, string> = {
 }
 
 export function UnfinishedTestBanner() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const attemptsQuery = useQuery({
     queryKey: attemptKeys.listAll,
@@ -60,7 +62,7 @@ export function UnfinishedTestBanner() {
             to="/exam/full-mock-sessions/$sessionId"
             params={{ sessionId: draft.fullMockSessionId }}
           >
-            Продолжить
+            {t('Продолжить')}
           </Link>
         </Button>
       )
@@ -71,7 +73,7 @@ export function UnfinishedTestBanner() {
           {...examAttemptLink(draft.materialType, draft.materialId)}
           onClick={() => handlePrepareAttempt(draft)}
         >
-          Продолжить
+          {t('Продолжить')}
         </Link>
       </Button>
     )
@@ -79,7 +81,9 @@ export function UnfinishedTestBanner() {
 
   return (
     <Card className="gap-2 rounded-[14px] sm:rounded-[16px] border border-[#e7e7e4] bg-white p-3 sm:p-4 shadow-none">
-      <h3 className="text-[11px] sm:text-xs font-semibold text-[#808084]">Черновики</h3>
+      <h3 className="text-[11px] sm:text-xs font-semibold text-[#808084]">
+        {t('Черновики')}
+      </h3>
       <div className="divide-y divide-[#ededeb]">
         {inProgressAttempts.map((draft) => (
           <div
@@ -104,7 +108,7 @@ export function UnfinishedTestBanner() {
                 ) : null}
               </div>
               <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm font-semibold leading-snug text-[#111111]">
-                {draft.testTitle || 'Практический тест'}
+                {draft.testTitle || t('Практический тест')}
               </p>
             </div>
             {renderDraftButton(draft)}

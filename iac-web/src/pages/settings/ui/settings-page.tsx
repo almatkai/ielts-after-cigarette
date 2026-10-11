@@ -32,6 +32,8 @@ import {
   updateProfile,
 } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
+import { LanguagePicker } from '@/components/ui/language-picker'
 
 const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
 
@@ -93,6 +95,7 @@ function firstError(errors: unknown[]) {
 }
 
 export function SettingsPage() {
+  const { t } = useLanguage()
   const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
     useMascotVisibility()
   const queryClient = useQueryClient()
@@ -119,7 +122,7 @@ export function SettingsPage() {
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setProfileMessage('Профиль сохранён.')
       } catch (error) {
-        setProfileMessage(getErrorMessage(error))
+        setProfileMessage(t(getErrorMessage(error)))
       }
     },
   })
@@ -143,7 +146,7 @@ export function SettingsPage() {
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setGoalMessage('Цель обновлена.')
       } catch (error) {
-        setGoalMessage(getErrorMessage(error))
+        setGoalMessage(t(getErrorMessage(error)))
       }
     },
   })
@@ -165,13 +168,13 @@ export function SettingsPage() {
   }, [profile, initialized, profileForm, goalForm])
 
   if (profileQuery.isPending) {
-    return <LoadingState label="Загружаем настройки…" />
+    return <LoadingState label={t('Загружаем настройки…')} />
   }
   if (profileQuery.isError) {
     return (
       <ErrorState
-        title="Не удалось загрузить профиль"
-        message={getErrorMessage(profileQuery.error)}
+        title={t('Не удалось загрузить профиль')}
+        message={t(getErrorMessage(profileQuery.error))}
         onRetry={() => void profileQuery.refetch()}
       />
     )
@@ -179,20 +182,36 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <CardTitle className="text-base tracking-[-0.02em]">
+            {t('Язык интерфейса')}
+          </CardTitle>
+          <CardDescription className="mt-1 leading-5">
+            {t(
+              'Выберите язык приложения. Настройка сохранится на этом устройстве.',
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-5 sm:p-6">
+          <LanguagePicker />
+        </CardContent>
+      </Card>
       <div>
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Настройте профиль и цель
+          {t('Настройте профиль и цель')}
         </h2>
         <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Укажите целевой балл и дату экзамена — по ним строится ваш план
-          подготовки.
+          {t(
+            'Укажите целевой балл и дату экзамена — по ним строится ваш план подготовки.',
+          )}
         </p>
       </div>
 
       <Card className={cardClassName}>
         <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Профиль
+            {t('Профиль')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
             Имя аккаунта.
@@ -214,11 +233,11 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Имя</Label>
+                  <Label htmlFor={field.name}>{t('Имя')}</Label>
                   <Input
                     id={field.name}
                     autoComplete="name"
-                    placeholder="Как к вам обращаться"
+                    placeholder={t('Как к вам обращаться')}
                     value={field.state.value}
                     onChange={(event) => field.handleChange(event.target.value)}
                     onBlur={field.handleBlur}
@@ -226,7 +245,7 @@ export function SettingsPage() {
                   />
                   {firstError(field.state.meta.errors) ? (
                     <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -234,7 +253,7 @@ export function SettingsPage() {
             </profileForm.Field>
             {profileMessage ? (
               <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
-                {profileMessage}
+                {t(profileMessage)}
               </p>
             ) : null}
           </CardContent>
@@ -246,7 +265,7 @@ export function SettingsPage() {
                   disabled={isSubmitting}
                   className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
-                  {isSubmitting ? 'Сохраняем…' : 'Сохранить профиль'}
+                  {isSubmitting ? t('Сохраняем…') : t('Сохранить профиль')}
                 </Button>
               )}
             </profileForm.Subscribe>
@@ -257,10 +276,10 @@ export function SettingsPage() {
       <Card className={cardClassName}>
         <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Цель подготовки
+            {t('Цель подготовки')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Целевой балл, формат и дата экзамена.
+            {t('Целевой балл, формат и дата экзамена.')}
           </CardDescription>
         </CardHeader>
         <form
@@ -279,13 +298,13 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Целевой балл</Label>
+                  <Label htmlFor={field.name}>{t('Целевой балл')}</Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
                   >
                     <SelectTrigger id={field.name} className={selectClassName}>
-                      <SelectValue placeholder="Выберите балл" />
+                      <SelectValue placeholder={t('Выберите балл')} />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       {targetBandOptions.map((band) => (
@@ -297,7 +316,7 @@ export function SettingsPage() {
                   </Select>
                   {firstError(field.state.meta.errors) ? (
                     <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -309,13 +328,13 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Формат IELTS</Label>
+                  <Label htmlFor={field.name}>{t('Формат IELTS')}</Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
                   >
                     <SelectTrigger id={field.name} className={selectClassName}>
-                      <SelectValue placeholder="Выберите формат" />
+                      <SelectValue placeholder={t('Выберите формат')} />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       <SelectItem value="academic">Academic</SelectItem>
@@ -324,7 +343,7 @@ export function SettingsPage() {
                   </Select>
                   {firstError(field.state.meta.errors) ? (
                     <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -336,7 +355,9 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor={field.name}>Планируемая дата экзамена</Label>
+                  <Label htmlFor={field.name}>
+                    {t('Планируемая дата экзамена')}
+                  </Label>
                   <Input
                     id={field.name}
                     type="date"
@@ -348,7 +369,7 @@ export function SettingsPage() {
                   />
                   {firstError(field.state.meta.errors) ? (
                     <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -356,7 +377,7 @@ export function SettingsPage() {
             </goalForm.Field>
             {goalMessage ? (
               <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
-                {goalMessage}
+                {t(goalMessage)}
               </p>
             ) : null}
           </CardContent>
@@ -368,7 +389,7 @@ export function SettingsPage() {
                   disabled={isSubmitting}
                   className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                 >
-                  {isSubmitting ? 'Сохраняем…' : 'Сохранить цель'}
+                  {isSubmitting ? t('Сохраняем…') : t('Сохранить цель')}
                 </Button>
               )}
             </goalForm.Subscribe>
@@ -379,10 +400,10 @@ export function SettingsPage() {
       <Card className={cardClassName}>
         <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Персонаж-помощник
+            {t('Персонаж-помощник')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Управление отображением питомца Юки в интерфейсе.
+            {t('Управление отображением питомца Юки в интерфейсе.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-5 sm:p-6">
@@ -392,12 +413,12 @@ export function SettingsPage() {
                 htmlFor="mascot-toggle"
                 className="text-sm font-medium text-[#111111] cursor-pointer"
               >
-                Показывать питомца (Юки)
+                {t('Показывать питомца (Юки)')}
               </Label>
               <p className="text-xs leading-5 text-[#69696d]">
-                Отображать анимированного лисёнка в правом нижнем углу экрана.
-                Если отключить, останется компактная кнопка быстрого перехода в
-                чат.
+                {t(
+                  'Отображать анимированного лисёнка в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
+                )}
               </p>
             </div>
             <Switch

@@ -1,6 +1,7 @@
 import { Brand } from '@/components/landing/brand'
 import { Card } from '@/components/ui/card'
 import { BorderBeam } from '@/registry/magicui/border-beam'
+import { LanguagePicker } from '@/components/ui/language-picker'
 
 type AuthShellProps = {
   children: React.ReactNode
@@ -10,8 +11,11 @@ export function AuthShell({ children }: AuthShellProps) {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
       <header>
-        <div className="container-shell flex h-20 items-center justify-start">
+        <div className="container-shell flex h-20 items-center justify-between">
           <Brand />
+          <div className="w-36">
+            <LanguagePicker compact />
+          </div>
         </div>
       </header>
 

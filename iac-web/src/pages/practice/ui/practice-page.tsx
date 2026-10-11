@@ -12,6 +12,7 @@ import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 const skills = [
   {
@@ -61,22 +62,25 @@ const cardClassName =
 
 export function PracticePage() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-4 sm:gap-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-lg sm:text-xl font-semibold tracking-[-0.025em] text-[#111111]">
-            Практика
+            {t('Практика')}
           </h1>
           <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
-            Выберите секцию для тренировки или пройдите полный пробный экзамен.
+            {t(
+              'Выберите секцию для тренировки или пройдите полный пробный экзамен.',
+            )}
           </p>
         </div>
         <Badge
           variant="outline"
           className="w-fit border-[#deded9] bg-white px-2.5 py-0.5 sm:py-1 text-xs text-[#69696d]"
         >
-          4 секции + Full Mock
+          {t('4 секции + Full Mock')}
         </Badge>
       </header>
 
@@ -104,7 +108,7 @@ export function PracticePage() {
                       variant="outline"
                       className="border-[#ededeb] bg-[#fafaf8] px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-[#69696d]"
                     >
-                      {skill.badge}
+                      {t(skill.badge)}
                     </Badge>
                   </div>
 
@@ -114,17 +118,17 @@ export function PracticePage() {
                         {skill.title}
                       </h2>
                       <span className="text-[11px] sm:text-xs text-[#8b8b8e]">
-                        ({skill.subtitle})
+                        ({t(skill.subtitle)})
                       </span>
                     </div>
                     <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
-                      {skill.description}
+                      {t(skill.description)}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-4 sm:mt-6 flex items-center gap-2 pt-1 sm:pt-2 text-xs sm:text-sm font-semibold text-[#2563eb]">
-                  <span>Перейти к материалам</span>
+                  <span>{t('Перейти к материалам')}</span>
                   <ArrowRight
                     className="size-3.5 sm:size-4 transition-transform group-hover:translate-x-1"
                     aria-hidden
@@ -148,19 +152,23 @@ export function PracticePage() {
             <div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                 <h2 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
-                  Полный пробный экзамен (Full Mock)
+                  {t('Полный пробный экзамен (Full Mock)')}
                 </h2>
                 <Badge
                   variant="outline"
                   className="border-blue-200 bg-blue-50/60 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-blue-700"
                 >
-                  4 секции подряд
+                  {t('4 секции подряд')}
                 </Badge>
               </div>
               <p className="mt-1 sm:mt-1.5 max-w-2xl text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
                 {user
-                  ? 'Мы автоматически подберём Listening, Reading, Writing и Speaking из общей библиотеки — сначала непройденные тесты. Четыре секции подряд, отдельные таймеры секций и итоговый Band Score.'
-                  : 'Один бесплатный Academic Full Mock: четыре секции, отдельные таймеры секций, итоговый Band Score и разбор ответов. Для следующих тестов войдите в аккаунт.'}
+                  ? t(
+                      'Мы автоматически подберём Listening, Reading, Writing и Speaking из общей библиотеки — сначала непройденные тесты. Четыре секции подряд, отдельные таймеры секций и итоговый Band Score.',
+                    )
+                  : t(
+                      'Один бесплатный Academic Full Mock: четыре секции, отдельные таймеры секций, итоговый Band Score и разбор ответов. Для следующих тестов войдите в аккаунт.',
+                    )}
               </p>
             </div>
           </div>
@@ -168,7 +176,7 @@ export function PracticePage() {
             to="/full-mocks"
             className="inline-flex shrink-0 items-center justify-center rounded-[9px] sm:rounded-[10px] bg-[#2563eb] px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
           >
-            Подготовить Full Mock
+            {t('Подготовить Full Mock')}
           </Link>
         </div>
       </Card>

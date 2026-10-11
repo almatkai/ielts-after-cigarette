@@ -9,6 +9,7 @@ import { Link } from '@tanstack/react-router'
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 import {
   Popover,
   PopoverContent,
@@ -25,7 +26,8 @@ export function DashboardHeader({
   onOpenNavigation,
 }: DashboardHeaderProps) {
   const { user } = useAuth()
-  const accountName = user?.displayName.trim() || 'Аккаунт'
+  const { t } = useLanguage()
+  const accountName = user?.displayName.trim() || t('Аккаунт')
 
   return (
     <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center border-b border-[#eeeeeb] bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-xl">
@@ -36,7 +38,7 @@ export function DashboardHeader({
           size="icon"
           onClick={onOpenNavigation}
           className="shrink-0 rounded-[9px] text-[#69696d] lg:hidden"
-          aria-label="Открыть меню"
+          aria-label={t('Открыть меню')}
           aria-controls="dashboard-mobile-navigation"
         >
           <HambergerMenu aria-hidden />
@@ -48,7 +50,7 @@ export function DashboardHeader({
         {pageTitle ? (
           <div className="min-w-0 flex-1">
             <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
-              Рабочее пространство
+              {t('Рабочее пространство')}
             </p>
             <h1 className="truncate text-sm sm:text-base font-semibold tracking-[-0.025em] text-[#111111]">
               {pageTitle}
@@ -67,7 +69,7 @@ export function DashboardHeader({
               variant="ghost"
               size="icon"
               className="rounded-[9px] text-[#69696d] data-[state=open]:bg-[#f4f4f1] data-[state=open]:text-[#111111]"
-              aria-label="Открыть уведомления"
+              aria-label={t('Открыть уведомления')}
             >
               <Notification aria-hidden />
             </Button>
@@ -79,7 +81,7 @@ export function DashboardHeader({
           >
             <div className="border-b border-[#ededeb] px-5 py-4">
               <h2 className="text-sm font-semibold tracking-[-0.015em] text-[#111111]">
-                Уведомления
+                {t('Уведомления')}
               </h2>
             </div>
             <div className="flex flex-col items-center px-5 py-10 text-center">
@@ -91,10 +93,10 @@ export function DashboardHeader({
                 />
               </span>
               <p className="mt-4 text-sm font-semibold text-[#111111]">
-                Пока нет уведомлений
+                {t('Пока нет уведомлений')}
               </p>
               <p className="mt-1 max-w-[240px] text-xs leading-5 text-[#808084]">
-                Новые сообщения и напоминания появятся здесь.
+                {t('Новые сообщения и напоминания появятся здесь.')}
               </p>
             </div>
           </PopoverContent>
@@ -107,13 +109,13 @@ export function DashboardHeader({
         >
           <Link
             to={user ? '/profile' : '/login'}
-            aria-label={user ? 'Открыть профиль' : 'Войти в аккаунт'}
+            aria-label={user ? t('Открыть профиль') : t('Войти в аккаунт')}
           >
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
               <User className="size-[17px]" strokeWidth={1.8} aria-hidden />
             </span>
             <span className="hidden text-sm font-semibold sm:inline">
-              {user ? accountName : 'Войти в аккаунт'}
+              {user ? accountName : t('Войти в аккаунт')}
             </span>
           </Link>
         </Button>

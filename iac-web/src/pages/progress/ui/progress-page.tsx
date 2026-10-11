@@ -13,6 +13,7 @@ import type { SkillId } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
 
 import { formatDateTime } from '@/lib/date'
+import { useLanguage } from '@/lib/i18n'
 
 const skillLabels: Record<SkillId, string> = {
   listening: 'Listening',
@@ -21,9 +22,11 @@ const skillLabels: Record<SkillId, string> = {
   speaking: 'Speaking',
 }
 
-const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none min-w-0 max-w-full overflow-hidden'
+const cardClassName =
+  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none min-w-0 max-w-full overflow-hidden'
 
 export function ProgressPage() {
+  const { language, t } = useLanguage()
   const dashboardQuery = useQuery({
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
@@ -60,13 +63,13 @@ export function ProgressPage() {
   ])
 
   if (dashboardQuery.isPending) {
-    return <LoadingState label="Загружаем прогресс…" />
+    return <LoadingState label={t('Загружаем прогресс…')} />
   }
   if (dashboardQuery.isError) {
     return (
       <ErrorState
-        title="Не удалось загрузить прогресс"
-        message={getErrorMessage(dashboardQuery.error)}
+        title={t('Не удалось загрузить прогресс')}
+        message={t(getErrorMessage(dashboardQuery.error))}
         onRetry={() => void dashboardQuery.refetch()}
       />
     )
@@ -82,14 +85,14 @@ export function ProgressPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
       <div>
         <h2 className="text-base sm:text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Отслеживайте свою динамику
+          {t('Отслеживайте свою динамику')}
         </h2>
       </div>
 
       <Card className={cardClassName}>
         <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
           <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-            Уровень по навыкам
+            {t('Уровень по навыкам')}
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2.5 sm:gap-3 p-3 sm:p-5 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
@@ -110,8 +113,12 @@ export function ProgressPage() {
               </div>
               <p className="mt-1 sm:mt-2 truncate text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
                 {progress.completedTasks === 0
-                  ? 'Нет выполненных заданий'
-                  : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
+                  ? t('Нет выполненных заданий')
+                  : language === 'en'
+                    ? `${progress.completedTasks} tasks · ${progress.accuracyPercent ?? 0}% accuracy`
+                    : language === 'kk'
+                      ? `${progress.completedTasks} тапсырма · дәлдігі ${progress.accuracyPercent ?? 0}%`
+                      : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
               </p>
             </div>
           ))}
@@ -121,16 +128,16 @@ export function ProgressPage() {
       <Card className={cardClassName}>
         <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
           <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-            История попыток
+            {t('История попыток')}
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2.5 sm:gap-3 p-3 sm:p-5 min-w-0">
           {attemptsPending ? (
-            <LoadingState label="Загружаем историю попыток…" />
+            <LoadingState label={t('Загружаем историю попыток…')} />
           ) : attemptsError ? (
             <ErrorState
-              title="Не удалось загрузить историю"
-              message={getErrorMessage(attemptsError)}
+              title={t('Не удалось загрузить историю')}
+              message={t(getErrorMessage(attemptsError))}
               onRetry={() => {
                 void attemptsQuery.refetch()
               }}
@@ -138,10 +145,10 @@ export function ProgressPage() {
           ) : attempts.length === 0 ? (
             <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-8 text-center">
               <p className="text-sm font-semibold text-[#111111]">
-                Попыток пока нет
+                {t('Попыток пока нет')}
               </p>
               <p className="mt-1 text-xs leading-5 text-[#808084]">
-                Пройдите первый тест в разделе Listening или Reading.
+                {t('Пройдите первый тест в разделе Listening или Reading.')}
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <Button asChild variant="outline" className="shadow-none">
@@ -163,10 +170,10 @@ export function ProgressPage() {
                 onClick={() => void fetchNextPage()}
               >
                 {isFetchingNextPage
-                  ? 'Загружаем историю…'
+                  ? t('Загружаем историю…')
                   : attemptsQuery.isFetchNextPageError
-                    ? 'Повторить загрузку истории'
-                    : 'Показать ещё'}
+                    ? t('Повторить загрузку истории')
+                    : t('Показать ещё')}
               </Button>
             </div>
           ) : null}
@@ -177,12 +184,16 @@ export function ProgressPage() {
 }
 
 function AttemptRow({ item }: { item: AttemptListItem }) {
+  const { t } = useLanguage()
   const submitted = item.status === 'SUBMITTED'
   const processing = item.status === 'PROCESSING'
   return (
     <div className="flex flex-col gap-2 rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-white p-3 sm:p-4 min-w-0 w-full sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs sm:text-sm font-semibold text-[#111111]" title={item.testTitle}>
+        <p
+          className="truncate text-xs sm:text-sm font-semibold text-[#111111]"
+          title={item.testTitle}
+        >
           {item.testTitle}
         </p>
         <p className="mt-0.5 sm:mt-1 truncate text-[11px] sm:text-xs text-[#808084]">
@@ -191,14 +202,18 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
           {submitted
             ? ''
             : processing
-              ? ' · на проверке ИИ'
-              : ' · не завершена'}
+              ? ` · ${t('на проверке ИИ')}`
+              : ` · ${t('не завершена')}`}
         </p>
       </div>
       <div className="flex items-center justify-between gap-3 shrink-0 sm:justify-end">
         {processing ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3b82f6]">
-            <svg className="size-3 animate-spin" viewBox="0 0 24 24" fill="none">
+            <svg
+              className="size-3 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
               <circle
                 className="opacity-25"
                 cx="12"
@@ -213,7 +228,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            Проверяется
+            {t('Проверяется')}
           </span>
         ) : null}
         {submitted ? (
@@ -228,49 +243,74 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
           </p>
         ) : null}
         {submitted || processing ? (
-          <Button asChild variant="outline" size="sm" className="shadow-none shrink-0">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shadow-none shrink-0"
+          >
             <Link to="/attempts/$attemptId" params={{ attemptId: item.id }}>
-              {processing ? 'Статус' : 'Разбор'}
+              {processing ? t('Статус') : t('Разбор')}
               <ArrowRight aria-hidden />
             </Link>
           </Button>
         ) : item.materialType === 'listening' ? (
-          <Button asChild variant="outline" size="sm" className="shadow-none shrink-0">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shadow-none shrink-0"
+          >
             <Link
               to="/exam/listening/$testId"
               params={{ testId: item.materialId }}
             >
-              Продолжить
+              {t('Продолжить')}
               <ArrowRight aria-hidden />
             </Link>
           </Button>
         ) : item.materialType === 'reading' ? (
-          <Button asChild variant="outline" size="sm" className="shadow-none shrink-0">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shadow-none shrink-0"
+          >
             <Link
               to="/exam/reading/$materialId"
               params={{ materialId: item.materialId }}
             >
-              Продолжить
+              {t('Продолжить')}
               <ArrowRight aria-hidden />
             </Link>
           </Button>
         ) : item.materialType === 'writing' ? (
-          <Button asChild variant="outline" size="sm" className="shadow-none shrink-0">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shadow-none shrink-0"
+          >
             <Link
               to="/exam/writing/$materialId"
               params={{ materialId: item.materialId }}
             >
-              Продолжить
+              {t('Продолжить')}
               <ArrowRight aria-hidden />
             </Link>
           </Button>
         ) : (
-          <Button asChild variant="outline" size="sm" className="shadow-none shrink-0">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shadow-none shrink-0"
+          >
             <Link
               to="/exam/speaking/$materialId"
               params={{ materialId: item.materialId }}
             >
-              Продолжить
+              {t('Продолжить')}
               <ArrowRight aria-hidden />
             </Link>
           </Button>

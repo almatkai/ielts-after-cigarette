@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { LoginForm } from './login-form'
+import { useLanguage } from '@/lib/i18n'
 
 export function LoginDialog({
   open,
@@ -19,6 +20,7 @@ export function LoginDialog({
   trigger: HTMLElement | null
   description?: string
 }) {
+  const { t } = useLanguage()
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -28,8 +30,12 @@ export function LoginDialog({
           if (trigger?.isConnected) trigger.focus()
         }}
       >
-        <DialogTitle className="sr-only">Войти или создать аккаунт</DialogTitle>
-        <DialogDescription className="sr-only">{description}</DialogDescription>
+        <DialogTitle className="sr-only">
+          {t('Войти или создать аккаунт')}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t(description)}
+        </DialogDescription>
         <LoginForm
           description={description}
           onSuccess={onSuccess}

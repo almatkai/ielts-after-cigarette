@@ -48,6 +48,7 @@ import {
   PreviewAnswer,
   PreviewEvidenceText,
 } from '@/features/admin/preview-answer'
+import { useLanguage } from '@/lib/i18n'
 
 const tfngValues = ['TRUE', 'FALSE', 'NOT_GIVEN'] as const
 const ynngValues = ['YES', 'NO', 'NOT_GIVEN'] as const
@@ -59,11 +60,14 @@ export function ReadingStudentPage({
   materialId: string
   fullMockSessionId?: string
 }) {
+  const { t } = useLanguage()
   return (
     <ExamAttemptShell<PublicReadingMaterial>
       skillBadge="IELTS Reading"
-      loadingLabel="Готовим материал…"
-      loadingDescription="Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов."
+      loadingLabel={t('Готовим материал…')}
+      loadingDescription={t(
+        'Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов.',
+      )}
       queryKey={attemptStartQueryKey('reading', materialId)}
       startAttemptFn={(signal) => startReadingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
@@ -192,6 +196,7 @@ function ReadingTestRunner({
   timerEnabled?: boolean
   answerKeys?: PreviewAnswerKeys
 }) {
+  const { language, t } = useLanguage()
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [revealedQuestionId, setRevealedQuestionId] = useState<string | null>(
     null,
@@ -318,7 +323,7 @@ function ReadingTestRunner({
   if (session.loadError) {
     return (
       <ErrorState
-        title="Не удалось восстановить ответы"
+        title={t('Не удалось восстановить ответы')}
         message={session.loadError}
         onRetry={session.retryLoad}
       />
@@ -328,8 +333,10 @@ function ReadingTestRunner({
     return (
       <ExamLoadingScreen
         badge="IELTS Reading"
-        label="Готовим чтение…"
-        description="Загружаем пассажи, формируем группы вопросов и восстанавливаем сохранённые ответы…"
+        label={t('Готовим чтение…')}
+        description={t(
+          'Загружаем пассажи, формируем группы вопросов и восстанавливаем сохранённые ответы…',
+        )}
       />
     )
   }
@@ -379,7 +386,7 @@ function ReadingTestRunner({
                 params={{ materialId: material.id }}
               >
                 <ArrowLeft className="size-4" aria-hidden />
-                <span>К редактору</span>
+                <span>{t('К редактору')}</span>
               </Link>
             ) : fullMockSessionId ? (
               <Link
@@ -387,12 +394,12 @@ function ReadingTestRunner({
                 params={{ sessionId: fullMockSessionId }}
               >
                 <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К Full Mock</span>
+                <span className="hidden sm:inline">{t('К Full Mock')}</span>
               </Link>
             ) : (
               <Link to="/reading">
                 <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К Reading</span>
+                <span className="hidden sm:inline">{t('К Reading')}</span>
               </Link>
             )}
           </Button>
@@ -429,7 +436,9 @@ function ReadingTestRunner({
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                   )}
                 >
-                  <span>Раздел {passageIndex + 1}</span>
+                  <span>
+                    {t('Раздел')} {passageIndex + 1}
+                  </span>
                   <span
                     className={cn(
                       'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
@@ -464,7 +473,9 @@ function ReadingTestRunner({
               onClick={handleContinueLater}
               className="rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
             >
-              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+              {session.isSavingAndExiting
+                ? t('Сохраняем…')
+                : t('Продолжить позже')}
             </Button>
           ) : null}
           {!preview ? (
@@ -475,22 +486,30 @@ function ReadingTestRunner({
                   disabled={session.isSubmitting}
                   className="bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
                 >
-                  {session.isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+                  {session.isSubmitting
+                    ? t('Отправляем…')
+                    : t('Завершить тест')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Завершить попытку?</AlertDialogTitle>
+                  <AlertDialogTitle>{t('Завершить попытку?')}</AlertDialogTitle>
                   <AlertDialogDescription>
                     {answeredCount < totalQuestions
-                      ? `Вы ответили на ${answeredCount} из ${totalQuestions} вопросов. Неотвеченные вопросы будут засчитаны как неверные.`
-                      : 'Все вопросы отвечены. Вы уверены, что хотите завершить тест и перейти к результатам?'}
+                      ? language === 'en'
+                        ? `You answered ${answeredCount} of ${totalQuestions} questions. Unanswered questions will be marked incorrect.`
+                        : language === 'kk'
+                          ? `${totalQuestions} сұрақтың ${answeredCount}-іне жауап бердіңіз. Жауапсыз сұрақтар қате деп есептеледі.`
+                          : `Вы ответили на ${answeredCount} из ${totalQuestions} вопросов. Неотвеченные вопросы будут засчитаны как неверные.`
+                      : t(
+                          'Все вопросы отвечены. Вы уверены, что хотите завершить тест и перейти к результатам?',
+                        )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Продолжить тест</AlertDialogCancel>
+                  <AlertDialogCancel>{t('Продолжить тест')}</AlertDialogCancel>
                   <AlertDialogAction onClick={session.submit}>
-                    Завершить
+                    {t('Завершить')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -504,7 +523,7 @@ function ReadingTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
         >
-          Не удалось сохранить черновик: {session.exitError}
+          {t('Не удалось сохранить черновик:')} {t(session.exitError)}
         </p>
       ) : null}
 
@@ -513,7 +532,7 @@ function ReadingTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
         >
-          Не удалось отправить тест: {session.submitError}
+          {t('Не удалось отправить тест:')} {t(session.submitError)}
         </p>
       ) : null}
 
@@ -525,8 +544,8 @@ function ReadingTestRunner({
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
                 {passages.length > 1
-                  ? `Раздел ${currentPassageIndex + 1}`
-                  : 'Текст'}
+                  ? `${t('Раздел')} ${currentPassageIndex + 1}`
+                  : t('Текст')}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {currentPassage.title}
@@ -543,7 +562,7 @@ function ReadingTestRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Уменьшить шрифт"
+                title={t('Уменьшить шрифт')}
               >
                 A-
               </button>
@@ -556,7 +575,7 @@ function ReadingTestRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Стандартный шрифт"
+                title={t('Стандартный шрифт')}
               >
                 A
               </button>
@@ -569,7 +588,7 @@ function ReadingTestRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Увеличить шрифт"
+                title={t('Увеличить шрифт')}
               >
                 A+
               </button>
@@ -591,7 +610,7 @@ function ReadingTestRunner({
                   quote={revealedQuote}
                 />
               ) : (
-                'Текст раздела ещё не добавлен. Вернитесь в редактор.'
+                t('Текст раздела ещё не добавлен. Вернитесь в редактор.')
               )}
             </div>
           </div>
@@ -604,19 +623,19 @@ function ReadingTestRunner({
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
                   {passages.length > 1
-                    ? `Раздел ${currentPassageIndex + 1}`
-                    : 'Вопросы'}
+                    ? `${t('Раздел')} ${currentPassageIndex + 1}`
+                    : t('Вопросы')}
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
-                  {currentPassage.questionGroups.length}{' '}
-                  {currentPassage.questionGroups.length === 1
-                    ? 'группа'
-                    : 'групп'}{' '}
-                  вопросов
+                  {language === 'en'
+                    ? `${currentPassage.questionGroups.length} question groups`
+                    : language === 'kk'
+                      ? `${currentPassage.questionGroups.length} сұрақ тобы`
+                      : `${currentPassage.questionGroups.length} ${currentPassage.questionGroups.length === 1 ? 'группа' : 'групп'} вопросов`}
                 </span>
               </div>
               <span className="text-xs font-semibold text-slate-500">
-                Вопрос {currentNumber} из {totalQuestions}
+                {t('Вопрос')} {currentNumber} {t('из')} {totalQuestions}
               </span>
             </div>
           </div>
@@ -626,7 +645,7 @@ function ReadingTestRunner({
               (group) => group.questions.length === 0,
             ) ? (
               <p role="status" className="text-sm text-amber-700">
-                В этом разделе ещё нет вопросов. Добавьте их в редакторе.
+                {t('В этом разделе ещё нет вопросов. Добавьте их в редакторе.')}
               </p>
             ) : null}
             {currentPassage.questionGroups.map((group) => (
@@ -680,15 +699,15 @@ function ReadingTestRunner({
               onClick={() => setActiveQuestionIndex((index) => index - 1)}
               className="gap-1.5 rounded-[10px] text-xs font-medium border-[#e7e7e4] bg-white hover:bg-slate-50"
             >
-              ← Назад
+              ← {t('Назад')}
             </Button>
             <div className="flex items-center gap-2">
               <span className="text-xs text-[#69696d] font-medium">
-                Вопрос {currentNumber} из {totalQuestions}
+                {t('Вопрос')} {currentNumber} {t('из')} {totalQuestions}
               </span>
               {passages.length > 1 && (
                 <span className="text-xs text-slate-400">
-                  · Раздел {currentPassageIndex + 1}
+                  · {t('Раздел')} {currentPassageIndex + 1}
                 </span>
               )}
             </div>
@@ -701,7 +720,7 @@ function ReadingTestRunner({
               onClick={() => setActiveQuestionIndex((index) => index + 1)}
               className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 text-xs font-medium shadow-xs"
             >
-              Далее →
+              {t('Далее')} →
             </Button>
           </div>
         </Card>
@@ -735,9 +754,11 @@ function ReadingTestRunner({
                         ? 'bg-[#3b82f6] text-white shadow-xs'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
                     )}
-                    title={`Раздел ${pIdx + 1}: ${pAnswered}/${pQuestions.length} отвечено`}
+                    title={`${t('Раздел')} ${pIdx + 1}: ${pAnswered}/${pQuestions.length} ${t('отвечено')}`}
                   >
-                    <span>Раздел {pIdx + 1}</span>
+                    <span>
+                      {t('Раздел')} {pIdx + 1}
+                    </span>
                     <span
                       className={cn(
                         'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
@@ -780,7 +801,7 @@ function ReadingTestRunner({
                         ? 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
                         : 'border-[#e7e7e4] bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
                   )}
-                  title={`Вопрос ${label}${answered ? ' (отвечен)' : ''}`}
+                  title={`${t('Вопрос')} ${label}${answered ? ` (${t('отвечен')})` : ''}`}
                 >
                   {label}
                 </button>
@@ -793,20 +814,19 @@ function ReadingTestRunner({
         <div className="flex items-center gap-3 shrink-0 text-xs text-slate-600 font-medium">
           {passages.length > 1 && (
             <span className="text-slate-500 hidden sm:inline">
-              В разделе:{' '}
+              {t('В разделе:')}{' '}
               <strong className="text-slate-800">
                 {activePassageAnsweredCount}
               </strong>{' '}
-              из {activePassageQuestions.length}
+              {t('из')} {activePassageQuestions.length}
               <span className="mx-2 text-slate-300">|</span>
             </span>
           )}
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-blue-600" />
-            Всего: <strong className="text-slate-800">
-              {answeredCount}
-            </strong>{' '}
-            из {totalQuestions}
+            {t('Всего:')}{' '}
+            <strong className="text-slate-800">{answeredCount}</strong>{' '}
+            {t('из')} {totalQuestions}
           </span>
         </div>
       </div>
@@ -973,6 +993,7 @@ function CleanStudentQuestion({
   onAnswer: (questionId: string, answer: StudentAnswer) => void
   preview?: boolean
 }) {
+  const { language, t } = useLanguage()
   const questionId = question.id
   const options = (question.content.options ?? []) as Option[]
   const values =
@@ -1055,7 +1076,11 @@ function CleanStudentQuestion({
         {prompt}
         {isMulti ? (
           <p className="text-xs font-medium text-slate-500">
-            Выберите до {limit} вариантов:
+            {language === 'en'
+              ? `Choose up to ${limit} options:`
+              : language === 'kk'
+                ? `${limit} нұсқаға дейін таңдаңыз:`
+                : `${t('Выберите до')} ${limit} ${t('вариантов:')}`}
           </p>
         ) : null}
         <div className="grid gap-2.5 pt-1">
@@ -1129,13 +1154,13 @@ function CleanStudentQuestion({
               onAnswer(questionId, { value: event.target.value })
             }
           }}
-          placeholder="Введите ваш ответ здесь…"
+          placeholder={t('Введите ваш ответ здесь…')}
           className="h-11 rounded-xl border-slate-200 bg-white px-4 text-base focus-visible:border-blue-500 focus-visible:ring-blue-500/20"
         />
         <p className="mt-1.5 text-xs text-slate-400">
           {preview
-            ? 'Пробный ответ хранится только на этой странице'
-            : 'Ответ автоматически сохраняется по мере ввода'}
+            ? t('Пробный ответ хранится только на этой странице')
+            : t('Ответ автоматически сохраняется по мере ввода')}
         </p>
       </div>
     </div>

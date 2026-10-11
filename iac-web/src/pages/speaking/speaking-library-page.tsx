@@ -16,8 +16,10 @@ import {
   speakingKeys,
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function SpeakingLibraryPage() {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const query = useQuery({
     queryKey: speakingKeys.publicMaterials,
@@ -31,19 +33,20 @@ export function SpeakingLibraryPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <h1 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Выберите Speaking-тренировку
+          {t('Выберите Speaking-тренировку')}
         </h1>
         <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Пройдите Parts 1–3 с таймерами, запишите ответы и получите расшифровку
-          с разбором по критериям IELTS.
+          {t(
+            'Пройдите Parts 1–3 с таймерами, запишите ответы и получите расшифровку с разбором по критериям IELTS.',
+          )}
         </p>
       </div>
       {query.isPending ? (
         <LibraryCardsSkeleton />
       ) : query.isError ? (
         <ErrorState
-          title="Не удалось загрузить Speaking-материалы"
-          message={getErrorMessage(query.error)}
+          title={t('Не удалось загрузить Speaking-материалы')}
+          message={t(getErrorMessage(query.error))}
           onRetry={() => void query.refetch()}
         />
       ) : materials.length === 0 ? (
@@ -75,7 +78,7 @@ export function SpeakingLibraryPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
-                      Сложность: {material.difficulty}
+                      {t('Сложность')}: {material.difficulty}
                     </p>
                     {material.description ? (
                       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#69696d]">
@@ -94,7 +97,7 @@ export function SpeakingLibraryPage() {
                         to="/exam/speaking/$materialId"
                         params={{ materialId: material.id }}
                       >
-                        Начать Speaking
+                        {t('Начать Speaking')}
                       </Link>
                     </Button>
                   ) : (

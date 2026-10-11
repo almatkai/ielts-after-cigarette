@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/card'
 import { getDashboard, queryKeys } from '@/features/ielts/api'
 import { GoalDialog } from '@/features/ielts/goal-form'
+import { useLanguage } from '@/lib/i18n'
 import { UnfinishedTestBanner } from './unfinished-test-banner'
 
 import type { SkillId } from '@/features/ielts/api'
@@ -81,6 +82,7 @@ export function OverviewPage() {
 }
 
 function AccountOverviewPage() {
+  const { language, t } = useLanguage()
   const dashboardQuery = useQuery({
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
@@ -90,7 +92,7 @@ function AccountOverviewPage() {
     return (
       <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
         <CardContent className="p-8 text-center text-sm text-[#69696d]">
-          Загружаем ваш dashboard…
+          {t('Загружаем ваш dashboard…')}
         </CardContent>
       </Card>
     )
@@ -102,10 +104,10 @@ function AccountOverviewPage() {
         <CardContent className="flex flex-col items-center p-8 text-center">
           <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
           <p className="mt-3 text-sm font-semibold text-[#111111]">
-            Не удалось загрузить dashboard
+            {t('Не удалось загрузить dashboard')}
           </p>
           <p className="mt-1 text-sm text-[#69696d]">
-            Проверьте соединение с сервером и попробуйте ещё раз.
+            {t('Проверьте соединение с сервером и попробуйте ещё раз.')}
           </p>
           <Button
             type="button"
@@ -113,7 +115,7 @@ function AccountOverviewPage() {
             className="mt-5"
             onClick={() => void dashboardQuery.refetch()}
           >
-            Повторить
+            {t('Повторить')}
           </Button>
         </CardContent>
       </Card>
@@ -123,36 +125,36 @@ function AccountOverviewPage() {
   const dashboard = dashboardQuery.data
   const overviewMetrics = [
     {
-      label: 'Текущий уровень',
+      label: t('Текущий уровень'),
       value:
         dashboard.profile.currentBand === null
           ? '—'
           : dashboard.profile.currentBand.toFixed(1),
       hint:
         dashboard.profile.currentBand === null
-          ? 'Появится после диагностики'
-          : 'Расчётный IELTS Band',
+          ? t('Появится после диагностики')
+          : t('Расчётный IELTS Band'),
       icon: Speedometer,
     },
     {
-      label: 'Целевой балл',
+      label: t('Целевой балл'),
       value:
         dashboard.profile.targetBand === null
           ? '—'
           : dashboard.profile.targetBand.toFixed(1),
       hint:
         dashboard.profile.targetBand === null
-          ? 'Укажите цель в диалоге «Настроить цель»'
-          : 'Ваша текущая цель',
+          ? t('Укажите цель в диалоге «Настроить цель»')
+          : t('Ваша текущая цель'),
       icon: DirectRight,
     },
     {
-      label: 'Дата экзамена',
+      label: t('Дата экзамена'),
       value: formatExamDate(dashboard.profile.examDate),
       hint:
         dashboard.profile.examDate === null
-          ? 'Добавьте дату в диалоге «Настроить цель»'
-          : 'Запланированная дата',
+          ? t('Добавьте дату в диалоге «Настроить цель»')
+          : t('Запланированная дата'),
       icon: Calendar,
     },
   ] as const
@@ -166,7 +168,7 @@ function AccountOverviewPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
       <section
         className="grid min-w-0 gap-2.5 sm:gap-4 sm:grid-cols-3"
-        aria-label="Основные показатели"
+        aria-label={t('Основные показатели')}
       >
         {overviewMetrics.map((metric) => {
           const Icon = metric.icon
@@ -213,13 +215,13 @@ function AccountOverviewPage() {
               />
               <div className="relative max-w-[620px]">
                 <Badge className="border border-[#dbeafe] bg-[#eff6ff] px-2 py-0.5 text-[11px] sm:text-xs text-[#1d4ed8] shadow-none hover:bg-[#eff6ff]">
-                  Рекомендуемый шаг
+                  {t('Рекомендуемый шаг')}
                 </Badge>
                 <h2 className="mt-2.5 sm:mt-5 text-base sm:text-[clamp(1.65rem,3vw,2.35rem)] leading-snug sm:leading-[1.08] font-semibold tracking-tight sm:tracking-[-0.045em] text-[#111111]">
-                  {dashboard.recommendedAction.title}
+                  {t(dashboard.recommendedAction.title)}
                 </h2>
                 <p className="mt-1.5 sm:mt-3 max-w-[560px] text-xs sm:text-[15px] leading-5 sm:leading-6 text-[#69696d]">
-                  {dashboard.recommendedAction.description}
+                  {t(dashboard.recommendedAction.description)}
                 </p>
                 <div className="mt-3.5 sm:mt-6 flex flex-col gap-2 sm:flex-row">
                   <Button
@@ -227,7 +229,7 @@ function AccountOverviewPage() {
                     className="h-9 sm:h-11 rounded-[9px] bg-[#3b82f6] px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-[#2563eb]"
                   >
                     <Link to={recommendedTarget}>
-                      Перейти к следующему шагу
+                      {t('Перейти к следующему шагу')}
                       <ArrowRight aria-hidden />
                     </Link>
                   </Button>
@@ -237,7 +239,7 @@ function AccountOverviewPage() {
                       variant="outline"
                       className="h-9 sm:h-11 rounded-[9px] border-[#deded9] bg-white px-4 sm:px-5 text-xs sm:text-sm shadow-none"
                     >
-                      Настроить цель
+                      {t('Настроить цель')}
                     </Button>
                   </GoalDialog>
                 </div>
@@ -256,10 +258,12 @@ function AccountOverviewPage() {
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    Прогресс по навыкам
+                    {t('Прогресс по навыкам')}
                   </CardTitle>
                   <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
-                    Общая картина по Listening, Reading, Writing и Speaking.
+                    {t(
+                      'Общая картина по Listening, Reading, Writing и Speaking.',
+                    )}
                   </CardDescription>
                 </div>
               </div>
@@ -282,8 +286,12 @@ function AccountOverviewPage() {
                   </div>
                   <p className="mt-1 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
                     {progress.completedTasks === 0
-                      ? 'Нет выполненных заданий'
-                      : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
+                      ? t('Нет выполненных заданий')
+                      : language === 'en'
+                        ? `${progress.completedTasks} tasks · ${progress.accuracyPercent ?? 0}% accuracy`
+                        : language === 'kk'
+                          ? `${progress.completedTasks} тапсырма · дәлдігі ${progress.accuracyPercent ?? 0}%`
+                          : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
                   </p>
                 </div>
               ))}
@@ -292,7 +300,7 @@ function AccountOverviewPage() {
                 variant="outline"
                 className="h-9 sm:h-10 rounded-[9px] border-[#deded9] bg-white px-4 text-xs sm:text-sm shadow-none sm:col-span-2"
               >
-                <Link to="/progress">Открыть прогресс</Link>
+                <Link to="/progress">{t('Открыть прогресс')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -310,7 +318,7 @@ function AccountOverviewPage() {
                 </span>
                 <div className="min-w-0">
                   <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    План на сегодня
+                    {t('План на сегодня')}
                   </CardTitle>
                 </div>
               </div>
@@ -324,10 +332,10 @@ function AccountOverviewPage() {
                     aria-hidden
                   />
                   <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-[#111111]">
-                    Заданий пока нет
+                    {t('Заданий пока нет')}
                   </p>
                   <p className="mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
-                    Добавьте первое занятие в план.
+                    {t('Добавьте первое занятие в план.')}
                   </p>
                 </div>
               ) : (
@@ -352,7 +360,7 @@ function AccountOverviewPage() {
                 variant="outline"
                 className="mt-3 sm:mt-4 h-9 sm:h-10 w-full rounded-[9px] border-[#deded9] bg-white text-xs sm:text-sm shadow-none"
               >
-                <Link to="/plan">Настроить план</Link>
+                <Link to="/plan">{t('Настроить план')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -360,7 +368,7 @@ function AccountOverviewPage() {
           <Card className={cardClassName}>
             <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
               <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                Быстрые действия
+                {t('Быстрые действия')}
               </CardTitle>
             </CardHeader>
             <CardContent className="divide-y divide-[#ededeb] p-0">
@@ -381,10 +389,10 @@ function AccountOverviewPage() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-xs sm:text-sm font-semibold">
-                        {action.label}
+                        {t(action.label)}
                       </span>
                       <span className="mt-0.5 block text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
-                        {action.description}
+                        {t(action.description)}
                       </span>
                     </span>
                     <ArrowRight

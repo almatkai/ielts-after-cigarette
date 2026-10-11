@@ -8,6 +8,7 @@ import { AiAssistantFloatingWidget } from './ai-assistant-widget'
 import { LoginDialog } from '@/components/auth/login-dialog'
 import type { MouseEvent } from 'react'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 const accountDestinations = [
   '/listening',
@@ -85,6 +86,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
     await router.invalidate()
   }
   const [navigationIsOpen, setNavigationIsOpen] = useState(false)
+  const { t } = useLanguage()
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -120,7 +122,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
             type="button"
             className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
             onClick={() => setNavigationIsOpen(false)}
-            aria-label="Закрыть меню"
+            aria-label={t('Закрыть меню')}
           />
           <DashboardSidebar
             id="dashboard-mobile-navigation"
@@ -134,7 +136,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
       <div className="min-h-screen lg:pl-[260px] min-w-0 overflow-x-clip">
         <DashboardHeader
-          pageTitle={pageTitle}
+          pageTitle={pageTitle ? t(pageTitle) : null}
           onOpenNavigation={() => setNavigationIsOpen(true)}
         />
         <main className="min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] p-3 sm:p-7 lg:p-9 min-w-0 max-w-full overflow-x-clip">

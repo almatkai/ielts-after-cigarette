@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-store'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/lib/i18n'
-import { LanguagePicker } from '@/components/ui/language-picker'
 
 import {
   primaryDashboardNavigation,
@@ -88,9 +87,6 @@ export function DashboardSidebar({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5">
-        <div className="mb-5">
-          <LanguagePicker compact />
-        </div>
         <p className="px-3.5 pb-3 text-[11px] font-semibold tracking-[0.09em] text-[#9a9a9d] uppercase">
           {t('Обучение')}
         </p>

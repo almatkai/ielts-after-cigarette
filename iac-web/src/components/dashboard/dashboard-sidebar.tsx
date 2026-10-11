@@ -88,6 +88,9 @@ export function DashboardSidebar({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5">
+        <div className="mb-5">
+          <LanguagePicker compact />
+        </div>
         <p className="px-3.5 pb-3 text-[11px] font-semibold tracking-[0.09em] text-[#9a9a9d] uppercase">
           {t('Обучение')}
         </p>
@@ -220,9 +223,6 @@ export function DashboardSidebar({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <div className="pt-3">
-            <LanguagePicker compact />
-          </div>
         </div>
       </div>
     </aside>

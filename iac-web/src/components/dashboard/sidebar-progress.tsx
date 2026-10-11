@@ -7,29 +7,31 @@ import {
 import { BandChange } from '@/features/attempts/band-change'
 import { useAttemptHistory } from '@/features/attempts/use-attempt-history'
 import { formatDateTime } from '@/lib/date'
+import { useLanguage } from '@/lib/i18n'
 
 export function SidebarProgress({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useLanguage()
   const query = useAttemptHistory()
   const items = completedAttempts(
     query.data?.pages.flatMap((page) => page.items) ?? [],
   )
   return (
-    <section aria-label="История прогресса" className="mt-auto pt-8 pb-4">
+    <section aria-label={t('История прогресса')} className="mt-auto pt-8 pb-4">
       <div className="flex items-center justify-between gap-2 px-3.5">
         <h2 className="text-[11px] font-semibold text-[#808084]">
-          История прогресса
+          {t('История прогресса')}
         </h2>
         <Link
           to="/progress"
           onClick={onNavigate}
           className="text-[11px] font-medium text-[#2563eb] hover:underline"
         >
-          Вся история
+          {t('Вся история')}
         </Link>
       </div>
       {query.isPending ? (
         <p className="px-3.5 pt-3 text-xs text-[#808084]">
-          Загружаем результаты…
+          {t('Загружаем результаты…')}
         </p>
       ) : query.isError ? (
         <button
@@ -37,11 +39,13 @@ export function SidebarProgress({ onNavigate }: { onNavigate?: () => void }) {
           onClick={() => void query.refetch()}
           className="px-3.5 pt-3 text-left text-xs text-[#69696d] hover:text-[#2563eb]"
         >
-          Не удалось загрузить. Повторить
+          {t('Не удалось загрузить. Повторить')}
         </button>
       ) : items.length === 0 ? (
         <p className="px-3.5 pt-3 text-xs leading-5 text-[#808084]">
-          После первого теста здесь появятся оценки и изменения результата.
+          {t(
+            'После первого теста здесь появятся оценки и изменения результата.',
+          )}
         </p>
       ) : (
         <div className="mt-2 space-y-1">

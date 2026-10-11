@@ -18,6 +18,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-store'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
+import { LanguagePicker } from '@/components/ui/language-picker'
 
 import {
   primaryDashboardNavigation,
@@ -44,6 +46,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const navigate = useNavigate()
   const auth = useAuth()
+  const { t } = useLanguage()
   const [logoutIsPending, setLogoutIsPending] = useState(false)
 
   const location = useLocation()
@@ -62,7 +65,7 @@ export function DashboardSidebar({
   return (
     <aside
       id={id}
-      aria-label="Основная навигация приложения"
+      aria-label={t('Основная навигация приложения')}
       className={cn(
         'flex h-full w-[260px] flex-col border-r border-[#eeeeeb] bg-[#fafaf8]',
         className,
@@ -77,7 +80,7 @@ export function DashboardSidebar({
             size="icon"
             onClick={onClose}
             className="rounded-[9px] text-[#69696d]"
-            aria-label="Закрыть меню"
+            aria-label={t('Закрыть меню')}
           >
             <CloseSquare aria-hidden />
           </Button>
@@ -86,9 +89,9 @@ export function DashboardSidebar({
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5">
         <p className="px-3.5 pb-3 text-[11px] font-semibold tracking-[0.09em] text-[#9a9a9d] uppercase">
-          Обучение
+          {t('Обучение')}
         </p>
-        <nav className="space-y-1" aria-label="Основная навигация">
+        <nav className="space-y-1" aria-label={t('Основная навигация')}>
           {primaryDashboardNavigation.map((item) => {
             const Icon = item.icon
             const isRelatedActive =
@@ -125,7 +128,7 @@ export function DashboardSidebar({
                   strokeWidth={1.8}
                   aria-hidden
                 />
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </Link>
             )
           })}
@@ -153,7 +156,7 @@ export function DashboardSidebar({
                 strokeWidth={1.8}
                 aria-hidden
               />
-              <span>Администрирование</span>
+              <span>{t('Администрирование')}</span>
             </Link>
           ) : null}
           <Link
@@ -175,7 +178,7 @@ export function DashboardSidebar({
               strokeWidth={1.8}
               aria-hidden
             />
-            <span>{settingsDashboardNavigation.label}</span>
+            <span>{t(settingsDashboardNavigation.label)}</span>
           </Link>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -188,7 +191,7 @@ export function DashboardSidebar({
                   strokeWidth={1.8}
                   aria-hidden
                 />
-                <span>Выйти</span>
+                <span>{t('Выйти')}</span>
               </button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -196,26 +199,30 @@ export function DashboardSidebar({
                 <span className="mb-2 grid size-11 place-items-center rounded-[11px] bg-[#eff6ff] text-[#3b82f6]">
                   <Logout className="size-5" strokeWidth={1.8} aria-hidden />
                 </span>
-                <AlertDialogTitle>Выйти из аккаунта?</AlertDialogTitle>
+                <AlertDialogTitle>{t('Выйти из аккаунта?')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Чтобы продолжить подготовку, потребуется войти в аккаунт
-                  снова.
+                  {t(
+                    'Чтобы продолжить подготовку, потребуется войти в аккаунт снова.',
+                  )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel className="h-10 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none">
-                  Отмена
+                  {t('Отмена')}
                 </AlertDialogCancel>
                 <AlertDialogAction
                   disabled={logoutIsPending}
                   onClick={() => void handleLogout()}
                   className="h-10 rounded-[9px] bg-[#3b82f6] px-5 text-white shadow-none hover:bg-[#2563eb]"
                 >
-                  {logoutIsPending ? 'Выходим…' : 'Выйти'}
+                  {logoutIsPending ? t('Выходим…') : t('Выйти')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <div className="pt-3">
+            <LanguagePicker compact />
+          </div>
         </div>
       </div>
     </aside>

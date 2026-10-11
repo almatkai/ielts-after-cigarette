@@ -8,6 +8,7 @@ import {
 import { useEffect } from 'react'
 import { PresenceBeacon } from '@/features/analytics/presence-beacon'
 import { reportError } from '@/lib/error-reporting'
+import { LanguageProvider, useLanguage } from '@/lib/i18n'
 import { NotFoundPage } from '@/pages/not-found/ui/not-found-page'
 
 import appCss from '../styles.css?url'
@@ -85,15 +86,17 @@ function RootErrorComponent({
   error: Error
   reset: () => void
 }) {
+  const { t } = useLanguage()
   useEffect(() => reportError(error, 'route'), [error])
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAFAF8] px-6 text-center">
       <h1 className="text-xl font-semibold text-[#111111]">
-        Что-то пошло не так
+        {t('Что-то пошло не так')}
       </h1>
       <p className="max-w-md text-sm leading-6 text-[#69696d]">
-        Произошла непредвиденная ошибка. Попробуйте повторить действие или
-        вернуться на главную.
+        {t(
+          'Произошла непредвиденная ошибка. Попробуйте повторить действие или вернуться на главную.',
+        )}
       </p>
       <div className="flex items-center gap-3">
         <button
@@ -101,13 +104,13 @@ function RootErrorComponent({
           onClick={reset}
           className="rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb]"
         >
-          Повторить
+          {t('Повторить')}
         </button>
         <Link
           to="/"
           className="rounded-[10px] border border-[#deded9] bg-white px-5 py-2.5 text-sm font-semibold text-[#111111] transition-colors hover:bg-[#f4f4f1]"
         >
-          На главную
+          {t('На главную')}
         </Link>
       </div>
     </div>
@@ -121,7 +124,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
         <PresenceBeacon />
         <Scripts />
       </body>

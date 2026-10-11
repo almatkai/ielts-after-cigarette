@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 export type EmptyStateProps = {
   title?: string
@@ -21,6 +22,7 @@ export function EmptyState({
   action,
   className,
 }: EmptyStateProps) {
+  const { t } = useLanguage()
   return (
     <div
       className={cn(
@@ -46,11 +48,11 @@ export function EmptyState({
         ) : null}
 
         <p className="text-base font-semibold tracking-tight text-[#0f172a] sm:text-lg">
-          {title}
+          {t(title)}
         </p>
         {description ? (
           <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#64748b] sm:text-sm">
-            {description}
+            {t(description)}
           </p>
         ) : null}
         {action ? <div className="mt-5">{action}</div> : null}

@@ -6,6 +6,7 @@ import type { AttemptListItem } from './api'
 import { bandChange, summarizeMaterialAttempts } from './attempt-history'
 import { BandChange } from './band-change'
 import { formatDateTime } from '@/lib/date'
+import { useLanguage } from '@/lib/i18n'
 
 export function useLibraryAttempts(skill: 'listening' | 'reading') {
   return useQuery({
@@ -15,13 +16,18 @@ export function useLibraryAttempts(skill: 'listening' | 'reading') {
 }
 
 export function LibraryAttemptResult({ items }: { items: AttemptListItem[] }) {
+  const { language, t } = useLanguage()
   const { latest, previous, count } = summarizeMaterialAttempts(items)
   if (!latest) return null
   return (
     <div className="rounded-[10px] border border-[#dcece1] bg-[#f4faf6] px-3.5 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-medium text-emerald-700">
-          Пройден · попыток: {count}
+          {language === 'en'
+            ? `Completed · ${count} ${count === 1 ? 'attempt' : 'attempts'}`
+            : language === 'kk'
+              ? `Орындалды · ${count} әрекет`
+              : `Пройден · попыток: ${count}`}
         </span>
         <BandChange value={bandChange(latest, previous)} />
       </div>
@@ -34,7 +40,7 @@ export function LibraryAttemptResult({ items }: { items: AttemptListItem[] }) {
         </span>
       </div>
       <p className="mt-1 text-[11px] text-[#808084]">
-        Последняя попытка ·{' '}
+        {t('Последняя попытка')} ·{' '}
         {formatDateTime(latest.submittedAt ?? latest.startedAt)}
       </p>
     </div>
@@ -52,6 +58,7 @@ export function LibraryAttemptActions({
   items: AttemptListItem[]
   pending: boolean
 }) {
+  const { t } = useLanguage()
   const client = useQueryClient()
   const { latest, active } = summarizeMaterialAttempts(items)
   const prepareAttempt = () => {
@@ -85,7 +92,7 @@ export function LibraryAttemptActions({
           className="h-10 rounded-[9px] px-4 shadow-none"
         >
           <Link to="/attempts/$attemptId" params={{ attemptId: latest.id }}>
-            Результат
+            {t('Результат')}
           </Link>
         </Button>
       ) : null}
@@ -96,7 +103,7 @@ export function LibraryAttemptActions({
           className="h-10 rounded-[9px] px-4 shadow-none"
         >
           <Link to="/attempts/$attemptId" params={{ attemptId: active.id }}>
-            На проверке
+            {t('На проверке')}
           </Link>
         </Button>
       ) : pending ? (
@@ -104,7 +111,7 @@ export function LibraryAttemptActions({
           disabled
           className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none"
         >
-          {label}
+          {t(label)}
         </Button>
       ) : (
         <Button
@@ -117,7 +124,7 @@ export function LibraryAttemptActions({
               params={{ testId: materialId }}
               onClick={prepareAttempt}
             >
-              {label}
+              {t(label)}
             </Link>
           ) : (
             <Link
@@ -125,7 +132,7 @@ export function LibraryAttemptActions({
               params={{ materialId }}
               onClick={prepareAttempt}
             >
-              {label}
+              {t(label)}
             </Link>
           )}
         </Button>

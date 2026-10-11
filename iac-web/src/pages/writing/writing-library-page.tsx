@@ -12,8 +12,10 @@ import {
 import { useAuth } from '@/features/auth/auth-store'
 import { listPublicWritingMaterials, writingKeys } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function WritingLibraryPage() {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const query = useQuery({
     queryKey: writingKeys.publicMaterials,
@@ -27,19 +29,20 @@ export function WritingLibraryPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Выберите Writing-тренировку
+          {t('Выберите Writing-тренировку')}
         </h2>
         <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Выполните Task 1 и Task 2 в экзаменационном темпе и получите разбор по
-          четырём критериям IELTS.
+          {t(
+            'Выполните Task 1 и Task 2 в экзаменационном темпе и получите разбор по четырём критериям IELTS.',
+          )}
         </p>
       </div>
       {query.isPending ? (
         <LibraryCardsSkeleton />
       ) : query.isError ? (
         <ErrorState
-          title="Не удалось загрузить Writing-материалы"
-          message={getErrorMessage(query.error)}
+          title={t('Не удалось загрузить Writing-материалы')}
+          message={t(getErrorMessage(query.error))}
           onRetry={() => void query.refetch()}
         />
       ) : materials.length === 0 ? (
@@ -68,7 +71,7 @@ export function WritingLibraryPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
-                      Сложность: {material.difficulty}
+                      {t('Сложность')}: {material.difficulty}
                     </p>
                     {material.description ? (
                       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#69696d]">
@@ -86,7 +89,7 @@ export function WritingLibraryPage() {
                       to="/exam/writing/$materialId"
                       params={{ materialId: material.id }}
                     >
-                      Начать Writing
+                      {t('Начать Writing')}
                     </Link>
                   </Button>
                 </div>

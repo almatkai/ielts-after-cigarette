@@ -19,8 +19,10 @@ import {
 } from '@/features/listening/api'
 
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function ListeningLibraryPage() {
+  const { language, t } = useLanguage()
   const { user } = useAuth()
   const attemptsQuery = useLibraryAttempts('listening')
   const query = useQuery({
@@ -34,13 +36,13 @@ export function ListeningLibraryPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div>
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Выберите тест для тренировки
+          {t('Выберите тест для тренировки')}
         </h2>
       </div>
       {attemptsQuery.isError ? (
         <ErrorState
-          title="Не удалось загрузить результаты"
-          message={getErrorMessage(attemptsQuery.error)}
+          title={t('Не удалось загрузить результаты')}
+          message={t(getErrorMessage(attemptsQuery.error))}
           onRetry={() => void attemptsQuery.refetch()}
         />
       ) : null}
@@ -48,8 +50,8 @@ export function ListeningLibraryPage() {
         <LibraryCardsSkeleton />
       ) : query.isError ? (
         <ErrorState
-          title="Не удалось загрузить тесты"
-          message={getErrorMessage(query.error)}
+          title={t('Не удалось загрузить тесты')}
+          message={t(getErrorMessage(query.error))}
           onRetry={() => void query.refetch()}
         />
       ) : tests.length === 0 ? (
@@ -79,7 +81,12 @@ export function ListeningLibraryPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#808084]">
-                      Длительность: {test.durationMinutes} минут
+                      {t('Длительность')}: {test.durationMinutes}{' '}
+                      {language === 'en'
+                        ? 'minutes'
+                        : language === 'kk'
+                          ? 'минут'
+                          : 'минут'}
                     </p>
                   </div>
                 </div>

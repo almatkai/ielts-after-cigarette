@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 import type { SaveState } from '@/features/attempts/attempt-session'
 import type {
   Attempt,
@@ -46,6 +47,7 @@ export function ExamLoadingScreen({
   showTimerTip?: boolean
   className?: string
 }) {
+  const { t } = useLanguage()
   return (
     <div
       className={cn(
@@ -101,7 +103,7 @@ export function ExamLoadingScreen({
         {showTimerTip ? (
           <p className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
             <Clock className="size-3.5 text-slate-400" aria-hidden="true" />
-            <span>Таймер запустится только после загрузки</span>
+            <span>{t('Таймер запустится только после загрузки')}</span>
           </p>
         ) : null}
       </div>
@@ -110,11 +112,12 @@ export function ExamLoadingScreen({
 }
 
 export function LibraryCardsSkeleton({ count = 4 }: { count?: number }) {
+  const { t } = useLanguage()
   return (
     <div
       className="grid gap-3 md:grid-cols-2"
       aria-busy="true"
-      aria-label="Загрузка списка тестов"
+      aria-label={t('Загрузка списка тестов')}
     >
       {Array.from({ length: count }).map((_, i) => (
         <Card
@@ -142,6 +145,7 @@ export function LoadingState({
   label?: string
   className?: string
 }) {
+  const { t } = useLanguage()
   return (
     <div
       className={cn(
@@ -174,7 +178,7 @@ export function LoadingState({
         </svg>
       </div>
       {label ? (
-        <p className="text-sm font-medium text-[#64748b]">{label}</p>
+        <p className="text-sm font-medium text-[#64748b]">{t(label)}</p>
       ) : null}
     </div>
   )
@@ -189,6 +193,7 @@ export function ErrorState({
   message: string
   onRetry: () => void
 }) {
+  const { t } = useLanguage()
   return (
     <div className="flex min-h-[60dvh] w-full flex-1 items-center justify-center p-4 sm:p-6">
       <Card className="w-full max-w-[460px] rounded-2xl border border-[#e2e8f0] bg-white p-7 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-9">
@@ -197,11 +202,11 @@ export function ErrorState({
             <CloseCircle className="size-7" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">
-            {title}
+            {t(title)}
           </h2>
-          <p className="text-sm leading-relaxed text-[#64748b]">{message}</p>
+          <p className="text-sm leading-relaxed text-[#64748b]">{t(message)}</p>
           <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">
-            Повторить попытку
+            {t('Повторить попытку')}
           </Button>
         </CardContent>
       </Card>
@@ -210,6 +215,7 @@ export function ErrorState({
 }
 
 export function SaveIndicator({ state }: { state: SaveState }) {
+  const { t } = useLanguage()
   if (state === 'idle') return null
   const text =
     state === 'saving'
@@ -222,7 +228,7 @@ export function SaveIndicator({ state }: { state: SaveState }) {
       className={`text-xs ${state === 'error' ? 'text-[#e23b3b]' : 'text-[#69696d]'}`}
       role="status"
     >
-      {text}
+      {t(text)}
     </span>
   )
 }
@@ -245,12 +251,13 @@ export function TimeBadge({
   danger?: boolean
   label: string
 }) {
+  const { t } = useLanguage()
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium tabular-nums ${
         danger ? 'border-red-200 bg-red-50 text-[#e23b3b]' : 'bg-white'
       }`}
-      aria-label={label}
+      aria-label={t(label)}
     >
       <Clock className="size-4" aria-hidden />
       {formatClock(seconds)}
@@ -295,6 +302,7 @@ export function ChoiceOptions({
   value: StudentAnswer | undefined
   onAnswer: (answer: StudentAnswer) => void
 }) {
+  const { language, t } = useLanguage()
   if (limit && limit > 1) {
     const selected = Array.isArray(value?.optionIds)
       ? (value.optionIds as unknown[]).filter(
@@ -333,7 +341,11 @@ export function ChoiceOptions({
           ))}
         </div>
         <p className="text-xs text-[#69696d]">
-          Выберите {limit} варианта: {selected.length} из {limit}.
+          {language === 'en'
+            ? `Choose up to ${limit} options: ${selected.length} of ${limit} selected.`
+            : language === 'kk'
+              ? `${limit} нұсқаға дейін таңдаңыз: ${limit}-ден ${selected.length} таңдалды.`
+              : `${t('Выберите до')} ${limit} ${t('вариантов:')} ${selected.length} ${t('из')} ${limit}.`}
         </p>
       </>
     )
@@ -383,11 +395,16 @@ export function AttemptSubmitBar({
   onContinueLater?: () => void
   isSavingAndExiting?: boolean
 }) {
+  const { language, t } = useLanguage()
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
       <p className="text-sm text-[#69696d]">
-        Отвечено на {answeredCount} из {totalQuestions} вопросов.
-        {disabledMessage ? ` ${disabledMessage}` : ''}
+        {language === 'en'
+          ? `${answeredCount} of ${totalQuestions} questions answered.`
+          : language === 'kk'
+            ? `${totalQuestions} сұрақтың ${answeredCount}-іне жауап берілді.`
+            : `Отвечено на ${answeredCount} из ${totalQuestions} вопросов.`}
+        {disabledMessage ? ` ${t(disabledMessage)}` : ''}
       </p>
       <div className="flex items-center gap-2.5">
         {onContinueLater ? (
@@ -398,28 +415,29 @@ export function AttemptSubmitBar({
             onClick={onContinueLater}
             className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
           >
-            {isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+            {isSavingAndExiting ? t('Сохраняем…') : t('Продолжить позже')}
           </Button>
         ) : null}
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button disabled={isSubmitting || isSavingAndExiting || disabled}>
-              {isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+              {isSubmitting ? t('Отправляем…') : t('Завершить тест')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Завершить тест?</AlertDialogTitle>
+              <AlertDialogTitle>{t('Завершить тест?')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Ответы будут отправлены на проверку, изменить их после
-                завершения нельзя. Без ответа останется{' '}
-                {totalQuestions - answeredCount} вопросов.
+                {t(
+                  'Ответы будут отправлены на проверку, изменить их после завершения нельзя. Без ответа останется',
+                )}{' '}
+                {totalQuestions - answeredCount} {t('вопросов.')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Продолжить</AlertDialogCancel>
+              <AlertDialogCancel>{t('Продолжить')}</AlertDialogCancel>
               <AlertDialogAction onClick={onSubmit}>
-                Завершить
+                {t('Завершить')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -436,6 +454,7 @@ export function AttemptResultSummary({
   attempt: Attempt
   review: AttemptReviewItem[] | null
 }) {
+  const { t } = useLanguage()
   const correctCount = review
     ? review.filter((item) => item.isCorrect).length
     : null
@@ -452,7 +471,7 @@ export function AttemptResultSummary({
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
-            Баллы
+            {t('Баллы')}
           </p>
           <p className="mt-1 text-2xl font-semibold">
             {attempt.score ?? '—'} из {attempt.maxScore ?? '—'}
@@ -460,7 +479,7 @@ export function AttemptResultSummary({
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
-            Верных ответов
+            {t('Верных ответов')}
           </p>
           <p className="mt-1 text-2xl font-semibold">
             {correctCount !== null && review !== null
@@ -480,6 +499,7 @@ export function ReviewQuestion({
   item: AttemptReviewItem
   options: Option[]
 }) {
+  const { t } = useLanguage()
   return (
     <div className="grid gap-2 rounded-lg border p-3 text-sm">
       <p className="font-medium">
@@ -490,22 +510,23 @@ export function ReviewQuestion({
         {item.isCorrect ? (
           <TickCircle
             className="size-4 shrink-0 text-emerald-600"
-            aria-label="Верно"
+            aria-label={t('Верно')}
           />
         ) : (
           <CloseCircle
             className="size-4 shrink-0 text-[#3b82f6]"
-            aria-label="Неверно"
+            aria-label={t('Неверно')}
           />
         )}
         <span>
-          Ваш ответ: <strong>{formatAnswer(item.answer, options)}</strong>
+          {t('Ваш ответ')}:{' '}
+          <strong>{formatAnswer(item.answer, options)}</strong>
         </span>
         <span className="text-[#69696d]">+{item.pointsAwarded} б.</span>
       </p>
       {!item.isCorrect ? (
         <p>
-          Правильный ответ:{' '}
+          {t('Правильный ответ')}:{' '}
           <strong className="text-emerald-700">
             {formatAnswer(item.correctAnswer, options)}
           </strong>
@@ -582,6 +603,7 @@ export function AttemptResultHeader({
   onRetake?: () => void
   isRetaking?: boolean
 }) {
+  const { t } = useLanguage()
   const skillBackLabels: Record<string, string> = {
     reading: 'К материалам Reading',
     listening: 'К материалам Listening',
@@ -604,12 +626,12 @@ export function AttemptResultHeader({
               params={{ sessionId: fullMockSessionId }}
             >
               <ArrowLeft className="size-4" aria-hidden />
-              <span>К Full Mock</span>
+              <span>{t('К Full Mock')}</span>
             </Link>
           ) : (
             <Link to={`/${skill}`}>
               <ArrowLeft className="size-4" aria-hidden />
-              <span>{skillBackLabels[skill] ?? 'Назад'}</span>
+              <span>{t(skillBackLabels[skill] ?? 'Назад')}</span>
             </Link>
           )}
         </Button>
@@ -626,7 +648,7 @@ export function AttemptResultHeader({
             <Refresh2
               className={cn('size-3.5', isRetaking && 'animate-spin')}
             />
-            <span>{isRetaking ? 'Подготовка…' : 'Пройти заново'}</span>
+            <span>{isRetaking ? t('Подготовка…') : t('Пройти заново')}</span>
           </Button>
         )}
 
@@ -636,7 +658,7 @@ export function AttemptResultHeader({
           size="sm"
           className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
         >
-          <Link to={`/${skill}`}>К списку тестов</Link>
+          <Link to={`/${skill}`}>{t('К списку тестов')}</Link>
         </Button>
       </div>
     </header>
@@ -675,6 +697,7 @@ export function AttemptPerformanceReport({
   durationMinutes?: number
   paceUnit?: string
 }) {
+  const { language, t } = useLanguage()
   const cefrDescription = cefrLevel(band)
 
   const timeSpentSeconds = useMemo(() => {
@@ -700,9 +723,11 @@ export function AttemptPerformanceReport({
     if (timeSpentSeconds === null) return '—'
     const mins = Math.floor(timeSpentSeconds / 60)
     const secs = timeSpentSeconds % 60
-    if (mins === 0) return `${secs} сек`
-    return `${mins} мин ${secs > 0 ? `${secs} сек` : ''}`
-  }, [timeSpentSeconds])
+    const secondsLabel = language === 'en' ? 'sec' : 'сек'
+    const minutesLabel = language === 'en' ? 'min' : 'мин'
+    if (mins === 0) return `${secs} ${secondsLabel}`
+    return `${mins} ${minutesLabel} ${secs > 0 ? `${secs} ${secondsLabel}` : ''}`
+  }, [timeSpentSeconds, language])
 
   const totalCount = totalQuestions ?? (criteria ? criteria.length : 0)
 
@@ -711,9 +736,11 @@ export function AttemptPerformanceReport({
     const paceSec = Math.round(timeSpentSeconds / totalCount)
     const m = Math.floor(paceSec / 60)
     const s = paceSec % 60
-    if (m === 0) return `${s} сек / ${paceUnit}`
-    return `${m} мин ${s > 0 ? `${s} сек` : ''} / ${paceUnit}`
-  }, [timeSpentSeconds, totalCount, paceUnit])
+    const secondsLabel = language === 'en' ? 'sec' : 'сек'
+    const minutesLabel = language === 'en' ? 'min' : 'мин'
+    if (m === 0) return `${s} ${secondsLabel} / ${t(paceUnit)}`
+    return `${m} ${minutesLabel} ${s > 0 ? `${s} ${secondsLabel}` : ''} / ${t(paceUnit)}`
+  }, [timeSpentSeconds, totalCount, paceUnit, language, t])
 
   const effectiveTotal = totalQuestions ?? maxScore ?? 0
   const effectiveCorrect = correctCount ?? score ?? 0
@@ -742,7 +769,7 @@ export function AttemptPerformanceReport({
                 {band !== null && band !== undefined ? band.toFixed(1) : '—'}
               </span>
               <span className="text-sm font-semibold text-slate-400">
-                из 9.0
+                {t('из 9.0')}
               </span>
             </div>
           </div>
@@ -757,13 +784,13 @@ export function AttemptPerformanceReport({
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Критерии IELTS
+                  {t('Критерии IELTS')}
                 </span>
                 <span className="text-xs font-bold text-[#3b82f6]">
                   {criteria.filter((c) => !c.unavailable).length <
                   criteria.length
-                    ? `${criteria.filter((c) => !c.unavailable).length} критерия`
-                    : `${criteria.length} критерия`}
+                    ? `${criteria.filter((c) => !c.unavailable).length} ${t('критерия')}`
+                    : `${criteria.length} ${t('критерия')}`}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
@@ -785,9 +812,9 @@ export function AttemptPerformanceReport({
                     {c.unavailable ? (
                       <span
                         className="block mt-1 text-[11px] font-semibold text-amber-600 truncate"
-                        title="Пока не определяется нашей системой"
+                        title={t('Пока не определяется нашей системой')}
                       >
-                        {c.displayBand ?? 'Не определяется'}
+                        {c.displayBand ?? t('Не определяется')}
                       </span>
                     ) : (
                       <span className="text-base font-bold text-slate-900">
@@ -803,10 +830,10 @@ export function AttemptPerformanceReport({
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Точность и баллы
+                    {t('Точность и баллы')}
                   </span>
                   <span className="text-xs font-bold text-[#3b82f6]">
-                    {scorePercent}% точности
+                    {scorePercent}% {t('точности')}
                   </span>
                 </div>
                 <div className="mt-3 flex items-baseline gap-2">
@@ -814,7 +841,7 @@ export function AttemptPerformanceReport({
                     {effectiveCorrect}
                   </span>
                   <span className="text-sm font-medium text-slate-400">
-                    из {effectiveTotal} правильных
+                    {t('из')} {effectiveTotal} {t('правильных')}
                   </span>
                 </div>
               </div>
@@ -830,17 +857,17 @@ export function AttemptPerformanceReport({
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
                     <TickCircle className="size-3.5 text-emerald-600" />
-                    {effectiveCorrect} верно
+                    {effectiveCorrect} {t('верно')}
                   </span>
                   {incorrectCount > 0 ? (
                     <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200/60">
                       <CloseCircle className="size-3.5 text-rose-600" />
                       {incorrectCount}{' '}
-                      {incorrectCount === 1 ? 'ошибка' : 'ошибок'}
+                      {t(incorrectCount === 1 ? 'ошибка' : 'ошибок')}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
-                      Без ошибок
+                      {t('Без ошибок')}
                     </span>
                   )}
                 </div>
@@ -854,12 +881,12 @@ export function AttemptPerformanceReport({
           <div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Время выполнения
+                {t('Время выполнения')}
               </span>
               {durationMinutes ? (
                 <span className="inline-flex items-center gap-1 text-xs text-slate-500">
                   <Clock className="size-3.5 text-slate-400" />
-                  Лимит: {durationMinutes} мин
+                  {t('Лимит')}: {durationMinutes} {t('мин')}
                 </span>
               ) : null}
             </div>
@@ -869,14 +896,14 @@ export function AttemptPerformanceReport({
               </span>
               {isTimeOverLimit && (
                 <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 border border-amber-200/80">
-                  Лимит исчерпан
+                  {t('Лимит исчерпан')}
                 </span>
               )}
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>Средний темп:</span>
+            <span>{t('Средний темп:')}</span>
             <strong className="font-semibold text-slate-700">
               {paceFormatted ?? '—'}
             </strong>
@@ -894,6 +921,7 @@ export function EnhancedReviewQuestion({
   item: AttemptReviewItem
   options: Option[]
 }) {
+  const { t } = useLanguage()
   const isAnswered = isQuestionAnswered(item.questionId, item.answer)
   const isCorrect = item.isCorrect
 
@@ -915,12 +943,12 @@ export function EnhancedReviewQuestion({
           {isCorrect ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
               <TickCircle className="size-3.5 text-emerald-600" />
-              Верно (+{item.pointsAwarded} б.)
+              {t('Верно')} (+{item.pointsAwarded} {t('б.')})
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
               <CloseCircle className="size-3.5 text-rose-600" />
-              {isAnswered ? 'Ошибка (0 б.)' : 'Не отвечено (0 б.)'}
+              {t(isAnswered ? 'Ошибка (0 б.)' : 'Не отвечено (0 б.)')}
             </span>
           )}
         </div>
@@ -941,7 +969,7 @@ export function EnhancedReviewQuestion({
           )}
         >
           <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
-            Ваш ответ
+            {t('Ваш ответ')}
           </span>
           <span
             className={cn(
@@ -956,7 +984,7 @@ export function EnhancedReviewQuestion({
         {!isCorrect && (
           <div className="rounded-[10px] border border-emerald-200 bg-emerald-50/70 p-3 text-emerald-950">
             <span className="block text-[11px] font-semibold uppercase tracking-wider text-emerald-700 mb-1">
-              Правильный ответ
+              {t('Правильный ответ')}
             </span>
             <span className="font-bold text-sm text-emerald-900">
               {formatAnswer(item.correctAnswer, options)}
@@ -970,7 +998,7 @@ export function EnhancedReviewQuestion({
         <div className="rounded-[10px] border border-blue-100 bg-[#f0f7ff] p-3 text-xs leading-relaxed text-slate-700">
           <div className="flex items-center gap-1.5 font-semibold text-[#2563eb] mb-1">
             <InfoCircle className="size-3.5" />
-            <span>Разбор и цитата:</span>
+            <span>{t('Разбор и цитата:')}</span>
           </div>
           <div className="whitespace-pre-wrap text-slate-700">
             {item.explanation}

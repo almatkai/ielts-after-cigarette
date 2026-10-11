@@ -3,18 +3,14 @@ import { Link } from '@tanstack/react-router'
 
 import { Brand } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
-import { LanguagePicker } from '@/components/ui/language-picker'
 import { useLanguage } from '@/lib/i18n'
 
 export function NotFoundPage() {
   const { t } = useLanguage()
   return (
     <div className="min-h-screen overflow-hidden bg-[#fafaf8] text-[#111111]">
-      <header className="container-shell flex h-20 items-center justify-between">
+      <header className="container-shell flex h-20 items-center">
         <Brand />
-        <div className="w-36">
-          <LanguagePicker compact />
-        </div>
       </header>
 
       <main className="container-shell grid min-h-[calc(100vh-80px)] items-center gap-8 py-10 lg:grid-cols-12 lg:gap-14 lg:py-14">

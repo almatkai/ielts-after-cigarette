@@ -13,7 +13,9 @@ export type Language = 'ru' | 'kk' | 'en'
 
 const LANGUAGE_STORAGE_KEY = 'daiyndyq-language'
 
-const translations: Record<string, Partial<Record<Language, string>>> = {
+type TranslationMap = Partial<Record<string, Partial<Record<Language, string>>>>
+
+const translations: TranslationMap = {
   Язык: { kk: 'Тіл', en: 'Language' },
   Обучение: { kk: 'Оқу', en: 'Study' },
   Обзор: { kk: 'Шолу', en: 'Overview' },
@@ -1234,7 +1236,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     () => ({
       language,
       setLanguage,
-      t: (source) => translations[source][language] ?? source,
+      t: (source) => translations[source]?.[language] ?? source,
     }),
     [language, setLanguage],
   )

@@ -22,6 +22,7 @@ import {
   getAnalyticsRealtime,
 } from '@/features/analytics/api'
 import { ApiError } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import {
   ActivityHeatmap,
@@ -64,15 +65,16 @@ const funnelLabels: Record<string, string> = {
 const percent = (part: number, whole: number) =>
   whole > 0 ? `${Math.round((part / whole) * 100)}%` : '—'
 
-function duration(seconds: number | null) {
+function duration(seconds: number | null, t: (source: string) => string) {
   if (seconds === null) return '—'
   const minutes = Math.round(seconds / 60)
   return minutes < 60
-    ? `${minutes} мин`
-    : `${Math.floor(minutes / 60)} ч ${minutes % 60} мин`
+    ? `${minutes} ${t('мин')}`
+    : `${Math.floor(minutes / 60)} ${t('ч')} ${minutes % 60} ${t('мин')}`
 }
 
 export function AnalyticsPage() {
+  const { t } = useLanguage()
   const [days, setDays] = useState<AnalyticsDays>(30)
   const overviewQuery = useQuery({
     queryKey: analyticsQueryKeys.overview(days),
@@ -96,20 +98,20 @@ export function AnalyticsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-            Аналитика
+            {t('Аналитика')}
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-            Пульс платформы
+            {t('Пульс платформы')}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
             {overviewQuery.data
-              ? `Обновлено ${new Date(overviewQuery.data.generatedAt).toLocaleTimeString('ru-RU')} · дни считаются по ${overviewQuery.data.timeZone}`
-              : 'Регистрации, онлайн, активность и удержание.'}
+              ? `${t('Обновлено')} ${new Date(overviewQuery.data.generatedAt).toLocaleTimeString('ru-RU')} · ${t('дни считаются по')} ${overviewQuery.data.timeZone}`
+              : t('Регистрации, онлайн, активность и удержание.')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <select
-            aria-label="Период"
+            aria-label={t('Период')}
             className="h-9 rounded-[10px] border border-[#deded9] bg-white px-3 text-sm"
             value={days}
             onChange={(event) =>
@@ -118,7 +120,7 @@ export function AnalyticsPage() {
           >
             {periods.map((period) => (
               <option key={period.value} value={period.value}>
-                {period.label}
+                {t(period.label)}
               </option>
             ))}
           </select>
@@ -132,7 +134,7 @@ export function AnalyticsPage() {
               className={overviewQuery.isFetching ? 'animate-spin' : undefined}
               aria-hidden
             />
-            Обновить
+            {t('Обновить')}
           </Button>
         </div>
       </div>
@@ -145,7 +147,7 @@ export function AnalyticsPage() {
       {overviewQuery.isPending ? (
         <Panel>
           <p className="p-8 text-center text-sm text-[#69696d]">
-            Считаем метрики…
+            {t('Считаем метрики…')}
           </p>
         </Panel>
       ) : overviewQuery.isError ? (
@@ -155,8 +157,10 @@ export function AnalyticsPage() {
             <p className="mt-3 text-sm">
               {overviewQuery.error instanceof ApiError &&
               overviewQuery.error.status === 403
-                ? 'Нет доступа: аналитика доступна только администраторам (роль ADMIN).'
-                : 'Не удалось загрузить аналитику.'}
+                ? t(
+                    'Нет доступа: аналитика доступна только администраторам (роль ADMIN).',
+                  )
+                : t('Не удалось загрузить аналитику.')}
             </p>
             <Button
               type="button"
@@ -164,7 +168,7 @@ export function AnalyticsPage() {
               className="mt-4"
               onClick={() => void overviewQuery.refetch()}
             >
-              Повторить
+              {t('Повторить')}
             </Button>
           </div>
         </Panel>
@@ -244,6 +248,7 @@ function LivePanel({
   realtime: AnalyticsRealtime | undefined
   isError: boolean
 }) {
+  const { t } = useLanguage()
   const unavailable = isError || (realtime && !realtime.available)
   return (
     <div className="grid gap-4 rounded-[16px] border border-[#e7e7e4] bg-white p-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -258,24 +263,29 @@ function LivePanel({
             />
           </span>
           {unavailable
-            ? 'Онлайн-статистика недоступна (Redis)'
-            : `Сейчас на сайте · активность за последние ${Math.round((realtime?.windowSeconds ?? 120) / 60)} мин`}
+            ? t('Онлайн-статистика недоступна (Redis)')
+            : `${t('Сейчас на сайте · активность за последние')} ${Math.round((realtime?.windowSeconds ?? 120) / 60)} ${t('мин')}`}
         </div>
         <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
           <div>
             <p className="text-[56px] leading-none font-semibold tracking-[-0.04em]">
               {realtime ? formatNumber(realtime.onlineVisitors) : '—'}
             </p>
-            <p className="mt-2 text-sm text-[#69696d]">посетителей онлайн</p>
+            <p className="mt-2 text-sm text-[#69696d]">
+              {t('посетителей онлайн')}
+            </p>
           </div>
           <dl className="grid grid-cols-3 gap-6 text-sm">
-            <LiveFigure label="вошли в аккаунт" value={realtime?.onlineUsers} />
             <LiveFigure
-              label="уникальных сегодня"
+              label={t('вошли в аккаунт')}
+              value={realtime?.onlineUsers}
+            />
+            <LiveFigure
+              label={t('уникальных сегодня')}
               value={realtime?.visitorsToday}
             />
             <LiveFigure
-              label="просмотров сегодня"
+              label={t('просмотров сегодня')}
               value={realtime?.pageViewsToday}
             />
           </dl>
@@ -284,7 +294,7 @@ function LivePanel({
       <div className="rounded-[12px] bg-[#f7f7f5] p-4">
         <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#69696d] uppercase">
           <Eye className="size-4" aria-hidden />
-          Где сейчас пользователи
+          {t('Где сейчас пользователи')}
         </p>
         {realtime && realtime.activePages.length > 0 ? (
           <ul className="mt-3 grid gap-2">
@@ -304,7 +314,7 @@ function LivePanel({
           </ul>
         ) : (
           <p className="mt-3 text-sm text-[#898781]">
-            Сейчас никто не открыл сайт.
+            {t('Сейчас никто не открыл сайт.')}
           </p>
         )}
       </div>
@@ -331,6 +341,7 @@ function OverviewContent({
   overview: AnalyticsOverview
   realtime: AnalyticsRealtime | undefined
 }) {
+  const { t } = useLanguage()
   const { totals, daily } = overview
   const dayLabels = daily.map((point) => point.day)
   const registeredInPeriod = daily.reduce((sum, p) => sum + p.registrations, 0)
@@ -342,19 +353,19 @@ function OverviewContent({
     <>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
-          label="Зарегистрировано"
+          label={t('Зарегистрировано')}
           value={formatNumber(totals.registeredUsers)}
-          detail={`+${formatNumber(totals.registeredToday)} сегодня · +${formatNumber(totals.registered7d)} за 7 дней · +${formatNumber(totals.registered30d)} за 30`}
+          detail={`+${formatNumber(totals.registeredToday)} ${t('сегодня')} · +${formatNumber(totals.registered7d)} ${t('за 7 дней')} · +${formatNumber(totals.registered30d)} ${t('за 30')}`}
         />
         <StatTile
-          label="Ждут в waitlist"
+          label={t('Ждут в waitlist')}
           value={formatNumber(totals.waitlistPending)}
-          detail={`+${formatNumber(totals.waitlistToday)} сегодня · +${formatNumber(totals.waitlist7d)} за 7 дней`}
+          detail={`+${formatNumber(totals.waitlistToday)} ${t('сегодня')} · +${formatNumber(totals.waitlist7d)} ${t('за 7 дней')}`}
         />
         <StatTile
-          label="Конверсия waitlist → аккаунт"
+          label={t('Конверсия waitlist → аккаунт')}
           value={percent(totals.waitlistConverted, totals.waitlistLeads)}
-          detail={`${formatNumber(totals.waitlistConverted)} из ${formatNumber(totals.waitlistLeads)} заявок зарегистрировались`}
+          detail={`${formatNumber(totals.waitlistConverted)} ${t('из')} ${formatNumber(totals.waitlistLeads)} ${t('заявок зарегистрировались')}`}
         />
         <StatTile
           label="DAU / WAU / MAU"
@@ -365,40 +376,40 @@ function OverviewContent({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
-          label="Попыток сегодня"
+          label={t('Попыток сегодня')}
           value={formatNumber(totals.attemptsToday)}
-          detail={`${formatNumber(totals.submittedToday)} отправлено на проверку`}
+          detail={`${formatNumber(totals.submittedToday)} ${t('отправлено на проверку')}`}
         />
         <StatTile
-          label={`Full Mock за ${overview.days} дн.`}
+          label={`${t('Full Mock за')} ${overview.days} ${t('дн.')}`}
           value={formatNumber(totals.fullMocksStarted)}
-          detail={`${formatNumber(totals.fullMocksSubmitted)} завершено · ${percent(totals.fullMocksSubmitted, totals.fullMocksStarted)}`}
+          detail={`${formatNumber(totals.fullMocksSubmitted)} ${t('завершено')} · ${percent(totals.fullMocksSubmitted, totals.fullMocksStarted)}`}
         />
         <StatTile
-          label={`Регистрации за ${overview.days} дн.`}
+          label={`${t('Регистрации за')} ${overview.days} ${t('дн.')}`}
           value={formatNumber(registeredInPeriod)}
-          detail={`и ${formatNumber(waitlistInPeriod)} новых заявок в waitlist`}
+          detail={`${t('и')} ${formatNumber(waitlistInPeriod)} ${t('новых заявок в waitlist')}`}
         />
         <StatTile
-          label="Уникальных посетителей сегодня"
+          label={t('Уникальных посетителей сегодня')}
           value={realtime ? formatNumber(realtime.visitorsToday) : '—'}
-          detail="Оценка HyperLogLog, точность ±1%"
+          detail={t('Оценка HyperLogLog, точность ±1%')}
         />
       </div>
 
       <Panel
-        title="Регистрации и заявки по дням"
+        title={t('Регистрации и заявки по дням')}
         icon={<Profile2User className="size-[18px]" aria-hidden />}
       >
         <LineChart
           days={dayLabels}
           series={[
             {
-              label: 'Регистрации',
+              label: t('Регистрации'),
               values: daily.map((p) => p.registrations),
             },
             {
-              label: 'Заявки в waitlist',
+              label: t('Заявки в waitlist'),
               values: daily.map((p) => p.waitlistJoins),
             },
           ]}
@@ -407,32 +418,32 @@ function OverviewContent({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel
-          title="Аудитория"
+          title={t('Аудитория')}
           icon={<People className="size-[18px]" aria-hidden />}
         >
           <LineChart
             days={dayLabels}
             series={[
               {
-                label: 'Активные пользователи (DAU)',
+                label: t('Активные пользователи (DAU)'),
                 values: daily.map((p) => p.activeUsers),
               },
               {
-                label: 'Уникальные посетители',
+                label: t('Уникальные посетители'),
                 values: daily.map((p) => p.visitors),
               },
             ]}
           />
         </Panel>
         <Panel
-          title="Попытки тестов"
+          title={t('Попытки тестов')}
           icon={<Activity className="size-[18px]" aria-hidden />}
         >
           <LineChart
             days={dayLabels}
             series={[
-              { label: 'Начато', values: daily.map((p) => p.attempts) },
-              { label: 'Отправлено', values: daily.map((p) => p.submitted) },
+              { label: t('Начато'), values: daily.map((p) => p.attempts) },
+              { label: t('Отправлено'), values: daily.map((p) => p.submitted) },
             ]}
           />
         </Panel>
@@ -440,24 +451,26 @@ function OverviewContent({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Panel
-          title="Навыки"
+          title={t('Навыки')}
           icon={<Chart className="size-[18px]" aria-hidden />}
         >
           {overview.skills.length === 0 ? (
-            <p className="text-sm text-[#69696d]">Попыток за период нет.</p>
+            <p className="text-sm text-[#69696d]">
+              {t('Попыток за период нет.')}
+            </p>
           ) : (
             <div className="-mx-5 -mb-5 overflow-x-auto">
               <table className="w-full min-w-[520px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-[#ededeb] text-xs text-[#69696d]">
                     {[
-                      'Навык',
-                      'Начато',
-                      'Завершено',
-                      'Брошено',
-                      'Студ.',
+                      t('Навык'),
+                      t('Начато'),
+                      t('Завершено'),
+                      t('Брошено'),
+                      t('Студ.'),
                       'Band',
-                      'Время, медиана',
+                      t('Время, медиана'),
                     ].map((title) => (
                       <th
                         key={title}
@@ -494,7 +507,7 @@ function OverviewContent({
                         {skill.averageBand?.toFixed(1) ?? '—'}
                       </td>
                       <td className="px-4 py-3">
-                        {duration(skill.medianDurationSec)}
+                        {duration(skill.medianDurationSec, t)}
                       </td>
                     </tr>
                   ))}
@@ -504,16 +517,18 @@ function OverviewContent({
           )}
         </Panel>
         <Panel
-          title={`Воронка за ${overview.days} дн.`}
+          title={`${t('Воронка за')} ${overview.days} ${t('дн.')}`}
           icon={<Activity className="size-[18px]" aria-hidden />}
         >
           <BarList
             rows={overview.funnel.map((step) => ({
-              label: funnelLabels[step.step] ?? step.step,
+              label: t(funnelLabels[step.step] ?? step.step),
               value: step.users,
             }))}
             suffix={(row, index) =>
-              index > 1 ? `${percent(row.value, registeredStep)} от рег.` : null
+              index > 1
+                ? `${percent(row.value, registeredStep)} ${t('от рег.')}`
+                : null
             }
           />
         </Panel>
@@ -521,24 +536,26 @@ function OverviewContent({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Panel
-          title="Когда занимаются студенты"
+          title={t('Когда занимаются студенты')}
           icon={<Chart className="size-[18px]" aria-hidden />}
         >
           <ActivityHeatmap cells={overview.heatmap} />
         </Panel>
         <Panel
-          title="Источники новых пользователей"
+          title={t('Источники новых пользователей')}
           icon={<Global className="size-[18px]" aria-hidden />}
         >
           {overview.sources.length === 0 ? (
             <p className="text-sm text-[#69696d]">
-              Новых пользователей за период нет.
+              {t('Новых пользователей за период нет.')}
             </p>
           ) : (
             <BarList
               rows={overview.sources.map((source) => ({
                 label:
-                  source.source === 'direct' ? 'Прямой заход' : source.source,
+                  source.source === 'direct'
+                    ? t('Прямой заход')
+                    : source.source,
                 value: source.users,
               }))}
             />
@@ -547,7 +564,7 @@ function OverviewContent({
       </div>
 
       <Panel
-        title="Удержание по недельным когортам"
+        title={t('Удержание по недельным когортам')}
         icon={<People className="size-[18px]" aria-hidden />}
       >
         <CohortTable cohorts={overview.cohorts} />
@@ -555,7 +572,7 @@ function OverviewContent({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel
-          title="Популярные страницы сегодня"
+          title={t('Популярные страницы сегодня')}
           icon={<Eye className="size-[18px]" aria-hidden />}
         >
           {realtime && realtime.topPagesToday.length > 0 ? (
@@ -566,7 +583,9 @@ function OverviewContent({
               }))}
             />
           ) : (
-            <p className="text-sm text-[#69696d]">Просмотров сегодня нет.</p>
+            <p className="text-sm text-[#69696d]">
+              {t('Просмотров сегодня нет.')}
+            </p>
           )}
         </Panel>
         <ExportPanel />
@@ -576,10 +595,11 @@ function OverviewContent({
 }
 
 function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
+  const { t } = useLanguage()
   if (cohorts.length === 0) {
     return (
       <p className="text-sm text-[#69696d]">
-        За последние 8 недель регистраций нет.
+        {t('За последние 8 недель регистраций нет.')}
       </p>
     )
   }
@@ -587,18 +607,22 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
   return (
     <div className="grid gap-3">
       <p className="text-sm leading-6 text-[#69696d]">
-        Доля пользователей, вернувшихся на N-й неделе после регистрации. День
-        регистрации не считается возвратом.
+        {t(
+          'Доля пользователей, вернувшихся на N-й неделе после регистрации. День регистрации не считается возвратом.',
+        )}
       </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-separate border-spacing-[2px] text-sm tabular-nums">
           <thead>
             <tr className="text-xs text-[#69696d]">
-              <th className="px-2 py-2 text-left font-medium">Неделя</th>
-              <th className="px-2 py-2 text-right font-medium">Пользователи</th>
+              <th className="px-2 py-2 text-left font-medium">{t('Неделя')}</th>
+              <th className="px-2 py-2 text-right font-medium">
+                {t('Пользователи')}
+              </th>
               {Array.from({ length: weeks }, (_, i) => (
                 <th key={i} className="px-2 py-2 text-center font-medium">
-                  Н{i + 1}
+                  {t('Н')}
+                  {i + 1}
                 </th>
               ))}
             </tr>
@@ -612,7 +636,7 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
               return (
                 <tr key={cohort.week}>
                   <td className="px-2 py-2 whitespace-nowrap">
-                    с {formatDay(cohort.week)}
+                    {t('с')} {formatDay(cohort.week)}
                   </td>
                   <td className="px-2 py-2 text-right font-semibold">
                     {formatNumber(cohort.size)}
@@ -631,7 +655,7 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
                           background,
                           color: dark ? '#fff' : '#111',
                         }}
-                        title={`${formatNumber(users)} из ${formatNumber(cohort.size)}`}
+                        title={`${formatNumber(users)} ${t('из')} ${formatNumber(cohort.size)}`}
                       >
                         {Math.round(share * 100)}%
                       </td>
@@ -648,6 +672,7 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
 }
 
 function ExportPanel() {
+  const { t } = useLanguage()
   const [days, setDays] = useState<AnalyticsDays | null>(null)
   const [pending, setPending] = useState<AnalyticsDataset | null>(null)
   const [error, setError] = useState('')
@@ -672,11 +697,11 @@ function ExportPanel() {
 
   return (
     <Panel
-      title="Выгрузка для анализа"
+      title={t('Выгрузка для анализа')}
       icon={<DocumentDownload className="size-[18px]" aria-hidden />}
       action={
         <select
-          aria-label="Период выгрузки"
+          aria-label={t('Период выгрузки')}
           className="h-8 rounded-[8px] border border-[#deded9] bg-white px-2 text-xs"
           value={days ?? ''}
           onChange={(event) =>
@@ -687,19 +712,19 @@ function ExportPanel() {
             )
           }
         >
-          <option value="">Всё время</option>
+          <option value="">{t('Всё время')}</option>
           {periods.map((period) => (
             <option key={period.value} value={period.value}>
-              {period.label}
+              {t(period.label)}
             </option>
           ))}
         </select>
       }
     >
       <p className="text-sm leading-6 text-[#69696d]">
-        CSV напрямую из PostgreSQL (COPY) — готово для pandas, DuckDB,
-        ClickHouse или BigQuery. Только идентификаторы и факты: без имён, email
-        и телефонов.
+        {t(
+          'CSV напрямую из PostgreSQL (COPY) — готово для pandas, DuckDB, ClickHouse или BigQuery. Только идентификаторы и факты: без имён, email и телефонов.',
+        )}
       </p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {analyticsDatasets.map((dataset) => (
@@ -712,13 +737,13 @@ function ExportPanel() {
             onClick={() => void download(dataset.id)}
           >
             <DocumentDownload aria-hidden />
-            {pending === dataset.id ? 'Готовим…' : dataset.label}
+            {pending === dataset.id ? t('Готовим…') : t(dataset.label)}
           </Button>
         ))}
       </div>
       {error ? (
         <p role="alert" className="mt-3 text-sm text-[#c92f2f]">
-          {error}
+          {t(error)}
         </p>
       ) : null}
     </Panel>

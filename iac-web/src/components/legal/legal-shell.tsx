@@ -183,7 +183,7 @@ export function LegalShell({
                   : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
               )}
             >
-              t('Политика конфиденциальности')
+              {t('Политика конфиденциальности')}
             </Link>
             <Link
               to="/terms"
@@ -194,7 +194,7 @@ export function LegalShell({
                   : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
               )}
             >
-              t('Условия использования')
+              {t('Условия использования')}
             </Link>
           </div>
         </div>
@@ -271,7 +271,7 @@ export function LegalShell({
                 isPrivacy && 'font-semibold text-[#3b82f6]',
               )}
             >
-              t('Политика конфиденциальности')
+              {t('Политика конфиденциальности')}
             </Link>
             <span className="text-[#cbd5e1]">•</span>
             <Link
@@ -281,7 +281,7 @@ export function LegalShell({
                 isTerms && 'font-semibold text-[#3b82f6]',
               )}
             >
-              t('Условия использования')
+              {t('Условия использования')}
             </Link>
             <span className="text-[#cbd5e1]">•</span>
             <Link

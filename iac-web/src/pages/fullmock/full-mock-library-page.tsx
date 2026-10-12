@@ -15,7 +15,7 @@ import {
 } from '@/features/fullmock/api'
 import type { FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -234,7 +234,7 @@ function AccountFullMockLibraryPage() {
       <div className="grid gap-3">
         {start.isError ? (
           <p role="alert" className="text-sm text-[#e23b3b]">
-            {getErrorMessage(start.error)}
+            {tr(getErrorMessage(start.error))}
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-3">

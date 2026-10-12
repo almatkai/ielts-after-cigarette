@@ -2,6 +2,7 @@ import { LampCharge, Lock } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
 import { GuestSignInButton } from '@/components/auth/guest-results-access'
+import { useLanguage } from '@/lib/i18n'
 import { formatAnswer } from './attempt-ui'
 import { useMistakeReviewStatus } from './use-mistake-review-status'
 import type { Option } from './attempt-ui'
@@ -31,6 +32,7 @@ export function MistakeRow({
   onRetry: () => void
   guestPreview?: boolean
 }) {
+  const { t } = useLanguage()
   const { reviewed } = useMistakeReviewStatus(attemptId, item.questionId)
   const content = (
     <>
@@ -45,18 +47,18 @@ export function MistakeRow({
           ) : (
             <LampCharge className="size-4" aria-hidden />
           )}
-          Разобрать ошибку
+          {t('Разобрать ошибку')}
         </span>
       </span>
       <span className="flex flex-wrap items-center gap-2.5 text-xs text-slate-600">
-        Ваш ответ:{' '}
+        {t('Ваш ответ')}:{' '}
         <strong className="text-slate-900">
           {formatAnswer(item.answer, reviewOptions(item))}
         </strong>
         <span
           className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${reviewed ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`}
         >
-          {reviewed ? 'Разобрано' : 'Ошибка'}
+          {reviewed ? t('Разобрано') : t('Ошибка')}
         </span>
       </span>
     </>
@@ -66,7 +68,7 @@ export function MistakeRow({
   return item.locked && guestPreview ? (
     <GuestSignInButton
       className={className}
-      label={`Разобрать ошибку ${item.number}: войти в аккаунт`}
+      label={`${t('Разобрать ошибку')} ${item.number}: ${t('войти в аккаунт')}`}
     >
       {content}
     </GuestSignInButton>
@@ -79,7 +81,7 @@ export function MistakeRow({
       type="button"
       onClick={onRetry}
       className={className}
-      aria-label={`Разобрать ошибку ${item.number}`}
+      aria-label={`${t('Разобрать ошибку')} ${item.number}`}
     >
       {content}
     </button>

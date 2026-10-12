@@ -30,6 +30,7 @@ import { getAttemptMaterial } from '@/features/attempts/api'
 import type { AttemptReviewItem, StudentAnswer } from '@/features/attempts/api'
 import { getListeningMediaBlob } from '@/features/listening/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
+import { useLanguage } from '@/lib/i18n'
 import { reviewOptions } from './mistake-list'
 import { withReviewMaterial } from './review-material'
 import { evaluateRetryAnswer } from './retry-answer'
@@ -96,6 +97,7 @@ function MistakeRetryContent({
   materialType?: string
   onNext?: () => void
 }) {
+  const { t } = useLanguage()
   const { markReviewed } = useMistakeReviewStatus(
     attemptId,
     initialItem.questionId,
@@ -257,7 +259,7 @@ function MistakeRetryContent({
 
   const passageBody = item.passageBody?.trim() ?? ''
 
-  const passageTitle = item.passageTitle || 'Текст для чтения'
+  const passageTitle = item.passageTitle || t('Текст для чтения')
   const quote = extractQuote(item)
   const hasPassage =
     !isListening && Boolean(passageBody && passageBody.length > 0)
@@ -267,7 +269,7 @@ function MistakeRetryContent({
   const leftColumnTitle = isListening
     ? listeningPart?.title
       ? `Listening: ${listeningPart.title}`
-      : 'Аудиозапись и стенограмма'
+      : t('Аудиозапись и стенограмма')
     : passageTitle
 
   const options = reviewOptions(item)
@@ -357,7 +359,7 @@ function MistakeRetryContent({
         </span>
         <DialogClose className="shrink-0 rounded-[8px] p-1 text-[#8b8b8e] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]">
           <CloseSquare className="size-5" aria-hidden />
-          <span className="sr-only">Закрыть</span>
+          <span className="sr-only">{t('Закрыть')}</span>
         </DialogClose>
       </DialogHeader>
 
@@ -378,12 +380,12 @@ function MistakeRetryContent({
               {isListening ? (
                 <>
                   <VolumeHigh className="size-3.5" />
-                  Аудио и стенограмма
+                  {t('Аудио и стенограмма')}
                 </>
               ) : (
                 <>
                   <Book1 className="size-3.5" />
-                  Текст пассажа
+                  {t('Текст пассажа')}
                 </>
               )}
             </button>
@@ -398,7 +400,7 @@ function MistakeRetryContent({
               )}
             >
               <TextalignLeft className="size-3.5" />
-              Вопрос и решение
+              {t('Вопрос и решение')}
             </button>
           </div>
         </div>
@@ -406,7 +408,7 @@ function MistakeRetryContent({
 
       {audioQuery.isError && !audioUrl ? (
         <p className="px-5 py-3 text-sm text-[#69696d]">
-          Не удалось загрузить аудио
+          {t('Не удалось загрузить аудио')}
         </p>
       ) : null}
       {/* Audio Player Bar (for Listening) */}
@@ -414,7 +416,7 @@ function MistakeRetryContent({
         <div className="px-5 py-2.5 bg-blue-50/60 border-b border-[#e5e7eb] flex flex-col gap-1.5 shrink-0">
           <audio
             ref={audioRef}
-            aria-label="Аудио"
+            aria-label={t('Аудио')}
             className="w-full h-8"
             controls
             preload="metadata"
@@ -488,8 +490,8 @@ function MistakeRetryContent({
                     <Play className="size-3 text-[#2563eb]" />
                     <span>
                       {showHint || isCorrect === false
-                        ? `Фрагмент [${formatSeconds(hintAudioStart ?? timestampStart)} - ${formatSeconds(timestampEnd)}]`
-                        : `Слушать аудио`}
+                        ? `${t('Фрагмент')} [${formatSeconds(hintAudioStart ?? timestampStart)} - ${formatSeconds(timestampEnd)}]`
+                        : t('Слушать аудио')}
                     </span>
                   </Button>
                 ) : isListening && (revealed || isCorrect) && audioRange ? (
@@ -506,7 +508,7 @@ function MistakeRetryContent({
                     className="h-7 text-[11px] font-semibold text-[#2563eb] hover:bg-blue-50 px-2 gap-1 rounded-md"
                   >
                     <Eye className="size-3 text-[#2563eb]" />
-                    <span>К ответу в тексте</span>
+                    <span>{t('К ответу в тексте')}</span>
                   </Button>
                 ) : null}
 
@@ -578,10 +580,10 @@ function MistakeRetryContent({
                     <VolumeHigh className="size-8 text-slate-400" />
                     <p className="text-sm font-medium text-slate-700">
                       {audioUrl
-                        ? 'Аудиозапись'
+                        ? t('Аудиозапись')
                         : audioQuery.isPending && audioAssetId
-                          ? 'Загрузка аудио…'
-                          : 'Нет стенограммы'}
+                          ? t('Загрузка аудио…')
+                          : t('Нет стенограммы')}
                     </p>
                   </div>
                 )
@@ -607,14 +609,14 @@ function MistakeRetryContent({
         >
           <div
             role="region"
-            aria-label="Разбор ошибки"
+            aria-label={t('Разбор ошибки')}
             className="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6 space-y-4"
           >
             {/* Header Title */}
             <div>
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-lg font-bold tracking-tight text-slate-900">
-                  Работа над ошибкой
+                  {t('Работа над ошибкой')}
                 </DialogTitle>
                 {hasPassage && (
                   <button
@@ -623,12 +625,12 @@ function MistakeRetryContent({
                     className="md:hidden text-xs text-[#2563eb] font-semibold underline underline-offset-2 flex items-center gap-1"
                   >
                     <Book1 className="size-3" />
-                    Читать текст
+                    {t('Читать текст')}
                   </button>
                 )}
               </div>
               <DialogDescription className="sr-only">
-                Вопрос {item.number}
+                {t('Вопрос')} {item.number}
               </DialogDescription>
             </div>
 
@@ -636,7 +638,7 @@ function MistakeRetryContent({
             <div className="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm font-medium text-slate-900 leading-relaxed shadow-2xs space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold text-[#2563eb]">
-                  Вопрос {item.number}
+                  {t('Вопрос')} {item.number}
                 </span>
                 {typeof item.content?.completionRule === 'object' &&
                 item.content.completionRule ? (
@@ -671,7 +673,7 @@ function MistakeRetryContent({
               <p className="text-slate-900 leading-relaxed">
                 {item.prompt === '{{answer}}' ? (
                   <span className="italic text-slate-600">
-                    Заполните пропуск: [ _____ ]
+                    {t('Заполните пропуск: [ _____ ]')}
                   </span>
                 ) : (
                   item.prompt.replace('{{answer}}', '_____')
@@ -684,13 +686,13 @@ function MistakeRetryContent({
               <div className="flex items-center gap-2">
                 <CloseCircle className="size-4 shrink-0 text-rose-600" />
                 <span>
-                  Ваш ответ:{' '}
+                  {t('Ваш ответ')}:{' '}
                   <strong className="line-through">
                     {formatAnswer(item.answer, options)}
                   </strong>
                 </span>
               </div>
-              <span className="font-semibold text-rose-700">Ошибка</span>
+              <span className="font-semibold text-rose-700">{t('Ошибка')}</span>
             </div>
 
             {/* Retry Inputs (Level 1) */}
@@ -782,12 +784,14 @@ function MistakeRetryContent({
                     ))}
                   </div>
                 ) : isChoice ? (
-                  <p className="text-sm text-[#69696d]">Нет вариантов ответа</p>
+                  <p className="text-sm text-[#69696d]">
+                    {t('Нет вариантов ответа')}
+                  </p>
                 ) : (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Ответ"
-                      aria-label="Ответ"
+                      placeholder={t('Ответ')}
+                      aria-label={t('Ответ')}
                       value={selectedAnswer}
                       onChange={(e) => setSelectedAnswer(e.target.value)}
                       onKeyDown={(e) => {
@@ -803,9 +807,11 @@ function MistakeRetryContent({
                   <div className="flex items-start gap-2.5 rounded-[12px] border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-950">
                     <LampCharge className="size-4 shrink-0 text-amber-600 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-amber-900">Неверно</p>
+                      <p className="font-semibold text-amber-900">
+                        {t('Неверно')}
+                      </p>
                       <p className="mt-0.5 text-amber-800 leading-relaxed">
-                        Попробуйте ещё раз.
+                        {t('Попробуйте ещё раз.')}
                       </p>
                     </div>
                   </div>
@@ -822,7 +828,7 @@ function MistakeRetryContent({
                     }
                     className="bg-[#2563eb] hover:bg-blue-600 text-white font-medium px-5 shadow-xs"
                   >
-                    Проверить
+                    {t('Проверить')}
                   </Button>
 
                   <Button
@@ -834,7 +840,7 @@ function MistakeRetryContent({
                       setUnblurTranscript(true)
                     }}
                   >
-                    Показать решение
+                    {t('Показать решение')}
                   </Button>
                   {!showHint && (
                     <Button
@@ -845,7 +851,7 @@ function MistakeRetryContent({
                       className="text-xs text-slate-600 hover:text-slate-900 gap-1.5"
                     >
                       <LampCharge className="size-3.5 text-amber-500" />
-                      Подсказка
+                      {t('Подсказка')}
                     </Button>
                   )}
                 </div>
@@ -860,7 +866,7 @@ function MistakeRetryContent({
                   <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-amber-100/90 px-2.5 py-1 text-xs font-semibold text-amber-900 border border-amber-200/70">
                     <LampCharge className="size-3.5 text-amber-600" />
                     <span>
-                      {isListening ? 'Подсказка' : 'Подсказка к поиску'}
+                      {isListening ? t('Подсказка') : t('Подсказка к поиску')}
                     </span>
                   </div>
 
@@ -878,7 +884,7 @@ function MistakeRetryContent({
                       className="h-8 shrink-0 gap-1.5 whitespace-nowrap rounded-[8px] border-amber-200 bg-white text-xs font-semibold text-amber-900 shadow-none hover:bg-amber-50"
                     >
                       <Play className="size-3 text-amber-700" />
-                      Слушать фрагмент
+                      {t('Слушать фрагмент')}
                     </Button>
                   ) : quote ? (
                     <button
@@ -887,7 +893,7 @@ function MistakeRetryContent({
                       className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
                     >
                       <Eye className="size-3 text-[#2563eb]" />
-                      <span>Показать в тексте</span>
+                      <span>{t('Показать в тексте')}</span>
                     </button>
                   ) : null}
                 </div>
@@ -896,7 +902,7 @@ function MistakeRetryContent({
                 {item.hint ? (
                   <div className="space-y-1">
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-900/70">
-                      На что обратить внимание:
+                      {t('На что обратить внимание')}:
                     </p>
                     <p className="text-[13.5px] leading-relaxed text-slate-800 font-medium">
                       {item.hint}
@@ -910,10 +916,10 @@ function MistakeRetryContent({
                     <div className="flex items-center justify-between text-[11px] text-slate-400">
                       <span className="font-semibold uppercase tracking-wider flex items-center gap-1 text-slate-500">
                         <Book1 className="size-3.5 text-slate-400" />
-                        Цитата из текста
+                        {t('Цитата из текста')}
                       </span>
                       <span className="text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 text-[10.5px]">
-                        Подсвечена слева
+                        {t('Подсвечена слева')}
                       </span>
                     </div>
                     <p className="text-[13px] font-serif italic text-slate-700 leading-relaxed pl-2 border-l-2 border-amber-400">
@@ -922,7 +928,7 @@ function MistakeRetryContent({
                   </div>
                 ) : (
                   <p className="text-xs text-slate-600 italic">
-                    Подсказки нет.
+                    {t('Подсказки нет.')}
                   </p>
                 )}
 
@@ -938,7 +944,7 @@ function MistakeRetryContent({
                   >
                     <span></span>
                     <span className="underline underline-offset-2 font-semibold">
-                      Показать решение
+                      {t('Показать решение')}
                     </span>
                   </button>
                 </div>
@@ -952,7 +958,7 @@ function MistakeRetryContent({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-100/90 px-2.5 py-1 text-xs font-semibold text-emerald-900 border border-emerald-200/70">
                     <TickCircle className="size-3.5 text-emerald-600" />
-                    <span>{isCorrect ? 'Верно' : 'Решение'}</span>
+                    <span>{isCorrect ? t('Верно') : t('Решение')}</span>
                   </div>
 
                   {isListening &&
@@ -969,7 +975,7 @@ function MistakeRetryContent({
                       className="h-8 shrink-0 gap-1.5 whitespace-nowrap rounded-[8px] border-emerald-200 bg-white text-xs font-semibold text-emerald-900 shadow-none hover:bg-emerald-50"
                     >
                       <Play className="size-3 text-emerald-700" />
-                      Слушать ответ
+                      {t('Слушать ответ')}
                     </Button>
                   ) : !isListening && quote ? (
                     <button
@@ -978,7 +984,7 @@ function MistakeRetryContent({
                       className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs hover:bg-slate-50 transition-all"
                     >
                       <Eye className="size-3 text-[#2563eb]" />
-                      <span>Показать в тексте</span>
+                      <span>{t('Показать в тексте')}</span>
                     </button>
                   ) : null}
                 </div>
@@ -986,7 +992,7 @@ function MistakeRetryContent({
                 {/* Correct Answer Display */}
                 <div className="space-y-1">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-900/70">
-                    Правильный ответ:
+                    {t('Правильный ответ')}:
                   </p>
                   <div className="flex items-center gap-2">
                     <span className="text-base sm:text-lg font-bold text-emerald-950">
@@ -995,8 +1001,8 @@ function MistakeRetryContent({
                     {isCorrect && (
                       <span className="text-xs font-medium text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
                         {attemptCount > 1
-                          ? `со ${attemptCount}-й попытки`
-                          : 'с 1-й попытки'}
+                          ? `${t('со')} ${attemptCount}${t('-й попытки')}`
+                          : t('с 1-й попытки')}
                       </span>
                     )}
                   </div>
@@ -1012,11 +1018,11 @@ function MistakeRetryContent({
                         ) : (
                           <Book1 className="size-3.5 text-slate-400" />
                         )}
-                        Цитата
+                        {t('Цитата')}
                       </span>
                       {!isListening ? (
                         <span className="text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[10.5px]">
-                          Подсвечена слева
+                          {t('Подсвечена слева')}
                         </span>
                       ) : null}
                     </div>
@@ -1031,7 +1037,7 @@ function MistakeRetryContent({
                   <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-1.5">
                     <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                       <InfoCircle className="size-3.5 text-slate-400" />
-                      <span>Подробное объяснение:</span>
+                      <span>{t('Подробное объяснение')}:</span>
                     </div>
                     <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-slate-800 font-normal">
                       {item.explanation}
@@ -1049,7 +1055,7 @@ function MistakeRetryContent({
                 onClick={onNext}
                 className="gap-2 whitespace-nowrap rounded-[10px]"
               >
-                Следующая ошибка
+                {t('Следующая ошибка')}
                 <ArrowRight className="size-4" aria-hidden />
               </Button>
             </div>
@@ -1145,6 +1151,7 @@ function ListeningTranscriptRender({
   timestampEnd?: number
   onPlayHintAudio?: (start?: number) => void
 }) {
+  const { t } = useLanguage()
   const { matchIndex, matchLen, broadStart, broadEnd } = useMemo(
     () => findBroadRegion(body, quote),
     [body, quote],
@@ -1168,7 +1175,7 @@ function ListeningTranscriptRender({
       >
         {!isRevealed && !unblurTranscript && (
           <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/90 p-3 flex items-center justify-between text-xs text-blue-950">
-            <span>Стенограмма скрыта</span>
+            <span>{t('Стенограмма скрыта')}</span>
             <Button
               type="button"
               size="sm"
@@ -1176,7 +1183,7 @@ function ListeningTranscriptRender({
               onClick={onUnblur}
               className="h-6 text-[11px] text-blue-900 border-blue-300 bg-white"
             >
-              Показать
+              {t('Показать')}
             </Button>
           </div>
         )}
@@ -1243,7 +1250,7 @@ function ListeningTranscriptRender({
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-amber-200/80 select-none">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
               <LampCharge className="size-4 text-amber-600" />
-              <span>Фрагмент с подсказкой (~3–5 реплик)</span>
+              <span>{t('Фрагмент с подсказкой (~3–5 реплик)')}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1257,7 +1264,7 @@ function ListeningTranscriptRender({
                 >
                   <Play className="size-3 text-amber-700" />
                   <span>
-                    Слушать [
+                    {t('Слушать')} [
                     {typeof timestampEnd === 'number'
                       ? `${formatSeconds(hintAudioStart)} - ${formatSeconds(timestampEnd)}`
                       : formatSeconds(hintAudioStart)}
@@ -1275,19 +1282,19 @@ function ListeningTranscriptRender({
                   className="h-7 text-[11px] font-semibold text-amber-950 bg-amber-100 hover:bg-amber-200/90 border-amber-300 gap-1 rounded-full shadow-2xs"
                 >
                   <Eye className="size-3 text-amber-700" />
-                  <span>Показать текст фрагмента</span>
+                  <span>{t('Показать текст фрагмента')}</span>
                 </Button>
               ) : (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-medium text-emerald-800 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    ✓ Текст открыт
+                    ✓ {t('Текст открыт')}
                   </span>
                   <button
                     type="button"
                     onClick={onReblur}
                     className="text-[11px] text-amber-800 hover:text-amber-950 underline px-1"
                   >
-                    Скрыть
+                    {t('Скрыть')}
                   </button>
                 </div>
               )}

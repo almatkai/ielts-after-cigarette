@@ -17,6 +17,7 @@ import type {
   MistakeDetail,
 } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import { MistakeRow } from '@/features/attempts/mistake-list'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
 import {
@@ -46,6 +47,7 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 })
 
 export function MistakesPage() {
+  const { t, language } = useLanguage()
   const { skill, page, attempt } = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
   const queryClient = useQueryClient()
@@ -62,7 +64,7 @@ export function MistakesPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-            Банк ошибок
+            {t('Банк ошибок')}
           </h2>
         </div>
         <Button
@@ -70,19 +72,19 @@ export function MistakesPage() {
           size="sm"
           className="shadow-none"
           disabled={isRefreshing}
-          aria-label="Обновить банк ошибок"
+          aria-label={t('Обновить банк ошибок')}
           onClick={() =>
             void queryClient.invalidateQueries({
               queryKey: attemptKeys.mistakes,
             })
           }
         >
-          {isRefreshing ? 'Обновляем…' : 'Обновить'}
+          {isRefreshing ? t('Обновляем…') : t('Обновить')}
         </Button>
       </div>
 
       <nav
-        aria-label="Навык"
+        aria-label={t('Навык')}
         className="flex gap-1 overflow-x-auto rounded-[12px] bg-[#f0f0ed] p-1"
       >
         {skills.map((value) => (
@@ -111,16 +113,16 @@ export function MistakesPage() {
           <div className="flex items-center justify-between gap-3 text-sm text-[#69696d]">
             <p>
               {skill === 'reading' || skill === 'listening'
-                ? 'Попытки с ошибками'
-                : 'Завершённые разборы'}
+                ? t('Попытки с ошибками')
+                : t('Завершённые разборы')}
             </p>
-            <p>Последние сначала</p>
+            <p>{t('Последние сначала')}</p>
           </div>
           {listQuery.isPending ? (
-            <LoadingState label="Загружаем попытки…" />
+            <LoadingState label={t('Загружаем попытки…')} />
           ) : listQuery.isError ? (
             <ErrorState
-              title="Не удалось загрузить попытки"
+              title={t('Не удалось загрузить попытки')}
               message={getErrorMessage(listQuery.error)}
               onRetry={() => void listQuery.refetch()}
             />
@@ -131,7 +133,7 @@ export function MistakesPage() {
               <Card className={cardClassName}>
                 <CardContent className="grid gap-3 p-6">
                   <p className="text-sm text-[#69696d]">
-                    На этой странице больше нет попыток.
+                    {t('На этой странице больше нет попыток.')}
                   </p>
                   <Button
                     variant="outline"
@@ -140,7 +142,7 @@ export function MistakesPage() {
                       void navigate({ search: { skill, page: 1 } })
                     }
                   >
-                    К первой странице
+                    {t('К первой странице')}
                   </Button>
                 </CardContent>
               </Card>
@@ -155,7 +157,7 @@ export function MistakesPage() {
                   >
                     <div className="min-w-0 flex-1 basis-[180px]">
                       <h3 className="break-words text-xs sm:text-sm font-semibold text-[#111111]">
-                        {item.testTitle || 'Без названия'}
+                        {item.testTitle || t('Без названия')}
                       </h3>
                       <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
                         {dateFormatter.format(
@@ -168,7 +170,7 @@ export function MistakesPage() {
                         className={`text-sm font-medium ${item.mistakeCount !== null ? 'text-rose-700' : 'text-[#1d4ed8]'}`}
                       >
                         {item.mistakeCount !== null
-                          ? mistakeCountLabel(item.mistakeCount)
+                          ? mistakeCountLabel(item.mistakeCount, language)
                           : `Band ${item.band?.toFixed(1) ?? '—'}`}
                       </span>
                       <Button
@@ -182,8 +184,8 @@ export function MistakesPage() {
                         }
                       >
                         {item.mistakeCount !== null
-                          ? 'Разобрать'
-                          : 'Посмотреть разбор'}
+                          ? t('Разобрать')
+                          : t('Посмотреть разбор')}
                         <ArrowRight className="size-4" aria-hidden />
                       </Button>
                     </div>
@@ -197,7 +199,7 @@ export function MistakesPage() {
           (page > 1 || listQuery.data.hasNext) ? (
             <div
               className="flex items-center justify-between gap-3"
-              aria-label="Страницы попыток"
+              aria-label={t('Страницы попыток')}
             >
               <Button
                 variant="outline"
@@ -209,9 +211,11 @@ export function MistakesPage() {
                 }
               >
                 <ArrowLeft className="size-4" aria-hidden />
-                Назад
+                {t('Назад')}
               </Button>
-              <p className="text-sm text-[#69696d]">Страница {page}</p>
+              <p className="text-sm text-[#69696d]">
+                {t('Страница')} {page}
+              </p>
               <Button
                 variant="outline"
                 size="sm"
@@ -221,7 +225,7 @@ export function MistakesPage() {
                   void navigate({ search: { skill, page: page + 1 } })
                 }
               >
-                Далее
+                {t('Далее')}
                 <ArrowRight className="size-4" aria-hidden />
               </Button>
             </div>
@@ -243,6 +247,7 @@ function AttemptMistakes({
   skill: AttemptMaterialType
   onBack: () => void
 }) {
+  const { t, language } = useLanguage()
   const [retryIndex, setRetryIndex] = useState<number | null>(null)
   const detailQuery = useQuery({
     queryKey: attemptKeys.mistakeDetail(attemptId),
@@ -268,28 +273,29 @@ function AttemptMistakes({
         className="w-fit gap-2 px-0 text-[#69696d] hover:bg-transparent hover:text-[#111111]"
         onClick={onBack}
       >
-        <ArrowLeft className="size-4" aria-hidden />К списку попыток
+        <ArrowLeft className="size-4" aria-hidden />
+        {t('К списку попыток')}
       </Button>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="break-words text-lg font-semibold tracking-[-0.02em]">
-            {selected?.testTitle || 'Разбор попытки'}
+            {selected?.testTitle || t('Разбор попытки')}
           </h3>
           <p className="mt-1 text-sm text-[#69696d]">
             {materialTypeLabels[materialType]}
             {detail &&
             (materialType === 'reading' || materialType === 'listening')
-              ? ` · ${mistakeCountLabel(detail.review.length)}`
+              ? ` · ${mistakeCountLabel(detail.review.length, language)}`
               : ''}
           </p>
         </div>
         <ReviewLink attemptId={attemptId} />
       </div>
       {detailQuery.isPending ? (
-        <LoadingState label="Загружаем разбор этой попытки…" />
+        <LoadingState label={t('Загружаем разбор этой попытки…')} />
       ) : detailQuery.isError ? (
         <ErrorState
-          title="Не удалось загрузить разбор"
+          title={t('Не удалось загрузить разбор')}
           message={getErrorMessage(detailQuery.error)}
           onRetry={() => void detailQuery.refetch()}
         />
@@ -314,7 +320,7 @@ function AttemptMistakes({
           !detailQuery.data.writingEvaluation &&
           !detailQuery.data.speakingEvaluation ? (
             <p className="py-6 text-sm text-[#69696d]">
-              В этой попытке нет ошибок для разбора.
+              {t('В этой попытке нет ошибок для разбора.')}
             </p>
           ) : null}
         </>
@@ -335,22 +341,29 @@ function AttemptMistakes({
 }
 
 function EmptyMistakesState({ skill }: { skill: AttemptMaterialType }) {
+  const { t } = useLanguage()
   const objective = skill === 'reading' || skill === 'listening'
   return (
     <Card className={cardClassName}>
       <CardContent className="grid justify-items-center gap-3 p-10 text-center">
         <p className="font-semibold">
           {objective
-            ? `В ${materialTypeLabels[skill]} ошибок пока нет`
-            : `Разборов ${materialTypeLabels[skill]} пока нет`}
+            ? t(`В ${materialTypeLabels[skill]} ошибок пока нет`)
+            : t(`Разборов ${materialTypeLabels[skill]} пока нет`)}
         </p>
         <p className="max-w-md text-sm leading-6 text-[#69696d]">
           {objective
-            ? 'Здесь появятся завершённые попытки с неверными или пропущенными ответами.'
-            : 'Здесь появятся оценки и обратная связь по завершённым попыткам.'}
+            ? t(
+                'Здесь появятся завершённые попытки с неверными или пропущенными ответами.',
+              )
+            : t(
+                'Здесь появятся оценки и обратная связь по завершённым попыткам.',
+              )}
         </p>
         <Button asChild variant="outline" className="shadow-none">
-          <Link to={`/${skill}`}>Перейти к {materialTypeLabels[skill]}</Link>
+          <Link to={`/${skill}`}>
+            {t(`Перейти к ${materialTypeLabels[skill]}`)}
+          </Link>
         </Button>
       </CardContent>
     </Card>
@@ -364,6 +377,7 @@ function AIEvaluationCard({
   detail: MistakeDetail
   skill: AttemptMaterialType
 }) {
+  const { t } = useLanguage()
   const evaluation = detail.writingEvaluation ?? detail.speakingEvaluation
   if (!evaluation) return null
   const isSpeaking = skill === 'speaking' || Boolean(detail.speakingEvaluation)
@@ -423,7 +437,9 @@ function AIEvaluationCard({
           criterion: detail.speakingEvaluation?.criteria.pronunciation,
           unavailable: !isPronunciationAvailable,
           feedback: !isPronunciationAvailable
-            ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+            ? t(
+                'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
+              )
             : detail.speakingEvaluation?.criteria.pronunciation.feedback,
         },
       ]
@@ -439,8 +455,9 @@ function AIEvaluationCard({
           </CardTitle>
           {isSpeaking && !isPronunciationAvailable ? (
             <span className="text-xs text-[#69696d]">
-              Оценка по 3 критериям (произношение пока не определяется нашей
-              системой)
+              {t(
+                'Оценка по 3 критериям (произношение пока не определяется нашей системой)',
+              )}
             </span>
           ) : null}
         </div>
@@ -462,7 +479,7 @@ function AIEvaluationCard({
                   {label}
                   {unavailable ? (
                     <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                      Пока не определяется
+                      {t('Пока не определяется')}
                     </span>
                   ) : (
                     <span className="text-[#3b82f6]">
@@ -485,6 +502,7 @@ function AIEvaluationCard({
 }
 
 function ReviewLink({ attemptId }: { attemptId: string }) {
+  const { t } = useLanguage()
   return (
     <Button
       asChild
@@ -493,7 +511,7 @@ function ReviewLink({ attemptId }: { attemptId: string }) {
       className="shrink-0 gap-1.5 rounded-[9px] shadow-none"
     >
       <Link to="/attempts/$attemptId" params={{ attemptId }}>
-        Полный разбор
+        {t('Полный разбор')}
         <ArrowRight className="size-3.5" aria-hidden />
       </Link>
     </Button>

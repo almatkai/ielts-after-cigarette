@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 type AuthInputProps = {
@@ -33,6 +34,7 @@ export function AuthInput({
   inputMode,
   maxLength,
 }: AuthInputProps) {
+  const { t } = useLanguage()
   const [passwordIsVisible, setPasswordIsVisible] = useState(false)
   const isPassword = type === 'password'
   const inputType = isPassword && passwordIsVisible ? 'text' : type
@@ -73,7 +75,9 @@ export function AuthInput({
             size="icon"
             onClick={() => setPasswordIsVisible((visible) => !visible)}
             className="absolute top-1/2 right-1.5 grid size-10 -translate-y-1/2 place-items-center rounded-[9px] text-[#475569] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
-            aria-label={passwordIsVisible ? 'Скрыть пароль' : 'Показать пароль'}
+            aria-label={
+              passwordIsVisible ? t('Скрыть пароль') : t('Показать пароль')
+            }
             aria-pressed={passwordIsVisible}
           >
             {passwordIsVisible ? (
@@ -101,7 +105,7 @@ export function AuthInput({
             className="text-xs leading-4 text-[#dc2626]"
             role="alert"
           >
-            {error}
+            {t(error)}
           </p>
         ) : null}
       </div>

@@ -9,6 +9,7 @@ import { useAttemptDetail } from './use-attempt-detail'
 import { withReviewMaterial } from './review-material'
 import { mistakeCountLabel } from '@/pages/mistakes/model'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import type { AttemptDetail, AttemptReviewItem } from './api'
 import type { ReviewMaterial } from './review-material'
 
@@ -23,6 +24,7 @@ export function ObjectiveAttemptReview({
   title?: string
   showHeading?: boolean
 }) {
+  const { t, language } = useLanguage()
   const [selected, setSelected] = useState<AttemptReviewItem | null>(null)
   const review = attempt.review ?? []
   const mistakes = review
@@ -42,7 +44,7 @@ export function ObjectiveAttemptReview({
     <section className="grid min-w-0 gap-5">
       {showHeading ? (
         <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
-          Работа над ошибками
+          {t('Работа над ошибками')}
         </h1>
       ) : null}
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -53,7 +55,7 @@ export function ObjectiveAttemptReview({
             </h2>
           ) : null}
           <p className="mt-1 text-sm text-[#69696d]">
-            {skill} · {mistakeCountLabel(mistakes.length)}
+            {skill} · {mistakeCountLabel(mistakes.length, language)}
           </p>
         </div>
         {attempt.band !== null ? (
@@ -88,7 +90,7 @@ export function ObjectiveAttemptReview({
           </CardContent>
         </Card>
       ) : (
-        <p className="py-6 text-sm text-[#69696d]">Нет ошибок</p>
+        <p className="py-6 text-sm text-[#69696d]">{t('Нет ошибок')}</p>
       )}
       <MistakeRetryDialog
         item={selected}
@@ -118,6 +120,7 @@ export function ObjectiveAttemptResult({
   onRetake?: () => void
   isRetaking?: boolean
 }) {
+  const { t } = useLanguage()
   const query = useAttemptDetail(attemptId)
   if (fullMockSessionId || query.data?.reviewLocked) {
     const sessionId = fullMockSessionId ?? query.data?.fullMockSessionId
@@ -133,12 +136,12 @@ export function ObjectiveAttemptResult({
       />
       {query.isError ? (
         <ErrorState
-          title="Не удалось загрузить разбор"
+          title={t('Не удалось загрузить разбор')}
           message={getErrorMessage(query.error)}
           onRetry={() => void query.refetch()}
         />
       ) : !query.data ? (
-        <LoadingState label="Загрузка…" />
+        <LoadingState label={t('Загрузка…')} />
       ) : (
         <ObjectiveAttemptReview
           key={attemptId}

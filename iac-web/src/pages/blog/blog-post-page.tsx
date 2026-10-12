@@ -6,10 +6,12 @@ import { BlogBackLink, BlogShell } from '@/components/blog/blog-shell'
 import { blogMediaUrl, publishedPostQueryOptions } from '@/features/blog/api'
 import { landingHref } from '@/features/blog/links'
 import { formatBlogDate } from '@/features/blog/seo'
+import { useLanguage } from '@/lib/i18n'
 
 const routeApi = getRouteApi('/blog/$slug')
 
 export function BlogPostPage() {
+  const { t } = useLanguage()
   const { slug } = routeApi.useParams()
   const { data: post } = useSuspenseQuery(publishedPostQueryOptions(slug))
 
@@ -24,8 +26,8 @@ export function BlogPostPage() {
 
   return (
     <BlogShell width="narrow">
-      <nav aria-label="Навигационная цепочка">
-        <BlogBackLink to="/blog">Все статьи</BlogBackLink>
+      <nav aria-label={t('Навигационная цепочка')}>
+        <BlogBackLink to="/blog">{t('Все статьи')}</BlogBackLink>
       </nav>
 
       <article className="mt-5 rounded-[20px] border border-[#e7e7e4] bg-white px-5 py-8 sm:px-10 sm:py-10">
@@ -51,7 +53,7 @@ export function BlogPostPage() {
               <p className="text-sm font-semibold text-[#111111]">
                 {post.author.displayName}
                 <span className="ml-2 rounded-full bg-[#ecfdf5] px-2 py-0.5 text-[11px] font-medium text-[#047857]">
-                  IELTS 7.5+ подтверждён
+                  {t('IELTS 7.5+ подтверждён')}
                 </span>
               </p>
               <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-[#808084]">
@@ -60,11 +62,17 @@ export function BlogPostPage() {
                 ) : null}
                 {updated && post.contentUpdatedAt ? (
                   <span>
-                    · обновлено{' '}
+                    · {t('обновлено')}{' '}
                     <time dateTime={post.contentUpdatedAt}>{updated}</time>
                   </span>
                 ) : null}
-                <span>· {post.readingTimeMinutes} мин чтения</span>
+                <span>
+                  ·{' '}
+                  {t('{count} мин чтения').replace(
+                    '{count}',
+                    String(post.readingTimeMinutes),
+                  )}
+                </span>
               </p>
             </div>
           </div>
@@ -88,24 +96,25 @@ export function BlogPostPage() {
 
       <section className="mt-6 rounded-[20px] border border-[#e7e7e4] bg-white p-6">
         <h2 className="text-lg font-semibold tracking-[-0.02em]">
-          Готовитесь к IELTS?
+          {t('Готовитесь к IELTS?')}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[#69696d]">
-          Тренируйте Listening, Reading, Writing и Speaking на реальных форматах
-          заданий с AI-проверкой и разбором ошибок.
+          {t(
+            'Тренируйте Listening, Reading, Writing и Speaking на реальных форматах заданий с AI-проверкой и разбором ошибок.',
+          )}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <a
             href={landingHref}
             className="rounded-[10px] bg-[#3b82f6] px-4 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#2563eb]"
           >
-            Начать подготовку
+            {t('Начать подготовку')}
           </a>
           <Link
             to="/blog"
             className="rounded-[10px] border border-[#deded9] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] no-underline transition-colors hover:bg-[#f4f4f1]"
           >
-            Другие статьи
+            {t('Другие статьи')}
           </Link>
         </div>
       </section>
@@ -114,19 +123,20 @@ export function BlogPostPage() {
 }
 
 export function BlogPostNotFound() {
+  const { t } = useLanguage()
   return (
     <BlogShell width="narrow">
       <div className="flex flex-col items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white px-6 py-14 text-center">
         <DocumentText className="size-8 text-[#a0a0a4]" aria-hidden />
-        <h1 className="text-lg font-semibold">Статья не найдена</h1>
+        <h1 className="text-lg font-semibold">{t('Статья не найдена')}</h1>
         <p className="text-sm text-[#69696d]">
-          Возможно, её сняли с публикации или ссылка устарела.
+          {t('Возможно, её сняли с публикации или ссылка устарела.')}
         </p>
         <Link
           to="/blog"
           className="mt-2 rounded-[10px] bg-[#3b82f6] px-5 py-2.5 text-sm font-semibold text-white no-underline"
         >
-          Все статьи
+          {t('Все статьи')}
         </Link>
       </div>
     </BlogShell>

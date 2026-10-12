@@ -47,6 +47,7 @@ import type {
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { useExamTimer } from '@/features/attempts/exam-timer'
+import { tr } from '@/lib/i18n'
 
 type PartPhase = 'ready' | 'preparing' | 'recording' | 'uploading' | 'finished'
 
@@ -229,7 +230,7 @@ export function SpeakingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not save draft:'} {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
       {session.submitError ? (
@@ -237,7 +238,7 @@ export function SpeakingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not submit Speaking:'} {session.submitError}
+          {'Could not submit Speaking:'} {tr(session.submitError)}
         </p>
       ) : null}
       <div
@@ -616,7 +617,7 @@ export function SpeakingAttemptResult({
       {detailQuery.isError ? (
         <ErrorState
           title={'Could not load feedback'}
-          message={getErrorMessage(detailQuery.error)}
+          message={tr(getErrorMessage(detailQuery.error))}
           onRetry={() => void detailQuery.refetch()}
         />
       ) : assessment?.status === 'FAILED' ? (
@@ -885,7 +886,7 @@ function useAudioRecorder({
             return true
           })
           .catch((error: unknown) => {
-            onError(getErrorMessage(error))
+            onError(tr(getErrorMessage(error)))
             return false
           })
           .finally(() => {
@@ -910,7 +911,7 @@ function useAudioRecorder({
       )
       return false
     }
-  }, [attemptId, onError, onUploaded, partId, stopTracks, t])
+  }, [attemptId, onError, onUploaded, partId, stopTracks])
   useEffect(
     () => () => {
       stop()

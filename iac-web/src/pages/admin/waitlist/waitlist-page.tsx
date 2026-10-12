@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adminQueryKeys, listWaitlistEntries } from '@/features/admin/api'
 import { ApiError } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type { WaitlistEntry } from '@/features/admin/api'
 
@@ -38,6 +39,7 @@ function unknownRefTags(entries: WaitlistEntry[]) {
 }
 
 export function WaitlistPage() {
+  const { t } = useLanguage()
   const waitlistQuery = useQuery({
     queryKey: adminQueryKeys.waitlist,
     queryFn: ({ signal }) => listWaitlistEntries(signal),
@@ -51,12 +53,12 @@ export function WaitlistPage() {
             Waitlist
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-            Заявки в waitlist
+            {t('Заявки в waitlist')}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
             {waitlistQuery.data
-              ? `Всего заявок: ${waitlistQuery.data.total}`
-              : 'Заявки с лендинга и реферальная статистика.'}
+              ? `${t('Всего заявок')}: ${waitlistQuery.data.total}`
+              : t('Заявки с лендинга и реферальная статистика.')}
           </p>
         </div>
         <Button
@@ -69,14 +71,14 @@ export function WaitlistPage() {
             className={waitlistQuery.isFetching ? 'animate-spin' : undefined}
             aria-hidden
           />
-          Обновить
+          {t('Обновить')}
         </Button>
       </div>
 
       {waitlistQuery.isPending ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="p-8 text-center text-sm text-[#69696d]">
-            Загружаем заявки…
+            {t('Загружаем заявки…')}
           </CardContent>
         </Card>
       ) : waitlistQuery.isError ? (
@@ -86,8 +88,10 @@ export function WaitlistPage() {
             <p className="mt-3 text-sm">
               {waitlistQuery.error instanceof ApiError &&
               waitlistQuery.error.status === 403
-                ? 'Нет доступа: waitlist доступен только администраторам (роль ADMIN).'
-                : 'Не удалось загрузить заявки.'}
+                ? t(
+                    'Нет доступа: waitlist доступен только администраторам (роль ADMIN).',
+                  )
+                : t('Не удалось загрузить заявки.')}
             </p>
             <Button
               type="button"
@@ -95,7 +99,7 @@ export function WaitlistPage() {
               className="mt-4"
               onClick={() => void waitlistQuery.refetch()}
             >
-              Повторить
+              {t('Повторить')}
             </Button>
           </CardContent>
         </Card>
@@ -103,10 +107,13 @@ export function WaitlistPage() {
         <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
             <DirectInbox className="size-8 text-[#9a9a9d]" aria-hidden />
-            <h2 className="mt-4 text-lg font-semibold">Заявок пока нет</h2>
+            <h2 className="mt-4 text-lg font-semibold">
+              {t('Заявок пока нет')}
+            </h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
-              Как только посетители начнут оставлять контакты, они появятся
-              здесь вместе с реферальной статистикой.
+              {t(
+                'Как только посетители начнут оставлять контакты, они появятся здесь вместе с реферальной статистикой.',
+              )}
             </p>
           </CardContent>
         </Card>
@@ -118,6 +125,7 @@ export function WaitlistPage() {
 }
 
 function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
+  const { t } = useLanguage()
   const referrers = topReferrers(entries)
   const tags = unknownRefTags(entries)
 
@@ -130,13 +138,15 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                 <People className="size-[18px]" aria-hidden />
               </span>
-              <CardTitle className="text-base">Топ приглашающих</CardTitle>
+              <CardTitle className="text-base">
+                {t('Топ приглашающих')}
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {referrers.length === 0 ? (
               <p className="text-sm text-[#69696d]">
-                Пока никто никого не пригласил.
+                {t('Пока никто никого не пригласил.')}
               </p>
             ) : (
               <ul className="grid gap-3">
@@ -155,7 +165,7 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
                       {entry.referralCode}
                     </span>
                     <Badge variant="outline">
-                      {entry.referrals} {pluralizeInvites(entry.referrals)}
+                      {entry.referrals} {t(pluralizeInvites(entry.referrals))}
                     </Badge>
                   </li>
                 ))}
@@ -170,20 +180,22 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
                 <Tag className="size-[18px]" aria-hidden />
               </span>
-              <CardTitle className="text-base">Внешние метки</CardTitle>
+              <CardTitle className="text-base">{t('Внешние метки')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {tags.length === 0 ? (
               <p className="text-sm text-[#69696d]">
-                Переходов по кодам, не принадлежащим пользователям waitlist,
-                нет.
+                {t(
+                  'Переходов по кодам, не принадлежащим пользователям waitlist, нет.',
+                )}
               </p>
             ) : (
               <>
                 <p className="text-sm leading-6 text-[#69696d]">
-                  Коды «приглашён по», которые не совпадают ни с одним кодом из
-                  waitlist — так помечены внешние источники трафика.
+                  {t(
+                    'Коды «приглашён по», которые не совпадают ни с одним кодом из waitlist — так помечены внешние источники трафика.',
+                  )}
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -204,15 +216,15 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
         <table className="w-full min-w-[1080px] text-left text-sm">
           <thead>
             <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
-              <th className="px-4 py-3 font-medium">Имя</th>
-              <th className="px-4 py-3 font-medium">Фамилия</th>
+              <th className="px-4 py-3 font-medium">{t('Имя')}</th>
+              <th className="px-4 py-3 font-medium">{t('Фамилия')}</th>
               <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Телефон</th>
-              <th className="px-4 py-3 font-medium">Источник</th>
-              <th className="px-4 py-3 font-medium">Код</th>
-              <th className="px-4 py-3 font-medium">Приглашён по</th>
-              <th className="px-4 py-3 font-medium">Приглашено</th>
-              <th className="px-4 py-3 font-medium">Дата</th>
+              <th className="px-4 py-3 font-medium">{t('Телефон')}</th>
+              <th className="px-4 py-3 font-medium">{t('Источник')}</th>
+              <th className="px-4 py-3 font-medium">{t('Код')}</th>
+              <th className="px-4 py-3 font-medium">{t('Приглашён по')}</th>
+              <th className="px-4 py-3 font-medium">{t('Приглашено')}</th>
+              <th className="px-4 py-3 font-medium">{t('Дата')}</th>
             </tr>
           </thead>
           <tbody>

@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 
 import { FoxMascot } from './fox-mascot'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 import { useMascotVisibility } from '@/features/assistant/mascot-store'
 
 const AiAssistantChatWindow = lazy(() =>
@@ -16,6 +17,7 @@ export function AiAssistantFloatingWidget({
 }: {
   className?: string
 }) {
+  const { t } = useLanguage()
   const foxSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`
   const { isVisible, setVisible } = useMascotVisibility()
   const [bubbleDismissed, setBubbleDismissed] = useState(false)
@@ -90,11 +92,11 @@ export function AiAssistantFloatingWidget({
                 className="fixed bottom-4 right-4 z-50 rounded-2xl border bg-white p-5 shadow-xl"
                 role="status"
               >
-                Загружаем чат Юки…
+                {t('Загружаем чат Юки…')}
                 <button
                   type="button"
                   className="ml-4"
-                  aria-label="Закрыть чат"
+                  aria-label={t('Закрыть чат')}
                   onClick={() => setChatIsOpen(false)}
                 >
                   <CloseCircle />
@@ -134,7 +136,7 @@ export function AiAssistantFloatingWidget({
                 }
               }}
               className="group/bubble relative mb-2 cursor-pointer max-w-[240px] sm:max-w-[280px] rounded-2xl bg-white/95 p-3.5 shadow-[0_12px_32px_rgba(29,39,61,0.16)] border border-blue-100/90 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-300 hover:shadow-[0_16px_40px_rgba(37,99,235,0.22)] animate-speech-bubble outline-none after:absolute after:-bottom-2.5 after:right-8 sm:after:right-12 after:size-0 after:border-x-8 after:border-x-transparent after:border-t-10 after:border-t-white after:filter after:drop-shadow-[0_2px_1px_rgba(29,39,61,0.06)]"
-              aria-label="Открыть чат с Юки"
+              aria-label={t('Открыть чат с Юки')}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-1.5">
@@ -149,20 +151,20 @@ export function AiAssistantFloatingWidget({
                     setBubbleDismissed(true)
                   }}
                   className="text-[#94a3b8] hover:text-[#0f172a] -mr-1 -mt-1 p-0.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
-                  title="Скрыть подсказку"
-                  aria-label="Скрыть подсказку"
+                  title={t('Скрыть подсказку')}
+                  aria-label={t('Скрыть подсказку')}
                 >
                   <CloseCircle className="size-4" variant="Outline" />
                 </button>
               </div>
 
               <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-[#334155]">
-                Привет! Меня зовут <strong>Юки</strong> — я твой наставник по
-                IELTS.
+                {t('Привет! Меня зовут')} <strong>{t('Юки')}</strong>{' '}
+                {t('— я твой наставник по IELTS.')}
               </p>
 
               <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb]">
-                <span>Открыть чат</span>
+                <span>{t('Открыть чат')}</span>
                 <span className="text-xs transition-transform duration-200 group-hover/bubble:translate-x-1">
                   →
                 </span>
@@ -180,8 +182,8 @@ export function AiAssistantFloatingWidget({
                 setVisible(false)
               }}
               className="absolute top-0 right-1 sm:top-1 sm:right-2 z-20 flex size-6 sm:size-7 items-center justify-center rounded-full bg-white/95 text-slate-400 hover:text-slate-700 shadow-md border border-slate-200/90 backdrop-blur-xs transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer opacity-75 sm:opacity-0 sm:group-hover/mascot:opacity-100 focus:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              title="Скрыть питомца"
-              aria-label="Скрыть питомца"
+              title={t('Скрыть питомца')}
+              aria-label={t('Скрыть питомца')}
             >
               <CloseCircle className="size-4" variant="Outline" />
             </button>
@@ -190,7 +192,7 @@ export function AiAssistantFloatingWidget({
               type="button"
               onClick={() => setChatIsOpen(true)}
               className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-2xl block"
-              aria-label="Открыть чат с Юки"
+              aria-label={t('Открыть чат с Юки')}
             >
               <div ref={mascotRef} className="relative animate-fox-float">
                 <FoxMascot
@@ -216,8 +218,8 @@ export function AiAssistantFloatingWidget({
             type="button"
             onClick={() => setChatIsOpen(true)}
             className="group relative flex size-12 sm:size-13 items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-[0_8px_24px_rgba(37,99,235,0.35)] hover:shadow-[0_12px_28px_rgba(37,99,235,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            title="Открыть чат с Юки (включить питомца можно в Настройках)"
-            aria-label="Открыть чат с Юки"
+            title={t('Открыть чат с Юки (включить питомца можно в Настройках)')}
+            aria-label={t('Открыть чат с Юки')}
           >
             <Messages1
               className="size-6 transition-transform group-hover:scale-110"
@@ -226,7 +228,7 @@ export function AiAssistantFloatingWidget({
             <span className="absolute -top-1 -right-1 flex size-5.5 items-center justify-center rounded-full bg-white shadow-xs border border-blue-100 overflow-hidden">
               <img
                 src={foxSrc}
-                alt="Юки"
+                alt={t('Юки')}
                 className="size-full object-contain p-0.5"
               />
             </span>

@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 
+import { useLanguage } from '@/lib/i18n'
+
 export function PriorityLevel({
   priority,
   rank,
@@ -14,6 +16,7 @@ export function PriorityLevel({
   children?: ReactNode
   disabled: boolean
 }) {
+  const { t } = useLanguage()
   const { setNodeRef, isOver } = useDroppable({
     id: `level:${priority}`,
     disabled,
@@ -26,12 +29,14 @@ export function PriorityLevel({
     >
       <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
         <h3 className="text-sm font-semibold text-slate-900">
-          {priority === 'new' ? 'Новый уровень' : `Уровень ${rank}`}
+          {priority === 'new' ? t('Новый уровень') : `${t('Уровень')} ${rank}`}
         </h3>
         <p className="mt-1 text-xs leading-5 text-slate-500">
           {priority === 'new'
-            ? 'Перетащите сюда провайдер, чтобы вынести его в отдельный резервный уровень.'
-            : `Приоритет ${priority} · активных: ${count} · запросы по очереди`}
+            ? t(
+                'Перетащите сюда провайдер, чтобы вынести его в отдельный резервный уровень.',
+              )
+            : `${t('Приоритет')} ${priority} · ${t('активных')}: ${count} · ${t('запросы по очереди')}`}
         </p>
       </div>
       {children}

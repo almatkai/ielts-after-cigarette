@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adminQueryKeys, getAdminAccess } from '@/features/admin/api'
+import { useLanguage } from '@/lib/i18n'
 
 const milestones = [
   'Доступ к блогу отдельно от тестов',
@@ -11,6 +12,7 @@ const milestones = [
 ] as const
 
 export function AdminOverviewPage() {
+  const { t } = useLanguage()
   const accessQuery = useQuery({
     queryKey: adminQueryKeys.access,
     queryFn: ({ signal }) => getAdminAccess(signal),
@@ -20,13 +22,13 @@ export function AdminOverviewPage() {
     <div className="grid gap-5">
       <div>
         <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-          Администрирование
+          {t('Администрирование')}
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Рабочее пространство
+          {t('Рабочее пространство')}
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69696d]">
-          Материалы, статьи и пользователи доступны по выданным правам.
+          {t('Материалы, статьи и пользователи доступны по выданным правам.')}
         </p>
       </div>
 
@@ -37,21 +39,26 @@ export function AdminOverviewPage() {
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
                 <ShieldTick className="size-[18px]" aria-hidden />
               </span>
-              <CardTitle className="text-base">Проверка доступа</CardTitle>
+              <CardTitle className="text-base">
+                {t('Проверка доступа')}
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5">
             {accessQuery.isPending ? (
-              <p className="text-sm text-[#69696d]">Проверяем backend…</p>
+              <p className="text-sm text-[#69696d]">
+                {t('Проверяем backend…')}
+              </p>
             ) : accessQuery.isError ? (
               <p className="text-sm text-[#c92f2f]">
-                Backend не подтвердил административный доступ.
+                {t('Backend не подтвердил административный доступ.')}
               </p>
             ) : (
               <div className="flex items-center gap-3 text-sm">
                 <TickCircle className="size-5 text-emerald-600" aria-hidden />
                 <span>
-                  Доступ подтверждён сервером: <b>{accessQuery.data.role}</b>
+                  {t('Доступ подтверждён сервером:')}{' '}
+                  <b>{accessQuery.data.role}</b>
                 </span>
               </div>
             )}
@@ -64,12 +71,15 @@ export function AdminOverviewPage() {
               <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
                 <Book className="size-[18px]" aria-hidden />
               </span>
-              <CardTitle className="text-base">Раздельные доступы</CardTitle>
+              <CardTitle className="text-base">
+                {t('Раздельные доступы')}
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-5 text-sm leading-6 text-[#69696d]">
-            Редактор тестов работает с учебными материалами. Модератор блога — с
-            авторами и статьями.
+            {t(
+              'Редактор тестов работает с учебными материалами. Модератор блога — с авторами и статьями.',
+            )}
           </CardContent>
         </Card>
       </div>
@@ -78,7 +88,9 @@ export function AdminOverviewPage() {
         <CardHeader className="border-b border-[#ededeb] p-5">
           <div className="flex items-center gap-3">
             <Data className="size-5 text-[#69696d]" aria-hidden />
-            <CardTitle className="text-base">Готово на этом этапе</CardTitle>
+            <CardTitle className="text-base">
+              {t('Готово на этом этапе')}
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="p-5">
@@ -86,7 +98,7 @@ export function AdminOverviewPage() {
             {milestones.map((milestone) => (
               <li key={milestone} className="flex items-center gap-3 text-sm">
                 <TickCircle className="size-4 text-emerald-600" aria-hidden />
-                {milestone}
+                {t(milestone)}
               </li>
             ))}
           </ul>

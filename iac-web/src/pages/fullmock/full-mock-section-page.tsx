@@ -13,6 +13,7 @@ import { ReadingAttemptRunner } from '@/pages/reading/reading-student-page'
 import { SpeakingAttemptRunner } from '@/pages/speaking/speaking-student-page'
 import { WritingAttemptRunner } from '@/pages/writing/writing-student-page'
 import { getErrorMessage } from '@/lib/api/client'
+import { tr } from '@/lib/i18n'
 
 export function FullMockSectionPage({
   sessionId,
@@ -74,7 +75,7 @@ export function FullMockSectionPage({
     return (
       <ErrorState
         title="Could not open the Full Mock section"
-        message={getErrorMessage(query.error)}
+        message={tr(getErrorMessage(query.error))}
         onRetry={() => void query.refetch()}
       />
     )

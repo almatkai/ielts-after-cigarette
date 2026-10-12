@@ -87,15 +87,15 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Загружаем экзаменационную сессию…"
-        description="Получаем статус секций, таймеры и расписание Full Mock..."
+        label="Loading your exam session…"
+        description="Loading section status, timers, and the Full Mock schedule..."
       />
     )
   }
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
+        title="Could not load the Full Mock"
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -124,12 +124,12 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           onClick={() => returnToSite.mutate()}
         >
           <ArrowLeft aria-hidden />
-          {returnToSite.isPending ? 'Сохраняем…' : 'Вернуться на сайт'}
+          {returnToSite.isPending ? 'Saving…' : 'Return to site'}
         </Button>
       </div>
       {returnToSite.isError ? (
         <p role="alert" className="text-sm text-[#e23b3b]">
-          Не удалось приостановить тест: {getErrorMessage(returnToSite.error)}
+          Could not pause the test: {getErrorMessage(returnToSite.error)}
         </p>
       ) : null}
       {session.status === 'SUBMITTED' ? (
@@ -153,17 +153,17 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
             <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} завершён. Можно перейти дальше.
+                  {labels[current.skill]} is complete. You can continue.
                 </p>
                 <Button
                   disabled={advance.isPending || returnToSite.isPending}
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
-                    ? 'Переходим…'
+                    ? 'Continuing…'
                     : session.currentSection === 4
-                      ? 'Завершить и показать отчёт'
-                      : 'Продолжить к следующей секции'}
+                      ? 'Finish and show the report'
+                      : 'Continue to the next section'}
                 </Button>
               </CardContent>
             </Card>
@@ -212,18 +212,18 @@ function SectionCard({
             <Badge className="bg-emerald-600">
               <TickCircle aria-hidden />
               {section.attempt.status === 'ABANDONED'
-                ? 'Время вышло'
+                ? 'Time is up'
                 : section.attempt.status === 'PROCESSING'
-                  ? 'Проверяется'
-                  : 'Сдано'}
+                  ? 'Assessing'
+                  : 'Submitted'}
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
               <Lock aria-hidden />
-              Закрыто
+              Locked
             </Badge>
           ) : (
-            <Badge variant="secondary">Текущая</Badge>
+            <Badge variant="secondary">Current</Badge>
           )}
         </div>
       </CardHeader>
@@ -235,14 +235,14 @@ function SectionCard({
               : section.skill === 'speaking'
                 ? 15
                 : 60)}{' '}
-          минут
+          minutes
         </p>
         {isCurrent && !completed ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionLink section={section} sessionId={sessionId} />
             {section.remainingMilliseconds != null ? (
               <Badge variant="outline">
-                На паузе · {formatRemainingTime(section.remainingMilliseconds)}
+                Paused at · {formatRemainingTime(section.remainingMilliseconds)}
               </Badge>
             ) : section.deadlineAt ? (
               <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ function SectionCard({
                   disabled={pause.isPending}
                   onClick={() => pause.mutate()}
                 >
-                  На паузу
+                  Pause
                 </Button>
                 <ExamTimer deadlineAt={section.deadlineAt} />
               </div>
@@ -278,7 +278,7 @@ function SectionLink({
   const content = (
     <>
       <PlayCircle aria-hidden />
-      Продолжить
+      Resume section
     </>
   )
   return (

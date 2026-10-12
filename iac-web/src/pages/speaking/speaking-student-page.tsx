@@ -47,7 +47,6 @@ import type {
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { useExamTimer } from '@/features/attempts/exam-timer'
-import { useLanguage } from '@/lib/i18n'
 
 type PartPhase = 'ready' | 'preparing' | 'recording' | 'uploading' | 'finished'
 
@@ -58,14 +57,11 @@ export function SpeakingStudentPage({
   materialId: string
   fullMockSessionId?: string
 }) {
-  const { t } = useLanguage()
   return (
     <ExamAttemptShell<PublicSpeakingMaterial>
       skillBadge="IELTS Speaking"
-      loadingLabel={t('Готовим Speaking-тренировку…')}
-      loadingDescription={t(
-        'Формируем карточки заданий Parts 1–3 и инициализируем модуль записи голоса.',
-      )}
+      loadingLabel={'Preparing Speaking practice…'}
+      loadingDescription="Preparing Parts 1–3 prompts and setting up voice recording."
       queryKey={attemptStartQueryKey('speaking', materialId)}
       startAttemptFn={(signal) => startSpeakingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
@@ -103,7 +99,6 @@ export function SpeakingAttemptRunner({
   sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
-  const { t } = useLanguage()
   const session = useAttemptSession(attempt.id)
   const detailQuery = useQuery({
     queryKey: attemptKeys.detail(attempt.id),
@@ -167,7 +162,7 @@ export function SpeakingAttemptRunner({
   if (session.loadError) {
     return (
       <ErrorState
-        title={t('Не удалось восстановить ответы')}
+        title={'Could not restore your answers'}
         message={session.loadError}
         onRetry={session.retryLoad}
       />
@@ -177,10 +172,8 @@ export function SpeakingAttemptRunner({
     return (
       <ExamLoadingScreen
         badge="IELTS Speaking"
-        label={t('Готовим устную часть…')}
-        description={t(
-          'Загружаем карточки заданий, настраиваем микрофон и проверяем статус сессии…',
-        )}
+        label={'Preparing Speaking…'}
+        description="Loading prompts, setting up your microphone, and checking the session…"
       />
     )
   }
@@ -196,7 +189,7 @@ export function SpeakingAttemptRunner({
         <Button asChild variant="link" className="sr-only">
           <Link to="/speaking">
             <ArrowLeft aria-hidden />
-            {t('К Speaking')}
+            {'Back to Speaking'}
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -206,7 +199,7 @@ export function SpeakingAttemptRunner({
               {material.examType === 'academic'
                 ? 'Academic'
                 : 'General Training'}
-              {' · '}Part {activeIndex + 1} {t('из')} {material.parts.length}
+              {' · '}Part {activeIndex + 1} {'of'} {material.parts.length}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -214,7 +207,7 @@ export function SpeakingAttemptRunner({
               <TimeBadge
                 seconds={secondsLeft}
                 danger={secondsLeft <= 60}
-                label="Время секции Speaking"
+                label="Speaking time remaining"
               />
             ) : null}
             <SaveIndicator state={session.saveState} />
@@ -226,7 +219,7 @@ export function SpeakingAttemptRunner({
               onClick={handleContinueLater}
               className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
             >
-              {isExiting ? t('Сохраняем…') : t('Продолжить позже')}
+              {isExiting ? 'Saving…' : 'Continue later'}
             </Button>
           </div>
         </div>
@@ -236,7 +229,7 @@ export function SpeakingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {t('Не удалось сохранить черновик:')} {t(session.exitError)}
+          {'Could not save draft:'} {session.exitError}
         </p>
       ) : null}
       {session.submitError ? (
@@ -244,12 +237,12 @@ export function SpeakingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {t('Не удалось отправить Speaking:')} {t(session.submitError)}
+          {'Could not submit Speaking:'} {session.submitError}
         </p>
       ) : null}
       <div
         className="grid grid-cols-3 gap-2"
-        aria-label={t('Прогресс частей Speaking')}
+        aria-label={'Speaking part progress'}
       >
         {material.parts.map((item, index) => {
           const ready = hasPartResponse(
@@ -267,10 +260,10 @@ export function SpeakingAttemptRunner({
               <span className="block font-semibold">Part {item.position}</span>
               <span className="text-xs">
                 {ready
-                  ? t('Ответ готов')
+                  ? 'Response ready'
                   : index === activeIndex
-                    ? t('Сейчас')
-                    : t('Не начато')}
+                    ? 'Current'
+                    : 'Not started'}
               </span>
             </button>
           )
@@ -341,7 +334,6 @@ function SpeakingPartRunner({
   totalParts: number
   stopRecorderRef: React.RefObject<(() => Promise<void>) | null>
 }) {
-  const { t } = useLanguage()
   const [phase, setPhase] = useState<PartPhase>('ready')
   const [remaining, setRemaining] = useState(part.responseSeconds)
   const [prepared, setPrepared] = useState(false)
@@ -434,11 +426,7 @@ function SpeakingPartRunner({
           <TimeBadge
             seconds={remaining}
             danger={phase === 'recording' && remaining < 30}
-            label={
-              phase === 'preparing'
-                ? t('Время на подготовку')
-                : t('Время на ответ')
-            }
+            label={phase === 'preparing' ? 'Preparation time' : 'Response time'}
           />
         </div>
       </CardHeader>
@@ -453,21 +441,20 @@ function SpeakingPartRunner({
           {part.type === 'part2' && phase === 'ready' && !prepared ? (
             <Button type="button" variant="outline" onClick={beginPreparation}>
               <Timer1 aria-hidden />
-              {t('Начать 1 минуту подготовки')}
+              {'Start 1-minute preparation'}
             </Button>
           ) : null}
           {phase === 'preparing' ? (
             <p className="flex items-center gap-2 text-sm text-[#69696d]">
-              {t(
-                'Подготовьте идеи: запись начнётся только после нажатия «Начать ответ».',
-              )}
+              'Plan your ideas. Recording starts only when you select “Start
+              speaking”.'
             </p>
           ) : null}
           {(phase === 'ready' || phase === 'finished') &&
           (part.type !== 'part2' || prepared || hasRecording) ? (
             <Button type="button" onClick={() => void beginRecording()}>
               <Microphone2 aria-hidden />
-              {hasRecording ? t('Записать заново') : t('Начать запись')}
+              {hasRecording ? 'Record again' : 'Start recording'}
             </Button>
           ) : null}
           {phase === 'recording' ? (
@@ -477,16 +464,16 @@ function SpeakingPartRunner({
               onClick={stopRef.current}
             >
               <StopCircle aria-hidden />
-              {t('Остановить и сохранить')}
+              {'Stop and save'}
             </Button>
           ) : null}
           {phase === 'uploading' || recorder.isUploading ? (
-            <p className="text-sm text-[#69696d]">{t('Сохраняем запись…')}</p>
+            <p className="text-sm text-[#69696d]">{'Saving recording…'}</p>
           ) : null}
           {(phase === 'finished' || hasRecording) && !recorder.isUploading ? (
             <p className="flex items-center gap-2 text-sm text-emerald-700">
               <TickCircle className="size-4" aria-hidden />
-              {t('Запись сохранена.')}
+              {'Recording saved.'}
             </p>
           ) : null}
         </div>
@@ -495,9 +482,7 @@ function SpeakingPartRunner({
             className="text-sm font-medium"
             htmlFor={`transcript-${part.id}`}
           >
-            {t(
-              'Черновая расшифровка (необязательно, но полезна без микрофона)',
-            )}
+            'Draft transcript (optional, useful if you don’t have a microphone)'
           </label>
           <Textarea
             id={`transcript-${part.id}`}
@@ -505,20 +490,17 @@ function SpeakingPartRunner({
             onChange={(event) => onTranscriptChange(event.target.value)}
             rows={6}
             className="resize-y text-base leading-7"
-            placeholder={t(
-              'Можно напечатать ответ вручную или наговорить голосом — аудио расшифруется автоматически.',
-            )}
+            placeholder="Type your answer or say it aloud—your audio will be transcribed automatically."
           />
           <p className="text-xs text-[#808084]">
-            {t(
-              'Наша система пока не может определить произношение (Pronunciation). Оценка будет сформирована по беглости, словарному запасу и грамматической точности.',
-            )}
+            'Our system can’t assess pronunciation yet. Your score will be based
+            on fluency, vocabulary, and grammatical accuracy.'
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5">
           {onPrevious ? (
             <Button type="button" variant="outline" onClick={onPrevious}>
-              {t('Назад')}
+              {'Back'}
             </Button>
           ) : (
             <span />
@@ -531,7 +513,7 @@ function SpeakingPartRunner({
                 disabled={isSubmitting || isExiting}
                 onClick={onContinueLater}
               >
-                {isExiting ? t('Сохраняем…') : t('Продолжить позже')}
+                {isExiting ? 'Saving…' : 'Continue later'}
               </Button>
             ) : null}
             {onNext ? (
@@ -540,7 +522,7 @@ function SpeakingPartRunner({
                 disabled={!responseReady || recorder.isUploading}
                 onClick={onNext}
               >
-                {t('К следующей части')}
+                {'Next part'}
               </Button>
             ) : (
               <Button
@@ -554,8 +536,8 @@ function SpeakingPartRunner({
                 onClick={onSubmit}
               >
                 {isSubmitting
-                  ? t('Проверяем работу…')
-                  : t('Отправить на проверку')}
+                  ? 'Assessing your response…'
+                  : 'Submit for assessment'}
               </Button>
             )}
           </div>
@@ -607,7 +589,6 @@ export function SpeakingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const { t } = useLanguage()
   const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
@@ -627,28 +608,30 @@ export function SpeakingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {t('Работа над ошибками')}
+          {'Review your work'}
         </h1>
         <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (
         <ErrorState
-          title={t('Не удалось загрузить разбор')}
-          message={t(getErrorMessage(detailQuery.error))}
+          title={'Could not load feedback'}
+          message={getErrorMessage(detailQuery.error)}
           onRetry={() => void detailQuery.refetch()}
         />
       ) : assessment?.status === 'FAILED' ? (
         <ErrorState
-          title={t('Не удалось проверить Speaking')}
-          message={t(
+          title={'Could not assess Speaking'}
+          message={
             assessment.errorMessage ||
-              'Автоматическая проверка завершилась с ошибкой. Начните новую попытку или повторите позже.',
-          )}
+            'Automatic assessment failed. Start a new attempt or try again later.'
+          }
           onRetry={() => void detailQuery.refetch()}
         />
       ) : !evaluation ? (
-        <LoadingState label={t('Расшифровываем аудио и проверяем ответы…')} />
+        <LoadingState
+          label={'Transcribing audio and assessing your answers…'}
+        />
       ) : (
         <SpeakingEvaluationView
           attempt={effectiveAttempt}
@@ -669,7 +652,6 @@ function SpeakingEvaluationView({
   material: PublicSpeakingMaterial
   evaluation: SpeakingEvaluation
 }) {
-  const { t } = useLanguage()
   const isPronunciationAvailable = Boolean(
     evaluation.pronunciationAvailable &&
     evaluation.criteria.pronunciation.band > 0,
@@ -685,7 +667,7 @@ function SpeakingEvaluationView({
       label: 'Pronunciation',
       band: evaluation.criteria.pronunciation.band,
       unavailable: !isPronunciationAvailable,
-      displayBand: !isPronunciationAvailable ? t('Не определяется') : undefined,
+      displayBand: !isPronunciationAvailable ? 'Not assessed' : undefined,
     },
   ]
 
@@ -698,9 +680,7 @@ function SpeakingEvaluationView({
       {
         ...evaluation.criteria.pronunciation,
         feedback: !isPronunciationAvailable
-          ? t(
-              'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
-            )
+          ? 'Our system can’t assess pronunciation yet. This score is based on fluency, vocabulary, and grammar.'
           : evaluation.criteria.pronunciation.feedback,
       },
       !isPronunciationAvailable,
@@ -713,22 +693,20 @@ function SpeakingEvaluationView({
         band={evaluation.overallBand}
         bandNote={
           isPronunciationAvailable
-            ? t('Учебная оценка по 4 критериям IELTS Speaking')
-            : t(
-                'Учебная оценка по 3 критериям (система пока не может определить произношение)',
-              )
+            ? 'Practice score across 4 IELTS Speaking criteria'
+            : 'Practice score across 3 criteria (pronunciation is not assessed yet)'
         }
         criteria={criteriaList}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
         durationMinutes={material.parts.length * 5}
-        paceUnit={t('часть')}
+        paceUnit={'part'}
       />
 
       {evaluation.summary ? (
         <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-            {t('Резюме экзаменатора')}
+            {'Examiner summary'}
           </p>
           <p className="text-sm leading-relaxed text-slate-700">
             {evaluation.summary}
@@ -751,7 +729,7 @@ function SpeakingEvaluationView({
                 <h2 className="font-semibold text-slate-900">{label}</h2>
                 {unavailable ? (
                   <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
-                    {t('Пока не определяется')}
+                    {'Not assessed yet'}
                   </span>
                 ) : (
                   <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
@@ -762,10 +740,8 @@ function SpeakingEvaluationView({
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {criterion.feedback ||
                   (unavailable
-                    ? t(
-                        'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.',
-                      )
-                    : t('Комментарий не получен.'))}
+                    ? 'Our system can’t assess pronunciation yet. The score uses 3 criteria: fluency, vocabulary, and grammar.'
+                    : 'No comment provided.')}
               </p>
             </CardContent>
           </Card>
@@ -781,32 +757,33 @@ function SpeakingEvaluationView({
             {part.transcript ? (
               <div className="rounded-xl bg-[#f7f7f5] p-4">
                 <p className="mb-1 text-xs font-semibold text-[#69696d]">
-                  {t('РАСШИФРОВКА')}
+                  {'TRANSCRIPT'}
                 </p>
                 {part.transcript}
               </div>
             ) : null}
-            <FeedbackList title={t('Сильные стороны')} items={part.strengths} />
-            <FeedbackList title={t('Что улучшить')} items={part.improvements} />
+            <FeedbackList title={'Strengths'} items={part.strengths} />
+            <FeedbackList
+              title={'Areas to improve'}
+              items={part.improvements}
+            />
           </CardContent>
         </Card>
       ))}
       <p className="flex items-center gap-2 text-xs text-[#808084]">
         <Book className="size-4" aria-hidden />
-        {t(
-          'Оценка носит учебный характер; фактический результат IELTS определяет экзаменатор.',
-        )}
+        'This score is for practice only; your official IELTS result is
+        determined by an examiner.'
       </p>
     </div>
   )
 }
 
 function FeedbackList({ title, items }: { title: string; items: string[] }) {
-  const { t } = useLanguage()
   if (items.length === 0) return null
   return (
     <div>
-      <p className="font-semibold">{t(title)}</p>
+      <p className="font-semibold">{title}</p>
       <ul className="mt-1 list-disc pl-5 text-[#69696d]">
         {items.map((item) => (
           <li key={item}>{item}</li>
@@ -827,7 +804,6 @@ function useAudioRecorder({
   onUploaded: () => void
   onError: (message: string) => void
 }) {
-  const { t } = useLanguage()
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<Blob[]>([])
@@ -863,7 +839,7 @@ function useAudioRecorder({
   const start = useCallback(async () => {
     if (typeof MediaRecorder === 'undefined') {
       onError(
-        t('Браузер не поддерживает запись аудио. Введите расшифровку вручную.'),
+        'Your browser does not support audio recording. Enter a transcript instead.',
       )
       return false
     }
@@ -897,7 +873,7 @@ function useAudioRecorder({
         )
         stopTracks()
         if (file.size === 0) {
-          onError(t('Запись получилась пустой. Попробуйте ещё раз.'))
+          onError('The recording is empty. Please try again.')
           settledRef.current?.(false)
           settledRef.current = null
           return
@@ -929,12 +905,8 @@ function useAudioRecorder({
       stopTracks()
       onError(
         error instanceof DOMException && error.name === 'NotAllowedError'
-          ? t(
-              'Доступ к микрофону не разрешён. Разрешите его или введите расшифровку вручную.',
-            )
-          : t(
-              'Не удалось запустить микрофон. Проверьте устройство и попробуйте снова.',
-            ),
+          ? 'Microphone access is blocked. Allow access or enter a transcript manually.'
+          : 'Could not start the microphone. Check your device and try again.',
       )
       return false
     }

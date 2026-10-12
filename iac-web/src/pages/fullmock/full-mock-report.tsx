@@ -27,14 +27,14 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
           <span className="text-4xl font-semibold tracking-tight text-[#2563eb]">
             {session.overallBand?.toFixed(1) ?? '—'}
           </span>
-          <h2 className="text-sm font-semibold">Итоговый IELTS band</h2>
+          <h2 className="text-sm font-semibold">Overall IELTS band</h2>
         </div>
         <FullMockRetake sessionId={session.id} />
       </div>
       <div
         className="grid grid-cols-2 gap-3 lg:grid-cols-4"
         role="group"
-        aria-label="Секции Full Mock"
+        aria-label="Full Mock sections"
       >
         {session.sections.map((section) => {
           const skill =
@@ -48,7 +48,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
             >
               <button
                 type="button"
-                aria-label={`Выбрать ${skill}`}
+                aria-label={`Show ${skill} review`}
                 aria-pressed={active}
                 aria-controls="full-mock-review"
                 onClick={() =>
@@ -75,14 +75,14 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
                       : section.skill === 'speaking'
                         ? 15
                         : 60)}{' '}
-                  минут
+                  minutes
                 </span>
                 <Badge variant="secondary" className="w-fit">
                   {ungraded
-                    ? 'Без оценки'
+                    ? 'Not graded'
                     : section.attempt.status === 'PROCESSING'
-                      ? 'Проверяется'
-                      : 'Сдано'}
+                      ? 'Assessing'
+                      : 'Submitted'}
                 </Badge>
                 <span className="h-9 text-xl font-semibold text-[#2563eb]">
                   {locked && !ungraded
@@ -102,12 +102,12 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
       {selected ? (
         <section
           id="full-mock-review"
-          aria-label={`Работа над ошибками ${selected.skill}`}
+          aria-label={`${selected.skill} review`}
           className="min-w-0"
         >
           {selected.attempt.status === 'ABANDONED' ? (
             <p className="text-sm text-[#69696d]">
-              Секция завершена без оценки.
+              This section finished without a score.
             </p>
           ) : (
             <AttemptReviewPage

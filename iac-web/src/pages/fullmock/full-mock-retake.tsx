@@ -16,8 +16,10 @@ import { authStore, useAuth } from '@/features/auth/auth-store'
 import { retakeGuestMock } from '@/features/auth/guest'
 import { fullMockKeys, startGeneratedFullMock } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function FullMockRetake({ sessionId }: { sessionId: string }) {
+  const { t } = useLanguage()
   const { user, guest } = useAuth()
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -43,7 +45,7 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
           to="/exam/full-mock-sessions/$sessionId"
           params={{ sessionId: guest.sessionId }}
         >
-          Открыть последнюю попытку
+          {t('Открыть последнюю попытку')}
         </Link>
       </Button>
     )
@@ -58,15 +60,18 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
       }}
     >
       <AlertDialogTrigger asChild>
-        <Button className="w-full sm:w-fit">Пересдать тест</Button>
+        <Button className="w-full sm:w-fit">{t('Пересдать тест')}</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Пересдать полный тест?</AlertDialogTitle>
+          <AlertDialogTitle>{t('Пересдать полный тест?')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Новая попытка начнётся с чистыми ответами и таймерами. Предыдущий
-            результат сохранится.
-            {user ? ' Незавершённый тест, если он есть, будет закрыт.' : ''}
+            {t(
+              'Новая попытка начнётся с чистыми ответами и таймерами. Предыдущий результат сохранится.',
+            )}
+            {user
+              ? ` ${t('Незавершённый тест, если он есть, будет закрыт.')}`
+              : ''}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {retake.isError ? (
@@ -76,10 +81,10 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
         ) : null}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={retake.isPending}>
-            Отмена
+            {t('Отмена')}
           </AlertDialogCancel>
           <Button disabled={retake.isPending} onClick={() => retake.mutate()}>
-            {retake.isPending ? 'Готовим тест…' : 'Начать заново'}
+            {retake.isPending ? t('Готовим тест…') : t('Начать заново')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

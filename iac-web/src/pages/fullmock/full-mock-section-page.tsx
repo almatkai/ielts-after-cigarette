@@ -65,15 +65,15 @@ export function FullMockSectionPage({
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Открываем секцию экзамена…"
-        description="Инициализируем материалы следующей части полного пробного тестирования..."
+        label="Opening the exam section…"
+        description="Preparing the materials for the next part of the full mock exam..."
       />
     )
   }
   if (query.isError) {
     return (
       <ErrorState
-        title="Не удалось открыть секцию Full Mock"
+        title="Could not open the Full Mock section"
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />

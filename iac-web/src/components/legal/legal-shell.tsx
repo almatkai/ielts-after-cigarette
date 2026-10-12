@@ -151,7 +151,9 @@ export function LegalShell({
           <div className="mt-5 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-[#69696d]">
             <div>
               {t('Последнее обновление:')}
-              <span className="font-medium text-[#475569]">{lastUpdated}</span>
+              <span className="font-medium text-[#475569]">
+                {t(lastUpdated)}
+              </span>
             </div>
             <div>
               {t('Юрисдикция:')}

@@ -142,10 +142,10 @@ export function LegalShell({
           </div>
 
           <h1 className="text-3xl font-bold tracking-tight text-[#0f172a] sm:text-4xl lg:text-5xl">
-            {title}
+            {t(title)}
           </h1>
           <p className="mt-3 max-w-3xl text-base leading-relaxed text-[#475569] sm:text-lg">
-            {subtitle}
+            {t(subtitle)}
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-[#69696d]">
@@ -221,7 +221,7 @@ export function LegalShell({
                           : 'text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]',
                       )}
                     >
-                      {item.title}
+                      {t(item.title)}
                     </a>
                   )
                 })}

@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
-import { authStore } from '@/features/auth/auth-store'
+import { authStore, useAuth } from '@/features/auth/auth-store'
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import {
   getProfile,
@@ -96,12 +97,14 @@ function firstError(errors: unknown[]) {
 
 export function SettingsPage() {
   const { t } = useLanguage()
+  const { user } = useAuth()
   const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
     useMascotVisibility()
   const queryClient = useQueryClient()
   const profileQuery = useQuery({
     queryKey: queryKeys.profile,
     queryFn: ({ signal }) => getProfile(signal),
+    enabled: Boolean(user),
   })
   const profile = profileQuery.data ?? null
   const [profileMessage, setProfileMessage] = useState<string | null>(null)
@@ -167,6 +170,30 @@ export function SettingsPage() {
     }
   }, [profile, initialized, profileForm, goalForm])
 
+  // Гость может выбрать язык без регистрации; остальное откроется после входа.
+  if (!user) {
+    return (
+      <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+        <LanguageSettingsCard />
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+            <CardTitle className="text-base tracking-[-0.02em]">
+              {t('Профиль и цель')}
+            </CardTitle>
+            <CardDescription className="mt-1 leading-5">
+              {t(
+                'Профиль, цель подготовки и напоминания доступны после входа.',
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 sm:p-6">
+            <LoginToContinue />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (profileQuery.isPending) {
     return <LoadingState label={t('Загружаем настройки…')} />
   }
@@ -182,21 +209,7 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
-      <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
-          <CardTitle className="text-base tracking-[-0.02em]">
-            {t('Язык интерфейса')}
-          </CardTitle>
-          <CardDescription className="mt-1 leading-5">
-            {t(
-              'Выберите язык приложения. Настройка сохранится на этом устройстве.',
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-5 sm:p-6">
-          <LanguagePicker />
-        </CardContent>
-      </Card>
+      <LanguageSettingsCard />
       <div>
         <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
           {t('Настройте профиль и цель')}
@@ -431,5 +444,27 @@ export function SettingsPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+// Язык — персональная настройка устройства, доступная и гостям без аккаунта.
+function LanguageSettingsCard() {
+  const { t } = useLanguage()
+  return (
+    <Card className={cardClassName}>
+      <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardTitle className="text-base tracking-[-0.02em]">
+          {t('Язык интерфейса')}
+        </CardTitle>
+        <CardDescription className="mt-1 leading-5">
+          {t(
+            'Выберите язык приложения. Настройка сохранится на этом устройстве.',
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-5 sm:p-6">
+        <LanguagePicker />
+      </CardContent>
+    </Card>
   )
 }

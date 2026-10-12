@@ -346,7 +346,7 @@ function AccountOverviewPage() {
                       className="rounded-[9px] sm:rounded-[10px] border border-[#ededeb] p-2.5 sm:p-3"
                     >
                       <p className="text-xs sm:text-sm font-semibold text-[#111111]">
-                        {item.title}
+                        {t(item.title)}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-[#808084]">
                         {skillLabels[item.skill]} · {item.durationMinutes} мин.

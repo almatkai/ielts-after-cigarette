@@ -1427,6 +1427,35 @@ const translations: TranslationMap = {
     kk: 'Толық IELTS сынақ тесті',
     en: 'Full IELTS mock test',
   },
+  'Юридические документы': { kk: 'Құқықтық құжаттар', en: 'Legal documents' },
+  'Политика конфиденциальности': {
+    kk: 'Құпиялылық саясаты',
+    en: 'Privacy Policy',
+  },
+  'Условия использования': { kk: 'Пайдалану шарттары', en: 'Terms of Use' },
+  'Распечатать документ': { kk: 'Құжатты басып шығару', en: 'Print document' },
+  Печать: { kk: 'Басып шығару', en: 'Print' },
+  'Войти в кабинет': { kk: 'Жеке кабинетке кіру', en: 'Sign in' },
+  'Назад ко входу': { kk: 'Кіруге оралу', en: 'Back to sign in' },
+  Редакция: { kk: 'Редакция', en: 'Version' },
+  'Последнее обновление:': { kk: 'Соңғы жаңарту:', en: 'Last updated:' },
+  'Юрисдикция:': { kk: 'Юрисдикция:', en: 'Jurisdiction:' },
+  'Контакты:': { kk: 'Байланыс:', en: 'Contact:' },
+  'Республика Казахстан': {
+    kk: 'Қазақстан Республикасы',
+    en: 'Republic of Kazakhstan',
+  },
+  'Содержание документа': { kk: 'Құжаттың мазмұны', en: 'Table of contents' },
+  'Возникли вопросы?': { kk: 'Сұрақтарыңыз бар ма?', en: 'Questions?' },
+  'По любым вопросам обработки персональных данных пишите на': {
+    kk: 'Жеке деректерді өңдеу бойынша кез келген сұрақ бойынша жазыңыз:',
+    en: 'For any personal-data questions, write to',
+  },
+  '© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.': {
+    kk: '© 2026 Daiyndyq IELTS. Барлық құқықтар қорғалған. Астана, Қазақстан.',
+    en: '© 2026 Daiyndyq IELTS. All rights reserved. Astana, Kazakhstan.',
+  },
+  Вход: { kk: 'Кіру', en: 'Sign in' },
 }
 
 type LanguageContextValue = {

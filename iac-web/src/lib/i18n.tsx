@@ -851,6 +851,10 @@ const translations: TranslationMap = {
     kk: 'Таңдалған емтихан форматы үшін әзірше жарияланған тест жоқ.',
     en: 'There are no published tests for the selected exam format yet.',
   },
+  'Профиль, цель подготовки и напоминания доступны после входа.': {
+    kk: 'Профиль, дайындық мақсаты мен еске салғыштар аккаунтқа кірген соң қолжетімді.',
+    en: 'Your profile, study goal, and reminders are available after signing in.',
+  },
   'Ошибка 404': { kk: '404 қатесі', en: 'Error 404' },
   'Кажется, эта страница потерялась.': {
     kk: 'Бұл бет табылмады.',

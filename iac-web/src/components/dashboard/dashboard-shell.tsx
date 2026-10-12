@@ -19,7 +19,6 @@ const accountDestinations = [
   '/mistakes',
   '/progress',
   '/profile',
-  '/settings',
 ] as const
 type AccountDestination = (typeof accountDestinations)[number]
 

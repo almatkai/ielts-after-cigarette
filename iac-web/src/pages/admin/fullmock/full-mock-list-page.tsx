@@ -6,17 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { fullMockKeys, listFullMocks } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function FullMockListPage() {
+  const { t } = useLanguage()
   const query = useQuery({
     queryKey: fullMockKeys.adminTests,
     queryFn: ({ signal }) => listFullMocks(signal),
   })
-  if (query.isPending) return <LoadingState label="Загружаем Full Mock…" />
+  if (query.isPending) return <LoadingState label={t('Загружаем Full Mock…')} />
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
+        title={t('Не удалось загрузить Full Mock')}
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -29,16 +31,18 @@ export function FullMockListPage() {
             Full Mock
           </h1>
           <p className="mt-1 text-sm text-[#69696d]">
-            Архив ручных наборов. Новые Full Mock собираются автоматически из
-            опубликованных тестов Listening, Reading, Writing и Speaking.
+            {t(
+              'Архив ручных наборов. Новые Full Mock собираются автоматически из опубликованных тестов Listening, Reading, Writing и Speaking.',
+            )}
           </p>
         </div>
       </div>
       {query.data.items.length === 0 ? (
         <Card className="shadow-none">
           <CardContent className="p-8 text-sm text-[#69696d]">
-            В архиве нет ручных наборов. Создавать отдельные Full Mock больше не
-            нужно.
+            {t(
+              'В архиве нет ручных наборов. Создавать отдельные Full Mock больше не нужно.',
+            )}
           </CardContent>
         </Card>
       ) : (
@@ -55,7 +59,8 @@ export function FullMockListPage() {
                     {item.title}
                   </CardTitle>
                   <p className="mt-2 text-sm text-[#69696d]">
-                    {item.examType} · {item.durationMinutes} минут · {item.slug}
+                    {item.examType} · {item.durationMinutes} {t('минут')} ·{' '}
+                    {item.slug}
                   </p>
                 </div>
                 <Badge

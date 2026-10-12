@@ -18,6 +18,7 @@ import {
   parseListeningImport,
 } from '@/features/listening/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type {
   ListeningImportIssue,
@@ -98,6 +99,7 @@ C: Station entrance
 The speaker says traffic volume has increased.`
 
 export function ListeningImportPage() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [source, setSource] = useState('')
@@ -134,15 +136,16 @@ export function ListeningImportPage() {
         <div>
           <Button asChild variant="link" className="h-auto p-0">
             <Link to="/admin/listening/tests">
-              <ArrowLeft aria-hidden /> К тестам
+              <ArrowLeft aria-hidden /> {t('К тестам')}
             </Link>
           </Button>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-            Импорт Listening v1
+            {t('Импорт Listening v1')}
           </h1>
           <p className="mt-2 text-sm text-[#69696d]">
-            Импорт создаёт draft. Аудио и изображения можно прикрепить в
-            конструкторе.
+            {t(
+              'Импорт создаёт draft. Аудио и изображения можно прикрепить в конструкторе.',
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -150,7 +153,7 @@ export function ListeningImportPage() {
             variant="outline"
             onClick={() => void navigator.clipboard.writeText(template)}
           >
-            <ClipboardText aria-hidden /> Скопировать шаблон
+            <ClipboardText aria-hidden /> {t('Скопировать шаблон')}
           </Button>
           <Button
             variant="outline"
@@ -159,7 +162,7 @@ export function ListeningImportPage() {
               setResult(null)
             }}
           >
-            Вставить пример
+            {t('Вставить пример')}
           </Button>
         </div>
       </div>
@@ -170,7 +173,7 @@ export function ListeningImportPage() {
       ) : null}
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>Документ</CardTitle>
+          <CardTitle>{t('Документ')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <Textarea
@@ -189,7 +192,7 @@ export function ListeningImportPage() {
               onClick={() => void parse()}
               disabled={!source.trim() || parseMutation.isPending}
             >
-              <DocumentUpload aria-hidden /> Распознать
+              <DocumentUpload aria-hidden /> {t('Распознать')}
             </Button>
           </div>
         </CardContent>
@@ -218,6 +221,7 @@ function Preview({
   pending: boolean
   onImport: () => void
 }) {
+  const { t } = useLanguage()
   return (
     <Card className="shadow-none">
       <CardHeader>
@@ -235,7 +239,7 @@ function Preview({
             <p className="mt-1 text-xs text-[#69696d]">
               {part.audioAssetId
                 ? '✓ audio attached'
-                : '○ audio добавляется после импорта'}
+                : t('○ audio добавляется после импорта')}
             </p>
             <div className="mt-3 grid gap-2">
               {part.groups.map((group) => (
@@ -262,16 +266,20 @@ function Preview({
             </div>
           </div>
         ))}
-        <Issues title="Ошибки" items={result.errors} tone="red" />
-        <Issues title="Предупреждения" items={result.warnings} tone="amber" />
-        <Issues title="Информация" items={result.info} tone="blue" />
+        <Issues title={t('Ошибки')} items={result.errors} tone="red" />
+        <Issues
+          title={t('Предупреждения')}
+          items={result.warnings}
+          tone="amber"
+        />
+        <Issues title={t('Информация')} items={result.info} tone="blue" />
         <div className="flex justify-end">
           <Button
             className="bg-[#3b82f6] hover:bg-[#2563eb]"
             disabled={result.errors.length > 0 || pending}
             onClick={onImport}
           >
-            {pending ? 'Импортируем…' : 'Создать DRAFT'}
+            {pending ? t('Импортируем…') : t('Создать DRAFT')}
           </Button>
         </div>
       </CardContent>

@@ -23,6 +23,7 @@ import {
 } from '@/features/admin/api'
 import type { ReadingMaterial } from '@/features/admin/api'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 const difficultyLabels = {
   foundation: 'Foundation',
@@ -31,6 +32,7 @@ const difficultyLabels = {
 } as const
 
 export function ReadingMaterialsPage() {
+  const { t } = useLanguage()
   const auth = useAuth()
   const navigate = useNavigate()
   const [exportMaterial, setExportMaterial] = useState<ReadingMaterial | null>(
@@ -63,10 +65,12 @@ export function ReadingMaterialsPage() {
             Reading
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-            Библиотека материалов
+            {t('Библиотека материалов')}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
-            Материалы и полные тесты. Проверяйте черновики перед публикацией.
+            {t(
+              'Материалы и полные тесты. Проверяйте черновики перед публикацией.',
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -75,7 +79,7 @@ export function ReadingMaterialsPage() {
             variant="outline"
             onClick={() => void navigate({ to: '/admin/reading/import' })}
           >
-            <DocumentUpload aria-hidden /> Импортировать текст
+            <DocumentUpload aria-hidden /> {t('Импортировать текст')}
           </Button>
           <Button
             type="button"
@@ -84,7 +88,7 @@ export function ReadingMaterialsPage() {
               void navigate({ to: '/admin/reading/materials/new' })
             }
           >
-            <DocumentForward aria-hidden /> Создать вручную
+            <DocumentForward aria-hidden /> {t('Создать вручную')}
           </Button>
         </div>
       </div>
@@ -92,21 +96,23 @@ export function ReadingMaterialsPage() {
       {materialsQuery.isPending ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="p-8 text-center text-sm text-[#69696d]">
-            Загружаем материалы…
+            {t('Загружаем материалы…')}
           </CardContent>
         </Card>
       ) : materialsQuery.isError ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
             <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
-            <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
+            <p className="mt-3 text-sm">
+              {t('Не удалось загрузить библиотеку.')}
+            </p>
             <Button
               type="button"
               variant="outline"
               className="mt-4"
               onClick={() => void materialsQuery.refetch()}
             >
-              Повторить
+              {t('Повторить')}
             </Button>
           </CardContent>
         </Card>
@@ -114,10 +120,13 @@ export function ReadingMaterialsPage() {
         <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
             <Book className="size-8 text-[#9a9a9d]" aria-hidden />
-            <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
+            <h2 className="mt-4 text-lg font-semibold">
+              {t('Материалов пока нет')}
+            </h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
-              Создайте или импортируйте материал, добавьте вопросы и проверьте
-              тест перед публикацией.
+              {t(
+                'Создайте или импортируйте материал, добавьте вопросы и проверьте тест перед публикацией.',
+              )}
             </p>
           </CardContent>
         </Card>
@@ -146,7 +155,7 @@ export function ReadingMaterialsPage() {
                     </Badge>
                     {material.hasUnpublishedChanges ? (
                       <span className="text-xs text-amber-700">
-                        Есть неопубликованные изменения
+                        {t('Есть неопубликованные изменения')}
                       </span>
                     ) : null}
                   </div>
@@ -154,7 +163,8 @@ export function ReadingMaterialsPage() {
                     {material.title}
                   </h2>
                   <p className="mt-1 truncate text-xs text-[#808084]">
-                    /{material.slug} · версия {material.currentVersionNumber}
+                    /{material.slug} · {t('версия')}{' '}
+                    {material.currentVersionNumber}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -166,7 +176,7 @@ export function ReadingMaterialsPage() {
                         preload={false}
                       >
                         <Eye aria-hidden />
-                        Предпросмотр теста
+                        {t('Предпросмотр теста')}
                       </Link>
                     </Button>
                   ) : null}
@@ -177,7 +187,9 @@ export function ReadingMaterialsPage() {
                     onClick={() => void handleExport(material.id)}
                   >
                     <ExportCurve aria-hidden />
-                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                    {exportLoadingId === material.id
+                      ? t('Загрузка…')
+                      : t('Экспорт')}
                   </Button>
                   <Button asChild variant="outline">
                     <Link
@@ -185,7 +197,7 @@ export function ReadingMaterialsPage() {
                       params={{ materialId: material.id }}
                     >
                       <Edit aria-hidden />
-                      Редактировать
+                      {t('Редактировать')}
                     </Link>
                   </Button>
                 </div>

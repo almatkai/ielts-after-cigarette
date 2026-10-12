@@ -21,8 +21,10 @@ import {
   writingKeys,
 } from '@/features/writing/api'
 import type { WritingMaterial } from '@/features/writing/api'
+import { useLanguage } from '@/lib/i18n'
 
 export function WritingMaterialsPage() {
+  const { t } = useLanguage()
   const [exportMaterial, setExportMaterial] = useState<WritingMaterial | null>(
     null,
   )
@@ -52,22 +54,23 @@ export function WritingMaterialsPage() {
             Writing
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-            Библиотека материалов
+            {t('Библиотека материалов')}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
-            По два задания: Academic Task 1 с визуалом или General letter, и
-            общий Task 2.
+            {t(
+              'По два задания: Academic Task 1 с визуалом или General letter, и общий Task 2.',
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild type="button" variant="outline">
             <Link to="/admin/writing/import">
-              <DocumentUpload aria-hidden /> Импорт JSON
+              <DocumentUpload aria-hidden /> {t('Импорт JSON')}
             </Link>
           </Button>
           <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
             <Link to="/admin/writing/materials/new">
-              <DocumentForward aria-hidden /> Создать вручную
+              <DocumentForward aria-hidden /> {t('Создать вручную')}
             </Link>
           </Button>
         </div>
@@ -75,21 +78,23 @@ export function WritingMaterialsPage() {
       {materialsQuery.isPending ? (
         <Card className="shadow-none">
           <CardContent className="p-8 text-center text-sm text-[#69696d]">
-            Загружаем материалы…
+            {t('Загружаем материалы…')}
           </CardContent>
         </Card>
       ) : materialsQuery.isError ? (
         <Card className="shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
             <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
-            <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
+            <p className="mt-3 text-sm">
+              {t('Не удалось загрузить библиотеку.')}
+            </p>
             <Button
               type="button"
               variant="outline"
               className="mt-4"
               onClick={() => void materialsQuery.refetch()}
             >
-              Повторить
+              {t('Повторить')}
             </Button>
           </CardContent>
         </Card>
@@ -97,10 +102,13 @@ export function WritingMaterialsPage() {
         <Card className="border-dashed shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
             <Edit2 className="size-8 text-[#9a9a9d]" aria-hidden />
-            <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
+            <h2 className="mt-4 text-lg font-semibold">
+              {t('Материалов пока нет')}
+            </h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
-              Создайте первый набор из Task 1 и Task 2, затем опубликуйте его
-              для студентов.
+              {t(
+                'Создайте первый набор из Task 1 и Task 2, затем опубликуйте его для студентов.',
+              )}
             </p>
           </CardContent>
         </Card>
@@ -124,7 +132,7 @@ export function WritingMaterialsPage() {
                     </Badge>
                     {material.hasUnpublishedChanges ? (
                       <span className="text-xs text-amber-700">
-                        Есть неопубликованные изменения
+                        {t('Есть неопубликованные изменения')}
                       </span>
                     ) : null}
                   </div>
@@ -132,7 +140,8 @@ export function WritingMaterialsPage() {
                     {material.title}
                   </h2>
                   <p className="mt-1 truncate text-xs text-[#808084]">
-                    /{material.slug} · версия {material.currentVersionNumber}
+                    /{material.slug} · {t('версия')}{' '}
+                    {material.currentVersionNumber}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -143,14 +152,16 @@ export function WritingMaterialsPage() {
                     onClick={() => void handleExport(material.id)}
                   >
                     <ExportCurve aria-hidden />
-                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                    {exportLoadingId === material.id
+                      ? t('Загрузка…')
+                      : t('Экспорт')}
                   </Button>
                   <Button asChild variant="outline">
                     <Link
                       to="/admin/writing/materials/$materialId"
                       params={{ materialId: material.id }}
                     >
-                      <Edit aria-hidden /> Редактировать
+                      <Edit aria-hidden /> {t('Редактировать')}
                     </Link>
                   </Button>
                 </div>

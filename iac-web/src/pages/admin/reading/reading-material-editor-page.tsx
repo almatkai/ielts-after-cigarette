@@ -25,6 +25,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/lib/i18n'
 import {
   adminQueryKeys,
   archiveReadingMaterial,
@@ -86,6 +87,7 @@ export function ReadingMaterialEditorPage({
 }: {
   materialId?: string
 }) {
+  const { t } = useLanguage()
   const editing = Boolean(materialId)
   const auth = useAuth()
   const navigate = useNavigate()
@@ -117,7 +119,7 @@ export function ReadingMaterialEditorPage({
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.readingMaterials,
       })
-      setMessage('Черновик сохранён.')
+      setMessage(t('Черновик сохранён.'))
       if (!materialId) {
         await navigate({
           to: '/admin/reading/materials/$materialId',
@@ -141,7 +143,7 @@ export function ReadingMaterialEditorPage({
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.readingMaterials,
       })
-      setMessage('Текущая версия опубликована.')
+      setMessage(t('Текущая версия опубликована.'))
     },
   })
   const archiveMutation = useMutation({
@@ -155,7 +157,7 @@ export function ReadingMaterialEditorPage({
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.readingMaterials,
       })
-      setMessage('Материал перенесён в архив.')
+      setMessage(t('Материал перенесён в архив.'))
     },
   })
 
@@ -216,7 +218,9 @@ export function ReadingMaterialEditorPage({
 
   const saveDraft = async () => {
     if (form.title.trim().length < 3 || form.body.trim().length < 50) {
-      throw new Error('Добавьте название и текст длиной не менее 50 символов.')
+      throw new Error(
+        t('Добавьте название и текст длиной не менее 50 символов.'),
+      )
     }
     return saveMutation.mutateAsync({
       ...form,
@@ -263,16 +267,18 @@ export function ReadingMaterialEditorPage({
   }
 
   if (editing && materialQuery.isPending) {
-    return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
+    return <p className="text-sm text-[#69696d]">{t('Загружаем материал…')}</p>
   }
   if (editing && materialQuery.isError) {
     return (
       <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
         <CardContent className="flex flex-col items-center p-8 text-center">
           <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
-          <p className="mt-3 text-sm">Материал не удалось загрузить.</p>
+          <p className="mt-3 text-sm">{t('Материал не удалось загрузить.')}</p>
           <Button asChild variant="outline" className="mt-4">
-            <Link to="/admin/reading/materials">Вернуться в библиотеку</Link>
+            <Link to="/admin/reading/materials">
+              {t('Вернуться в библиотеку')}
+            </Link>
           </Button>
         </CardContent>
       </Card>
@@ -291,12 +297,13 @@ export function ReadingMaterialEditorPage({
         <div>
           <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
             <Link to="/admin/reading/materials">
-              <ArrowLeft aria-hidden />К библиотеке
+              <ArrowLeft aria-hidden />
+              {t('К библиотеке')}
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-              {editing ? 'Редактор материала' : 'Новый Reading материал'}
+              {editing ? t('Редактор материала') : t('Новый Reading материал')}
             </h1>
             {material ? (
               <Badge variant="outline">{material.status}</Badge>
@@ -304,7 +311,7 @@ export function ReadingMaterialEditorPage({
           </div>
           {material ? (
             <p className="mt-2 text-xs text-[#808084]">
-              Версия текста {material.currentVersionNumber} · revision{' '}
+              {t('Версия текста')} {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
           ) : null}
@@ -318,7 +325,7 @@ export function ReadingMaterialEditorPage({
               onClick={() => void handlePreview()}
             >
               <Eye aria-hidden />
-              {dirty ? 'Сохранить и открыть тест' : 'Предпросмотр теста'}
+              {dirty ? t('Сохранить и открыть тест') : t('Предпросмотр теста')}
             </Button>
           ) : null}
           {material ? (
@@ -328,7 +335,7 @@ export function ReadingMaterialEditorPage({
               onClick={() => setExportOpen(true)}
             >
               <ExportCurve aria-hidden />
-              Экспорт V1
+              {t('Экспорт V1')}
             </Button>
           ) : null}
           {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -339,7 +346,7 @@ export function ReadingMaterialEditorPage({
               onClick={() => void handlePublish()}
             >
               <Send2 aria-hidden />
-              Опубликовать текущую версию
+              {t('Опубликовать текущую версию')}
             </Button>
           ) : null}
           {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -348,12 +355,12 @@ export function ReadingMaterialEditorPage({
               variant="outline"
               disabled={pending}
               onClick={() => {
-                if (window.confirm('Архивировать этот Reading-материал?')) {
+                if (window.confirm(t('Архивировать этот Reading-материал?'))) {
                   archiveMutation.mutate()
                 }
               }}
             >
-              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
+              {archiveMutation.isPending ? t('Архивируем…') : t('Архивировать')}
             </Button>
           ) : null}
           <Button
@@ -362,7 +369,7 @@ export function ReadingMaterialEditorPage({
             className="bg-[#3b82f6] hover:bg-[#2563eb]"
           >
             <Save2 aria-hidden />
-            {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
+            {saveMutation.isPending ? t('Сохраняем…') : t('Сохранить черновик')}
           </Button>
         </div>
       </div>
@@ -391,10 +398,11 @@ export function ReadingMaterialEditorPage({
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="flex flex-row items-center justify-between border-b border-[#ededeb] p-5">
           <div>
-            <CardTitle className="text-base">Группы вопросов</CardTitle>
+            <CardTitle className="text-base">{t('Группы вопросов')}</CardTitle>
             <p className="mt-1 text-xs text-[#808084]">
-              Все официальные типы IELTS Reading доступны в списке. Ответы
-              хранятся отдельно от текста.
+              {t(
+                'Все официальные типы IELTS Reading доступны в списке. Ответы хранятся отдельно от текста.',
+              )}
             </p>
           </div>
           <Button
@@ -403,15 +411,20 @@ export function ReadingMaterialEditorPage({
             disabled={form.kind === 'TEST'}
             onClick={addGroup}
           >
-            Добавить группу
+            {t('Добавить группу')}
           </Button>
         </CardHeader>
         <CardContent className="grid gap-4 p-5">
           {form.questionGroups.length === 0 ? (
             <p className="text-sm text-[#69696d]">
               {form.kind === 'TEST'
-                ? `Это полный тест. Вопросы находятся внутри ${materialQuery.data?.passages?.length ?? 0} passage и публикуются вместе.`
-                : 'Вопросы можно добавить сейчас или позже.'}
+                ? t(
+                    'Это полный тест. Вопросы находятся внутри {count} passage и публикуются вместе.',
+                  ).replace(
+                    '{count}',
+                    String(materialQuery.data?.passages?.length ?? 0),
+                  )
+                : t('Вопросы можно добавить сейчас или позже.')}
             </p>
           ) : null}
           {form.kind === 'TEST'
@@ -424,16 +437,20 @@ export function ReadingMaterialEditorPage({
                     Passage {index + 1}: {passage.title}
                   </p>
                   <p className="mt-1 text-sm text-[#69696d]">
-                    {passage.questionGroups?.reduce(
-                      (total, group) =>
-                        total +
-                        group.questions.reduce(
-                          (points, question) => points + question.points,
+                    {t('{count} вопросов').replace(
+                      '{count}',
+                      String(
+                        passage.questionGroups?.reduce(
+                          (total, group) =>
+                            total +
+                            group.questions.reduce(
+                              (points, question) => points + question.points,
+                              0,
+                            ),
                           0,
-                        ),
-                      0,
-                    ) ?? 0}{' '}
-                    вопросов
+                        ) ?? 0,
+                      ),
+                    )}
                   </p>
                 </div>
               ))
@@ -445,7 +462,7 @@ export function ReadingMaterialEditorPage({
             >
               <div className="flex items-end gap-3">
                 <div className="grid flex-1 gap-2">
-                  <Label>Тип вопросов</Label>
+                  <Label>{t('Тип вопросов')}</Label>
                   <select
                     value={group.type}
                     onChange={(event) =>
@@ -475,11 +492,11 @@ export function ReadingMaterialEditorPage({
                     )
                   }
                 >
-                  Удалить
+                  {t('Удалить')}
                 </Button>
               </div>
               <div className="grid gap-2">
-                <Label>Инструкция</Label>
+                <Label>{t('Инструкция')}</Label>
                 <Input
                   value={group.instructions}
                   onChange={(event) =>
@@ -498,7 +515,10 @@ export function ReadingMaterialEditorPage({
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">
-                      Вопрос {questionIndex + 1}
+                      {t('Вопрос {number}').replace(
+                        '{number}',
+                        String(questionIndex + 1),
+                      )}
                     </span>
                     <Button
                       type="button"
@@ -512,7 +532,7 @@ export function ReadingMaterialEditorPage({
                         })
                       }
                     >
-                      Удалить
+                      {t('Удалить')}
                     </Button>
                   </div>
                   <Textarea
@@ -523,7 +543,7 @@ export function ReadingMaterialEditorPage({
                       })
                     }
                     rows={2}
-                    placeholder="Текст вопроса"
+                    placeholder={t('Текст вопроса')}
                   />
                   <ReadingQuestionFields
                     groupType={group.type}
@@ -533,7 +553,9 @@ export function ReadingMaterialEditorPage({
                     }
                   />
                   <div className="grid gap-2">
-                    <Label>Участок текста с ответом (Цитата из Passage)</Label>
+                    <Label>
+                      {t('Участок текста с ответом (Цитата из Passage)')}
+                    </Label>
                     <Textarea
                       value={String(question.content.quote ?? '')}
                       onChange={(event) =>
@@ -545,13 +567,15 @@ export function ReadingMaterialEditorPage({
                         })
                       }
                       rows={2}
-                      placeholder="Точная фраза или предложение из текста, где чётко даётся ответ"
+                      placeholder={t(
+                        'Точная фраза или предложение из текста, где чётко даётся ответ',
+                      )}
                       className="text-xs font-serif"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label>
-                      Наводящая подсказка студенту (без спойлера ответа)
+                      {t('Наводящая подсказка студенту (без спойлера ответа)')}
                     </Label>
                     <Input
                       value={String(question.content.hint ?? '')}
@@ -563,12 +587,16 @@ export function ReadingMaterialEditorPage({
                           },
                         })
                       }
-                      placeholder="Например: Обратите внимание на 1-й абзац и слова-синонимы"
+                      placeholder={t(
+                        'Например: Обратите внимание на 1-й абзац и слова-синонимы',
+                      )}
                       className={fieldClassName}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Подробное объяснение (почему именно так)</Label>
+                    <Label>
+                      {t('Подробное объяснение (почему именно так)')}
+                    </Label>
                     <Textarea
                       value={question.explanation}
                       onChange={(event) =>
@@ -577,7 +605,9 @@ export function ReadingMaterialEditorPage({
                         })
                       }
                       rows={3}
-                      placeholder="Почему этот ответ правильный и в чём ловушка других вариантов"
+                      placeholder={t(
+                        'Почему этот ответ правильный и в чём ловушка других вариантов',
+                      )}
                     />
                   </div>
                   <Input
@@ -613,7 +643,7 @@ export function ReadingMaterialEditorPage({
                   })
                 }
               >
-                Добавить вопрос
+                {t('Добавить вопрос')}
               </Button>
             </div>
           ))}
@@ -622,11 +652,11 @@ export function ReadingMaterialEditorPage({
 
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Метаданные</CardTitle>
+          <CardTitle className="text-base">{t('Метаданные')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
           <div className="grid gap-2 sm:col-span-2">
-            <Label htmlFor="material-title">Название</Label>
+            <Label htmlFor="material-title">{t('Название')}</Label>
             <Input
               id="material-title"
               value={form.title}
@@ -640,12 +670,12 @@ export function ReadingMaterialEditorPage({
               id="material-slug"
               value={form.slug}
               onChange={(event) => update('slug', event.target.value)}
-              placeholder="создастся автоматически"
+              placeholder={t('создастся автоматически')}
               className={fieldClassName}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="material-exam-type">Формат экзамена</Label>
+            <Label htmlFor="material-exam-type">{t('Формат экзамена')}</Label>
             <select
               id="material-exam-type"
               value={form.examType}
@@ -659,7 +689,7 @@ export function ReadingMaterialEditorPage({
             </select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="material-difficulty">Сложность</Label>
+            <Label htmlFor="material-difficulty">{t('Сложность')}</Label>
             <select
               id="material-difficulty"
               value={form.difficulty}
@@ -677,7 +707,9 @@ export function ReadingMaterialEditorPage({
             </select>
           </div>
           <div className="grid gap-2 sm:col-span-2">
-            <Label htmlFor="material-description">Краткое описание</Label>
+            <Label htmlFor="material-description">
+              {t('Краткое описание')}
+            </Label>
             <Textarea
               id="material-description"
               value={form.description}
@@ -694,7 +726,7 @@ export function ReadingMaterialEditorPage({
         </CardHeader>
         <CardContent className="p-5">
           <Label htmlFor="material-body" className="sr-only">
-            Текст материала
+            {t('Текст материала')}
           </Label>
           <Textarea
             id="material-body"
@@ -702,21 +734,23 @@ export function ReadingMaterialEditorPage({
             onChange={(event) => update('body', event.target.value)}
             rows={22}
             className="font-serif text-base leading-7"
-            placeholder="Вставьте текст Reading passage…"
+            placeholder={t('Вставьте текст Reading passage…')}
           />
           <p className="mt-2 text-right text-xs text-[#808084]">
-            {form.body.trim().length} символов
+            {form.body.trim().length} {t('символов')}
           </p>
         </CardContent>
       </Card>
 
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Источник и права</CardTitle>
+          <CardTitle className="text-base">{t('Источник и права')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
           <div className="grid gap-2">
-            <Label htmlFor="material-source-title">Название источника</Label>
+            <Label htmlFor="material-source-title">
+              {t('Название источника')}
+            </Label>
             <Input
               id="material-source-title"
               value={form.sourceTitle ?? ''}
@@ -725,7 +759,7 @@ export function ReadingMaterialEditorPage({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="material-source-url">HTTPS-ссылка</Label>
+            <Label htmlFor="material-source-url">{t('HTTPS-ссылка')}</Label>
             <Input
               id="material-source-url"
               type="url"
@@ -736,8 +770,9 @@ export function ReadingMaterialEditorPage({
           </div>
         </CardContent>
         <CardFooter className="border-t border-[#ededeb] px-5 py-4 text-xs leading-5 text-[#808084]">
-          Добавляйте только собственные или лицензированные материалы и
-          фиксируйте источник.
+          {t(
+            'Добавляйте только собственные или лицензированные материалы и фиксируйте источник.',
+          )}
         </CardFooter>
       </Card>
     </form>
@@ -755,6 +790,7 @@ function ReadingQuestionFields({
   question: ReadingQuestion
   onChange: (patch: Partial<ReadingQuestion>) => void
 }) {
+  const { t } = useLanguage()
   const options = Array.isArray(question.content.options)
     ? question.content.options.filter(isReadingOption)
     : []
@@ -784,7 +820,7 @@ function ReadingQuestionFields({
     <div className="grid gap-4 rounded-lg border border-[#deded9] bg-white p-4">
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="grid gap-2">
-          <Label>Номер в тесте</Label>
+          <Label>{t('Номер в тесте')}</Label>
           <Input
             type="number"
             min={1}
@@ -796,7 +832,7 @@ function ReadingQuestionFields({
           />
         </div>
         <div className="grid gap-2">
-          <Label>Последний номер (multi-select)</Label>
+          <Label>{t('Последний номер (multi-select)')}</Label>
           <Input
             type="number"
             min={number}
@@ -816,11 +852,11 @@ function ReadingQuestionFields({
               })
             }}
             className={fieldClassName}
-            placeholder="Например 22 для диапазона 18–22"
+            placeholder={t('Например 22 для диапазона 18–22')}
           />
         </div>
         <div className="grid gap-2">
-          <Label>Лимит выбора</Label>
+          <Label>{t('Лимит выбора')}</Label>
           <Input
             type="number"
             min={1}
@@ -837,7 +873,7 @@ function ReadingQuestionFields({
         </div>
       </div>
       <div className="grid gap-2">
-        <Label>Общий текст / таблица / summary</Label>
+        <Label>{t('Общий текст / таблица / summary')}</Label>
         <Textarea
           value={
             typeof question.content.context === 'string'
@@ -846,11 +882,11 @@ function ReadingQuestionFields({
           }
           onChange={(event) => updateContent({ context: event.target.value })}
           rows={3}
-          placeholder="Используйте {{12}} для пронумерованных пропусков"
+          placeholder={t('Используйте {{12}} для пронумерованных пропусков')}
         />
       </div>
       <div className="grid gap-2">
-        <Label>HTTPS-ссылка на изображение (diagram/map)</Label>
+        <Label>{t('HTTPS-ссылка на изображение (diagram/map)')}</Label>
         <Input
           value={
             typeof question.content.imageUrl === 'string'
@@ -864,7 +900,7 @@ function ReadingQuestionFields({
       </div>
       <div className="grid gap-2">
         <div className="flex items-center justify-between gap-3">
-          <Label>Варианты / банк слов</Label>
+          <Label>{t('Варианты / банк слов')}</Label>
           <Button
             type="button"
             size="sm"
@@ -881,13 +917,13 @@ function ReadingQuestionFields({
               })
             }
           >
-            Добавить вариант
+            {t('Добавить вариант')}
           </Button>
         </div>
         {options.map((option, index) => (
           <div key={`${option.id}-${index}`} className="flex gap-2">
             <Input
-              aria-label="ID варианта"
+              aria-label={t('ID варианта')}
               value={option.id}
               onChange={(event) =>
                 updateOption(index, { id: event.target.value.toUpperCase() })
@@ -895,7 +931,7 @@ function ReadingQuestionFields({
               className={`${fieldClassName} w-20`}
             />
             <Input
-              aria-label="Текст варианта"
+              aria-label={t('Текст варианта')}
               value={option.text}
               onChange={(event) =>
                 updateOption(index, { text: event.target.value })
@@ -913,13 +949,13 @@ function ReadingQuestionFields({
                 })
               }
             >
-              Удалить
+              {t('Удалить')}
             </Button>
           </div>
         ))}
       </div>
       <div className="grid gap-2">
-        <Label>Правильный ответ</Label>
+        <Label>{t('Правильный ответ')}</Label>
         {enumValues ? (
           <select
             value={
@@ -932,7 +968,7 @@ function ReadingQuestionFields({
             }
             className={fieldClassName}
           >
-            <option value="">Выберите ответ</option>
+            <option value="">{t('Выберите ответ')}</option>
             {enumValues.map((value) => (
               <option key={value} value={value}>
                 {value}
@@ -981,7 +1017,7 @@ function ReadingQuestionFields({
             }
             className={fieldClassName}
           >
-            <option value="">Выберите вариант</option>
+            <option value="">{t('Выберите вариант')}</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.id}. {option.text}

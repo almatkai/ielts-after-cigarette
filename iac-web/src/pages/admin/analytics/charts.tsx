@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useLanguage } from '@/lib/i18n'
+
 // Validated categorical slots (light surface), assigned in fixed order.
 export const seriesColors = [
   '#2a78d6',
@@ -302,6 +304,7 @@ export function ActivityHeatmap({
 }: {
   cells: { weekday: number; hour: number; attempts: number }[]
 }) {
+  const { t } = useLanguage()
   const [hover, setHover] = useState<{
     weekday: number
     hour: number
@@ -322,7 +325,7 @@ export function ActivityHeatmap({
           ))}
           {weekdays.map((label, dayIndex) => (
             <div key={label} className="contents">
-              <span className="self-center">{label}</span>
+              <span className="self-center">{t(label)}</span>
               {Array.from({ length: 24 }, (_, hour) => {
                 const attempts = grid.get(`${dayIndex + 1}:${hour}`) ?? 0
                 return (
@@ -334,7 +337,7 @@ export function ActivityHeatmap({
                       setHover({ weekday: dayIndex, hour, attempts })
                     }
                     onPointerLeave={() => setHover(null)}
-                    aria-label={`${label} ${hour}:00 — ${attempts}`}
+                    aria-label={`${t(label)} ${hour}:00 — ${attempts}`}
                   />
                 )
               })}
@@ -344,10 +347,10 @@ export function ActivityHeatmap({
       </div>
       <p className="min-h-5 text-xs text-[#52514e]" aria-live="polite">
         {hover
-          ? `${weekdays[hover.weekday]}, ${String(hover.hour).padStart(2, '0')}:00–${String(hover.hour + 1).padStart(2, '0')}:00 — ${formatNumber(hover.attempts)} попыток`
+          ? `${t(weekdays[hover.weekday])}, ${String(hover.hour).padStart(2, '0')}:00–${String(hover.hour + 1).padStart(2, '0')}:00 — ${formatNumber(hover.attempts)} ${t('попыток')}`
           : max > 0
-            ? `Наведите на ячейку. Максимум — ${formatNumber(max)} попыток в час.`
-            : 'Попыток за период нет.'}
+            ? `${t('Наведите на ячейку. Максимум —')} ${formatNumber(max)} ${t('попыток в час.')}`
+            : t('Попыток за период нет.')}
       </p>
     </div>
   )

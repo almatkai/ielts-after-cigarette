@@ -16,7 +16,7 @@ import { authStore, useAuth } from '@/features/auth/auth-store'
 import { retakeGuestMock } from '@/features/auth/guest'
 import { fullMockKeys, startGeneratedFullMock } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 
 export function FullMockRetake({ sessionId }: { sessionId: string }) {
   const { t } = useLanguage()
@@ -76,7 +76,7 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
         </AlertDialogHeader>
         {retake.isError ? (
           <p role="alert" className="text-sm text-[#e23b3b]">
-            {getErrorMessage(retake.error)}
+            {tr(getErrorMessage(retake.error))}
           </p>
         ) : null}
         <AlertDialogFooter>

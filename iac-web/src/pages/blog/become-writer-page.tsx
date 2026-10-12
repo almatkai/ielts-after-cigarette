@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/lib/i18n'
 
 const MIN_OVERALL_BAND = 7.5
 const halfBandOptions = Array.from({ length: 19 }, (_, index) =>
@@ -37,13 +38,14 @@ type BandSelectProps = {
 }
 
 function BandSelect({ id, label, value, onChange, min }: BandSelectProps) {
+  const { t } = useLanguage()
   const options = halfBandOptions.filter((band) => {
     const numeric = Number(band)
     return min === undefined || numeric >= min
   })
   return (
     <div className="grid gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>{t(label)}</Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger id={id} className="w-full">
           <SelectValue placeholder="—" />
@@ -61,6 +63,7 @@ function BandSelect({ id, label, value, onChange, min }: BandSelectProps) {
 }
 
 function ApplicationForm() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [overallBand, setOverallBand] = useState('')
   const [listeningBand, setListeningBand] = useState('')
@@ -165,7 +168,7 @@ function ApplicationForm() {
           onChange={setSpeakingBand}
         />
         <div className="grid gap-1.5">
-          <Label htmlFor="exam-type">Тип экзамена</Label>
+          <Label htmlFor="exam-type">{t('Тип экзамена')}</Label>
           <Select
             value={examType}
             onValueChange={(value) =>
@@ -173,7 +176,7 @@ function ApplicationForm() {
             }
           >
             <SelectTrigger id="exam-type" className="w-full">
-              <SelectValue placeholder="Не указан" />
+              <SelectValue placeholder={t('Не указан')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="academic">Academic</SelectItem>
@@ -182,17 +185,17 @@ function ApplicationForm() {
           </Select>
         </div>
         <div className="grid gap-1.5">
-          <Label htmlFor="trf-number">Номер сертификата (TRF) *</Label>
+          <Label htmlFor="trf-number">{t('Номер сертификата (TRF) *')}</Label>
           <Input
             id="trf-number"
             value={trfNumber}
             onChange={(event) => setTrfNumber(event.target.value)}
-            placeholder="Например: 25RU000123ALMATY01"
+            placeholder={t('Например: 25RU000123ALMATY01')}
             required
           />
         </div>
         <div className="grid gap-1.5">
-          <Label htmlFor="test-date">Дата сдачи теста</Label>
+          <Label htmlFor="test-date">{t('Дата сдачи теста')}</Label>
           <Input
             id="test-date"
             type="date"
@@ -203,7 +206,7 @@ function ApplicationForm() {
       </div>
 
       <div className="grid gap-1.5">
-        <Label>Сертификат IELTS * (PNG, JPG, WebP или GIF)</Label>
+        <Label>{t('Сертификат IELTS * (PNG, JPG, WebP или GIF)')}</Label>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -219,11 +222,13 @@ function ApplicationForm() {
             </span>
           ) : (
             <span className="text-sm text-[#69696d]">
-              Нажмите, чтобы загрузить скан или фото сертификата
+              {t('Нажмите, чтобы загрузить скан или фото сертификата')}
             </span>
           )}
           {uploadMutation.isPending ? (
-            <span className="ml-auto text-xs text-[#808084]">Загружаем…</span>
+            <span className="ml-auto text-xs text-[#808084]">
+              {t('Загружаем…')}
+            </span>
           ) : null}
         </button>
         <input
@@ -241,23 +246,27 @@ function ApplicationForm() {
 
       <div className="grid gap-1.5">
         <Label htmlFor="bio">
-          Коротко о себе и темах, о которых хотите писать
+          {t('Коротко о себе и темах, о которых хотите писать')}
         </Label>
         <Textarea
           id="bio"
           value={bio}
           onChange={(event) => setBio(event.target.value)}
           rows={4}
-          placeholder="Например: сдал IELTS Academic на 8.0, готовлю студентов к Writing, хочу писать разборы эссе"
+          placeholder={t(
+            'Например: сдал IELTS Academic на 8.0, готовлю студентов к Writing, хочу писать разборы эссе',
+          )}
         />
       </div>
 
       {(validationError || applyMutation.isError || uploadMutation.isError) && (
         <p className="rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
-          {validationError ??
-            (applyMutation.isError
-              ? 'Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.'
-              : 'Не удалось загрузить сертификат. Попробуйте другой файл.')}
+          {t(
+            validationError ??
+              (applyMutation.isError
+                ? 'Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.'
+                : 'Не удалось загрузить сертификат. Попробуйте другой файл.'),
+          )}
         </p>
       )}
 
@@ -266,13 +275,14 @@ function ApplicationForm() {
         disabled={applyMutation.isPending || uploadMutation.isPending}
         className="justify-self-start"
       >
-        {applyMutation.isPending ? 'Отправляем…' : 'Отправить заявку'}
+        {applyMutation.isPending ? t('Отправляем…') : t('Отправить заявку')}
       </Button>
     </form>
   )
 }
 
 export function BecomeWriterPage() {
+  const { t } = useLanguage()
   const auth = useAuth()
   const authenticated = Boolean(auth.user && auth.accessToken)
   const applicationQuery = useQuery({
@@ -286,73 +296,83 @@ export function BecomeWriterPage() {
 
   return (
     <BlogShell width="narrow">
-      <BlogBackLink to="/blog">Все статьи</BlogBackLink>
+      <BlogBackLink to="/blog">{t('Все статьи')}</BlogBackLink>
 
       <p className="mt-6 text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-        Авторам
+        {t('Авторам')}
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-        Стать автором блога
+        {t('Стать автором блога')}
       </h1>
       <p className="mt-3 text-sm leading-6 text-[#69696d]">
-        Публикации в блоге пишут авторы с подтверждённым официальным IELTS от
-        7.5. Заполните заявку — команда платформы проверит баллы и сертификат и
-        откроет доступ к редактору.
+        {t(
+          'Публикации в блоге пишут авторы с подтверждённым официальным IELTS от 7.5. Заполните заявку — команда платформы проверит баллы и сертификат и откроет доступ к редактору.',
+        )}
       </p>
 
       {!auth.initialized || (authenticated && applicationQuery.isPending) ? (
-        <p className="mt-8 text-sm text-[#69696d]">Проверяем аккаунт…</p>
+        <p className="mt-8 text-sm text-[#69696d]">{t('Проверяем аккаунт…')}</p>
       ) : !authenticated ? (
-        <StatusCard title="Войдите, чтобы подать заявку">
-          <p>Заявка привязывается к вашему аккаунту на платформе.</p>
+        <StatusCard title={t('Войдите, чтобы подать заявку')}>
+          <p>{t('Заявка привязывается к вашему аккаунту на платформе.')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button asChild>
               <Link to="/login" search={{ redirect: '/blog/become-writer' }}>
-                Войти
+                {t('Войти')}
               </Link>
             </Button>
           </div>
         </StatusCard>
       ) : alreadyWriter ? (
         <StatusCard
-          title="Вы уже автор"
+          title={t('Вы уже автор')}
           icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
         >
-          <p>Редактор статей доступен в кабинете автора.</p>
+          <p>{t('Редактор статей доступен в кабинете автора.')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button asChild>
-              <Link to="/writer/posts">Мои статьи</Link>
+              <Link to="/writer/posts">{t('Мои статьи')}</Link>
             </Button>
           </div>
         </StatusCard>
       ) : application?.status === 'PENDING' ? (
-        <StatusCard title="Заявка на проверке">
+        <StatusCard title={t('Заявка на проверке')}>
           <p>
-            Вы отправили заявку с общим баллом {application.overallBand}. Мы
-            проверим сертификат и сообщим вам о решении.
+            {t(
+              'Вы отправили заявку с общим баллом {band}. Мы проверим сертификат и сообщим вам о решении.',
+            ).replace('{band}', String(application.overallBand))}
           </p>
           <StatusActions />
         </StatusCard>
       ) : application?.status === 'APPROVED' ? (
         <StatusCard
-          title="Заявка одобрена"
+          title={t('Заявка одобрена')}
           icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
         >
-          <p>Обновите страницу, чтобы получить доступ к редактору.</p>
+          <p>{t('Обновите страницу, чтобы получить доступ к редактору.')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button type="button" onClick={() => window.location.reload()}>
-              Обновить доступ
+              {t('Обновить доступ')}
             </Button>
           </div>
         </StatusCard>
       ) : application?.status === 'REJECTED' ? (
         <div className="mt-8 grid gap-6">
           <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-            <p className="font-semibold text-[#111111]">Заявка отклонена</p>
+            <p className="font-semibold text-[#111111]">
+              {t('Заявка отклонена')}
+            </p>
             {application.reviewNotes ? (
-              <p className="mt-2">Причина: {application.reviewNotes}</p>
+              <p className="mt-2">
+                {t('Причина: {reason}').replace(
+                  '{reason}',
+                  application.reviewNotes,
+                )}
+              </p>
             ) : null}
-            <p className="mt-2">Вы можете исправить данные и подать заново.</p>
+            <p className="mt-2">
+              {t('Вы можете исправить данные и подать заново.')}
+            </p>
           </div>
           <ApplicationForm />
         </div>
@@ -386,13 +406,14 @@ function StatusCard({
 }
 
 function StatusActions() {
+  const { t } = useLanguage()
   return (
     <div className="mt-4 flex flex-wrap gap-3">
       <Button asChild>
-        <Link to="/blog">Читать блог</Link>
+        <Link to="/blog">{t('Читать блог')}</Link>
       </Button>
       <Button asChild variant="outline">
-        <Link to="/">Вернуться к подготовке</Link>
+        <Link to="/">{t('Вернуться к подготовке')}</Link>
       </Button>
     </div>
   )

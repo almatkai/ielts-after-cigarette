@@ -5,6 +5,7 @@ import { SearchNormal1, ArrowRight2 } from 'iconsax-react'
 import { Input } from '@/components/ui/input'
 import { listUsers, usersKey } from '@/features/admin/users-api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import {
   date,
   Pagination,
@@ -15,6 +16,7 @@ import {
 } from './shared'
 
 export function UsersPage() {
+  const { t } = useLanguage()
   const [search, setSearch] = useState('')
   const [q, setQ] = useState('')
   const [role, setRole] = useState('')
@@ -34,7 +36,7 @@ export function UsersPage() {
     <div className="grid gap-5">
       <div className="flex items-baseline gap-3">
         <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-          Пользователи
+          {t('Пользователи')}
         </h1>
         {query.data && (
           <span className="text-sm text-muted-foreground">
@@ -51,13 +53,13 @@ export function UsersPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Имя, email или телефон"
-            aria-label="Поиск пользователей"
+            placeholder={t('Имя, email или телефон')}
+            aria-label={t('Поиск пользователей')}
             className="h-10 bg-white pl-10"
           />
         </div>
         <select
-          aria-label="Роль"
+          aria-label={t('Роль')}
           value={role}
           onChange={(e) => {
             setRole(e.target.value)
@@ -65,17 +67,17 @@ export function UsersPage() {
           }}
           className="h-10 rounded-lg border border-[#e7e7e4] bg-white px-3 text-sm"
         >
-          <option value="">Все роли</option>
+          <option value="">{t('Все роли')}</option>
           {Object.entries(roles).map(([value, label]) => (
             <option key={value} value={value}>
-              {label}
+              {t(label)}
             </option>
           ))}
         </select>
       </div>
       {query.isError ? (
         <QueryError
-          message={getErrorMessage(query.error)}
+          message={t(getErrorMessage(query.error))}
           retry={() => void query.refetch()}
         />
       ) : (
@@ -83,12 +85,12 @@ export function UsersPage() {
           <table className="w-full min-w-[680px] text-left text-sm">
             <thead className="border-b border-[#e7e7e4] bg-[#fafaf8] text-xs text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-medium">Пользователь</th>
-                <th className="px-4 py-3 font-medium">Роль</th>
-                <th className="px-4 py-3 font-medium">Тесты</th>
-                <th className="px-4 py-3 font-medium">Активность</th>
+                <th className="px-5 py-3 font-medium">{t('Пользователь')}</th>
+                <th className="px-4 py-3 font-medium">{t('Роль')}</th>
+                <th className="px-4 py-3 font-medium">{t('Тесты')}</th>
+                <th className="px-4 py-3 font-medium">{t('Активность')}</th>
                 <th className="w-10">
-                  <span className="sr-only">Открыть</span>
+                  <span className="sr-only">{t('Открыть')}</span>
                 </th>
               </tr>
             </thead>
@@ -99,7 +101,7 @@ export function UsersPage() {
                     colSpan={5}
                     className="p-12 text-center text-muted-foreground"
                   >
-                    Загрузка…
+                    {t('Загрузка…')}
                   </td>
                 </tr>
               ) : (
@@ -136,22 +138,24 @@ export function UsersPage() {
                           user.role === 'WRITER' ? 'text-[#2563eb]' : ''
                         }
                       >
-                        {roles[user.role]}
+                        {t(roles[user.role])}
                       </span>
                       {user.blocked ? (
                         <p className="mt-1 text-xs text-destructive">
-                          Заблокирован
+                          {t('Заблокирован')}
                         </p>
                       ) : user.status !== 'REGISTERED' ? (
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {statusText[user.status]}
+                          {t(statusText[user.status])}
                         </p>
                       ) : null}
                     </td>
                     <td className="px-4 py-4">
-                      <p>{user.completedTests} завершено</p>
+                      <p>
+                        {user.completedTests} {t('завершено')}
+                      </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {user.unfinishedTests} в процессе
+                        {user.unfinishedTests} {t('в процессе')}
                       </p>
                     </td>
                     <td className="px-4 py-4 text-xs text-muted-foreground">
@@ -161,7 +165,7 @@ export function UsersPage() {
                       <Link
                         to="/admin/users/$userId"
                         params={{ userId: user.id }}
-                        aria-label={`Открыть ${user.displayName}`}
+                        aria-label={`${t('Открыть')} ${user.displayName}`}
                         className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-[#eff6ff] hover:text-primary"
                       >
                         <ArrowRight2 className="size-4" aria-hidden />
@@ -176,7 +180,7 @@ export function UsersPage() {
                     colSpan={5}
                     className="p-12 text-center text-muted-foreground"
                   >
-                    Ничего не найдено
+                    {t('Ничего не найдено')}
                   </td>
                 </tr>
               )}

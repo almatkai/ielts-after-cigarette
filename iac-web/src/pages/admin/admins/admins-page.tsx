@@ -12,11 +12,13 @@ import {
   removeSuperAdmin,
 } from '@/features/admin/api'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type { SuperAdminEntry } from '@/features/admin/api'
 
 export function AdminsPage() {
   const queryClient = useQueryClient()
+  const { t } = useLanguage()
   const [newAdminEmail, setNewAdminEmail] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -79,15 +81,15 @@ export function AdminsPage() {
     <div className="grid gap-5">
       <div>
         <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
-          Администрирование
+          {t('Администрирование')}
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-          Администраторы
+          {t('Администраторы')}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
-          Эти аккаунты имеют доступ к waitlist и другим инструментам
-          администрирования. Администратор из переменных окружения (env) не
-          удаляется через интерфейс.
+          {t(
+            'Эти аккаунты имеют доступ к waitlist и другим инструментам администрирования. Администратор из переменных окружения (env) не удаляется через интерфейс.',
+          )}
         </p>
       </div>
 
@@ -100,7 +102,7 @@ export function AdminsPage() {
           required
           value={newAdminEmail}
           onChange={(event) => setNewAdminEmail(event.target.value)}
-          placeholder="email нового администратора"
+          placeholder={t('email нового администратора')}
           className="h-11 w-full max-w-xs rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0"
         />
         <Button
@@ -109,20 +111,20 @@ export function AdminsPage() {
           disabled={busy}
         >
           <UserAdd aria-hidden />
-          Добавить
+          {t('Добавить')}
         </Button>
       </form>
 
       {actionError ? (
         <p className="text-sm text-[#c92f2f]" role="alert">
-          {actionError}
+          {t(actionError)}
         </p>
       ) : null}
 
       {adminsQuery.isPending ? (
         <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
           <CardContent className="p-8 text-center text-sm text-[#69696d]">
-            Загружаем список администраторов…
+            {t('Загружаем список администраторов…')}
           </CardContent>
         </Card>
       ) : adminsQuery.isError ? (
@@ -132,8 +134,10 @@ export function AdminsPage() {
             <p className="mt-3 text-sm">
               {adminsQuery.error instanceof ApiError &&
               adminsQuery.error.status === 403
-                ? 'Нет доступа: управление администраторами доступно только роли ADMIN.'
-                : 'Не удалось загрузить список администраторов.'}
+                ? t(
+                    'Нет доступа: управление администраторами доступно только роли ADMIN.',
+                  )
+                : t('Не удалось загрузить список администраторов.')}
             </p>
             <Button
               type="button"
@@ -141,7 +145,7 @@ export function AdminsPage() {
               className="mt-4"
               onClick={() => void adminsQuery.refetch()}
             >
-              Повторить
+              {t('Повторить')}
             </Button>
           </CardContent>
         </Card>
@@ -151,7 +155,7 @@ export function AdminsPage() {
             <thead>
               <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
                 <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Источник</th>
+                <th className="px-4 py-3 font-medium">{t('Источник')}</th>
                 <th className="px-4 py-3 font-medium" />
               </tr>
             </thead>
@@ -171,15 +175,17 @@ export function AdminsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {admin.source === 'env' ? 'env' : 'добавлен вручную'}
+                    {admin.source === 'env' ? 'env' : t('добавлен вручную')}
                   </td>
                   <td className="px-4 py-3 text-right">
                     {admin.source === 'env' ? (
                       <span
                         className="text-xs text-[#a1a1a6]"
-                        title="Задан в переменных окружения, удалить можно только правкой env"
+                        title={t(
+                          'Задан в переменных окружения, удалить можно только правкой env',
+                        )}
                       >
-                        недоступно
+                        {t('недоступно')}
                       </span>
                     ) : (
                       <Button
@@ -190,7 +196,7 @@ export function AdminsPage() {
                         onClick={() => void handleRemove(admin)}
                       >
                         <Trash aria-hidden />
-                        Удалить
+                        {t('Удалить')}
                       </Button>
                     )}
                   </td>
@@ -202,7 +208,7 @@ export function AdminsPage() {
                     colSpan={3}
                     className="px-4 py-8 text-center text-[#69696d]"
                   >
-                    Список администраторов пуст.
+                    {t('Список администраторов пуст.')}
                   </td>
                 </tr>
               )}

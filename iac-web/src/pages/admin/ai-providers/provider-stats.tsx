@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { getAIStats } from '@/features/ai-providers/api'
+import { useLanguage } from '@/lib/i18n'
 import type { AIStats } from '@/features/ai-providers/api'
 
-const duration = (ms: number | null) =>
+const duration = (ms: number | null, t: (source: string) => string) =>
   ms === null
     ? '—'
     : ms < 1000
-      ? `${Math.round(ms)} мс`
-      : `${(ms / 1000).toFixed(2)} с`
+      ? `${Math.round(ms)} ${t('мс')}`
+      : `${(ms / 1000).toFixed(2)} ${t('с')}`
 const purposes: Record<string, string> = {
   assistant: 'Юки',
   writing: 'Writing',
@@ -29,6 +30,7 @@ const triggers: Record<string, string> = {
 }
 
 export function ProviderStats({ revision }: { revision: number }) {
+  const { t } = useLanguage()
   const [data, setData] = useState<AIStats | null>(null)
   const [days, setDays] = useState(7)
   const [purpose, setPurpose] = useState('all')
@@ -66,40 +68,41 @@ export function ProviderStats({ revision }: { revision: number }) {
   )
   return (
     <section
-      aria-label="Статистика провайдеров"
+      aria-label={t('Статистика провайдеров')}
       className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
     >
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 p-5">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">
-            Скорость и надёжность
+            {t('Скорость и надёжность')}
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-            Сравнивайте модели на одинаковых задачах. Успех означает корректный
-            формат ответа, не оценку качества IELTS.
+            {t(
+              'Сравнивайте модели на одинаковых задачах. Успех означает корректный формат ответа, не оценку качества IELTS.',
+            )}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select
-            aria-label="Период статистики"
+            aria-label={t('Период статистики')}
             className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm"
             value={days}
             onChange={(event) => setDays(Number(event.target.value))}
           >
-            <option value={1}>24 часа</option>
-            <option value={7}>7 дней</option>
-            <option value={30}>30 дней</option>
+            <option value={1}>{t('24 часа')}</option>
+            <option value={7}>{t('7 дней')}</option>
+            <option value={30}>{t('30 дней')}</option>
           </select>
           <select
-            aria-label="Задача для статистики"
+            aria-label={t('Задача для статистики')}
             className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm"
             value={purpose}
             onChange={(event) => setPurpose(event.target.value)}
           >
-            <option value="all">Все задачи</option>
+            <option value="all">{t('Все задачи')}</option>
             {Object.entries(purposes).map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
@@ -109,26 +112,28 @@ export function ProviderStats({ revision }: { revision: number }) {
             disabled={busy}
             onClick={() => setRefresh((value) => value + 1)}
           >
-            {busy ? 'Загрузка…' : 'Обновить статистику'}
+            {busy ? t('Загрузка…') : t('Обновить статистику')}
           </Button>
         </div>
       </header>
       {error && (
         <p role="alert" className="p-5 text-sm text-red-700">
-          {error}
+          {t(error)}
         </p>
       )}
       {data?.migrationRequired ? (
         <p className="p-5 text-sm text-slate-500">
-          История запросов начнёт сохраняться после миграции 000032. Ключи,
-          промпты и ответы в статистику не попадают.
+          {t(
+            'История запросов начнёт сохраняться после миграции 000032. Ключи, промпты и ответы в статистику не попадают.',
+          )}
         </p>
       ) : (
         <>
           {!busy && !models.length && (
             <p className="p-5 text-sm text-slate-500">
-              Пока нет измерений за этот период. Нажмите «Проверить» у
-              провайдера или используйте Юки / проверку работы.
+              {t(
+                'Пока нет измерений за этот период. Нажмите «Проверить» у провайдера или используйте Юки / проверку работы.',
+              )}
             </p>
           )}
           {models.length > 0 && (
@@ -137,15 +142,15 @@ export function ProviderStats({ revision }: { revision: number }) {
                 <thead className="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
                   <tr>
                     {[
-                      'Провайдер / модель',
-                      'Задача',
-                      'Попытки',
-                      'Успех',
-                      'Победы',
-                      'Ответ p50',
-                      'Ответ p95',
-                      'Первый токен',
-                      'Отмены',
+                      t('Провайдер / модель'),
+                      t('Задача'),
+                      t('Попытки'),
+                      t('Успех'),
+                      t('Победы'),
+                      t('Ответ p50'),
+                      t('Ответ p95'),
+                      t('Первый токен'),
+                      t('Отмены'),
                     ].map((title) => (
                       <th key={title} className="px-4 py-3 font-medium">
                         {title}
@@ -172,13 +177,15 @@ export function ProviderStats({ revision }: { revision: number }) {
                             {row.model}
                           </p>
                         </td>
-                        <td className="px-4 py-4">{purposes[row.purpose]}</td>
+                        <td className="px-4 py-4">
+                          {t(purposes[row.purpose] ?? row.purpose)}
+                        </td>
                         <td className="px-4 py-4 tabular-nums">
                           {row.calls}
                           <p className="mt-1 text-xs text-slate-500">
                             {row.successes < 5
-                              ? 'Мало данных'
-                              : `${row.failures} ошибок · ${row.timeouts} таймаутов`}
+                              ? t('Мало данных')
+                              : `${row.failures} ${t('ошибок')} · ${row.timeouts} ${t('таймаутов')}`}
                           </p>
                         </td>
                         <td className="px-4 py-4 tabular-nums">{rate}</td>
@@ -186,13 +193,13 @@ export function ProviderStats({ revision }: { revision: number }) {
                           {row.wins}
                         </td>
                         <td className="px-4 py-4 font-medium tabular-nums">
-                          {duration(row.p50Ms)}
+                          {duration(row.p50Ms, t)}
                         </td>
                         <td className="px-4 py-4 tabular-nums">
-                          {duration(row.p95Ms)}
+                          {duration(row.p95Ms, t)}
                         </td>
                         <td className="px-4 py-4 tabular-nums">
-                          {duration(row.firstTokenMs)}
+                          {duration(row.firstTokenMs, t)}
                         </td>
                         <td className="px-4 py-4 tabular-nums text-slate-500">
                           {row.cancelled}
@@ -205,28 +212,26 @@ export function ProviderStats({ revision }: { revision: number }) {
             </div>
           )}
           <p className="border-t border-slate-100 px-5 py-3 text-xs leading-5 text-slate-500">
-            p50 — медиана, p95 — задержка для 95% корректных ответов. Отменённые
-            пользователем запросы не считаются ошибками и не входят в эти
-            задержки. Первый токен измеряется для streaming; «Проверить»
-            измеряет короткий ответ, не полноценную оценку работы. Задержки
-            отражают только успешные ответы, отдельно от ошибок и таймаутов.
+            {t(
+              'p50 — медиана, p95 — задержка для 95% корректных ответов. Отменённые пользователем запросы не считаются ошибками и не входят в эти задержки. Первый токен измеряется для streaming; «Проверить» измеряет короткий ответ, не полноценную оценку работы. Задержки отражают только успешные ответы, отдельно от ошибок и таймаутов.',
+            )}
           </p>
           {recent.length > 0 && (
             <details className="border-t border-slate-100">
               <summary className="cursor-pointer px-5 py-4 text-sm font-medium text-slate-800">
-                Последние попытки ({recent.length})
+                {t('Последние попытки')} ({recent.length})
               </summary>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">
                   <thead className="bg-slate-50 text-slate-500">
                     <tr>
                       {[
-                        'Время',
-                        'Провайдер / модель',
-                        'Задача',
-                        'Почему запущен',
-                        'Результат',
-                        'Время ответа',
+                        t('Время'),
+                        t('Провайдер / модель'),
+                        t('Задача'),
+                        t('Почему запущен'),
+                        t('Результат'),
+                        t('Время ответа'),
                       ].map((title) => (
                         <th key={title} className="px-4 py-3 font-medium">
                           {title}
@@ -247,14 +252,16 @@ export function ProviderStats({ revision }: { revision: number }) {
                           </p>
                           <p
                             className="mt-1 break-all text-[10px] text-slate-400"
-                            title="ID гонки / запроса"
+                            title={t('ID гонки / запроса')}
                           >
                             {row.runId}
                           </p>
                         </td>
-                        <td className="px-4 py-3">{purposes[row.purpose]}</td>
                         <td className="px-4 py-3">
-                          {triggers[row.trigger] ?? row.trigger}
+                          {t(purposes[row.purpose] ?? row.purpose)}
+                        </td>
+                        <td className="px-4 py-3">
+                          {t(triggers[row.trigger] ?? row.trigger)}
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -267,7 +274,9 @@ export function ProviderStats({ revision }: { revision: number }) {
                                   : 'text-slate-500'
                             }
                           >
-                            {row.won ? 'Победитель' : outcomes[row.outcome]}
+                            {row.won
+                              ? t('Победитель')
+                              : t(outcomes[row.outcome] ?? row.outcome)}
                           </span>
                           {row.code && (
                             <p className="mt-1 text-slate-400">
@@ -279,7 +288,7 @@ export function ProviderStats({ revision }: { revision: number }) {
                           )}
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 tabular-nums">
-                          {duration(row.durationMs)}
+                          {duration(row.durationMs, t)}
                         </td>
                       </tr>
                     ))}

@@ -17,6 +17,7 @@ import type {
 import { ReadingPreviewRunner } from '@/pages/reading/reading-student-page'
 import { ListeningPreviewRunner } from '@/pages/listening/listening-student-page'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 function TestPreviewPage<T>({
   id,
@@ -40,6 +41,7 @@ function TestPreviewPage<T>({
   editorLink: ReactNode
 }) {
   const auth = useAuth()
+  const { t } = useLanguage()
   const [version, setVersion] = useState<PreviewVersion>('draft')
   const [reset, setReset] = useState(0)
   const [timerEnabled, setTimerEnabled] = useState(false)
@@ -58,18 +60,20 @@ function TestPreviewPage<T>({
         <div className="mx-auto flex max-w-[1780px] flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold">
-              Предпросмотр {skill} · Без сохранения попытки
+              {t('Предпросмотр')} {skill} · {t('Без сохранения попытки')}
             </h1>
             <p className="mt-1 text-xs text-slate-600">
               {version === 'draft'
-                ? 'Текущая сохранённая версия'
-                : 'Опубликованная версия — её видят пользователи'}
+                ? t('Текущая сохранённая версия')
+                : t('Опубликованная версия — её видят пользователи')}
               {query.data
-                ? ` · Версия ${query.data.versionNumber} · revision ${query.data.revision}`
+                ? ` · ${t('Версия')} ${query.data.versionNumber} · revision ${query.data.revision}`
                 : ''}
             </p>
             <p className="mt-1 text-xs text-slate-600">
-              Пробные ответы не сохраняются. Попытка и статистика не создаются.
+              {t(
+                'Пробные ответы не сохраняются. Попытка и статистика не создаются.',
+              )}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -80,7 +84,7 @@ function TestPreviewPage<T>({
               variant={version === 'draft' ? 'default' : 'outline'}
               onClick={() => setVersion('draft')}
             >
-              Черновик
+              {t('Черновик')}
             </Button>
             {query.data?.status === 'PUBLISHED' || version === 'published' ? (
               <Button
@@ -89,7 +93,7 @@ function TestPreviewPage<T>({
                 variant={version === 'published' ? 'default' : 'outline'}
                 onClick={() => setVersion('published')}
               >
-                Опубликованная версия
+                {t('Опубликованная версия')}
               </Button>
             ) : null}
             <Button
@@ -99,7 +103,7 @@ function TestPreviewPage<T>({
               aria-pressed={timerEnabled}
               onClick={() => setTimerEnabled((value) => !value)}
             >
-              {timerEnabled ? 'Выключить таймер' : 'Включить таймер'}
+              {timerEnabled ? t('Выключить таймер') : t('Включить таймер')}
             </Button>
             <Button
               type="button"
@@ -108,28 +112,30 @@ function TestPreviewPage<T>({
               disabled={!query.data}
               onClick={() => setReset((value) => value + 1)}
             >
-              Сбросить ответы
+              {t('Сбросить ответы')}
             </Button>
           </div>
         </div>
       </header>
       {query.isPending ? (
         <p role="status" className="p-6 text-sm">
-          Загружаем предпросмотр…
+          {t('Загружаем предпросмотр…')}
         </p>
       ) : null}
       {query.isError ? (
         <div role="alert" className="mx-auto grid max-w-xl gap-3 p-6">
-          <h2 className="font-semibold">Не удалось открыть предпросмотр</h2>
+          <h2 className="font-semibold">
+            {t('Не удалось открыть предпросмотр')}
+          </h2>
           <p className="text-sm text-slate-600">
-            {getErrorMessage(query.error)}
+            {t(getErrorMessage(query.error))}
           </p>
           <Button
             type="button"
             variant="outline"
             onClick={() => void query.refetch()}
           >
-            Повторить
+            {t('Повторить')}
           </Button>
         </div>
       ) : null}
@@ -147,6 +153,7 @@ function TestPreviewPage<T>({
 }
 
 export function ReadingTestPreviewPage({ materialId }: { materialId: string }) {
+  const { t } = useLanguage()
   return (
     <TestPreviewPage
       id={materialId}
@@ -158,7 +165,8 @@ export function ReadingTestPreviewPage({ materialId }: { materialId: string }) {
             to="/admin/reading/materials/$materialId"
             params={{ materialId }}
           >
-            <ArrowLeft aria-hidden />К редактору
+            <ArrowLeft aria-hidden />
+            {t('К редактору')}
           </Link>
         </Button>
       }
@@ -174,6 +182,7 @@ export function ReadingTestPreviewPage({ materialId }: { materialId: string }) {
 }
 
 export function ListeningTestPreviewPage({ testId }: { testId: string }) {
+  const { t } = useLanguage()
   return (
     <TestPreviewPage
       id={testId}
@@ -182,7 +191,8 @@ export function ListeningTestPreviewPage({ testId }: { testId: string }) {
       editorLink={
         <Button asChild size="sm" variant="outline">
           <Link to="/admin/listening/tests/$testId" params={{ testId }}>
-            <ArrowLeft aria-hidden />К редактору
+            <ArrowLeft aria-hidden />
+            {t('К редактору')}
           </Link>
         </Button>
       }

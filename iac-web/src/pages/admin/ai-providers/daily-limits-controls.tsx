@@ -4,9 +4,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/lib/api/client'
 import { getAILimits, saveAILimits } from '@/features/ai-limits/api'
+import { useLanguage } from '@/lib/i18n'
 import type { AILimits } from '@/features/ai-limits/api'
 
 export function DailyLimitsControls() {
+  const { t } = useLanguage()
   const [limits, setLimits] = useState<AILimits>({
     assistantLimit: 100,
     guestAssistantLimit: 15,
@@ -84,60 +86,63 @@ export function DailyLimitsControls() {
 
   return (
     <section
-      aria-label="Дневные лимиты AI"
+      aria-label={t('Дневные лимиты AI')}
       className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="font-semibold text-slate-900">
-              Дневные лимиты AI (квоты)
+              {t('Дневные лимиты AI (квоты)')}
             </h2>
             <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-              Действуют моментально
+              {t('Действуют моментально')}
             </span>
           </div>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Ограничение расхода токенов на пользователя в сутки. При пиковой
-            нагрузке можно снизить лимиты на лету без перезапуска сервера.
+            {t(
+              'Ограничение расхода токенов на пользователя в сутки. При пиковой нагрузке можно снизить лимиты на лету без перезапуска сервера.',
+            )}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Быстрые пресеты:</span>
+          <span className="text-xs text-slate-500">
+            {t('Быстрые пресеты:')}
+          </span>
           <button
             type="button"
             onClick={() => applyPreset(100, 15, 25, 25)}
             className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
           >
-            Штатный
+            {t('Штатный')}
           </button>
           <button
             type="button"
             onClick={() => applyPreset(30, 5, 10, 10)}
             className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100"
           >
-            Пик / Эконом
+            {t('Пик / Эконом')}
           </button>
           <button
             type="button"
             onClick={() => applyPreset(10, 0, 3, 3)}
             className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100"
           >
-            Экстренный
+            {t('Экстренный')}
           </button>
         </div>
       </div>
 
       {notice && (
         <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">
-          {notice}
+          {t(notice)}
         </div>
       )}
 
       {error && (
         <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-800">
-          {error}
+          {t(error)}
         </div>
       )}
 
@@ -148,10 +153,10 @@ export function DailyLimitsControls() {
               htmlFor="assistantLimit"
               className="text-xs font-semibold text-slate-700"
             >
-              Юки (студент)
+              {t('Юки (студент)')}
             </Label>
             <p className="text-[11px] text-slate-500">
-              Сообщений в день на пользователя
+              {t('Сообщений в день на пользователя')}
             </p>
             <Input
               id="assistantLimit"
@@ -174,10 +179,10 @@ export function DailyLimitsControls() {
               htmlFor="guestAssistantLimit"
               className="text-xs font-semibold text-slate-700"
             >
-              Юки (гость без входа)
+              {t('Юки (гость без входа)')}
             </Label>
             <p className="text-[11px] text-slate-500">
-              Сообщений в день на IP-адрес
+              {t('Сообщений в день на IP-адрес')}
             </p>
             <Input
               id="guestAssistantLimit"
@@ -203,10 +208,10 @@ export function DailyLimitsControls() {
               htmlFor="writingLimit"
               className="text-xs font-semibold text-slate-700"
             >
-              Writing (проверки)
+              {t('Writing (проверки)')}
             </Label>
             <p className="text-[11px] text-slate-500">
-              Оценок эссе в день на студента
+              {t('Оценок эссе в день на студента')}
             </p>
             <Input
               id="writingLimit"
@@ -229,10 +234,10 @@ export function DailyLimitsControls() {
               htmlFor="speakingLimit"
               className="text-xs font-semibold text-slate-700"
             >
-              Speaking (проверки)
+              {t('Speaking (проверки)')}
             </Label>
             <p className="text-[11px] text-slate-500">
-              Оценок устной речи в день на студента
+              {t('Оценок устной речи в день на студента')}
             </p>
             <Input
               id="speakingLimit"
@@ -255,14 +260,15 @@ export function DailyLimitsControls() {
           <p className="text-xs text-slate-400">
             {limits.updatedAt ? (
               <>
-                Обновлено: {new Date(limits.updatedAt).toLocaleString('ru-RU')}
+                {t('Обновлено')}:{' '}
+                {new Date(limits.updatedAt).toLocaleString('ru-RU')}
               </>
             ) : (
-              <>Используются базовые значения системы</>
+              <>{t('Используются базовые значения системы')}</>
             )}
           </p>
           <Button type="submit" disabled={loading || saving}>
-            {saving ? 'Сохранение...' : 'Сохранить лимиты'}
+            {saving ? t('Сохранение...') : t('Сохранить лимиты')}
           </Button>
         </div>
       </form>

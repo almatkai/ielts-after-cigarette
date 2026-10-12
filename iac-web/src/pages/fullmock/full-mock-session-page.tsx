@@ -17,6 +17,7 @@ import {
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { FullMockReport } from './full-mock-report'
+import { tr } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -96,7 +97,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     return (
       <ErrorState
         title="Could not load the Full Mock"
-        message={getErrorMessage(query.error)}
+        message={tr(getErrorMessage(query.error))}
         onRetry={() => void query.refetch()}
       />
     )
@@ -129,7 +130,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
       </div>
       {returnToSite.isError ? (
         <p role="alert" className="text-sm text-[#e23b3b]">
-          Could not pause the test: {getErrorMessage(returnToSite.error)}
+          Could not pause the test: {tr(getErrorMessage(returnToSite.error))}
         </p>
       ) : null}
       {session.status === 'SUBMITTED' ? (
@@ -170,7 +171,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           ) : null}
           {advance.isError ? (
             <p className="text-sm text-[#e23b3b]">
-              {getErrorMessage(advance.error)}
+              {tr(getErrorMessage(advance.error))}
             </p>
           ) : null}
         </>
@@ -260,7 +261,7 @@ function SectionCard({
         ) : null}
         {pause.isError ? (
           <p role="alert" className="mt-3 text-sm text-red-600">
-            {getErrorMessage(pause.error)}
+            {tr(getErrorMessage(pause.error))}
           </p>
         ) : null}
       </CardContent>

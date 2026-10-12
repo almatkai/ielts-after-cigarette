@@ -11,6 +11,7 @@ import {
 } from '@/features/blog/api'
 import { useAuth } from '@/features/auth/auth-store'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/i18n'
 
 function statusLabel(status: string) {
   switch (status) {
@@ -24,6 +25,7 @@ function statusLabel(status: string) {
 }
 
 export function WriterPostsPage() {
+  const { t } = useLanguage()
   const auth = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -63,30 +65,30 @@ export function WriterPostsPage() {
     <div className="mx-auto w-full max-w-[880px] min-w-0">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold tracking-[-0.03em]">
-          Мои статьи
+          {t('Мои статьи')}
         </h1>
         <Button asChild>
           <Link to="/writer/posts/new">
             <AddCircle className="size-4" aria-hidden />
-            Новая статья
+            {t('Новая статья')}
           </Link>
         </Button>
       </div>
 
       {actionError ? (
         <p className="mt-4 rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
-          {actionError}
+          {t(actionError)}
         </p>
       ) : null}
 
       <div className="mt-6 grid gap-3">
         {postsQuery.isPending ? (
-          <p className="text-sm text-[#69696d]">Загружаем…</p>
+          <p className="text-sm text-[#69696d]">{t('Загружаем…')}</p>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-[16px] border border-[#e7e7e4] bg-white px-6 py-14 text-center">
             <DocumentText className="size-8 text-[#a0a0a4]" aria-hidden />
             <p className="text-sm text-[#69696d]">
-              У вас пока нет статей. Создайте первую!
+              {t('У вас пока нет статей. Создайте первую!')}
             </p>
           </div>
         ) : (
@@ -102,10 +104,10 @@ export function WriterPostsPage() {
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
                     >
-                      {status.text}
+                      {t(status.text)}
                     </span>
                     <span className="text-xs text-[#808084]">
-                      Изменена{' '}
+                      {t('Изменена')}{' '}
                       {new Date(post.updatedAt).toLocaleDateString('ru-RU')}
                     </span>
                   </div>
@@ -119,7 +121,7 @@ export function WriterPostsPage() {
                       to="/writer/posts/$postId"
                       params={{ postId: post.id }}
                     >
-                      Редактировать
+                      {t('Редактировать')}
                     </Link>
                   </Button>
                   {post.status === 'DRAFT' ? (
@@ -128,13 +130,13 @@ export function WriterPostsPage() {
                       disabled={publishMutation.isPending}
                       onClick={() => publishMutation.mutate(post.id)}
                     >
-                      Опубликовать
+                      {t('Опубликовать')}
                     </Button>
                   ) : post.status === 'PUBLISHED' ? (
                     <>
                       <Button asChild variant="ghost">
                         <Link to="/blog/$slug" params={{ slug: post.slug }}>
-                          Открыть
+                          {t('Открыть')}
                         </Link>
                       </Button>
                       <Button
@@ -142,7 +144,7 @@ export function WriterPostsPage() {
                         disabled={archiveMutation.isPending}
                         onClick={() => archiveMutation.mutate(post.id)}
                       >
-                        В архив
+                        {t('В архив')}
                       </Button>
                     </>
                   ) : null}

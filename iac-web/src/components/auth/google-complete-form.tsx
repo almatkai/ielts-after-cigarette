@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/features/auth/auth-store'
 import type { GoogleRegistrationRequired } from '@/features/auth/google-auth'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import { AuthInput } from './auth-input'
 import { getFieldError } from './auth-input-utils'
@@ -50,6 +51,7 @@ export function GoogleCompleteForm({
   onSuccess,
 }: GoogleCompleteFormProps) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const { completeGoogleRegistration } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
@@ -114,11 +116,11 @@ export function GoogleCompleteForm({
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
         <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
-          Давайте создадим вам аккаунт
+          {t('Давайте создадим вам аккаунт')}
         </CardTitle>
         <CardDescription className="mt-2 text-[#475569]">
-          Вход через Google выполнен: {pending.profile.email}. Заполните данные
-          ниже, чтобы завершить регистрацию.
+          {t('Вход через Google выполнен:')} {pending.profile.email}.{' '}
+          {t('Заполните данные ниже, чтобы завершить регистрацию.')}
         </CardDescription>
       </CardHeader>
 
@@ -141,9 +143,9 @@ export function GoogleCompleteForm({
             {(field) => (
               <AuthInput
                 id={field.name}
-                label="Имя"
+                label={t('Имя')}
                 autoComplete="name"
-                placeholder="Как к вам обращаться"
+                placeholder={t('Как к вам обращаться')}
                 value={field.state.value}
                 onChange={(value) => {
                   field.handleChange(value)
@@ -167,7 +169,7 @@ export function GoogleCompleteForm({
             {(field) => (
               <AuthInput
                 id={field.name}
-                label="Номер WhatsApp"
+                label={t('Номер WhatsApp')}
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
@@ -212,7 +214,7 @@ export function GoogleCompleteForm({
                     />
                     <span>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
-                        Принимаю{' '}
+                        {t('Принимаю')}{' '}
                       </label>
                       <Link
                         to="/terms"
@@ -220,11 +222,11 @@ export function GoogleCompleteForm({
                         rel="noopener noreferrer"
                         className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
                       >
-                        условия использования
+                        {t('условия использования')}
                       </Link>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
                         {' '}
-                        и{' '}
+                        {t('и')}{' '}
                       </label>
                       <Link
                         to="/privacy"
@@ -232,7 +234,7 @@ export function GoogleCompleteForm({
                         rel="noopener noreferrer"
                         className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
                       >
-                        политику конфиденциальности
+                        {t('политику конфиденциальности')}
                       </Link>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
                         .
@@ -241,7 +243,7 @@ export function GoogleCompleteForm({
                   </div>
                   {termsError ? (
                     <p className="mt-1 text-xs text-[#dc2626]" role="alert">
-                      {termsError}
+                      {t(termsError)}
                     </p>
                   ) : null}
                 </div>
@@ -259,7 +261,7 @@ export function GoogleCompleteForm({
                 disabled={!canSubmit || isSubmitting}
                 className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {isSubmitting ? 'Создаём аккаунт…' : 'Создать аккаунт'}
+                {isSubmitting ? t('Создаём аккаунт…') : t('Создать аккаунт')}
               </Button>
             )}
           </form.Subscribe>
@@ -267,7 +269,7 @@ export function GoogleCompleteForm({
           {submissionError ? (
             <div className="mt-4 text-center">
               <p className="text-sm leading-6 text-[#dc2626]" role="alert">
-                {submissionError}
+                {t(submissionError)}
               </p>
               {sessionExpired ? (
                 <Button
@@ -276,7 +278,7 @@ export function GoogleCompleteForm({
                   onClick={onBack}
                   className="mt-1 inline-block h-auto p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
                 >
-                  Вернуться ко входу
+                  {t('Вернуться ко входу')}
                 </Button>
               ) : null}
             </div>
@@ -286,14 +288,14 @@ export function GoogleCompleteForm({
 
       <CardFooter className="justify-center px-6 pt-7 pb-8 sm:px-8">
         <p className="text-center text-sm text-[#475569]">
-          Уже есть аккаунт?{' '}
+          {t('Уже есть аккаунт?')}{' '}
           <Button
             type="button"
             variant="link"
             onClick={onBack}
             className="h-auto min-h-11 p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
           >
-            Вернуться ко входу
+            {t('Вернуться ко входу')}
           </Button>
         </p>
       </CardFooter>

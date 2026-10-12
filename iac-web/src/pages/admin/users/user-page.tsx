@@ -26,6 +26,7 @@ import {
 } from '@/features/admin/users-api'
 import type { UserDetail, UserUpdate } from '@/features/admin/users-api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import {
   date,
   Pagination,
@@ -36,6 +37,7 @@ import {
 } from './shared'
 
 export function UserPage({ userId }: { userId: string }) {
+  const { t } = useLanguage()
   const query = useQuery({
     queryKey: userKey(userId),
     queryFn: ({ signal }) => getUser(userId, signal),
@@ -43,13 +45,13 @@ export function UserPage({ userId }: { userId: string }) {
   if (query.isPending)
     return (
       <p className="py-12 text-center text-sm text-muted-foreground">
-        Загрузка…
+        {t('Загрузка…')}
       </p>
     )
   if (query.isError)
     return (
       <QueryError
-        message={getErrorMessage(query.error)}
+        message={t(getErrorMessage(query.error))}
         retry={() => void query.refetch()}
       />
     )
@@ -60,6 +62,7 @@ function UserProfile({ user }: { user: UserDetail }) {
   const self = auth.user?.id === user.id
   const navigate = useNavigate()
   const client = useQueryClient()
+  const { t } = useLanguage()
   const [tab, setTab] = useState<'profile' | 'tests' | 'activity'>('profile')
   const [notice, setNotice] = useState('')
   const [dialog, setDialog] = useState<
@@ -123,7 +126,7 @@ function UserProfile({ user }: { user: UserDetail }) {
         className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground no-underline hover:text-foreground"
       >
         <ArrowLeft2 className="size-4" aria-hidden />
-        Пользователи
+        {t('Пользователи')}
       </Link>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
@@ -140,26 +143,26 @@ function UserProfile({ user }: { user: UserDetail }) {
         <span
           className={`rounded-full px-3 py-1 text-xs ${user.blocked ? 'bg-red-50 text-destructive' : 'bg-[#eff6ff] text-[#2563eb]'}`}
         >
-          {user.blocked ? 'Заблокирован' : roles[user.role]}
+          {user.blocked ? t('Заблокирован') : t(roles[user.role])}
         </span>
       </div>
       <div className="grid grid-cols-3 divide-x divide-[#e7e7e4] rounded-xl border border-[#e7e7e4] bg-white">
-        <Metric value={String(user.completedTests)} label="Завершено" />
-        <Metric value={String(user.unfinishedTests)} label="В процессе" />
+        <Metric value={String(user.completedTests)} label={t('Завершено')} />
+        <Metric value={String(user.unfinishedTests)} label={t('В процессе')} />
         <Metric
           value={user.targetBand?.toFixed(1) ?? '—'}
-          label="Целевой балл"
+          label={t('Целевой балл')}
         />
       </div>
       <nav
-        aria-label="Данные пользователя"
+        aria-label={t('Данные пользователя')}
         className="flex gap-6 border-b border-[#e7e7e4]"
       >
         {(
           [
-            ['profile', 'Профиль'],
-            ['tests', 'Тесты'],
-            ['activity', 'Активность'],
+            ['profile', t('Профиль')],
+            ['tests', t('Тесты')],
+            ['activity', t('Активность')],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -186,7 +189,7 @@ function UserProfile({ user }: { user: UserDetail }) {
             className="grid gap-5 rounded-xl border border-[#e7e7e4] bg-white p-5"
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Имя" id="displayName">
+              <Field label={t('Имя')} id="displayName">
                 <Input
                   id="displayName"
                   required
@@ -197,7 +200,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   }
                 />
               </Field>
-              <Field label="Роль аккаунта" id="userRole">
+              <Field label={t('Роль аккаунта')} id="userRole">
                 <select
                   id="userRole"
                   disabled={self}
@@ -212,7 +215,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 >
                   {Object.entries(roles).map(([value, label]) => (
                     <option value={value} key={value}>
-                      {label}
+                      {t(label)}
                     </option>
                   ))}
                 </select>
@@ -228,7 +231,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </Field>
-              <Field label="Телефон" id="userPhone">
+              <Field label={t('Телефон')} id="userPhone">
                 <Input
                   id="userPhone"
                   type="tel"
@@ -239,11 +242,15 @@ function UserProfile({ user }: { user: UserDetail }) {
               </Field>
             </div>
             <fieldset className="grid gap-3 border-t border-[#e7e7e4] pt-4">
-              <legend className="px-1 text-sm font-medium">Доступы</legend>
+              <legend className="px-1 text-sm font-medium">
+                {t('Доступы')}
+              </legend>
               <p className="text-xs leading-5 text-muted-foreground">
                 {form.role === 'ADMIN'
-                  ? 'Администратору доступны все разделы.'
-                  : 'Выберите один или оба доступа. Они дополняют роль аккаунта; остальные разделы админки останутся закрыты.'}
+                  ? t('Администратору доступны все разделы.')
+                  : t(
+                      'Выберите один или оба доступа. Они дополняют роль аккаунта; остальные разделы админки останутся закрыты.',
+                    )}
               </p>
               <AccessCheckbox
                 checked={
@@ -266,8 +273,8 @@ function UserProfile({ user }: { user: UserDetail }) {
                         ),
                   })
                 }
-                title="Авторы и блог"
-                description="Заявки авторов, проверка и публикация статей"
+                title={t('Авторы и блог')}
+                description={t('Заявки авторов, проверка и публикация статей')}
               />
               <AccessCheckbox
                 checked={
@@ -290,8 +297,10 @@ function UserProfile({ user }: { user: UserDetail }) {
                         ),
                   })
                 }
-                title="Учебные материалы и тесты"
-                description="Создание, проверка и публикация Reading, Listening, Writing, Speaking; архив Full Mock"
+                title={t('Учебные материалы и тесты')}
+                description={t(
+                  'Создание, проверка и публикация Reading, Listening, Writing, Speaking; архив Full Mock',
+                )}
               />
             </fieldset>
             <label className="flex w-fit items-center gap-2 text-sm">
@@ -304,33 +313,39 @@ function UserProfile({ user }: { user: UserDetail }) {
                 }
                 className="size-4 accent-[#3b82f6]"
               />
-              Заблокировать аккаунт
+              {t('Заблокировать аккаунт')}
             </label>
             <div className="flex flex-wrap items-center gap-3">
               <Button disabled={busy} type="submit">
-                {save.isPending ? 'Сохранение…' : 'Сохранить'}
+                {save.isPending ? t('Сохранение…') : t('Сохранить')}
               </Button>
               {notice && (
                 <span role="status" className="text-sm text-[#16845b]">
-                  {notice}
+                  {t(notice)}
                 </span>
               )}
               {save.isError && (
                 <p role="alert" className="text-sm text-destructive">
-                  {getErrorMessage(save.error)}
+                  {t(getErrorMessage(save.error))}
                 </p>
               )}
             </div>
             <dl className="grid gap-x-5 gap-y-4 border-t border-[#e7e7e4] pt-5 text-sm grid-cols-2">
-              <Info label="Регистрация" value={date(user.createdAt, true)} />
               <Info
-                label="Статус"
-                value={statusText[user.status] ?? user.status}
+                label={t('Регистрация')}
+                value={date(user.createdAt, true)}
               />
-              <Info label="Текущий балл" value={user.currentBand?.toFixed(1)} />
-              <Info label="Экзамен" value={date(user.examDate)} />
               <Info
-                label="Тип экзамена"
+                label={t('Статус')}
+                value={t(statusText[user.status] ?? user.status)}
+              />
+              <Info
+                label={t('Текущий балл')}
+                value={user.currentBand?.toFixed(1)}
+              />
+              <Info label={t('Экзамен')} value={date(user.examDate)} />
+              <Info
+                label={t('Тип экзамена')}
                 value={
                   user.examType === 'academic'
                     ? 'Academic'
@@ -339,29 +354,31 @@ function UserProfile({ user }: { user: UserDetail }) {
                       : null
                 }
               />
-              <Info label="Часовой пояс" value={user.timezone} />
+              <Info label={t('Часовой пояс')} value={user.timezone} />
               <Info
                 label="Google"
-                value={user.googleConnected ? 'Подключён' : 'Не подключён'}
+                value={
+                  user.googleConnected ? t('Подключён') : t('Не подключён')
+                }
               />
               <Info
-                label="Пароль"
-                value={user.hasPassword ? 'Установлен' : 'Не установлен'}
+                label={t('Пароль')}
+                value={user.hasPassword ? t('Установлен') : t('Не установлен')}
               />
-              <Info label="Источник" value={user.source} />
-              <Info label="Реферальный код" value={user.referralCode} />
-              <Info label="Пригласил" value={user.referredByCode} />
+              <Info label={t('Источник')} value={user.source} />
+              <Info label={t('Реферальный код')} value={user.referralCode} />
+              <Info label={t('Пригласил')} value={user.referredByCode} />
               <Info
-                label="Согласие с условиями"
+                label={t('Согласие с условиями')}
                 value={date(user.termsAcceptedAt, true)}
               />
-              <Info label="Изменён" value={date(user.updatedAt, true)} />
+              <Info label={t('Изменён')} value={date(user.updatedAt, true)} />
               <Info label="ID" value={user.id} />
             </dl>
           </form>
           <div className="grid gap-5">
             <div className="rounded-xl border border-[#e7e7e4] bg-white p-4">
-              <h2 className="mb-3 text-sm font-semibold">Доступ</h2>
+              <h2 className="mb-3 text-sm font-semibold">{t('Доступ')}</h2>
               <div className="grid gap-2">
                 <Button
                   variant="outline"
@@ -370,7 +387,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   className="justify-start border-[#deded9]"
                 >
                   <Lock1 aria-hidden />
-                  Сменить пароль
+                  {t('Сменить пароль')}
                 </Button>
                 <Button
                   variant="outline"
@@ -379,7 +396,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   className="justify-start border-[#deded9]"
                 >
                   <Logout aria-hidden />
-                  Завершить сессии
+                  {t('Завершить сессии')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -388,12 +405,12 @@ function UserProfile({ user }: { user: UserDetail }) {
                   className="justify-start text-destructive hover:bg-red-50 hover:text-destructive"
                 >
                   <Trash aria-hidden />
-                  Удалить аккаунт
+                  {t('Удалить аккаунт')}
                 </Button>
               </div>
             </div>
             <div className="rounded-xl border border-[#e7e7e4] bg-white p-4">
-              <h2 className="mb-4 text-sm font-semibold">Навыки</h2>
+              <h2 className="mb-4 text-sm font-semibold">{t('Навыки')}</h2>
               <div className="grid gap-4">
                 {user.skills.map((skill) => (
                   <div
@@ -403,7 +420,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                     <div>
                       <p className="capitalize">{skill.skill}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {skill.completedTasks} заданий
+                        {skill.completedTasks} {t('заданий')}
                         {skill.accuracy != null
                           ? ` · ${Math.round(skill.accuracy)}%`
                           : ''}
@@ -416,7 +433,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 ))}
                 {!user.skills.length && (
                   <p className="text-sm text-muted-foreground">
-                    Нет результатов
+                    {t('Нет результатов')}
                   </p>
                 )}
               </div>
@@ -429,16 +446,16 @@ function UserProfile({ user }: { user: UserDetail }) {
         <div className="grid gap-5">
           <dl className="flex flex-wrap gap-8 rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm">
             <Info
-              label="Последняя активность"
+              label={t('Последняя активность')}
               value={date(user.lastActiveAt, true)}
             />
             <Info
-              label="Активных дней"
+              label={t('Активных дней')}
               value={String(user.activityDays.length)}
             />
           </dl>
           <div className="rounded-xl border border-[#e7e7e4] bg-white p-5">
-            <h2 className="mb-4 text-sm font-semibold">Дни занятий</h2>
+            <h2 className="mb-4 text-sm font-semibold">{t('Дни занятий')}</h2>
             <div className="flex flex-wrap gap-2">
               {user.activityDays.map((day) => (
                 <span
@@ -450,7 +467,7 @@ function UserProfile({ user }: { user: UserDetail }) {
               ))}
               {!user.activityDays.length && (
                 <p className="text-sm text-muted-foreground">
-                  Активности пока нет
+                  {t('Активности пока нет')}
                 </p>
               )}
             </div>
@@ -458,14 +475,14 @@ function UserProfile({ user }: { user: UserDetail }) {
           <div className="overflow-x-auto rounded-xl border border-[#e7e7e4] bg-white">
             <table className="w-full min-w-[600px] text-left text-sm">
               <caption className="px-5 pt-5 pb-3 text-left font-semibold">
-                Последние входы
+                {t('Последние входы')}
               </caption>
               <thead className="border-b border-[#e7e7e4] text-xs text-muted-foreground">
                 <tr>
-                  <th className="px-5 py-3 font-medium">Дата</th>
-                  <th className="px-5 py-3 font-medium">Устройство</th>
+                  <th className="px-5 py-3 font-medium">{t('Дата')}</th>
+                  <th className="px-5 py-3 font-medium">{t('Устройство')}</th>
                   <th className="px-5 py-3 font-medium">IP</th>
-                  <th className="px-5 py-3 font-medium">Сессия</th>
+                  <th className="px-5 py-3 font-medium">{t('Сессия')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -491,8 +508,8 @@ function UserProfile({ user }: { user: UserDetail }) {
                     <td className="px-5 py-4 text-xs">
                       {session.revokedAt ||
                       new Date(session.expiresAt) < new Date()
-                        ? 'Завершена'
-                        : 'Активна'}
+                        ? t('Завершена')
+                        : t('Активна')}
                     </td>
                   </tr>
                 ))}
@@ -502,7 +519,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                       colSpan={4}
                       className="p-8 text-center text-muted-foreground"
                     >
-                      Входов пока нет
+                      {t('Входов пока нет')}
                     </td>
                   </tr>
                 )}
@@ -521,17 +538,19 @@ function UserProfile({ user }: { user: UserDetail }) {
           <DialogHeader>
             <DialogTitle>
               {dialog === 'delete'
-                ? 'Удалить аккаунт?'
+                ? t('Удалить аккаунт?')
                 : dialog === 'password'
-                  ? 'Сменить пароль'
-                  : 'Завершить сессии?'}
+                  ? t('Сменить пароль')
+                  : t('Завершить сессии?')}
             </DialogTitle>
             <DialogDescription>
               {dialog === 'delete'
-                ? 'Профиль, тесты, записи и статьи будут удалены без восстановления.'
+                ? t(
+                    'Профиль, тесты, записи и статьи будут удалены без восстановления.',
+                  )
                 : dialog === 'password'
-                  ? 'Все сессии будут завершены.'
-                  : 'Пользователю потребуется войти снова.'}
+                  ? t('Все сессии будут завершены.')
+                  : t('Пользователю потребуется войти снова.')}
             </DialogDescription>
           </DialogHeader>
           <form
@@ -542,7 +561,7 @@ function UserProfile({ user }: { user: UserDetail }) {
             className="grid gap-4"
           >
             {dialog === 'password' && (
-              <Field label="Новый пароль" id="newPassword">
+              <Field label={t('Новый пароль')} id="newPassword">
                 <Input
                   id="newPassword"
                   type="password"
@@ -556,7 +575,7 @@ function UserProfile({ user }: { user: UserDetail }) {
               </Field>
             )}
             {dialog === 'delete' && (
-              <Field label={`Введите ${user.email}`} id="confirmEmail">
+              <Field label={`${t('Введите')} ${user.email}`} id="confirmEmail">
                 <Input
                   id="confirmEmail"
                   type="email"
@@ -569,7 +588,7 @@ function UserProfile({ user }: { user: UserDetail }) {
             )}
             {action.isError && (
               <p role="alert" className="text-sm text-destructive">
-                {getErrorMessage(action.error)}
+                {t(getErrorMessage(action.error))}
               </p>
             )}
             <div className="flex justify-end gap-2">
@@ -580,7 +599,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 disabled={action.isPending}
                 onClick={() => setDialog(null)}
               >
-                Отмена
+                {t('Отмена')}
               </Button>
               <Button
                 type="submit"
@@ -592,12 +611,12 @@ function UserProfile({ user }: { user: UserDetail }) {
                 }
               >
                 {action.isPending
-                  ? 'Подождите…'
+                  ? t('Подождите…')
                   : dialog === 'delete'
-                    ? 'Удалить навсегда'
+                    ? t('Удалить навсегда')
                     : dialog === 'password'
-                      ? 'Сменить пароль'
-                      : 'Завершить'}
+                      ? t('Сменить пароль')
+                      : t('Завершить')}
               </Button>
             </div>
           </form>
@@ -673,6 +692,7 @@ function Info({ label, value }: { label: string; value?: string | null }) {
   )
 }
 function UserTests({ id }: { id: string }) {
+  const { t } = useLanguage()
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<string | null>(null)
   const query = useQuery({
@@ -688,7 +708,7 @@ function UserTests({ id }: { id: string }) {
     <div className="grid gap-4">
       {query.isError ? (
         <QueryError
-          message={getErrorMessage(query.error)}
+          message={t(getErrorMessage(query.error))}
           retry={() => void query.refetch()}
         />
       ) : (
@@ -696,10 +716,10 @@ function UserTests({ id }: { id: string }) {
           <table className="w-full min-w-[620px] text-left text-sm">
             <thead className="border-b border-[#e7e7e4] bg-[#fafaf8] text-xs text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-medium">Тест</th>
-                <th className="px-4 py-3 font-medium">Статус</th>
-                <th className="px-4 py-3 font-medium">Балл</th>
-                <th className="px-4 py-3 font-medium">Начат</th>
+                <th className="px-5 py-3 font-medium">{t('Тест')}</th>
+                <th className="px-4 py-3 font-medium">{t('Статус')}</th>
+                <th className="px-4 py-3 font-medium">{t('Балл')}</th>
+                <th className="px-4 py-3 font-medium">{t('Начат')}</th>
               </tr>
             </thead>
             <tbody>
@@ -709,7 +729,7 @@ function UserTests({ id }: { id: string }) {
                     colSpan={4}
                     className="p-8 text-center text-muted-foreground"
                   >
-                    Загрузка…
+                    {t('Загрузка…')}
                   </td>
                 </tr>
               ) : (
@@ -733,7 +753,7 @@ function UserTests({ id }: { id: string }) {
                     <td
                       className={`px-4 py-4 text-xs ${attempt.status === 'SUBMITTED' ? 'text-[#16845b]' : 'text-muted-foreground'}`}
                     >
-                      {statusText[attempt.status] ?? attempt.status}
+                      {t(statusText[attempt.status] ?? attempt.status)}
                     </td>
                     <td className="px-4 py-4 tabular-nums">
                       {attempt.band?.toFixed(1) ?? '—'}
@@ -747,7 +767,7 @@ function UserTests({ id }: { id: string }) {
                       {date(attempt.startedAt, true)}
                       {attempt.submittedAt && (
                         <p className="mt-1">
-                          Завершён {date(attempt.submittedAt, true)}
+                          {t('Завершён')} {date(attempt.submittedAt, true)}
                         </p>
                       )}
                     </td>
@@ -760,7 +780,7 @@ function UserTests({ id }: { id: string }) {
                     colSpan={4}
                     className="p-8 text-center text-muted-foreground"
                   >
-                    Тестов пока нет
+                    {t('Тестов пока нет')}
                   </td>
                 </tr>
               )}
@@ -779,14 +799,16 @@ function UserTests({ id }: { id: string }) {
       >
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Ответы и оценка</DialogTitle>
-            <DialogDescription>Результаты выбранной попытки</DialogDescription>
+            <DialogTitle>{t('Ответы и оценка')}</DialogTitle>
+            <DialogDescription>
+              {t('Результаты выбранной попытки')}
+            </DialogDescription>
           </DialogHeader>
           {detail.isPending ? (
-            <p className="text-sm text-muted-foreground">Загрузка…</p>
+            <p className="text-sm text-muted-foreground">{t('Загрузка…')}</p>
           ) : detail.isError ? (
             <QueryError
-              message={getErrorMessage(detail.error)}
+              message={t(getErrorMessage(detail.error))}
               retry={() => void detail.refetch()}
             />
           ) : (
@@ -797,7 +819,7 @@ function UserTests({ id }: { id: string }) {
                   className="rounded-lg border border-[#e7e7e4] p-4"
                 >
                   <h3 className="mb-2 text-sm font-semibold">
-                    Ответ {index + 1}
+                    {t('Ответ')} {index + 1}
                   </h3>
                   <AnswerValue value={answer} />
                 </div>
@@ -812,7 +834,7 @@ function UserTests({ id }: { id: string }) {
                 !detail.data.writing &&
                 !detail.data.speaking && (
                   <p className="text-sm text-muted-foreground">
-                    Ответов пока нет
+                    {t('Ответов пока нет')}
                   </p>
                 )}
             </div>
@@ -843,11 +865,16 @@ const answerLabels: Record<string, string> = {
   transcript: 'Расшифровка',
 }
 function AnswerValue({ value }: { value: unknown }) {
+  const { t } = useLanguage()
   if (value == null) return null
   if (typeof value !== 'object')
     return (
       <p className="whitespace-pre-wrap break-words text-sm leading-6">
-        {typeof value === 'boolean' ? (value ? 'Да' : 'Нет') : String(value)}
+        {typeof value === 'boolean'
+          ? value
+            ? t('Да')
+            : t('Нет')
+          : String(value)}
       </p>
     )
   if (Array.isArray(value))
@@ -874,7 +901,7 @@ function AnswerValue({ value }: { value: unknown }) {
         .map(([key, v]) => (
           <div key={key}>
             <dt className="text-xs text-muted-foreground">
-              {answerLabels[key] ?? key.replaceAll('_', ' ')}
+              {t(answerLabels[key] ?? key.replaceAll('_', ' '))}
             </dt>
             <dd className="mt-1">
               <AnswerValue value={v} />

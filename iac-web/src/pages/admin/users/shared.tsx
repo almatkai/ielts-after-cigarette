@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/i18n'
 import type { AdminUser } from '@/features/admin/users-api'
 
 export const roles = {
@@ -55,12 +56,13 @@ export function Pagination({
   total: number
   onChange: (page: number) => void
 }) {
+  const { t } = useLanguage()
   const pages = Math.max(1, Math.ceil(total / 30))
   return (
     <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
       <span>
         {total
-          ? `${(page - 1) * 30 + 1}–${Math.min(page * 30, total)} из ${total}`
+          ? `${(page - 1) * 30 + 1}–${Math.min(page * 30, total)} ${t('из')} ${total}`
           : '0'}
       </span>
       <div className="flex items-center gap-3">
@@ -71,7 +73,7 @@ export function Pagination({
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
         >
-          Назад
+          {t('Назад')}
         </Button>
         <span>
           {page} / {pages}
@@ -83,7 +85,7 @@ export function Pagination({
           disabled={page >= pages}
           onClick={() => onChange(page + 1)}
         >
-          Далее
+          {t('Далее')}
         </Button>
       </div>
     </div>
@@ -96,6 +98,7 @@ export function QueryError({
   message: string
   retry: () => void
 }) {
+  const { t } = useLanguage()
   return (
     <div
       role="alert"
@@ -107,7 +110,7 @@ export function QueryError({
         variant="outline"
         onClick={retry}
       >
-        Повторить
+        {t('Повторить')}
       </Button>
     </div>
   )

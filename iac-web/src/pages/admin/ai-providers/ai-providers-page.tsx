@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import {
   deleteAIProvider,
   listAIProviders,
@@ -59,6 +60,7 @@ const errorText = (error: unknown) =>
     : 'Не удалось выполнить действие. Попробуйте ещё раз.'
 
 export function AIProvidersPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<AIProviderList | null>(null)
   const telemetryUnavailable =
     data?.errorReportingRequired !== false && !data?.errorReportingConfigured
@@ -156,18 +158,18 @@ export function AIProvidersPage() {
         : [...current.scopes, scope],
     }))
   const resultLabel = (result: ProviderTestResult) => {
-    if (result.ok) return `Работает · ${result.latencyMs} мс`
+    if (result.ok) return `${t('Работает')} · ${result.latencyMs} ${t('мс')}`
     const hint =
       result.httpStatus === 401 || result.httpStatus === 403
-        ? 'Проверьте API-ключ и доступ к модели.'
+        ? t('Проверьте API-ключ и доступ к модели.')
         : result.httpStatus === 404
-          ? 'Проверьте URL и ID модели.'
+          ? t('Проверьте URL и ID модели.')
           : result.httpStatus === 429
-            ? 'У провайдера исчерпан лимит запросов.'
+            ? t('У провайдера исчерпан лимит запросов.')
             : result.code === 'timeout'
-              ? 'Провайдер не ответил вовремя.'
-              : 'Проверьте настройки провайдера.'
-    return `Проверка не пройдена${result.httpStatus ? ` (HTTP ${result.httpStatus})` : ''}. ${hint} Подробности ${data?.errorReportingConfigured ? 'в GlitchTip' : 'в локальных логах backend'}.`
+              ? t('Провайдер не ответил вовремя.')
+              : t('Проверьте настройки провайдера.')
+    return `${t('Проверка не пройдена')}${result.httpStatus ? ` (HTTP ${result.httpStatus})` : ''}. ${hint} ${t('Подробности')} ${data?.errorReportingConfigured ? t('в GlitchTip') : t('в локальных логах backend')}.`
   }
 
   return (
@@ -175,12 +177,12 @@ export function AIProvidersPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-            AI-провайдеры
+            {t('AI-провайдеры')}
           </h1>
           <p className="text-sm leading-6 text-slate-600">
-            Собери провайдеров в уровни. Запросы по очереди распределяются между
-            участниками одного уровня: A, B, C, снова A. Каждый запрос идёт
-            одному провайдеру, следующий уровень — резерв.
+            {t(
+              'Собери провайдеров в уровни. Запросы по очереди распределяются между участниками одного уровня: A, B, C, снова A. Каждый запрос идёт одному провайдеру, следующий уровень — резерв.',
+            )}
           </p>
         </div>
         <Button
@@ -193,7 +195,7 @@ export function AIProvidersPage() {
               data.maxProviders
           }
         >
-          Добавить провайдера
+          {t('Добавить провайдера')}
         </Button>
       </header>
       {error && (
@@ -201,7 +203,7 @@ export function AIProvidersPage() {
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
         >
-          {error}
+          {t(error)}
           <Button
             variant="outline"
             className="ml-3"
@@ -215,13 +217,13 @@ export function AIProvidersPage() {
               })
             }
           >
-            Обновить
+            {t('Обновить')}
           </Button>
         </div>
       )}
       {notice && (
         <p role="status" className="text-sm text-emerald-700">
-          {notice}
+          {t(notice)}
         </p>
       )}
       {data?.migrationRequired && (
@@ -230,11 +232,12 @@ export function AIProvidersPage() {
           className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
         >
           <p>
-            База ещё не обновлена. Примените миграции до 000031, чтобы добавлять
-            и сохранять AI-провайдеров.
+            {t(
+              'База ещё не обновлена. Примените миграции до 000031, чтобы добавлять и сохранять AI-провайдеров.',
+            )}
           </p>
           {data.envFallbackConfigured && (
-            <p>Настроенный .env-резерв продолжает использоваться.</p>
+            <p>{t('Настроенный .env-резерв продолжает использоваться.')}</p>
           )}
         </div>
       )}
@@ -242,14 +245,16 @@ export function AIProvidersPage() {
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
           {!data.encryptionConfigured && (
             <p>
-              Для хранения ключей настройте AI_PROVIDER_ENCRYPTION_KEY на API и
-              worker. Ключ шифрования хранится отдельно от базы.
+              {t(
+                'Для хранения ключей настройте AI_PROVIDER_ENCRYPTION_KEY на API и worker. Ключ шифрования хранится отдельно от базы.',
+              )}
             </p>
           )}
           {telemetryUnavailable && (
             <p>
-              Для тестирования и включения провайдеров настройте GlitchTip
-              (SENTRY_DSN).
+              {t(
+                'Для тестирования и включения провайдеров настройте GlitchTip (SENTRY_DSN).',
+              )}
             </p>
           )}
         </div>
@@ -258,29 +263,32 @@ export function AIProvidersPage() {
         className={`grid items-start gap-6 ${showForm ? 'xl:grid-cols-[1fr_420px]' : ''}`}
       >
         <section
-          aria-label="Цепочка провайдеров"
+          aria-label={t('Цепочка провайдеров')}
           className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white"
         >
           <div className="border-b border-slate-200 px-5 py-4">
-            <h2 className="font-semibold text-slate-900">Уровни провайдеров</h2>
+            <h2 className="font-semibold text-slate-900">
+              {t('Уровни провайдеров')}
+            </h2>
             <p className="mt-1 text-xs text-slate-500">
-              Перетащи провайдер в нужный стек или выбери уровень в его
-              карточке. Одинаковый приоритет объединяет провайдеров. Отключённые
-              пропускаются; изменения действуют для новых запросов.
+              {t(
+                'Перетащи провайдер в нужный стек или выбери уровень в его карточке. Одинаковый приоритет объединяет провайдеров. Отключённые пропускаются; изменения действуют для новых запросов.',
+              )}
             </p>
             <p className="mt-2 text-xs leading-5 text-slate-500">
-              Один запрос не дублируется всем участникам. Другой провайдер
-              получает его только при ошибке или таймауте.
+              {t(
+                'Один запрос не дублируется всем участникам. Другой провайдер получает его только при ошибке или таймауте.',
+              )}
             </p>
           </div>
           {!data && !error && (
-            <p className="p-5 text-sm text-slate-500">Загрузка…</p>
+            <p className="p-5 text-sm text-slate-500">{t('Загрузка…')}</p>
           )}
           {data?.items.length === 0 && !data.migrationRequired && (
             <p className="p-5 text-sm leading-6 text-slate-600">
-              Добавьте первый провайдер, проверьте подключение и включите его.
-              Отдельный ключ нужен только при сохранении — существующий ключ не
-              раскрывается.
+              {t(
+                'Добавьте первый провайдер, проверьте подключение и включите его. Отдельный ключ нужен только при сохранении — существующий ключ не раскрывается.',
+              )}
             </p>
           )}
           <DndContext
@@ -345,7 +353,9 @@ export function AIProvidersPage() {
                                   <span
                                     className={`rounded-full px-2 py-0.5 text-xs ${provider.enabled ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
                                   >
-                                    {provider.enabled ? 'Включён' : 'Выключен'}
+                                    {provider.enabled
+                                      ? t('Включён')
+                                      : t('Выключен')}
                                   </span>
                                   {provider.fromEnv && (
                                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
@@ -361,14 +371,15 @@ export function AIProvidersPage() {
                                 </p>
                                 <p className="mt-2 text-xs text-slate-600">
                                   {provider.scopes
-                                    .map((scope) => scopeNames[scope])
+                                    .map((scope) => t(scopeNames[scope]))
                                     .join(', ')}{' '}
-                                  · Таймаут {provider.timeoutSeconds} с ·{' '}
+                                  · {t('Таймаут')} {provider.timeoutSeconds}{' '}
+                                  {t('с')} ·{' '}
                                   {provider.hasKey
                                     ? provider.fromEnv
-                                      ? 'Ключ из .env'
-                                      : 'Ключ зашифрован'
-                                    : 'Нет ключа'}
+                                      ? t('Ключ из .env')
+                                      : t('Ключ зашифрован')
+                                    : t('Нет ключа')}
                                 </p>
                               </div>
                             </div>
@@ -382,9 +393,9 @@ export function AIProvidersPage() {
                             )}
                             <div className="mt-3">
                               <label className="text-xs text-slate-500">
-                                Уровень
+                                {t('Уровень')}
                                 <select
-                                  aria-label={`Уровень ${provider.name}`}
+                                  aria-label={`${t('Уровень')} ${provider.name}`}
                                   value={provider.priority}
                                   disabled={
                                     busy ||
@@ -403,12 +414,12 @@ export function AIProvidersPage() {
                                 >
                                   {levels.map((value, levelIndex) => (
                                     <option key={value} value={value}>
-                                      Уровень {levelIndex + 1} · приоритет{' '}
-                                      {value}
+                                      {t('Уровень')} {levelIndex + 1} ·{' '}
+                                      {t('приоритет')} {value}
                                     </option>
                                   ))}
                                   <option value="new">
-                                    Новый отдельный уровень
+                                    {t('Новый отдельный уровень')}
                                   </option>
                                 </select>
                               </label>
@@ -431,7 +442,7 @@ export function AIProvidersPage() {
                                   })
                                 }
                               >
-                                Проверить
+                                {t('Проверить')}
                               </Button>
                               <Button
                                 size="sm"
@@ -443,7 +454,7 @@ export function AIProvidersPage() {
                                 }
                                 onClick={() => edit(provider)}
                               >
-                                Изменить
+                                {t('Изменить')}
                               </Button>
                               {!provider.fromEnv && (
                                 <Button
@@ -453,7 +464,7 @@ export function AIProvidersPage() {
                                   onClick={() => {
                                     if (
                                       window.confirm(
-                                        `Удалить провайдера «${provider.name}»?`,
+                                        `${t('Удалить провайдера')} «${provider.name}»?`,
                                       )
                                     )
                                       void perform(async () => {
@@ -467,7 +478,7 @@ export function AIProvidersPage() {
                                       })
                                   }}
                                 >
-                                  Удалить
+                                  {t('Удалить')}
                                 </Button>
                               )}
                             </div>
@@ -488,19 +499,25 @@ export function AIProvidersPage() {
           {data && !data.items.some((provider) => provider.fromEnv) && (
             <div className="border-t border-dashed border-slate-200 bg-slate-50 px-5 py-4">
               <h3 className="text-sm font-medium text-slate-700">
-                Последний резерв: .env
+                {t('Последний резерв: .env')}
               </h3>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 {data.envFallbackConfigured
-                  ? 'Уже настроен на сервере. Используется, если остальные провайдеры не ответили.'
-                  : 'Не настроен. Добавьте резервного провайдера или настройте AI_* на сервере.'}
+                  ? t(
+                      'Уже настроен на сервере. Используется, если остальные провайдеры не ответили.',
+                    )
+                  : t(
+                      'Не настроен. Добавьте резервного провайдера или настройте AI_* на сервере.',
+                    )}
               </p>
             </div>
           )}
         </section>
         {showForm && (
           <form
-            aria-label={editing ? 'Изменить провайдера' : 'Новый провайдер'}
+            aria-label={
+              editing ? t('Изменить провайдера') : t('Новый провайдер')
+            }
             className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5"
             onSubmit={(event) => {
               event.preventDefault()
@@ -515,10 +532,10 @@ export function AIProvidersPage() {
             }}
           >
             <h2 className="font-semibold text-slate-900">
-              {editing ? 'Изменить провайдера' : 'Новый провайдер'}
+              {editing ? t('Изменить провайдера') : t('Новый провайдер')}
             </h2>
             <div className="space-y-1.5">
-              <Label htmlFor="ai-provider-name">Название</Label>
+              <Label htmlFor="ai-provider-name">{t('Название')}</Label>
               <Input
                 id="ai-provider-name"
                 required
@@ -527,13 +544,13 @@ export function AIProvidersPage() {
                 onChange={(event) =>
                   setInput({ ...input, name: event.target.value })
                 }
-                placeholder="Например, OpenRouter"
+                placeholder={t('Например, OpenRouter')}
               />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ai-provider-endpoint">
                 {editingEnv
-                  ? 'URL completions из .env'
+                  ? t('URL completions из .env')
                   : 'HTTPS URL completions'}
               </Label>
               <Input
@@ -549,12 +566,16 @@ export function AIProvidersPage() {
               />
               <p className="text-xs leading-5 text-slate-500">
                 {editingEnv
-                  ? 'URL и модели берутся из .env. Название и приоритет сохраняются в админке; ключ остаётся на сервере.'
-                  : 'OpenAI-совместимый API, полный URL. Только публичный HTTPS без перенаправлений.'}
+                  ? t(
+                      'URL и модели берутся из .env. Название и приоритет сохраняются в админке; ключ остаётся на сервере.',
+                    )
+                  : t(
+                      'OpenAI-совместимый API, полный URL. Только публичный HTTPS без перенаправлений.',
+                    )}
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ai-provider-model">Модель</Label>
+              <Label htmlFor="ai-provider-model">{t('Модель')}</Label>
               <Input
                 id="ai-provider-model"
                 readOnly={editingEnv}
@@ -564,12 +585,12 @@ export function AIProvidersPage() {
                 onChange={(event) =>
                   setInput({ ...input, model: event.target.value })
                 }
-                placeholder="ID модели у провайдера"
+                placeholder={t('ID модели у провайдера')}
               />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ai-provider-speaking-model">
-                Модель для Speaking (необязательно)
+                {t('Модель для Speaking (необязательно)')}
               </Label>
               <Input
                 id="ai-provider-speaking-model"
@@ -579,12 +600,12 @@ export function AIProvidersPage() {
                 onChange={(event) =>
                   setInput({ ...input, speakingModel: event.target.value })
                 }
-                placeholder="По умолчанию — та же модель"
+                placeholder={t('По умолчанию — та же модель')}
               />
             </div>
             {!editingEnv && (
               <div className="space-y-1.5">
-                <Label htmlFor="ai-provider-key">API-ключ</Label>
+                <Label htmlFor="ai-provider-key">{t('API-ключ')}</Label>
                 <Input
                   id="ai-provider-key"
                   type="password"
@@ -597,19 +618,20 @@ export function AIProvidersPage() {
                   }
                   placeholder={
                     editing
-                      ? 'Пусто — сохранить текущий ключ'
-                      : 'Будет зашифрован при сохранении'
+                      ? t('Пусто — сохранить текущий ключ')
+                      : t('Будет зашифрован при сохранении')
                   }
                 />
                 <p className="text-xs leading-5 text-slate-500">
-                  Ключ никогда не возвращается из API и не сохраняется в
-                  браузере.
+                  {t(
+                    'Ключ никогда не возвращается из API и не сохраняется в браузере.',
+                  )}
                 </p>
               </div>
             )}
             <fieldset className="space-y-2">
               <legend className="mb-2 text-sm font-medium">
-                Использовать для
+                {t('Использовать для')}
               </legend>
               <div className="flex flex-wrap gap-4">
                 {(Object.keys(scopeNames) as AIScope[]).map((scope) => (
@@ -623,14 +645,14 @@ export function AIProvidersPage() {
                       checked={input.scopes.includes(scope)}
                       onChange={() => toggleScope(scope)}
                     />
-                    {scopeNames[scope]}
+                    {t(scopeNames[scope])}
                   </label>
                 ))}
               </div>
             </fieldset>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="ai-provider-priority">Приоритет</Label>
+                <Label htmlFor="ai-provider-priority">{t('Приоритет')}</Label>
                 <Input
                   id="ai-provider-priority"
                   type="number"
@@ -643,12 +665,15 @@ export function AIProvidersPage() {
                   }
                 />
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Одинаковый приоритет = один уровень и ротация запросов между
-                  провайдерами. Меньшее число — более ранний уровень.
+                  {t(
+                    'Одинаковый приоритет = один уровень и ротация запросов между провайдерами. Меньшее число — более ранний уровень.',
+                  )}
                 </p>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="ai-provider-timeout">Таймаут, секунды</Label>
+                <Label htmlFor="ai-provider-timeout">
+                  {t('Таймаут, секунды')}
+                </Label>
                 <Input
                   id="ai-provider-timeout"
                   type="number"
@@ -675,7 +700,7 @@ export function AIProvidersPage() {
                   setInput({ ...input, enabled: event.target.checked })
                 }
               />
-              Включить в цепочку
+              {t('Включить в цепочку')}
             </label>
             {formResult && (
               <p
@@ -698,7 +723,7 @@ export function AIProvidersPage() {
                   )
                 }
               >
-                Проверить подключение
+                {t('Проверить подключение')}
               </Button>
               <Button
                 type="submit"
@@ -709,7 +734,7 @@ export function AIProvidersPage() {
                   !input.scopes.length
                 }
               >
-                {busy ? 'Подождите…' : 'Сохранить'}
+                {busy ? t('Подождите…') : t('Сохранить')}
               </Button>
               <Button
                 type="button"
@@ -721,7 +746,7 @@ export function AIProvidersPage() {
                   setEditing(null)
                 }}
               >
-                Отмена
+                {t('Отмена')}
               </Button>
             </div>
           </form>
@@ -733,11 +758,15 @@ export function AIProvidersPage() {
       <p className="max-w-3xl text-xs leading-5 text-slate-500">
         {data?.errorReportingRequired === false &&
         !data.errorReportingConfigured
-          ? 'Локальный режим: GlitchTip отключён. Попытки пишутся в логи backend, замеры — в статистику. '
-          : 'Каждая ошибка провайдера отправляется в GlitchTip, даже если резерв ответил успешно. '}
-        При переходе к резерву незавершённый ответ Юки заменяется новым — ответы
-        разных моделей не склеиваются. Если никто не доступен, пользователь
-        увидит спокойное предложение попробовать позже.
+          ? t(
+              'Локальный режим: GlitchTip отключён. Попытки пишутся в логи backend, замеры — в статистику. ',
+            )
+          : t(
+              'Каждая ошибка провайдера отправляется в GlitchTip, даже если резерв ответил успешно. ',
+            )}
+        {t(
+          'При переходе к резерву незавершённый ответ Юки заменяется новым — ответы разных моделей не склеиваются. Если никто не доступен, пользователь увидит спокойное предложение попробовать позже.',
+        )}
       </p>
     </div>
   )

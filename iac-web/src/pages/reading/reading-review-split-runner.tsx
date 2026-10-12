@@ -8,6 +8,7 @@ import {
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -26,6 +27,7 @@ export function ReadingReviewSplitRunner({
   attempt: AttemptDetail
   material: PublicReadingMaterial
 }) {
+  const { t } = useLanguage()
   const { guest } = useAuth()
   const review = attempt.review ?? []
   const reviewByQuestionId = useMemo(
@@ -127,9 +129,17 @@ export function ReadingReviewSplitRunner({
             className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
           >
             {guest ? (
-              <Link to="/try"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К пробному тесту</span></Link>
+              <Link to="/try">
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">
+                  {t('К пробному тесту')}
+                </span>
+              </Link>
             ) : (
-              <Link to="/mistakes"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К ошибкам</span></Link>
+              <Link to="/mistakes">
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">{t('К ошибкам')}</span>
+              </Link>
             )}
           </Button>
           <div className="hidden md:block">
@@ -137,7 +147,7 @@ export function ReadingReviewSplitRunner({
               {material.title}
             </h1>
             <span className="text-[11px] text-slate-500">
-              Интерактивный разбор ответов
+              {t('Интерактивный разбор ответов')}
             </span>
           </div>
         </div>
@@ -166,7 +176,9 @@ export function ReadingReviewSplitRunner({
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                   )}
                 >
-                  <span>Раздел {passageIndex + 1}</span>
+                  <span>
+                    {t('Раздел')} {passageIndex + 1}
+                  </span>
                   {pErrors > 0 ? (
                     <span
                       className={cn(
@@ -176,7 +188,7 @@ export function ReadingReviewSplitRunner({
                           : 'bg-rose-100 text-rose-700',
                       )}
                     >
-                      {pErrors} ош.
+                      {pErrors} {t('ош.')}
                     </span>
                   ) : null}
                 </button>
@@ -198,7 +210,7 @@ export function ReadingReviewSplitRunner({
                   : 'text-slate-600 hover:text-slate-900',
               )}
             >
-              Все ({totalQuestions})
+              {t('Все')} ({totalQuestions})
             </button>
             <button
               type="button"
@@ -210,7 +222,7 @@ export function ReadingReviewSplitRunner({
                   : 'text-rose-700 hover:bg-rose-50',
               )}
             >
-              Ошибки ({errorCount})
+              {t('Ошибки')} ({errorCount})
             </button>
             <button
               type="button"
@@ -222,7 +234,7 @@ export function ReadingReviewSplitRunner({
                   : 'text-emerald-700 hover:bg-emerald-50',
               )}
             >
-              Верно ({correctCount})
+              {t('Верно')} ({correctCount})
             </button>
           </div>
 
@@ -243,8 +255,8 @@ export function ReadingReviewSplitRunner({
             <div className="flex items-center gap-2 min-w-0">
               <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
                 {passages.length > 1
-                  ? `Раздел ${(currentQuestion?.passageIndex ?? 0) + 1}`
-                  : 'Текст'}
+                  ? `${t('Раздел')} ${(currentQuestion?.passageIndex ?? 0) + 1}`
+                  : t('Текст')}
               </span>
               <h2 className="text-sm font-semibold text-slate-900 truncate">
                 {currentPassage?.title}
@@ -261,7 +273,7 @@ export function ReadingReviewSplitRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Уменьшить шрифт"
+                title={t('Уменьшить шрифт')}
               >
                 A-
               </button>
@@ -274,7 +286,7 @@ export function ReadingReviewSplitRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Стандартный шрифт"
+                title={t('Стандартный шрифт')}
               >
                 A
               </button>
@@ -287,7 +299,7 @@ export function ReadingReviewSplitRunner({
                     ? 'bg-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
                 )}
-                title="Увеличить шрифт"
+                title={t('Увеличить шрифт')}
               >
                 A+
               </button>
@@ -309,18 +321,18 @@ export function ReadingReviewSplitRunner({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
-                  Вопросы
+                  {t('Вопросы')}
                 </span>
                 <span className="text-xs text-slate-500 font-medium">
                   {currentPassage?.questionGroups.length}{' '}
                   {currentPassage?.questionGroups.length === 1
-                    ? 'группа'
-                    : 'групп'}{' '}
-                  вопросов
+                    ? t('группа')
+                    : t('групп')}{' '}
+                  {t('вопросов')}
                 </span>
               </div>
               <span className="text-xs font-semibold text-slate-500">
-                Активный вопрос:{' '}
+                {t('Активный вопрос')}:{' '}
                 {currentQuestion?.reviewItem?.number ?? activeQuestionIndex + 1}
               </span>
             </div>
@@ -408,7 +420,7 @@ export function ReadingReviewSplitRunner({
                       ? 'bg-rose-100 text-rose-800 border border-rose-300'
                       : 'bg-slate-100 text-slate-500 border border-slate-200',
                 )}
-                title={`Вопрос ${num}: ${isCorrect ? 'Верно' : 'Ошибка'}`}
+                title={`${t('Вопрос')} ${num}: ${isCorrect ? t('Верно') : t('Ошибка')}`}
               >
                 {num}
               </button>
@@ -445,6 +457,7 @@ function ReviewQuestionCard({
   onSelect: () => void
   onRetry: () => void
 }) {
+  const { t } = useLanguage()
   const [expandedExplanation, setExpandedExplanation] = useState(false)
   const isCorrect = item.isCorrect
 
@@ -476,12 +489,12 @@ function ReviewQuestionCard({
           {isCorrect ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
               <TickCircle className="size-3.5 text-emerald-600" />
-              Верно (+{item.pointsAwarded} б.)
+              {t('Верно')} (+{item.pointsAwarded} {t('б.')})
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
               <CloseCircle className="size-3.5 text-rose-600" />
-              Ошибка (0 б.)
+              {t('Ошибка')} (0 {t('б.')})
             </span>
           )}
         </div>
@@ -499,7 +512,7 @@ function ReviewQuestionCard({
             className="h-7 text-xs font-semibold border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 gap-1 rounded-[8px]"
           >
             <LampCharge className="size-3.5 text-rose-600" />
-            Разобрать
+            {t('Разобрать')}
           </Button>
         )}
       </div>
@@ -519,7 +532,7 @@ function ReviewQuestionCard({
           )}
         >
           <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">
-            Ваш ответ
+            {t('Ваш ответ')}
           </span>
           <span
             className={cn(
@@ -534,7 +547,7 @@ function ReviewQuestionCard({
         {/* Правильный ответ */}
         <div className="rounded-[8px] border border-emerald-200 bg-emerald-50/70 p-2.5 text-emerald-950">
           <span className="block text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-0.5">
-            Правильный ответ
+            {t('Правильный ответ')}
           </span>
           <span className="font-bold text-emerald-900">
             {formatAnswer(item.correctAnswer, options)}
@@ -556,8 +569,8 @@ function ReviewQuestionCard({
             <InfoCircle className="size-3.5" />
             <span>
               {expandedExplanation
-                ? 'Скрыть объяснение'
-                : 'Показать разбор и цитату'}
+                ? t('Скрыть объяснение')
+                : t('Показать разбор и цитату')}
             </span>
           </button>
 
@@ -566,7 +579,7 @@ function ReviewQuestionCard({
               {item.quote ? (
                 <div>
                   <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Цитата из текста:
+                    {t('Цитата из текста')}:
                   </span>
                   <blockquote className="font-serif italic text-slate-800 mt-1 pl-2 border-l-2 border-blue-400">
                     «{item.quote}»
@@ -576,7 +589,7 @@ function ReviewQuestionCard({
               {item.explanation ? (
                 <div>
                   <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Пояснение:
+                    {t('Пояснение')}:
                   </span>
                   <p className="whitespace-pre-wrap mt-0.5 text-slate-700">
                     {item.explanation}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useLanguage } from '@/lib/i18n'
+
 type TurnstileAPI = {
   render: (
     element: HTMLElement,
@@ -29,6 +31,7 @@ export function Turnstile({
   siteKey: string
   onToken: (token: string) => void
 }) {
+  const { t } = useLanguage()
   const container = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
 
@@ -77,7 +80,7 @@ export function Turnstile({
       <div ref={container} />
       {failed ? (
         <p role="alert" className="text-sm text-red-600">
-          Не удалось загрузить проверку безопасности. Обновите страницу.
+          {t('Не удалось загрузить проверку безопасности. Обновите страницу.')}
         </p>
       ) : null}
     </div>

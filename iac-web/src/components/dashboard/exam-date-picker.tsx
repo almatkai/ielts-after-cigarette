@@ -97,6 +97,22 @@ function getDaysWord(days: number, language: string): string {
   return 'дней'
 }
 
+/** «через 5 дней» / «5 күннен кейін» / «in 5 days». */
+function formatDaysUntil(days: number, language: string): string {
+  const word = getDaysWord(days, language)
+  if (language === 'en') return `in ${days} ${word}`
+  if (language === 'kk') return `${days} ${word}нен кейін`
+  return `через ${days} ${word}`
+}
+
+/** «Осталось 5 дней» / «5 күн қалды» / «5 days left». */
+function formatDaysLeft(days: number, language: string): string {
+  const word = getDaysWord(days, language)
+  if (language === 'en') return `${days} ${word} left`
+  if (language === 'kk') return `${days} ${word} қалды`
+  return `Осталось ${days} ${word}`
+}
+
 function getDaysRemaining(iso: string): number | null {
   const target = parseIsoDate(iso)
   if (!target) return null
@@ -314,9 +330,7 @@ export function ExamDatePicker({
               <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-[#2563eb] border border-blue-100">
                 {daysRemaining === 0
                   ? t('Сегодня')
-                  : language === 'en'
-                    ? `in ${daysRemaining} ${getDaysWord(daysRemaining, language)}`
-                    : `через ${daysRemaining} ${getDaysWord(daysRemaining, language)}`}
+                  : formatDaysUntil(daysRemaining, language)}
               </span>
             ) : null}
             <ArrowDown2
@@ -381,7 +395,7 @@ export function ExamDatePicker({
               onClick={() => selectPreset(preset.months)}
               className="rounded-full px-2 py-0.5 text-[11px] font-medium border border-slate-200 bg-slate-50/70 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 transition-all shrink-0 cursor-pointer active:scale-95"
             >
-              {preset.label}
+              {t(preset.label)}
             </button>
           ))}
         </div>
@@ -434,9 +448,7 @@ export function ExamDatePicker({
               {daysRemaining === 0
                 ? t('Экзамен сегодня!')
                 : daysRemaining > 0
-                  ? language === 'en'
-                    ? `${daysRemaining} ${getDaysWord(daysRemaining, language)} left`
-                    : `Осталось ${daysRemaining} ${getDaysWord(daysRemaining, language)}`
+                  ? formatDaysLeft(daysRemaining, language)
                   : t('Дата в прошлом')}
             </span>
           ) : (

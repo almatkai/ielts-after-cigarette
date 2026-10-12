@@ -45,6 +45,7 @@ import {
   completionQuestionNumbers,
   ListeningCompletionText,
 } from './listening-completion-text'
+import { tr } from '@/lib/i18n'
 
 const TIMER_DANGER_SECONDS = 300
 
@@ -350,7 +351,7 @@ function ListeningTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not save draft:'} {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
       {session.submitError ? (
@@ -358,7 +359,7 @@ function ListeningTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not submit test:'} {session.submitError}
+          {'Could not submit test:'} {tr(session.submitError)}
         </p>
       ) : null}
       {sharedAudioAssetId ? (

@@ -9,13 +9,32 @@ import {
 
 import type { ReactNode } from 'react'
 
-export type Language = 'ru' | 'kk' | 'en'
+import type { Language, TranslationMap } from './i18n-types'
+import { adminContentTranslations } from './i18n-admin-content'
+import { adminCoreTranslations } from './i18n-admin-core'
+import { authTranslations } from './i18n-auth'
+import { blogTranslations } from './i18n-blog'
+import { dashboardTranslations } from './i18n-dashboard'
+import { legalPrivacyTranslations } from './i18n-legal-privacy'
+import { legalTermsTranslations } from './i18n-legal-terms'
+import { reviewTranslations } from './i18n-review'
+
+export type { Language, TranslationEntry, TranslationMap } from './i18n-types'
 
 const LANGUAGE_STORAGE_KEY = 'daiyndyq-language'
 
-type TranslationMap = Partial<Record<string, Partial<Record<Language, string>>>>
+let activeLanguage: Language = 'ru'
 
-const translations: TranslationMap = {
+/**
+ * Non-hook translation for strings rendered outside React components
+ * (error payloads, helpers, refs). Falls back to the source string, so
+ * English-only exam strings pass through unchanged.
+ */
+export function tr(source: string): string {
+  return translations[source]?.[activeLanguage] ?? source
+}
+
+const baseTranslations: TranslationMap = {
   Язык: { kk: 'Тіл', en: 'Language' },
   Обучение: { kk: 'Оқу', en: 'Study' },
   Обзор: { kk: 'Шолу', en: 'Overview' },
@@ -1413,25 +1432,6 @@ const translations: TranslationMap = {
       kk: '3 академиялық мәтін, 40 сұрақ. True/False/Not Given, бірнеше таңдау және бос орындарды толтыру.',
       en: '3 academic passages, 40 questions. True/False/Not Given, multiple choice, and gap-fill.',
     },
-  'Task 1 (описание графиков/письма) и Task 2 (эссе). Детальный разбор по всем 4 официальным критериям IELTS.':
-    {
-      kk: 'Task 1 (график сипаттамасы/хат) және Task 2 (эссе). IELTS ресми 4 критерийі бойынша толық талдау.',
-      en: 'Task 1 (describe a chart or write a letter) and Task 2 (essay), assessed against all 4 official IELTS criteria.',
-    },
-  'Интервью (Part 1), карточка монолога (Part 2) и обсуждение (Part 3) с записью аудио и подробной оценкой.':
-    {
-      kk: 'Сұхбат (Part 1), монолог картасы (Part 2) және талқылау (Part 3): аудио жазба мен толық бағалау.',
-      en: 'Interview (Part 1), a cue-card monologue (Part 2), and discussion (Part 3), with recorded audio and detailed feedback.',
-    },
-  'Полный пробный IELTS': {
-    kk: 'Толық IELTS сынақ тесті',
-    en: 'Full IELTS mock test',
-  },
-  'Юридические документы': { kk: 'Құқықтық құжаттар', en: 'Legal documents' },
-  'Политика конфиденциальности': {
-    kk: 'Құпиялылық саясаты',
-    en: 'Privacy Policy',
-  },
   'Условия использования': { kk: 'Пайдалану шарттары', en: 'Terms of Use' },
   'Распечатать документ': { kk: 'Құжатты басып шығару', en: 'Print document' },
   Печать: { kk: 'Басып шығару', en: 'Print' },
@@ -1474,7 +1474,7 @@ const translations: TranslationMap = {
   'Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Daiyndyq IELTS».':
     {
       kk: 'IELTS-ке дайындықтың білім беру платформасы «Daiyndyq IELTS»-ты пайдалану тәртібі мен ережелерін реттейтін пайдаланушы келісімшарты.',
-      en: 'The user agreement governing the use of the Daiyndyq IELTS IELTS-preparation learning platform.',
+      en: 'The user agreement governing use of the Daiyndyq IELTS preparation platform.',
     },
   '5 октября 2026 г.': { kk: '2026 ж. 5 қазан', en: '5 October 2026' },
   '1. Общие положения': { kk: '1. Жалпы ережелер', en: '1. General terms' },
@@ -1536,7 +1536,7 @@ const translations: TranslationMap = {
     en: '7. Limitation of liability',
   },
   '6. Подписки и платные услуги': {
-    kk: '6. Жазылымдар және қызметкерлер',
+    kk: '6. Жазылымдар және ақылы қызметтер',
     en: '6. Subscriptions and paid services',
   },
   '8. Прекращение действия соглашения': {
@@ -1548,6 +1548,19 @@ const translations: TranslationMap = {
     en: '9. Governing law and disputes',
   },
   '10. Контакты': { kk: '10. Байланыс', en: '10. Contacts' },
+}
+
+// Domain dictionaries live in separate modules so parallel work doesn't collide.
+const translations: TranslationMap = {
+  ...baseTranslations,
+  ...adminContentTranslations,
+  ...adminCoreTranslations,
+  ...authTranslations,
+  ...blogTranslations,
+  ...dashboardTranslations,
+  ...legalPrivacyTranslations,
+  ...legalTermsTranslations,
+  ...reviewTranslations,
 }
 
 type LanguageContextValue = {
@@ -1571,6 +1584,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    activeLanguage = language
     document.documentElement.lang = language
   }, [language])
 

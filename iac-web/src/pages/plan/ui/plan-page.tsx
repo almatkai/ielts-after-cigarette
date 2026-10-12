@@ -26,7 +26,7 @@ import { getDashboard, queryKeys } from '@/features/ielts/api'
 import type { SkillId } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 
 const cardClassName =
   'group gap-0 rounded-[16px] border border-[#e7e7e4] bg-white py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all duration-200 hover:border-slate-300'
@@ -89,7 +89,7 @@ export function PlanPage() {
     return (
       <ErrorState
         title={t('Не удалось загрузить план')}
-        message={getErrorMessage(dashboardQuery.error)}
+        message={tr(getErrorMessage(dashboardQuery.error))}
         onRetry={() => void dashboardQuery.refetch()}
       />
     )
@@ -442,7 +442,7 @@ export function PlanPage() {
                     {t('Анализ ошибок')}
                   </div>
                   <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
-                    {t(weakestMeta.advice)}{' '}
+                    {weakestMeta ? t(weakestMeta.advice) : null}{' '}
                     {t(
                       'Все ошибки сохраняются в разделе «Ошибки» для повторения.',
                     )}

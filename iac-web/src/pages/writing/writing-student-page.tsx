@@ -29,6 +29,7 @@ import { WritingReview } from '@/features/attempts/writing-review'
 import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { tr } from '@/lib/i18n'
 
 export function WritingStudentPage({
   materialId,
@@ -216,7 +217,7 @@ export function WritingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not save draft:'} {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
       {session.submitError ? (
@@ -224,7 +225,7 @@ export function WritingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {'Could not submit your work:'} {session.submitError}
+          {'Could not submit your work:'} {tr(session.submitError)}
         </p>
       ) : null}
       <div className="min-h-0 flex-1">
@@ -491,7 +492,7 @@ export function WritingAttemptResult({
       {detailQuery.isError ? (
         <ErrorState
           title={'Could not load feedback'}
-          message={getErrorMessage(detailQuery.error)}
+          message={tr(getErrorMessage(detailQuery.error))}
           onRetry={() => void detailQuery.refetch()}
         />
       ) : assessment?.status === 'FAILED' ? (

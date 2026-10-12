@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { tr } from '@/lib/i18n'
 import type { SaveState } from '@/features/attempts/attempt-session'
 import type {
   Attempt,
@@ -174,7 +175,7 @@ export function LoadingState({
         </svg>
       </div>
       {label ? (
-        <p className="text-sm font-medium text-[#64748b]">{label}</p>
+        <p className="text-sm font-medium text-[#64748b]">{tr(label)}</p>
       ) : null}
     </div>
   )
@@ -197,9 +198,11 @@ export function ErrorState({
             <CloseCircle className="size-7" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">
-            {title}
+            {tr(title)}
           </h2>
-          <p className="text-sm leading-relaxed text-[#64748b]">{message}</p>
+          <p className="text-sm leading-relaxed text-[#64748b]">
+            {tr(message)}
+          </p>
           <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">
             Try again
           </Button>
@@ -250,7 +253,7 @@ export function TimeBadge({
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium tabular-nums ${
         danger ? 'border-red-200 bg-red-50 text-[#e23b3b]' : 'bg-white'
       }`}
-      aria-label={label}
+      aria-label={tr(label)}
     >
       <Clock className="size-4" aria-hidden />
       {formatClock(seconds)}

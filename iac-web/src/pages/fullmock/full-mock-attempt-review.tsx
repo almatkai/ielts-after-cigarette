@@ -6,6 +6,7 @@ import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { fullMockKeys, getFullMockSession } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { AttemptReviewPage } from '@/pages/attempts/attempt-review-page'
+import { tr } from '@/lib/i18n'
 
 const skills = ['listening', 'reading', 'writing', 'speaking'] as const
 const labels = {
@@ -31,7 +32,7 @@ export function FullMockAttemptReview({
     return (
       <ErrorState
         title="Could not load the Full Mock"
-        message={getErrorMessage(query.error)}
+        message={tr(getErrorMessage(query.error))}
         onRetry={() => void query.refetch()}
       />
     )
@@ -50,7 +51,8 @@ export function FullMockAttemptReview({
         params={{ sessionId }}
         className="inline-flex w-fit items-center gap-2 text-sm text-[#69696d] hover:text-[#111111]"
       >
-        <ArrowLeft className="size-4" aria-hidden />Back to the report
+        <ArrowLeft className="size-4" aria-hidden />
+        Back to the report
       </Link>
       <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
         Review

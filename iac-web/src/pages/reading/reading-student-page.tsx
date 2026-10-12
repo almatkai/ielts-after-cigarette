@@ -48,6 +48,7 @@ import {
   PreviewAnswer,
   PreviewEvidenceText,
 } from '@/features/admin/preview-answer'
+import { tr } from '@/lib/i18n'
 
 const tfngValues = ['TRUE', 'FALSE', 'NOT_GIVEN'] as const
 const ynngValues = ['YES', 'NO', 'NOT_GIVEN'] as const
@@ -506,7 +507,7 @@ function ReadingTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
         >
-          {'Could not save draft:'} {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
 
@@ -515,7 +516,7 @@ function ReadingTestRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
         >
-          {'Could not submit test:'} {session.submitError}
+          {'Could not submit test:'} {tr(session.submitError)}
         </p>
       ) : null}
 

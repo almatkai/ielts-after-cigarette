@@ -1270,6 +1270,163 @@ const translations: TranslationMap = {
     kk: 'Басқа тесттерге қол жеткізу және прогресті сақтау үшін Google арқылы кіріңіз.',
     en: 'Sign in with Google to access more tests and save your progress.',
   },
+  'Загружаем изображение…': { kk: 'Сурет жүктелуде…', en: 'Loading image…' },
+  'Пока не определяется': { kk: 'Әзірше бағаланбайды', en: 'Not assessed yet' },
+  'Проверяем доступные тесты…': {
+    kk: 'Қолжетімді тесттер тексерілуде…',
+    en: 'Checking available tests…',
+  },
+  'Учитываем уже выполненные задания, чтобы подобрать новые.': {
+    kk: 'Жаңа тесттер таңдау үшін орындалған тапсырмалар ескеріледі.',
+    en: 'We count what you’ve already done to pick something new.',
+  },
+  'Не удалось подготовить Full Mock': {
+    kk: 'Full Mock дайындау мүмкін болмады',
+    en: 'Could not prepare the Full Mock',
+  },
+  'Мы автоматически подберём тесты из общей библиотеки. Сначала — задания, которые вы ещё не выполняли. Выбирать отдельный mock-тест не нужно.':
+    {
+      kk: 'Тесттерді ортақ кітапханадан автоматты таңдаймыз. Алдымен орындалмаған тапсырмалар. Бөлек mock-тест таңдаудың қажеті жоқ.',
+      en: 'We assemble your test set from the shared library automatically, starting with tasks you haven’t done yet. No need to pick individual mock tests.',
+    },
+  'Четыре секции в одной сессии': {
+    kk: 'Бір сессияда төрт бөлім',
+    en: 'Four sections in one session',
+  },
+  'Порядок секций экзамена': {
+    kk: 'Емтихан бөлімдерінің реті',
+    en: 'Exam section order',
+  },
+  'минут · отдельные таймеры секций': {
+    kk: 'минут · әр бөлімнің жеке таймері',
+    en: 'minutes · separate section timers',
+  },
+  'После сдачи секции вы переходите к следующей. Ответы сохраняются, а после проверки всех четырёх секций появится общий Band Score.':
+    {
+      kk: 'Бөлімді тапсырған соң келесісіне өтесіз. Жауаптар сақталады; төрт бөлімінің бәрі тексерілген соң жалпы Band Score шығады.',
+      en: 'After each section you move to the next one. Answers are saved, and an overall band score appears once all four sections are assessed.',
+    },
+  'Ваш прогресс по доступным тестам': {
+    kk: 'Қолжетімді тесттер бойынша прогресіңіз',
+    en: 'Your progress across available tests',
+  },
+  'Учитываются выполненные тесты и в практике, и в Full Mock. Повторные попытки не увеличивают счётчик.':
+    {
+      kk: 'Практикада да, Full Mock-та да орындалған тесттер есептеледі. Қайталап тапсыру есепті ұлгайытқан жоқ.',
+      en: 'Completed practice and Full Mock tests both count. Retries don’t increase the counter.',
+    },
+  'выполнено тестов': { kk: 'орындалған тест', en: 'completed tests' },
+  выполнено: { kk: 'орындалды', en: 'completed' },
+  'Выберите Academic или General в': {
+    kk: 'Академиялық немесе General форматты',
+    en: 'Choose Academic or General in your',
+  },
+  профиле: { kk: 'профильде', en: 'profile' },
+  ', чтобы мы подобрали подходящие тесты.': {
+    kk: 'таңдап, біз сізге сай тесттер жинаймыз.',
+    en: 'so we can pick suitable tests.',
+  },
+  'В следующих mock-тестах будут повторы': {
+    kk: 'Келесі mock-тесттерде қайталаулар болады',
+    en: 'The next mock tests will repeat some tasks',
+  },
+  'Вы выполнили все доступные тесты. Full Mock будет собран из ранее выполненных заданий, выбранных случайно.':
+    {
+      kk: 'Қолжетімді тесттердің бәрін орындадыңыз. Full Mock бұрын орындалған тапсырмалардан кездейсоқ жиналады.',
+      en: 'You’ve completed every available test. The Full Mock will be built from random earlier tasks.',
+    },
+  'Вы выполнили все доступные тесты по секциям:': {
+    kk: 'Бөлімдер бойынша қолжетімді тесттердің бәрін орындадыңыз:',
+    en: 'You’ve completed every available test for these sections:',
+  },
+  '. В новых Full Mock эти секции будут выбраны случайно из ранее выполненных тестов. Для остальных секций сначала подберём непройденные задания.':
+    {
+      kk: '. Жаңа Full Mock-та бұл бөлімдер бұрын орындалған тесттерден кездейсоқ таңдалады. Қалған бөлімдерге алдымен орындалмаған тапсырмалар ұсынылады.',
+      en: '. In the new Full Mock these sections will be chosen randomly from your earlier tests. Untouched tasks will be used first for the other sections.',
+    },
+  'Состав уже начатой сессии не изменится.': {
+    kk: 'Басталған сессияның құрамы өзгеріспен қалады.',
+    en: 'Your in-progress session keeps the same set of tests.',
+  },
+  'Для нового Full Mock пока недостаточно полных опубликованных тестов:': {
+    kk: 'Жаңа Full Mock үшін жарияланған толық тесттер әзірге жеткіліксіз:',
+    en: 'Not enough full published tests are available for a new Full Mock right now:',
+  },
+  'Текущую сессию можно продолжить.': {
+    kk: 'Ағымдағы сессияны жалғастыруға болады.',
+    en: 'You can continue your current session.',
+  },
+  'Пока можно заниматься отдельными секциями в практике.': {
+    kk: 'Әзірге практикада бөлек бөлімдермен жаттығуға болады.',
+    en: 'For now you can practise individual sections in Practice.',
+  },
+  'Продолжить текущую сессию': {
+    kk: 'Ағымдағы сессияны жалғастыру',
+    en: 'Continue the current session',
+  },
+  'Начать Full Mock? У каждой секции свой таймер. Общая продолжительность:': {
+    kk: 'Full Mock бастайсыз ба? Әр бөлімнің жеке таймері бар. Жалпы ұзақтығы:',
+    en: 'Start the Full Mock? Each section has its own timer. Total duration:',
+  },
+  'Начать Full Mock': { kk: 'Full Mock бастау', en: 'Start the Full Mock' },
+  'Начать заново? Текущая сессия будет закрыта. Мы подберём новый набор тестов, таймер начнётся заново.':
+    {
+      kk: 'Қайта бастайсыз ба? Ағымдағы сессия жабылады; жаңа тесттер таңдап, таймер қайта іске қосылады.',
+      en: 'Start over? Your current session will be closed. We’ll pick a fresh set of tests and restart the timers.',
+    },
+  'Начать заново': { kk: 'Қайта бастау', en: 'Start over' },
+  'К отдельным секциям': { kk: 'Бөлек бөлімдерге', en: 'Individual sections' },
+  'Готовим экзамен…': { kk: 'Емтихан дайындалуда…', en: 'Preparing the exam…' },
+  'Открыть последнюю попытку': {
+    kk: 'Соңғы әрекетті ашу',
+    en: 'Open the latest attempt',
+  },
+  'Пересдать тест': { kk: 'Тестті қайта тапсыру', en: 'Retake this test' },
+  'Пересдать полный тест?': {
+    kk: 'Толық тестті қайта тапсыру керек пе?',
+    en: 'Retake the full test?',
+  },
+  'Новая попытка начнётся с чистыми ответами и таймерами. Предыдущий результат сохранится.':
+    {
+      kk: 'Жаңа әрекет таза жауаптар мен таймерлермен басталады. Алдыңғы нәтиже сақталады.',
+      en: 'Your new attempt starts with clean answers and timers. The previous result stays saved.',
+    },
+  'Незавершённый тест, если он есть, будет закрыт.': {
+    kk: 'Аяқталмаған тест болса, жабылады.',
+    en: 'Any unfinished test will be closed.',
+  },
+  'Продолжить без регистрации': {
+    kk: 'Тіркелмей жалғастыру',
+    en: 'Continue without signing up',
+  },
+  'Попробовать один Full Mock без регистрации': {
+    kk: 'Тіркелмей бір Full Mock байқап көру',
+    en: 'Try one Full Mock without signing up',
+  },
+  '4 секции, 40 вопросов. Диалоги и академические лекции с таймингом и автоматической проверкой ответов.':
+    {
+      kk: '4 бөлім, 40 сұрақ. Диалогтар мен академиялық дәрістер: таймермен, жауаптар автоматты тексеріледі.',
+      en: '4 sections, 40 questions. Dialogues and academic lectures, timed, with automatic scoring.',
+    },
+  '3 академических текста, 40 вопросов. Задания True/False/Not Given, множественный выбор и заполнение пропусков.':
+    {
+      kk: '3 академиялық мәтін, 40 сұрақ. True/False/Not Given, бірнеше таңдау және бос орындарды толтыру.',
+      en: '3 academic passages, 40 questions. True/False/Not Given, multiple choice, and gap-fill.',
+    },
+  'Task 1 (описание графиков/письма) и Task 2 (эссе). Детальный разбор по всем 4 официальным критериям IELTS.':
+    {
+      kk: 'Task 1 (график сипаттамасы/хат) және Task 2 (эссе). IELTS ресми 4 критерийі бойынша толық талдау.',
+      en: 'Task 1 (describe a chart or write a letter) and Task 2 (essay), assessed against all 4 official IELTS criteria.',
+    },
+  'Интервью (Part 1), карточка монолога (Part 2) и обсуждение (Part 3) с записью аудио и подробной оценкой.':
+    {
+      kk: 'Сұхбат (Part 1), монолог картасы (Part 2) және талқылау (Part 3): аудио жазба мен толық бағалау.',
+      en: 'Interview (Part 1), a cue-card monologue (Part 2), and discussion (Part 3), with recorded audio and detailed feedback.',
+    },
+  'Полный пробный IELTS': {
+    kk: 'Толық IELTS сынақ тесті',
+    en: 'Full IELTS mock test',
+  },
 }
 
 type LanguageContextValue = {

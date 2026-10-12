@@ -29,7 +29,6 @@ import { WritingReview } from '@/features/attempts/writing-review'
 import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { useLanguage } from '@/lib/i18n'
 
 export function WritingStudentPage({
   materialId,
@@ -38,14 +37,11 @@ export function WritingStudentPage({
   materialId: string
   fullMockSessionId?: string
 }) {
-  const { t } = useLanguage()
   return (
     <ExamAttemptShell<PublicWritingMaterial>
       skillBadge="IELTS Writing"
-      loadingLabel={t('Готовим задания Writing…')}
-      loadingDescription={t(
-        'Загружаем темы заданий, требования к объёму слов и подготавливаем редактор эссе.',
-      )}
+      loadingLabel={'Preparing Writing tasks…'}
+      loadingDescription="Loading task prompts and word-count requirements, and preparing the essay editor."
       queryKey={attemptStartQueryKey('writing', materialId)}
       startAttemptFn={(signal) => startWritingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
@@ -83,7 +79,6 @@ export function WritingAttemptRunner({
   sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
-  const { t } = useLanguage()
   const session = useAttemptSession(attempt.id)
   const [activeTaskIndex, setActiveTaskIndex] = useState(0)
 
@@ -146,7 +141,7 @@ export function WritingAttemptRunner({
   if (session.loadError) {
     return (
       <ErrorState
-        title={t('Не удалось восстановить ответы')}
+        title={'Could not restore your answers'}
         message={session.loadError}
         onRetry={session.retryLoad}
       />
@@ -156,10 +151,8 @@ export function WritingAttemptRunner({
     return (
       <ExamLoadingScreen
         badge="IELTS Writing"
-        label={t('Готовим письменную часть…')}
-        description={t(
-          'Загружаем задания эссе, графические материалы и восстанавливаем черновики…',
-        )}
+        label={'Preparing Writing…'}
+        description="Loading essay tasks and images, and restoring your drafts…"
       />
     )
   }
@@ -187,7 +180,7 @@ export function WritingAttemptRunner({
         <Button asChild variant="link" className="sr-only">
           <Link to="/writing">
             <ArrowLeft aria-hidden />
-            {t('К Writing')}
+            {'Back to Writing'}
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -197,7 +190,7 @@ export function WritingAttemptRunner({
             <TimeBadge
               seconds={secondsLeft}
               danger={secondsLeft <= 5 * 60}
-              label={t('Оставшееся время')}
+              label={'Time remaining'}
             />
           </div>
           <Button
@@ -208,17 +201,14 @@ export function WritingAttemptRunner({
             onClick={handleContinueLater}
             className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
           >
-            {session.isSavingAndExiting
-              ? t('Сохраняем…')
-              : t('Продолжить позже')}
+            {session.isSavingAndExiting ? 'Saving…' : 'Continue later'}
           </Button>
         </div>
         <p className="sr-only">
           {material.examType === 'academic' ? 'Academic' : 'General Training'}
           {' · '}
-          {t(
-            'Task 1 — 20 минут, Task 2 — 40 минут. Черновики сохраняются автоматически.',
-          )}
+          'Task 1 — 20 minutes, Task 2 — 40 minutes. Drafts are saved
+          automatically.'
         </p>
       </div>
       {session.exitError ? (
@@ -226,7 +216,7 @@ export function WritingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {t('Не удалось сохранить черновик:')} {t(session.exitError)}
+          {'Could not save draft:'} {session.exitError}
         </p>
       ) : null}
       {session.submitError ? (
@@ -234,7 +224,7 @@ export function WritingAttemptRunner({
           role="alert"
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
         >
-          {t('Не удалось отправить работу:')} {t(session.submitError)}
+          {'Could not submit your work:'} {session.submitError}
         </p>
       ) : null}
       <div className="min-h-0 flex-1">
@@ -253,17 +243,17 @@ export function WritingAttemptRunner({
           disabled={activeTaskIndex === 0}
           onClick={() => setActiveTaskIndex((index) => index - 1)}
         >
-          {t('Назад')}
+          {'Back'}
         </Button>
         <p className="text-sm text-[#69696d]">
-          {t('Задание')} {activeTaskIndex + 1} {t('из')} {material.tasks.length}
+          {'Task'} {activeTaskIndex + 1} {'of'} {material.tasks.length}
         </p>
         <Button
           type="button"
           disabled={activeTaskIndex === material.tasks.length - 1}
           onClick={() => setActiveTaskIndex((index) => index + 1)}
         >
-          {t('Далее')}
+          {'Next'}
         </Button>
       </div>
       <AttemptSubmitBar
@@ -276,9 +266,7 @@ export function WritingAttemptRunner({
         disabledMessage={
           allTasksAnswered
             ? undefined
-            : t(
-                'Напишите ответ на оба задания. Работа короче рекомендуемого объёма будет оценена ниже.',
-              )
+            : 'Answer both tasks. Responses below the recommended word count may receive a lower score.'
         }
         onSubmit={session.submit}
       />
@@ -295,7 +283,6 @@ function WritingTaskEditor({
   text: string
   onChange: (next: string) => void
 }) {
-  const { language, t } = useLanguage()
   const words = countWords(text)
   return (
     <Card className="shadow-none">
@@ -305,11 +292,10 @@ function WritingTaskEditor({
             <CardTitle>Task {task.position}</CardTitle>
             <p className="mt-1 text-sm text-[#69696d]">
               {task.position === 1
-                ? t('Рекомендуемое время: 20 минут')
-                : t('Рекомендуемое время: 40 минут')}
+                ? 'Suggested time: 20 minutes'
+                : 'Suggested time: 40 minutes'}
               {' · '}
-              {t('минимум')} {task.minimumWords}{' '}
-              {language === 'en' ? 'words' : language === 'kk' ? 'сөз' : 'слов'}
+              {'minimum'} {task.minimumWords} words
             </p>
           </div>
           {task.position === 1 && task.visualType ? (
@@ -318,7 +304,7 @@ function WritingTaskEditor({
             </span>
           ) : task.position === 1 && task.letterTone ? (
             <span className="rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-medium text-[#1d4ed8]">
-              {task.letterTone} {t('letter')}
+              {task.letterTone} {'letter'}
             </span>
           ) : null}
         </div>
@@ -344,13 +330,13 @@ function WritingTaskEditor({
           onChange={(event) => onChange(event.target.value)}
           rows={15}
           className="resize-y font-serif text-base leading-7"
-          placeholder={t('Напишите свой ответ на английском…')}
-          aria-label={`${t('Ответ на')} Writing Task ${task.position}`}
+          placeholder={'Write your answer in English…'}
+          aria-label={`${'Answer for'} Writing Task ${task.position}`}
         />
         <p
           className={`text-right text-xs ${words < task.minimumWords ? 'text-amber-700' : 'text-emerald-700'}`}
         >
-          {words} {wordEnding(words, language)} · {t('рекомендуемый минимум')}{' '}
+          {words} {wordEnding(words)} · {'recommended minimum'}{' '}
           {task.minimumWords}
         </p>
       </CardContent>
@@ -365,7 +351,6 @@ function ProtectedWritingImage({
   assetId: string
   taskPosition: number
 }) {
-  const { t } = useLanguage()
   const query = useQuery({
     queryKey: ['writing', 'media', assetId],
     queryFn: () => getWritingMediaBlob(assetId),
@@ -384,25 +369,16 @@ function ProtectedWritingImage({
     [url],
   )
   if (query.isPending) {
-    return (
-      <p className="text-sm text-[#69696d]">{t('Загружаем изображение…')}</p>
-    )
+    return <p className="text-sm text-[#69696d]">{'Loading image…'}</p>
   }
   if (!url) {
-    return (
-      <p className="text-sm text-[#e23b3b]">{t('Изображение недоступно.')}</p>
-    )
+    return <p className="text-sm text-[#e23b3b]">{'Image unavailable.'}</p>
   }
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      title={t('Открыть в полном размере')}
-    >
+    <a href={url} target="_blank" rel="noreferrer" title={'Open full size'}>
       <img
         src={url}
-        alt={`${t('Визуальные данные для Writing Task')} ${taskPosition}`}
+        alt={`${'Visual for Writing Task'} ${taskPosition}`}
         className="max-h-[520px] w-full rounded-xl border object-contain"
       />
     </a>
@@ -414,7 +390,6 @@ function WritingProcessingCard({
 }: {
   fullMockSessionId?: string
 }) {
-  const { t } = useLanguage()
   return (
     <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 sm:p-8 shadow-xs">
       <div className="flex flex-col items-center text-center max-w-lg mx-auto py-4">
@@ -441,18 +416,16 @@ function WritingProcessingCard({
           </svg>
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">
-          {t('Эссе отправлено и проверяется нейросетью')}
+          {'Your essay was submitted and is being assessed by AI'}
         </h2>
         <p className="text-sm text-slate-600 leading-relaxed mb-4">
-          {t(
-            'ИИ оценивает раскрытие тем, связность и структуру, словарный запас и грамматическую точность. Обычно проверка занимает от 30 до 90 секунд.',
-          )}
+          'AI reviews task response, coherence and structure, vocabulary, and
+          grammar. Assessment usually takes 30 to 90 seconds.'
         </p>
         <div className="rounded-xl bg-[#f7f7f5] p-4 text-xs text-slate-500 mb-6 text-left w-full">
-          💡 <strong>{t('Вы можете не ждать на этом экране:')}</strong>{' '}
-          {t(
-            'закройте вкладку или перейдите в другие разделы. Проверка завершится в фоновом режиме, а результат с баллами и разбором сохранится в вашем профиле.',
-          )}
+          💡 <strong>{'You don’t need to wait here:'}</strong> 'close this tab
+          or move to another section. Assessment will finish in the background,
+          and your score and feedback will be saved to your profile.'
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           {fullMockSessionId ? (
@@ -461,15 +434,15 @@ function WritingProcessingCard({
                 to="/exam/full-mock-sessions/$sessionId"
                 params={{ sessionId: fullMockSessionId }}
               >
-                {t('К следующей секции Full Mock')}
+                {'Continue to the next Full Mock section'}
               </Link>
             </Button>
           ) : null}
           <Button asChild variant="outline">
-            <Link to="/">{t('В личный кабинет')}</Link>
+            <Link to="/">{'Go to dashboard'}</Link>
           </Button>
           <Button asChild variant="ghost">
-            <Link to="/writing">{t('К списку Writing')}</Link>
+            <Link to="/writing">{'Back to Writing'}</Link>
           </Button>
         </div>
       </div>
@@ -490,7 +463,6 @@ export function WritingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
-  const { t } = useLanguage()
   const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment
@@ -511,24 +483,24 @@ export function WritingAttemptResult({
 
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {t('Работа над ошибками')}
+          {'Review your work'}
         </h1>
         <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (
         <ErrorState
-          title={t('Не удалось загрузить разбор')}
-          message={t(getErrorMessage(detailQuery.error))}
+          title={'Could not load feedback'}
+          message={getErrorMessage(detailQuery.error)}
           onRetry={() => void detailQuery.refetch()}
         />
       ) : assessment?.status === 'FAILED' ? (
         <ErrorState
-          title={t('Не удалось проверить эссе')}
-          message={t(
+          title={'Could not assess the essay'}
+          message={
             assessment.errorMessage ||
-              'Автоматическая проверка завершилась с ошибкой. Начните новую попытку или повторите позже.',
-          )}
+            'Automatic assessment failed. Start a new attempt or try again later.'
+          }
           onRetry={() => void detailQuery.refetch()}
         />
       ) : !evaluation ? (
@@ -550,8 +522,6 @@ function countWords(value: string) {
   return trimmed ? trimmed.split(/\s+/).length : 0
 }
 
-function wordEnding(value: number, language: 'ru' | 'kk' | 'en') {
-  if (language === 'en') return value === 1 ? 'word' : 'words'
-  if (language === 'kk') return 'сөз'
-  return value === 1 ? 'слово' : value >= 2 && value <= 4 ? 'слова' : 'слов'
+function wordEnding(value: number) {
+  return value === 1 ? 'word' : 'words'
 }

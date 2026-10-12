@@ -26,11 +26,11 @@ export function FullMockAttemptReview({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
   })
-  if (query.isPending) return <LoadingState label="Загрузка…" />
+  if (query.isPending) return <LoadingState label="Loading…" />
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
+        title="Could not load the Full Mock"
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -39,7 +39,7 @@ export function FullMockAttemptReview({
   if (!session.sections.some((section) => section.attempt.id === attemptId)) {
     return (
       <p className="text-sm text-[#69696d]">
-        Попытка не относится к этому Full Mock.
+        This attempt does not belong to this Full Mock.
       </p>
     )
   }
@@ -50,13 +50,13 @@ export function FullMockAttemptReview({
         params={{ sessionId }}
         className="inline-flex w-fit items-center gap-2 text-sm text-[#69696d] hover:text-[#111111]"
       >
-        <ArrowLeft className="size-4" aria-hidden />К результату
+        <ArrowLeft className="size-4" aria-hidden />Back to the report
       </Link>
       <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
-        Работа над ошибками
+        Review
       </h1>
       <nav
-        aria-label="Секции Full Mock"
+        aria-label="Full Mock sections"
         className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#f0f0ed] p-1 sm:grid-cols-4"
       >
         {skills.map((skill) => {

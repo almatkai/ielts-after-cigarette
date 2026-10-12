@@ -137,8 +137,9 @@ export function DashboardSidebar({
           <SidebarProgress onNavigate={onNavigate} />
         ) : (
           <section className="mt-auto px-3.5 py-8 text-xs leading-5 text-[#808084]">
-            Один Full Mock доступен бесплатно. Для других тестов и сохранения
-            прогресса войдите в аккаунт.
+            {t(
+              'Один Full Mock доступен бесплатно. Для других тестов и сохранения прогресса войдите в аккаунт.',
+            )}
           </section>
         )}
 

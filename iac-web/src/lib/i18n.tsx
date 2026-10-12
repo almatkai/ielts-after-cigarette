@@ -1456,6 +1456,16 @@ const translations: TranslationMap = {
     en: '© 2026 Daiyndyq IELTS. All rights reserved. Astana, Kazakhstan.',
   },
   Вход: { kk: 'Кіру', en: 'Sign in' },
+  'Выберите дату экзамена': {
+    kk: 'Емтихан күнін таңдаңыз',
+    en: 'Choose your exam date',
+  },
+  Сегодня: { kk: 'Бүгін', en: 'Today' },
+  'Дата в прошлом': { kk: 'Күн өткенде', en: 'Date is in the past' },
+  Очистить: { kk: 'Тазалау', en: 'Clear' },
+  'Быстро:': { kk: 'Жылдам:', en: 'Quick:' },
+  'Предыдущий месяц': { kk: 'Алдыңғы ай', en: 'Previous month' },
+  'Следующий месяц': { kk: 'Келесі ай', en: 'Next month' },
 }
 
 type LanguageContextValue = {

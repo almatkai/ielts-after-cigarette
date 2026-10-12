@@ -7,23 +7,58 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
-const MONTH_NAMES = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-] as const
+const MONTH_NAMES: Record<string, readonly string[]> = {
+  ru: [
+    'Январь',
+    'Февраль',
+    'Март',
+    'Апрель',
+    'Май',
+    'Июнь',
+    'Июль',
+    'Август',
+    'Сентябрь',
+    'Октябрь',
+    'Ноябрь',
+    'Декабрь',
+  ],
+  kk: [
+    'Қаңтар',
+    'Ақпан',
+    'Наурыз',
+    'Сәуір',
+    'Мамыр',
+    'Маусым',
+    'Шілде',
+    'Тамыз',
+    'Қыркүйек',
+    'Қазан',
+    'Қараша',
+    'Желтоқсан',
+  ],
+  en: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+}
 
-const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
+const WEEKDAYS: Record<string, readonly string[]> = {
+  ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+  kk: ['Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб', 'Жс'],
+  en: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+}
 
 function formatIsoDate(d: Date): string {
   const y = d.getFullYear()
@@ -38,20 +73,24 @@ function parseIsoDate(iso: string): Date | null {
   return new Date(y, m - 1, d)
 }
 
-function formatRussianDate(iso: string): string {
+function formatDateLocalized(iso: string, language: string): string {
   const date = parseIsoDate(iso)
   if (!date) return ''
-  return new Intl.DateTimeFormat('ru-RU', {
+  const locale =
+    language === 'en' ? 'en-GB' : language === 'kk' ? 'kk-KZ' : 'ru-RU'
+  return new Intl.DateTimeFormat(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   }).format(date)
 }
 
-function getDaysWord(days: number): string {
+function getDaysWord(days: number, language: string): string {
   const abs = Math.abs(days)
   const mod10 = abs % 10
   const mod100 = abs % 100
+  if (language === 'en') return abs === 1 ? 'day' : 'days'
+  if (language === 'kk') return 'күн'
   if (mod100 >= 11 && mod100 <= 19) return 'дней'
   if (mod10 === 1) return 'день'
   if (mod10 >= 2 && mod10 <= 4) return 'дня'
@@ -88,6 +127,7 @@ export function ExamDatePicker({
   id,
   contentClassName,
 }: ExamDatePickerProps) {
+  const { language, t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
 
   // Determine initial view month and year
@@ -263,7 +303,9 @@ export function ExamDatePicker({
                 value ? 'font-medium text-[#111111]' : 'text-[#808084]',
               )}
             >
-              {value ? formatRussianDate(value) : 'Выберите дату экзамена'}
+              {value
+                ? formatDateLocalized(value, language)
+                : t('Выберите дату экзамена')}
             </span>
           </div>
 
@@ -271,8 +313,10 @@ export function ExamDatePicker({
             {daysRemaining !== null && daysRemaining >= 0 ? (
               <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-[#2563eb] border border-blue-100">
                 {daysRemaining === 0
-                  ? 'Сегодня'
-                  : `через ${daysRemaining} ${getDaysWord(daysRemaining)}`}
+                  ? t('Сегодня')
+                  : language === 'en'
+                    ? `in ${daysRemaining} ${getDaysWord(daysRemaining, language)}`
+                    : `через ${daysRemaining} ${getDaysWord(daysRemaining, language)}`}
               </span>
             ) : null}
             <ArrowDown2
@@ -296,7 +340,7 @@ export function ExamDatePicker({
         {/* Header: Month & Year + Controls */}
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <span className="text-sm font-bold text-slate-900 tracking-tight">
-            {MONTH_NAMES[viewMonth]} {viewYear}
+            {MONTH_NAMES[language][viewMonth]} {viewYear}
           </span>
 
           <div className="flex items-center gap-1">
@@ -310,7 +354,7 @@ export function ExamDatePicker({
                   ? 'text-slate-300 cursor-not-allowed opacity-50'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer',
               )}
-              aria-label="Предыдущий месяц"
+              aria-label={t('Предыдущий месяц')}
             >
               <ArrowLeft2 className="size-3.5" />
             </button>
@@ -318,7 +362,7 @@ export function ExamDatePicker({
               type="button"
               onClick={handleNextMonth}
               className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
-              aria-label="Следующий месяц"
+              aria-label={t('Следующий месяц')}
             >
               <ArrowRight2 className="size-3.5" />
             </button>
@@ -328,7 +372,7 @@ export function ExamDatePicker({
         {/* Quick Presets for IELTS preparation */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2 no-scrollbar">
           <span className="text-[11px] text-slate-400 font-medium shrink-0">
-            Быстро:
+            {t('Быстро:')}
           </span>
           {presets.map((preset) => (
             <button
@@ -344,7 +388,7 @@ export function ExamDatePicker({
 
         {/* Weekday Names */}
         <div className="grid grid-cols-7 gap-1 text-center py-1 border-t border-slate-100">
-          {WEEKDAYS.map((d) => (
+          {WEEKDAYS[language].map((d) => (
             <span
               key={d}
               className="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
@@ -388,14 +432,16 @@ export function ExamDatePicker({
             <span className="text-slate-600 text-[11px] font-medium flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
               {daysRemaining === 0
-                ? 'Экзамен сегодня!'
+                ? t('Экзамен сегодня!')
                 : daysRemaining > 0
-                  ? `Осталось ${daysRemaining} ${getDaysWord(daysRemaining)}`
-                  : 'Дата в прошлом'}
+                  ? language === 'en'
+                    ? `${daysRemaining} ${getDaysWord(daysRemaining, language)} left`
+                    : `Осталось ${daysRemaining} ${getDaysWord(daysRemaining, language)}`
+                  : t('Дата в прошлом')}
             </span>
           ) : (
             <span className="text-slate-400 text-[11px]">
-              Выберите дату экзамена
+              {t('Выберите дату экзамена')}
             </span>
           )}
 
@@ -405,7 +451,7 @@ export function ExamDatePicker({
               onClick={handleClear}
               className="text-[11px] font-medium text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
             >
-              Очистить
+              {t('Очистить')}
             </button>
           ) : null}
         </div>

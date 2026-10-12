@@ -1549,6 +1549,18 @@ const baseTranslations: TranslationMap = {
   },
   '10. Контакты': { kk: '10. Байланыс', en: '10. Contacts' },
   'Юридические документы': { kk: 'Құқықтық құжаттар', en: 'Legal documents' },
+  'Определите стартовый уровень': {
+    kk: 'Бастапқы деңгейіңізді анықтаңыз',
+    en: 'Find your starting level',
+  },
+  'Короткая диагностика поможет подобрать подходящую сложность.': {
+    kk: 'Қысқа диагностика сізге сай қиындық деңгейін таңдауға көмектеседі.',
+    en: 'A short diagnostic will help us match you with the right difficulty.',
+  },
+  'Выбрать навык и формат задания': {
+    kk: 'Дағды мен тапсырма форматын таңдау',
+    en: 'Choose a skill and task format',
+  },
 }
 
 // Domain dictionaries live in separate modules so parallel work doesn't collide.

@@ -1548,6 +1548,7 @@ const baseTranslations: TranslationMap = {
     en: '9. Governing law and disputes',
   },
   '10. Контакты': { kk: '10. Байланыс', en: '10. Contacts' },
+  'Юридические документы': { kk: 'Құқықтық құжаттар', en: 'Legal documents' },
 }
 
 // Domain dictionaries live in separate modules so parallel work doesn't collide.

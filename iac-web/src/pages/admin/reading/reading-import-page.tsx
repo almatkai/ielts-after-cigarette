@@ -20,6 +20,7 @@ import {
   parseReadingImport,
 } from '@/features/admin/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type {
   ReadingImportIssue,
@@ -133,6 +134,7 @@ const completionTypes = new Set([
 ])
 
 export function ReadingImportPage() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [source, setSource] = useState('')
@@ -170,7 +172,7 @@ export function ReadingImportPage() {
     setMessage(null)
     setResult(null)
     if (source.trim().length === 0) {
-      setMessage('Вставьте документ IELTS Reading Import Format v1.')
+      setMessage(t('Вставьте документ IELTS Reading Import Format v1.'))
       return
     }
     try {
@@ -192,10 +194,10 @@ export function ReadingImportPage() {
   const copyTemplate = async () => {
     try {
       await navigator.clipboard.writeText(template)
-      setMessage('Шаблон IELTS_READING_IMPORT_V1 скопирован.')
+      setMessage(t('Шаблон IELTS_READING_IMPORT_V1 скопирован.'))
     } catch {
       setMessage(
-        'Не удалось скопировать шаблон. Разрешите доступ к буферу обмена.',
+        t('Не удалось скопировать шаблон. Разрешите доступ к буферу обмена.'),
       )
     }
   }
@@ -210,15 +212,15 @@ export function ReadingImportPage() {
             className="h-auto p-0 text-[#69696d]"
             onClick={() => void navigate({ to: '/admin/reading/materials' })}
           >
-            <ArrowLeft aria-hidden /> К библиотеке
+            <ArrowLeft aria-hidden /> {t('К библиотеке')}
           </Button>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-            Импорт IELTS Reading
+            {t('Импорт IELTS Reading')}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
-            Основной формат — IELTS Reading Import Format v1. Сначала проверьте
-            preview, затем создайте обычные draft-материалы в существующем
-            конструкторе.
+            {t(
+              'Основной формат — IELTS Reading Import Format v1. Сначала проверьте preview, затем создайте обычные draft-материалы в существующем конструкторе.',
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -227,7 +229,7 @@ export function ReadingImportPage() {
             variant="outline"
             onClick={() => void copyTemplate()}
           >
-            <ClipboardText aria-hidden /> Скопировать шаблон
+            <ClipboardText aria-hidden /> {t('Скопировать шаблон')}
           </Button>
           <Button
             type="button"
@@ -237,7 +239,7 @@ export function ReadingImportPage() {
               setResult(null)
             }}
           >
-            Вставить пример
+            {t('Вставить пример')}
           </Button>
         </div>
       </div>
@@ -253,12 +255,14 @@ export function ReadingImportPage() {
 
       <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
         <CardHeader className="border-b border-[#ededeb] p-5">
-          <CardTitle className="text-base">Исходный документ</CardTitle>
+          <CardTitle className="text-base">{t('Исходный документ')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="import-exam-type">Формат по умолчанию</Label>
+              <Label htmlFor="import-exam-type">
+                {t('Формат по умолчанию')}
+              </Label>
               <select
                 id="import-exam-type"
                 value={examType}
@@ -272,7 +276,7 @@ export function ReadingImportPage() {
               </select>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="import-difficulty">Сложность</Label>
+              <Label htmlFor="import-difficulty">{t('Сложность')}</Label>
               <select
                 id="import-difficulty"
                 value={difficulty}
@@ -300,11 +304,11 @@ export function ReadingImportPage() {
             placeholder="# IELTS_READING_IMPORT_V1&#10;title: ..."
           />
           <p className="text-sm leading-6 text-[#69696d]">
-            Поддерживаются все типы Reading, банк слов через{' '}
-            <code>options:</code>, групповой выбор через{' '}
-            <code>MULTIPLE_SELECT</code>, изображения через <code>image:</code>{' '}
-            и пропуски вида <code>{'{{12}}'}</code>, <code>(12) …</code> или{' '}
-            <code>(12) ____</code>.
+            {t('Поддерживаются все типы Reading, банк слов через')}{' '}
+            <code>options:</code>, {t('групповой выбор через')}{' '}
+            <code>MULTIPLE_SELECT</code>, {t('изображения через')}{' '}
+            <code>image:</code> {t('и пропуски вида')} <code>{'{{12}}'}</code>,{' '}
+            <code>(12) …</code> {t('или')} <code>(12) ____</code>.
           </p>
           <div className="flex justify-end">
             <Button
@@ -314,7 +318,7 @@ export function ReadingImportPage() {
               className="bg-[#3b82f6] hover:bg-[#2563eb]"
             >
               <DocumentUpload aria-hidden />
-              {parseMutation.isPending ? 'Распознаём…' : 'Распознать'}
+              {parseMutation.isPending ? t('Распознаём…') : t('Распознать')}
             </Button>
           </div>
         </CardContent>
@@ -343,6 +347,7 @@ function ImportPreview({
   onBack: () => void
   onConfirm: () => void
 }) {
+  const { t } = useLanguage()
   const fatal = result.errors.length > 0
   return (
     <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
@@ -351,7 +356,9 @@ function ImportPreview({
           <CardTitle className="text-base">{result.title}</CardTitle>
           <Badge variant="outline">{result.formatVersion}</Badge>
           {result.durationMinutes ? (
-            <Badge variant="outline">{result.durationMinutes} мин.</Badge>
+            <Badge variant="outline">
+              {result.durationMinutes} {t('мин.')}
+            </Badge>
           ) : null}
         </div>
       </CardHeader>
@@ -366,7 +373,7 @@ function ImportPreview({
                 Passage {passage.number} — {passage.material.title}
               </h3>
               <Badge variant="outline">
-                Text ✓ {passage.material.body.length} символов
+                Text ✓ {passage.material.body.length} {t('символов')}
               </Badge>
             </div>
             <div className="mt-4 grid gap-3">
@@ -380,16 +387,16 @@ function ImportPreview({
             </div>
           </div>
         ))}
-        <IssueList title="Ошибки" issues={result.errors} kind="error" />
+        <IssueList title={t('Ошибки')} issues={result.errors} kind="error" />
         <IssueList
-          title="Предупреждения"
+          title={t('Предупреждения')}
           issues={result.warnings}
           kind="warning"
         />
-        <IssueList title="Информация" issues={result.info} kind="info" />
+        <IssueList title={t('Информация')} issues={result.info} kind="info" />
         <div className="flex flex-wrap justify-end gap-2 border-t border-[#ededeb] pt-4">
           <Button type="button" variant="outline" onClick={onBack}>
-            Исправить документ
+            {t('Исправить документ')}
           </Button>
           <Button
             type="button"
@@ -398,8 +405,11 @@ function ImportPreview({
             className="bg-[#3b82f6] hover:bg-[#2563eb]"
           >
             {pending
-              ? 'Импортируем…'
-              : `Создать один тест из ${result.passages.length} passage`}
+              ? t('Импортируем…')
+              : t('Создать один тест из {count} passage').replace(
+                  '{count}',
+                  String(result.passages.length),
+                )}
           </Button>
         </div>
       </CardContent>
@@ -414,6 +424,7 @@ function GroupPreview({
   group: ReadingQuestionGroup
   index: number
 }) {
+  const { t } = useLanguage()
   const numbers = group.questions
     .map((question) => question.content.number)
     .filter((number): number is number => typeof number === 'number')
@@ -439,14 +450,25 @@ function GroupPreview({
         <Badge variant="outline">{group.type.replaceAll('_', ' ')}</Badge>
       </div>
       <div className="mt-2 grid gap-1 text-[#69696d] sm:grid-cols-2 lg:grid-cols-4">
-        <span>✓ {group.questions.length} вопросов</span>
-        <span>✓ {answers} ответов</span>
+        <span>
+          ✓{' '}
+          {t('{count} вопросов').replace(
+            '{count}',
+            String(group.questions.length),
+          )}
+        </span>
+        <span>
+          ✓ {answers} {t('ответов')}
+        </span>
         <span>○ {explanations} explanations</span>
         {completionTypes.has(group.type) ? (
           <span>
             ✓ {group.questions.length} blanks
             {rule
-              ? ` · до ${rule.maxWords} слов${rule.allowNumber ? ' и число' : ''}`
+              ? ` · ${t('до {count} слов').replace(
+                  '{count}',
+                  String(rule.maxWords),
+                )}${rule.allowNumber ? ` ${t('и число')}` : ''}`
               : ''}
           </span>
         ) : null}
@@ -464,6 +486,7 @@ function IssueList({
   issues: ReadingImportIssue[]
   kind: 'error' | 'warning' | 'info'
 }) {
+  const { t } = useLanguage()
   if (issues.length === 0) return null
   const styles = {
     error: 'border-red-200 bg-red-50',
@@ -481,8 +504,18 @@ function IssueList({
         {issues.map((issue, index) => (
           <li key={`${issue.code}-${index}`}>
             {issue.message}
-            {issue.questionNumber ? ` · вопрос ${issue.questionNumber}` : ''}
-            {issue.line ? ` · строка ${issue.line}` : ''}
+            {issue.questionNumber
+              ? ` · ${t('вопрос {number}').replace(
+                  '{number}',
+                  String(issue.questionNumber),
+                )}`
+              : ''}
+            {issue.line
+              ? ` · ${t('строка {number}').replace(
+                  '{number}',
+                  String(issue.line),
+                )}`
+              : ''}
           </li>
         ))}
       </ul>

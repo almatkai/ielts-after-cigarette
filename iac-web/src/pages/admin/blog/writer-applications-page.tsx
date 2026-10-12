@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/lib/i18n'
 
 type StatusFilter = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -36,6 +37,7 @@ function statusBadge(status: WriterApplicationDto['status']) {
 }
 
 export function AdminWriterApplicationsPage() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [filter, setFilter] = useState<StatusFilter>('PENDING')
   const [reviewTarget, setReviewTarget] = useState<{
@@ -71,7 +73,7 @@ export function AdminWriterApplicationsPage() {
       })
     },
     onError: () => {
-      setActionError('Не удалось сохранить решение. Попробуйте ещё раз.')
+      setActionError(t('Не удалось сохранить решение. Попробуйте ещё раз.'))
     },
   })
 
@@ -81,11 +83,12 @@ export function AdminWriterApplicationsPage() {
     <div className="grid gap-5">
       <div>
         <h1 className="text-2xl font-semibold tracking-[-0.03em]">
-          Заявки авторов
+          {t('Заявки авторов')}
         </h1>
         <p className="mt-2 text-sm leading-6 text-[#69696d]">
-          Проверьте заявленный балл IELTS (минимум 7.5) и сертификат перед
-          одобрением. Одобренные заявители получают роль автора блога.
+          {t(
+            'Проверьте заявленный балл IELTS (минимум 7.5) и сертификат перед одобрением. Одобренные заявители получают роль автора блога.',
+          )}
         </p>
       </div>
 
@@ -102,10 +105,10 @@ export function AdminWriterApplicationsPage() {
             }`}
           >
             {candidate === 'PENDING'
-              ? 'На проверке'
+              ? t('На проверке')
               : candidate === 'APPROVED'
-                ? 'Одобренные'
-                : 'Отклонённые'}
+                ? t('Одобренные')
+                : t('Отклонённые')}
           </button>
         ))}
       </div>
@@ -118,10 +121,10 @@ export function AdminWriterApplicationsPage() {
 
       <div className="grid gap-3">
         {applicationsQuery.isPending ? (
-          <p className="text-sm text-[#69696d]">Загружаем…</p>
+          <p className="text-sm text-[#69696d]">{t('Загружаем…')}</p>
         ) : applications.length === 0 ? (
           <p className="rounded-[16px] border border-[#e7e7e4] bg-white px-5 py-10 text-center text-sm text-[#69696d]">
-            Заявок в этой категории нет.
+            {t('Заявок в этой категории нет.')}
           </p>
         ) : (
           applications.map((application) => (
@@ -160,7 +163,7 @@ export function AdminWriterApplicationsPage() {
                     }}
                   >
                     <TickCircle className="size-4" aria-hidden />
-                    Одобрить
+                    {t('Одобрить')}
                   </Button>
                   <Button
                     variant="outline"
@@ -169,7 +172,7 @@ export function AdminWriterApplicationsPage() {
                       setReviewNotes('')
                     }}
                   >
-                    Отклонить
+                    {t('Отклонить')}
                   </Button>
                 </div>
               ) : null}
@@ -190,8 +193,8 @@ export function AdminWriterApplicationsPage() {
               <DialogHeader>
                 <DialogTitle>
                   {reviewTarget.approve
-                    ? 'Одобрить заявку автора'
-                    : 'Отклонить заявку автора'}
+                    ? t('Одобрить заявку автора')
+                    : t('Отклонить заявку автора')}
                 </DialogTitle>
                 <DialogDescription>
                   {reviewTarget.application.userDisplayName} · Overall{' '}
@@ -216,15 +219,16 @@ export function AdminWriterApplicationsPage() {
                     <b>Speaking:</b> {reviewTarget.application.speakingBand}
                   </p>
                   <p>
-                    <b>Тип:</b> {reviewTarget.application.examType ?? '—'}
+                    <b>{t('Тип:')}</b>{' '}
+                    {reviewTarget.application.examType ?? '—'}
                   </p>
                   <p>
-                    <b>Дата теста:</b>{' '}
+                    <b>{t('Дата теста:')}</b>{' '}
                     {reviewTarget.application.testDate ?? '—'}
                   </p>
                   {reviewTarget.application.bio ? (
                     <p className="mt-2">
-                      <b>О себе:</b> {reviewTarget.application.bio}
+                      <b>{t('О себе:')}</b> {reviewTarget.application.bio}
                     </p>
                   ) : null}
                 </div>
@@ -237,15 +241,16 @@ export function AdminWriterApplicationsPage() {
                   className="h-72 w-full rounded-[12px] border border-[#e7e7e4] bg-white"
                 >
                   <p className="p-4 text-sm text-[#69696d]">
-                    Не удалось показать сертификат встроенно — откройте файл по
-                    ссылке{' '}
+                    {t(
+                      'Не удалось показать сертификат встроенно — откройте файл по ссылке',
+                    )}{' '}
                     <a
                       className="text-[#1d4ed8] underline"
                       href={`/api/v1/writers/applications/${reviewTarget.application.id}/certificate`}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      сертификат заявителя
+                      {t('сертификат заявителя')}
                     </a>
                     .
                   </p>
@@ -257,15 +262,17 @@ export function AdminWriterApplicationsPage() {
                   rows={2}
                   placeholder={
                     reviewTarget.approve
-                      ? 'Комментарий (необязательно)'
-                      : 'Причина отклонения, например: «балл ниже 7.5» или «нечитаемый скан»'
+                      ? t('Комментарий (необязательно)')
+                      : t(
+                          'Причина отклонения, например: «балл ниже 7.5» или «нечитаемый скан»',
+                        )
                   }
                 />
               </div>
 
               <DialogFooter>
                 <Button variant="ghost" onClick={() => setReviewTarget(null)}>
-                  Отмена
+                  {t('Отмена')}
                 </Button>
                 <Button
                   disabled={reviewMutation.isPending}
@@ -278,10 +285,10 @@ export function AdminWriterApplicationsPage() {
                   }
                 >
                   {reviewMutation.isPending
-                    ? 'Сохраняем…'
+                    ? t('Сохраняем…')
                     : reviewTarget.approve
-                      ? 'Одобрить и выдать роль автора'
-                      : 'Отклонить заявку'}
+                      ? t('Одобрить и выдать роль автора')
+                      : t('Отклонить заявку')}
                 </Button>
               </DialogFooter>
             </>

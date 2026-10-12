@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { Eye, EyeSlash } from 'iconsax-react'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/i18n'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import type { PreviewAnswerKey } from './preview-api'
@@ -19,6 +20,7 @@ export function PreviewAnswer({
   onToggle: () => void
   evidenceText?: string
 }) {
+  const { t } = useLanguage()
   const panelId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -49,7 +51,9 @@ export function PreviewAnswer({
         ) : (
           <Eye className="size-4 shrink-0" aria-hidden />
         )}
-        {open ? 'Скрыть ответ и объяснение' : 'Показать ответ с объяснением'}
+        {open
+          ? t('Скрыть ответ и объяснение')
+          : t('Показать ответ с объяснением')}
       </Button>
       {open ? (
         <div
@@ -57,32 +61,38 @@ export function PreviewAnswer({
           ref={panelRef}
           className="mt-3 space-y-4 rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-sm"
           role="region"
-          aria-label="Ответ и объяснение"
+          aria-label={t('Ответ и объяснение')}
         >
           <div>
-            <p className="font-semibold text-blue-900">Правильный ответ</p>
+            <p className="font-semibold text-blue-900">
+              {t('Правильный ответ')}
+            </p>
             <p className="mt-1 whitespace-pre-wrap break-words text-slate-900">
               {answer === '—'
-                ? 'Ответ не добавлен. Укажите его в редакторе.'
+                ? t('Ответ не добавлен. Укажите его в редакторе.')
                 : answer}
             </p>
           </div>
           <div>
-            <p className="font-semibold text-slate-900">Где находится ответ</p>
+            <p className="font-semibold text-slate-900">
+              {t('Где находится ответ')}
+            </p>
             {quote ? (
               <blockquote className="mt-2 whitespace-pre-wrap border-l-2 border-blue-400 pl-3 font-serif text-slate-800">
                 {quote}
               </blockquote>
             ) : (
               <p className="mt-1 text-slate-600">
-                Цитата не добавлена. Укажите подтверждающий фрагмент текста в
-                редакторе.
+                {t(
+                  'Цитата не добавлена. Укажите подтверждающий фрагмент текста в редакторе.',
+                )}
               </p>
             )}
             {quoteMissing ? (
               <p className="mt-2 text-amber-800" role="status">
-                Цитата не найдена в этой версии текста. Проверьте её в
-                редакторе.
+                {t(
+                  'Цитата не найдена в этой версии текста. Проверьте её в редакторе.',
+                )}
               </p>
             ) : null}
             {answerKey?.hint.trim() ? (
@@ -93,11 +103,11 @@ export function PreviewAnswer({
           </div>
           <div>
             <p className="font-semibold text-slate-900">
-              Почему этот ответ правильный
+              {t('Почему этот ответ правильный')}
             </p>
             <p className="mt-1 whitespace-pre-wrap break-words leading-relaxed text-slate-700">
               {answerKey?.explanation.trim() ||
-                'Объяснение не добавлено. Добавьте разбор в редакторе.'}
+                t('Объяснение не добавлено. Добавьте разбор в редакторе.')}
             </p>
           </div>
         </div>

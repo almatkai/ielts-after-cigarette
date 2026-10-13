@@ -1,7 +1,13 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-async function openWritingReview(page: Page) {
+type ReviewScreen = 'exam' | 'history' | 'bank' | 'fullmock'
+
+async function openWritingReview(
+  page: Page,
+  screen: ReviewScreen = 'exam',
+  inline = true,
+) {
   const criterion = { band: 7, feedback: 'Clear, accurate sentences.' }
   const criteria = {
     taskResponse: criterion,
@@ -19,7 +25,7 @@ async function openWritingReview(page: Page) {
     alternatives: [],
   })
   const attempt = {
-    id: 'writing-attempt',
+    id: '11111111-1111-4111-8111-111111111111',
     materialType: 'writing',
     materialId: 'material',
     materialVersionId: 'version',
@@ -54,7 +60,9 @@ async function openWritingReview(page: Page) {
           feedback: 'Комментарий к первому заданию',
           strengths: [],
           improvements: [],
-          annotations: [annotation('visitors has increased', 'error')],
+          annotations: inline
+            ? [annotation('visitors has increased', 'error')]
+            : [],
         },
         {
           taskId: 'task-two',
@@ -65,10 +73,14 @@ async function openWritingReview(page: Page) {
           strengths: [],
           improvements: [],
           // Both tasks start at #1; the second is a grammar suggestion.
-          annotations: [
-            annotation('Many people study abroad', 'suggestion'),
-            annotation('A phrase never written by the student', 'error'),
-          ],
+          modelParagraph:
+            'Many people believe that studying abroad broadens their perspective.',
+          annotations: inline
+            ? [
+                annotation('Many people study abroad', 'suggestion'),
+                annotation('A phrase never written by the student', 'error'),
+              ]
+            : [],
         },
       ],
     },
@@ -119,12 +131,67 @@ async function openWritingReview(page: Page) {
     if (path.endsWith('/writing/materials/material/attempts')) {
       return route.fulfill({ json: { attempt, material } })
     }
-    if (path.endsWith('/attempts/writing-attempt')) {
+    if (path.endsWith('/attempts/mistakes/attempts')) {
+      return route.fulfill({
+        json: {
+          items: [
+            {
+              ...attempt,
+              testTitle: 'Writing feedback',
+              testSlug: 'writing',
+              mistakeCount: null,
+            },
+          ],
+          page: 1,
+          hasNext: false,
+        },
+      })
+    }
+    if (
+      path.endsWith('/attempts/11111111-1111-4111-8111-111111111111/mistakes')
+    ) {
+      return route.fulfill({
+        json: {
+          attempt,
+          answers: attempt.answers,
+          writingEvaluation: attempt.writingEvaluation,
+          review: [],
+          contexts: [],
+        },
+      })
+    }
+    if (path.endsWith('/full-mock-sessions/mock-session')) {
+      return route.fulfill({
+        json: {
+          id: 'mock-session',
+          mockTestId: 'mock',
+          status: 'SUBMITTED',
+          currentSection: 4,
+          startedAt: attempt.startedAt,
+          submittedAt: attempt.submittedAt,
+          overallBand: 7,
+          mockTest: {
+            id: 'mock',
+            examType: 'academic',
+            title: 'Full Mock test',
+          },
+          sections: [{ position: 3, skill: 'writing', attempt }],
+        },
+      })
+    }
+    if (path.endsWith('/attempts/11111111-1111-4111-8111-111111111111')) {
       return route.fulfill({ json: attempt })
     }
     return route.fulfill({ json: { items: [] } })
   })
-  await page.goto('./exam/writing/material')
+  const urls: Record<ReviewScreen, string> = {
+    exam: './exam/writing/material',
+    history: './attempts/11111111-1111-4111-8111-111111111111',
+    bank: './mistakes?skill=writing&page=1&attempt=11111111-1111-4111-8111-111111111111',
+    fullmock:
+      './attempts/11111111-1111-4111-8111-111111111111?session=mock-session',
+  }
+  await page.goto(urls[screen])
   await expect(
     page.getByRole('region', { name: 'Writing Task 2' }),
   ).toBeVisible()
@@ -190,4 +257,49 @@ test('writing feedback fits a narrow screen', async ({ page }) => {
       page.getByRole('button', { name: 'Рекомендация 1', exact: true }),
     ).toBeVisible()
   }
+})
+
+for (const screen of ['history', 'bank', 'fullmock'] as const) {
+  test(`${screen}: original essay, inline feedback and rewrite survive the review route`, async ({
+    page,
+  }) => {
+    await openWritingReview(page, screen)
+    const taskTwo = page.getByRole('region', { name: 'Writing Task 2' })
+    const highlight = taskTwo.getByRole('button', {
+      name: 'Рекомендация 1: Many people study abroad',
+      exact: true,
+    })
+    await expect(highlight).toBeVisible()
+    await highlight.click()
+    await expect(
+      taskTwo.getByRole('button', { name: 'Рекомендация 1', exact: true }),
+    ).toBeFocused()
+    await expect(
+      taskTwo.getByText(
+        'Many people believe that studying abroad broadens their perspective.',
+        { exact: false },
+      ),
+    ).toBeVisible()
+    await expect(
+      page.getByText('See the separate Task 1 and Task 2 feedback.'),
+    ).toHaveCount(0)
+  })
+}
+
+test('a saved evaluation without inline annotations still displays the essay honestly', async ({
+  page,
+}) => {
+  await openWritingReview(page, 'history', false)
+  await expect(
+    page.getByText('The visitors has increased.', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Many people study abroad.', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Замечаний к отдельным фрагментам в этой проверке нет.', {
+      exact: true,
+    }),
+  ).toHaveCount(2)
+  await expect(page.locator('[id^="annotation-card-"]')).toHaveCount(0)
 })

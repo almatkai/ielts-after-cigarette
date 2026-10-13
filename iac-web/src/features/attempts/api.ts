@@ -235,6 +235,7 @@ export type MistakeAttemptsPage = {
 }
 
 export type MistakeDetail = {
+  answers?: AttemptAnswer[]
   attempt: Omit<Attempt, 'materialType'> & { materialType: AttemptMaterialType }
   review: (AttemptReviewItem & { contextIndex: number })[]
   contexts: { passageBody?: string; transcript?: string }[]

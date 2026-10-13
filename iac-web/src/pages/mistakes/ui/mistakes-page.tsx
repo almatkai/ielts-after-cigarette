@@ -1,3 +1,4 @@
+import { WritingReview } from '@/features/attempts/writing-review'
 import { ArrowLeft, ArrowRight, MessageQuestion } from 'iconsax-react'
 import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getRouteApi, Link } from '@tanstack/react-router'
@@ -364,69 +365,49 @@ function AIEvaluationCard({
   detail: MistakeDetail
   skill: AttemptMaterialType
 }) {
-  const evaluation = detail.writingEvaluation ?? detail.speakingEvaluation
+  if (detail.writingEvaluation) {
+    return (
+      <WritingReview
+        attempt={{ ...detail.attempt, answers: detail.answers }}
+        evaluation={detail.writingEvaluation}
+      />
+    )
+  }
+  const evaluation = detail.speakingEvaluation
   if (!evaluation) return null
   const isSpeaking = skill === 'speaking' || Boolean(detail.speakingEvaluation)
   const isPronunciationAvailable = Boolean(
     detail.speakingEvaluation?.pronunciationAvailable &&
     detail.speakingEvaluation.criteria.pronunciation.band > 0,
   )
-  const criteria = detail.writingEvaluation
-    ? [
-        {
-          label: 'Task Response',
-          criterion: detail.writingEvaluation.criteria.taskResponse,
-          unavailable: false,
-          feedback: detail.writingEvaluation.criteria.taskResponse.feedback,
-        },
-        {
-          label: 'Coherence',
-          criterion: detail.writingEvaluation.criteria.coherence,
-          unavailable: false,
-          feedback: detail.writingEvaluation.criteria.coherence.feedback,
-        },
-        {
-          label: 'Lexical Resource',
-          criterion: detail.writingEvaluation.criteria.lexicalResource,
-          unavailable: false,
-          feedback: detail.writingEvaluation.criteria.lexicalResource.feedback,
-        },
-        {
-          label: 'Grammar',
-          criterion: detail.writingEvaluation.criteria.grammar,
-          unavailable: false,
-          feedback: detail.writingEvaluation.criteria.grammar.feedback,
-        },
-      ]
-    : [
-        {
-          label: 'Fluency & Coherence',
-          criterion: detail.speakingEvaluation?.criteria.fluency,
-          unavailable: false,
-          feedback: detail.speakingEvaluation?.criteria.fluency.feedback,
-        },
-        {
-          label: 'Lexical Resource',
-          criterion: detail.speakingEvaluation?.criteria.lexicalResource,
-          unavailable: false,
-          feedback:
-            detail.speakingEvaluation?.criteria.lexicalResource.feedback,
-        },
-        {
-          label: 'Grammar Range & Accuracy',
-          criterion: detail.speakingEvaluation?.criteria.grammar,
-          unavailable: false,
-          feedback: detail.speakingEvaluation?.criteria.grammar.feedback,
-        },
-        {
-          label: 'Pronunciation',
-          criterion: detail.speakingEvaluation?.criteria.pronunciation,
-          unavailable: !isPronunciationAvailable,
-          feedback: !isPronunciationAvailable
-            ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
-            : detail.speakingEvaluation?.criteria.pronunciation.feedback,
-        },
-      ]
+  const criteria = [
+    {
+      label: 'Fluency & Coherence',
+      criterion: detail.speakingEvaluation?.criteria.fluency,
+      unavailable: false,
+      feedback: detail.speakingEvaluation?.criteria.fluency.feedback,
+    },
+    {
+      label: 'Lexical Resource',
+      criterion: detail.speakingEvaluation?.criteria.lexicalResource,
+      unavailable: false,
+      feedback: detail.speakingEvaluation?.criteria.lexicalResource.feedback,
+    },
+    {
+      label: 'Grammar Range & Accuracy',
+      criterion: detail.speakingEvaluation?.criteria.grammar,
+      unavailable: false,
+      feedback: detail.speakingEvaluation?.criteria.grammar.feedback,
+    },
+    {
+      label: 'Pronunciation',
+      criterion: detail.speakingEvaluation?.criteria.pronunciation,
+      unavailable: !isPronunciationAvailable,
+      feedback: !isPronunciationAvailable
+        ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+        : detail.speakingEvaluation?.criteria.pronunciation.feedback,
+    },
+  ]
 
   return (
     <Card className={cardClassName}>

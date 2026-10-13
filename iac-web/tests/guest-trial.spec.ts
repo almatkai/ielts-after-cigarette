@@ -1261,10 +1261,10 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
     )
     await page.goto(`./attempts/${skill}-guest`)
     await expect(
-      page.getByRole('heading', { name: 'Секция завершена' }),
+      page.getByRole('heading', { name: 'Section complete' }),
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: 'Продолжить Full Mock' }),
+      page.getByRole('link', { name: 'Continue the Full Mock' }),
     ).toBeVisible()
     await expect(page.getByText(/PRIVATE_/)).toHaveCount(0)
     await expect(

@@ -25,13 +25,26 @@ const LANGUAGE_STORAGE_KEY = 'daiyndyq-language'
 
 let activeLanguage: Language = 'ru'
 
+// Database-saved learning content (hints, explanations) keyed by its Russian
+// source text. Kept separate so review route chunks can carry the bulk of the
+// translations without bloating the main bundle.
+const contentTranslations: TranslationMap = {}
+
+export function registerContentTranslations(map: TranslationMap) {
+  Object.assign(contentTranslations, map)
+}
+
 /**
  * Non-hook translation for strings rendered outside React components
  * (error payloads, helpers, refs). Falls back to the source string, so
  * English-only exam strings pass through unchanged.
  */
 export function tr(source: string): string {
-  return translations[source]?.[activeLanguage] ?? source
+  return (
+    contentTranslations[source]?.[activeLanguage] ??
+    translations[source]?.[activeLanguage] ??
+    source
+  )
 }
 
 const baseTranslations: TranslationMap = {
@@ -1560,6 +1573,58 @@ const baseTranslations: TranslationMap = {
   'Выбрать навык и формат задания': {
     kk: 'Дағды мен тапсырма форматын таңдау',
     en: 'Choose a skill and task format',
+  },
+  'AI-провайдеры — Daiyndyq IELTS': {
+    kk: 'AI-провайдерлер — Daiyndyq IELTS',
+    en: 'AI providers — Daiyndyq IELTS',
+  },
+  'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза': {
+    kk: 'Daiyndyq IELTS — бірінші ретте 7.0-ден жоғары IELTS тапсырыңыз',
+    en: 'Daiyndyq IELTS — score above 7.0 on your first IELTS',
+  },
+  'Waitlist — администрирование IAC': {
+    kk: 'Waitlist — IAC әкімшілігі',
+    en: 'Waitlist — IAC admin',
+  },
+  'Администрирование — IAC': {
+    kk: 'Әкімшілік — IAC',
+    en: 'Administration — IAC',
+  },
+  'Аналитика — Daiyndyq IELTS': {
+    kk: 'Аналитика — Daiyndyq IELTS',
+    en: 'Analytics — Daiyndyq IELTS',
+  },
+  'Войти в Daiyndyq IELTS — подготовка к IELTS': {
+    kk: 'Daiyndyq IELTS-ке кіру — IELTS дайындығы',
+    en: 'Sign in to Daiyndyq IELTS — IELTS preparation',
+  },
+  'Доступ запрещён — Daiyndyq IELTS': {
+    kk: 'Кіруге тыйым салынған — Daiyndyq IELTS',
+    en: 'Access denied — Daiyndyq IELTS',
+  },
+  'Панель управления — Daiyndyq IELTS': {
+    kk: 'Басқару панелі — Daiyndyq IELTS',
+    en: 'Dashboard — Daiyndyq IELTS',
+  },
+  'Политика конфиденциальности — Daiyndyq IELTS': {
+    kk: 'Құпиялылық саясаты — Daiyndyq IELTS',
+    en: 'Privacy Policy — Daiyndyq IELTS',
+  },
+  'Практика — Daiyndyq IELTS': {
+    kk: 'Практика — Daiyndyq IELTS',
+    en: 'Practice — Daiyndyq IELTS',
+  },
+  'Предпросмотр теста — IAC': {
+    kk: 'Тест алдын ала қарау — IAC',
+    en: 'Test preview — IAC',
+  },
+  'Профиль — Daiyndyq IELTS': {
+    kk: 'Профиль — Daiyndyq IELTS',
+    en: 'Profile — Daiyndyq IELTS',
+  },
+  'Условия использования — Daiyndyq IELTS': {
+    kk: 'Пайдалану шарттары — Daiyndyq IELTS',
+    en: 'Terms of Use — Daiyndyq IELTS',
   },
 }
 

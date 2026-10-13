@@ -3,12 +3,12 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/forbidden')({
   head: () => ({
     meta: [
-      { title: 'Доступ запрещён — Daiyndyq IELTS' },
+      { title: tr('Доступ запрещён — Daiyndyq IELTS') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

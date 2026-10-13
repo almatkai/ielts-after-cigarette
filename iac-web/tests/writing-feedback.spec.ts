@@ -194,10 +194,10 @@ async function openWritingReview(
   await page.goto(urls[screen])
   await expect(
     page.getByRole('region', { name: 'Writing Task 2' }),
-  ).toBeVisible()
+  ).toBeVisible({ timeout: 15_000 })
 }
 
-test('each task links to its own card and honours annotation severity', async ({
+test('each task opens inline feedback and keeps its detailed card', async ({
   page,
 }) => {
   const errors: string[] = []
@@ -223,25 +223,44 @@ test('each task links to its own card and honours annotation severity', async ({
     taskTwo.getByText('A phrase never written by the student'),
   ).toHaveCount(0)
 
+  await suggestion.scrollIntoViewIfNeeded()
+  const scrollBefore = await page.evaluate(() => window.scrollY)
   await suggestion.click()
-  await expect(secondCard).toBeFocused()
+  const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
+  await expect(popup).toBeVisible()
+  await expect(popup.getByText('An alternative formulation')).toBeVisible()
+  await expect(
+    popup.getByText('Исправление или необязательное улучшение конструкции.'),
+  ).toBeVisible()
+  expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scrollBefore, 0)
+  await expect(secondCard).toBeVisible()
+  await expect(secondCard).not.toBeFocused()
   await expect(secondCard).toHaveAttribute('aria-pressed', 'true')
   await expect(
     taskOne.getByRole('button', { name: 'Error 1', exact: true }),
   ).toHaveAttribute('aria-pressed', 'false')
   expect(await suggestion.getAttribute('aria-controls')).toBe(
-    await secondCard.getAttribute('id'),
+    await popup.getAttribute('id'),
   )
   const ids = await page
     .locator('[id^="annotation-card-"]')
     .evaluateAll((elements) => elements.map((element) => element.id))
   expect(new Set(ids).size).toBe(ids.length)
 
+  await page.keyboard.press('Escape')
+  await expect(popup).not.toBeVisible()
+  await expect(suggestion).toBeFocused()
+
   await error.focus()
   await page.keyboard.press('Enter')
+  const errorPopup = page.getByRole('dialog', { name: 'Error 1' })
+  await expect(errorPopup).toBeVisible()
   await expect(
     taskOne.getByRole('button', { name: 'Error 1', exact: true }),
-  ).toBeFocused()
+  ).toHaveAttribute('aria-pressed', 'true')
+  await errorPopup.getByRole('button', { name: 'Close' }).click()
+  await expect(errorPopup).not.toBeVisible()
+  await expect(error).toBeFocused()
   expect(errors).toEqual([])
 })
 
@@ -250,12 +269,26 @@ test('writing feedback fits a narrow screen', async ({ page }) => {
   await openWritingReview(page)
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 })
+    await page
+      .getByRole('button', {
+        name: 'Suggestion 1: Many people study abroad',
+        exact: true,
+      })
+      .click()
+    const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
+    await expect(popup).toBeVisible()
+    await expect(popup).toHaveAttribute('data-side', 'top')
+    const bounds = await popup.boundingBox()
+    expect(bounds).not.toBeNull()
+    expect(bounds!.x).toBeGreaterThanOrEqual(0)
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width)
     await expect(
       page.getByRole('button', { name: 'Suggestion 1', exact: true }),
     ).toBeVisible()
+    await page.keyboard.press('Escape')
   }
 })
 
@@ -271,9 +304,12 @@ for (const screen of ['history', 'bank', 'fullmock'] as const) {
     })
     await expect(highlight).toBeVisible()
     await highlight.click()
+    const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
+    await expect(popup).toBeVisible()
     await expect(
       taskTwo.getByRole('button', { name: 'Suggestion 1', exact: true }),
-    ).toBeFocused()
+    ).toHaveAttribute('aria-pressed', 'true')
+    await page.keyboard.press('Escape')
     await expect(
       taskTwo.getByText(
         'Many people believe that studying abroad broadens their perspective.',

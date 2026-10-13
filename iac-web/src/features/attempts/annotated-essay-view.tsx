@@ -1,4 +1,5 @@
 import { useId, useMemo, useState } from 'react'
+import { InlineWritingAnnotation } from './inline-writing-annotation'
 import type { WritingAnnotation } from './api'
 
 export function AnnotatedEssayView({
@@ -10,6 +11,7 @@ export function AnnotatedEssayView({
 }) {
   const annotationPrefix = useId()
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [openSegmentIndex, setOpenSegmentIndex] = useState<number | null>(null)
   // Previously saved evaluations may predate server-side quote validation.
   const annotations = useMemo(
     () =>
@@ -18,17 +20,6 @@ export function AnnotatedEssayView({
         .map((ann, index) => ({ ...ann, id: index + 1 })),
     [suppliedAnnotations, text],
   )
-
-  const handleSelect = (id: number) => {
-    setSelectedId(id)
-    const el = document.getElementById(
-      `annotation-card-${annotationPrefix}-${id}`,
-    )
-    if (el) {
-      el.focus({ preventScroll: true })
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
-  }
 
   const segments = useMemo(() => {
     if (!text || !annotations.length) {
@@ -119,40 +110,21 @@ export function AnnotatedEssayView({
             const isSelected = selectedId === ann.id
 
             return (
-              <button
+              <InlineWritingAnnotation
                 key={idx}
-                type="button"
-                aria-label={`${isError ? 'Error' : 'Suggestion'} ${ann.id}: ${seg.text}`}
-                aria-controls={`annotation-card-${annotationPrefix}-${ann.id}`}
-                aria-pressed={isSelected}
-                onClick={() => handleSelect(ann.id)}
-                title={
-                  ann.replacement
-                    ? `Suggested wording: ${ann.replacement}`
-                    : undefined
-                }
-                className={`inline text-left font-serif text-base sm:text-lg cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
-                  isError
-                    ? `underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-950 hover:bg-red-100/90 ${
-                        isSelected
-                          ? 'bg-red-100 ring-2 ring-red-400'
-                          : 'bg-red-50/80'
-                      }`
-                    : `underline decoration-wavy decoration-amber-500 decoration-2 underline-offset-4 text-amber-950 hover:bg-amber-100/90 ${
-                        isSelected
-                          ? 'bg-amber-100 ring-2 ring-amber-400'
-                          : 'bg-amber-50/80'
-                      }`
-                }`}
-              >
-                <span>{seg.text}</span>
-                <sup
-                  className="ml-1 inline-flex items-center justify-center font-sans font-bold text-[10px] size-4 rounded-full text-white align-top select-none shadow-xs"
-                  style={{ backgroundColor: isError ? '#ef4444' : '#f59e0b' }}
-                >
-                  {ann.id}
-                </sup>
-              </button>
+                annotation={ann}
+                text={seg.text}
+                selected={isSelected}
+                open={openSegmentIndex === idx}
+                label={isError ? 'Error' : 'Suggestion'}
+                closeLabel="Close"
+                onOpenChange={(open) => {
+                  if (open) setSelectedId(ann.id)
+                  setOpenSegmentIndex((current) =>
+                    open ? idx : current === idx ? null : current,
+                  )
+                }}
+              />
             )
           })}
         </div>

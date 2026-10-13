@@ -81,6 +81,33 @@ export type WritingAssessmentJob = {
 
 export type WritingCriterion = { band: number; feedback: string }
 
+export type WritingAnnotation = {
+  id: number
+  quote: string
+  replacement: string
+  type: 'grammar' | 'vocabulary' | 'cohesion' | 'task_response'
+  severity: 'error' | 'suggestion'
+  explanationRu: string
+  alternatives?: string[]
+}
+
+export type WritingTaskFeedback = {
+  taskId: string
+  position: number
+  band: number
+  criteria: {
+    taskResponse: WritingCriterion
+    coherence: WritingCriterion
+    lexicalResource: WritingCriterion
+    grammar: WritingCriterion
+  }
+  feedback: string
+  strengths: string[]
+  improvements: string[]
+  annotations?: WritingAnnotation[]
+  modelParagraph?: string
+}
+
 export type WritingEvaluation = {
   model: string
   overallBand: number
@@ -91,20 +118,7 @@ export type WritingEvaluation = {
     grammar: WritingCriterion
   }
   summary: string
-  tasks: {
-    taskId: string
-    position: number
-    band: number
-    criteria: {
-      taskResponse: WritingCriterion
-      coherence: WritingCriterion
-      lexicalResource: WritingCriterion
-      grammar: WritingCriterion
-    }
-    feedback: string
-    strengths: string[]
-    improvements: string[]
-  }[]
+  tasks: WritingTaskFeedback[]
   evaluatedAt: string
 }
 

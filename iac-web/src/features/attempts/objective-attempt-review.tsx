@@ -12,6 +12,7 @@ import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 import type { AttemptDetail, AttemptReviewItem } from './api'
 import type { ReviewMaterial } from './review-material'
+import '@/lib/i18n-content'
 
 export function ObjectiveAttemptReview({
   attempt,

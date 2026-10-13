@@ -7,6 +7,7 @@ import {
   getGuestConfig,
 } from '@/features/auth/guest'
 import { GuestAccessGate } from '@/components/auth/guest-shell'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/_app')({
   ssr: false,
@@ -29,7 +30,7 @@ export const Route = createFileRoute('/_app')({
   },
   head: () => ({
     meta: [
-      { title: 'Панель управления — Daiyndyq IELTS' },
+      { title: tr('Панель управления — Daiyndyq IELTS') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

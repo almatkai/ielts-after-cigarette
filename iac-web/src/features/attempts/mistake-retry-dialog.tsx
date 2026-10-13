@@ -30,12 +30,13 @@ import { getAttemptMaterial } from '@/features/attempts/api'
 import type { AttemptReviewItem, StudentAnswer } from '@/features/attempts/api'
 import { getListeningMediaBlob } from '@/features/listening/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 import { reviewOptions } from './mistake-list'
 import { withReviewMaterial } from './review-material'
 import { evaluateRetryAnswer } from './retry-answer'
 import { getReviewAudioRange } from './review-audio-range'
 import { useMistakeReviewStatus } from './use-mistake-review-status'
+import '@/lib/i18n-content'
 
 function formatSeconds(sec?: number): string {
   if (typeof sec !== 'number' || isNaN(sec)) return '--:--'
@@ -460,7 +461,7 @@ function MistakeRetryContent({
           >
             {/* Left Column Subheader */}
             <div className="px-5 py-2.5 border-b border-[#ededeb] bg-[#f5f5f4] flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {isListening ? (
                   <VolumeHigh className="size-4 text-[#2563eb]" />
                 ) : (
@@ -471,7 +472,7 @@ function MistakeRetryContent({
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {isListening &&
                 !revealed &&
                 !isCorrect &&
@@ -683,7 +684,7 @@ function MistakeRetryContent({
 
             {/* Previous Student Answer Notice */}
             <div className="flex items-center justify-between rounded-[10px] border border-rose-100 bg-rose-50/70 px-3.5 py-2 text-xs text-rose-900">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <CloseCircle className="size-4 shrink-0 text-rose-600" />
                 <span>
                   {t('Ваш ответ')}:{' '}
@@ -905,7 +906,7 @@ function MistakeRetryContent({
                       {t('На что обратить внимание')}:
                     </p>
                     <p className="text-[13.5px] leading-relaxed text-slate-800 font-medium">
-                      {item.hint}
+                      {tr(item.hint)}
                     </p>
                   </div>
                 ) : null}
@@ -994,7 +995,7 @@ function MistakeRetryContent({
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-900/70">
                     {t('Правильный ответ')}:
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-base sm:text-lg font-bold text-emerald-950">
                       {formatAnswer(item.correctAnswer, options)}
                     </span>
@@ -1040,7 +1041,7 @@ function MistakeRetryContent({
                       <span>{t('Подробное объяснение')}:</span>
                     </div>
                     <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-slate-800 font-normal">
-                      {item.explanation}
+                      {tr(item.explanation)}
                     </p>
                   </div>
                 ) : null}
@@ -1253,7 +1254,7 @@ function ListeningTranscriptRender({
               <span>{t('Фрагмент с подсказкой (~3–5 реплик)')}</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {typeof hintAudioStart === 'number' && (
                 <Button
                   type="button"

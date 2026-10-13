@@ -389,7 +389,7 @@ export function AttemptSubmitBar({
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
       <p className="text-sm text-[#69696d]">
-        `${answeredCount} of ${totalQuestions} questions answered.`
+        {`${answeredCount} of ${totalQuestions} questions answered.`}
         {disabledMessage ? ` ${disabledMessage}` : ''}
       </p>
       <div className="flex items-center gap-2.5">
@@ -512,7 +512,9 @@ export function ReviewQuestion({
         </p>
       ) : null}
       {item.explanation ? (
-        <p className="whitespace-pre-wrap text-[#69696d]">{item.explanation}</p>
+        <p className="whitespace-pre-wrap text-[#69696d]">
+          {tr(item.explanation)}
+        </p>
       ) : null}
     </div>
   )
@@ -977,7 +979,7 @@ export function EnhancedReviewQuestion({
             <span>Explanation and quote:</span>
           </div>
           <div className="whitespace-pre-wrap text-slate-700">
-            {item.explanation}
+            {tr(item.explanation)}
           </div>
         </div>
       ) : null}

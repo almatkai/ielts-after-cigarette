@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { PrivacyPage } from '@/pages/legal/privacy-page'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/privacy')({
   ssr: false,
   head: () => ({
     meta: [
-      { title: 'Политика конфиденциальности — Daiyndyq IELTS' },
+      { title: tr('Политика конфиденциальности — Daiyndyq IELTS') },
       {
         name: 'description',
         content:

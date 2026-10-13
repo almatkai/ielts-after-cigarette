@@ -8,7 +8,7 @@ import {
 import { useEffect } from 'react'
 import { PresenceBeacon } from '@/features/analytics/presence-beacon'
 import { reportError } from '@/lib/error-reporting'
-import { LanguageProvider, useLanguage } from '@/lib/i18n'
+import { LanguageProvider, useLanguage, tr } from '@/lib/i18n'
 import { NotFoundPage } from '@/pages/not-found/ui/not-found-page'
 
 import appCss from '../styles.css?url'
@@ -32,7 +32,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза',
+        title: tr('Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза'),
       },
       {
         name: 'theme-color',

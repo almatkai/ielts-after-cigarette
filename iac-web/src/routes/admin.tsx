@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 import { AdminShell } from '@/components/admin/admin-shell'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/admin')({
   ssr: false,
@@ -15,7 +16,7 @@ export const Route = createFileRoute('/admin')({
   },
   head: () => ({
     meta: [
-      { title: 'Администрирование — IAC' },
+      { title: tr('Администрирование — IAC') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

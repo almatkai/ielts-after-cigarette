@@ -8,7 +8,7 @@ import {
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 import { useAuth } from '@/features/auth/auth-store'
-import { useLanguage } from '@/lib/i18n'
+import { useLanguage, tr } from '@/lib/i18n'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -19,6 +19,7 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
+import '@/lib/i18n-content'
 
 export function ReadingReviewSplitRunner({
   attempt,
@@ -592,7 +593,7 @@ function ReviewQuestionCard({
                     {t('Пояснение')}:
                   </span>
                   <p className="whitespace-pre-wrap mt-0.5 text-slate-700">
-                    {item.explanation}
+                    {tr(item.explanation)}
                   </p>
                 </div>
               ) : null}

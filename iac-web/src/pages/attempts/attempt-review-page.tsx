@@ -1,3 +1,4 @@
+import { WritingReview } from '@/features/attempts/writing-review'
 import { ArrowLeft } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
@@ -136,6 +137,11 @@ export function AttemptReviewPage({
         <ProcessingAttempt attempt={attempt} />
       ) : attempt.status !== 'SUBMITTED' ? (
         <InProgressAttempt attempt={attempt} />
+      ) : attempt.writingEvaluation ? (
+        <WritingReview
+          attempt={attempt}
+          evaluation={attempt.writingEvaluation}
+        />
       ) : aiEvaluation ? (
         <>
           <AIEvaluationReview attempt={attempt} evaluation={aiEvaluation} />
@@ -278,26 +284,6 @@ function evaluationFor(
   attempt: AttemptDetail,
   t: (source: string) => string,
 ): AIEvaluation | null {
-  if (attempt.writingEvaluation) {
-    const evaluation = attempt.writingEvaluation
-    return {
-      skill: 'Writing',
-      overallBand: evaluation.overallBand,
-      summary: evaluation.summary,
-      criteria: [
-        ['Task Response', evaluation.criteria.taskResponse],
-        ['Coherence & Cohesion', evaluation.criteria.coherence],
-        ['Lexical Resource', evaluation.criteria.lexicalResource],
-        ['Grammar Range & Accuracy', evaluation.criteria.grammar],
-      ],
-      parts: evaluation.tasks.map((task, index) => ({
-        title: `Task ${index + 1}`,
-        feedback: task.feedback,
-        strengths: task.strengths,
-        improvements: task.improvements,
-      })),
-    }
-  }
   if (attempt.speakingEvaluation) {
     const evaluation = attempt.speakingEvaluation
     const isPronunciationAvailable = Boolean(

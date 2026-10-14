@@ -46,7 +46,7 @@ function TestPreviewPage<T>({
   const query = useQuery({
     queryKey: ['admin', 'preview', skill, id, version, auth.user?.id],
     queryFn: ({ signal }) => fetchPreview(id, version, signal),
-    enabled: auth.user?.role === 'ADMIN',
+    enabled: auth.hasAnyPermission(['CONTENT_EDITOR']),
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
@@ -58,7 +58,7 @@ function TestPreviewPage<T>({
         <div className="mx-auto flex max-w-[1780px] flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold">
-              Предпросмотр {skill} · Только для администратора
+              Предпросмотр {skill} · Без сохранения попытки
             </h1>
             <p className="mt-1 text-xs text-slate-600">
               {version === 'draft'

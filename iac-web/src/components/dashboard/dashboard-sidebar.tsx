@@ -141,7 +141,7 @@ export function DashboardSidebar({
         )}
 
         <div className="shrink-0 space-y-1 border-t border-[#eeeeeb] pt-4">
-          {auth.hasAnyRole(['EDITOR', 'ADMIN']) ? (
+          {auth.canAccessAdmin() ? (
             <Link
               to="/admin"
               onClick={onNavigate}

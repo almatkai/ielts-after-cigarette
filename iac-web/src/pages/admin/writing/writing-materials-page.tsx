@@ -23,7 +23,9 @@ import {
 import type { WritingMaterial } from '@/features/writing/api'
 
 export function WritingMaterialsPage() {
-  const [exportMaterial, setExportMaterial] = useState<WritingMaterial | null>(null)
+  const [exportMaterial, setExportMaterial] = useState<WritingMaterial | null>(
+    null,
+  )
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
 
   const materialsQuery = useQuery({

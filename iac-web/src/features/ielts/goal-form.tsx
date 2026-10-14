@@ -167,7 +167,9 @@ export function GoalDialog({ children }: GoalDialogProps) {
   // Текущая цель из профиля + правки пользователя: поля сразу заполнены
   // сохранёнными значениями, без промежуточного пустого состояния.
   const form: GoalFormValues = {
-    ...(profileQuery.data ? profileToGoalForm(profileQuery.data) : emptyGoalForm),
+    ...(profileQuery.data
+      ? profileToGoalForm(profileQuery.data)
+      : emptyGoalForm),
     ...draft,
   }
 

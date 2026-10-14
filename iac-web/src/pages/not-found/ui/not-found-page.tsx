@@ -1,7 +1,4 @@
-import {
-  ArrowLeft,
-  Category,
-} from 'iconsax-react'
+import { ArrowLeft, Category } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
 import { Brand } from '@/components/landing/brand'

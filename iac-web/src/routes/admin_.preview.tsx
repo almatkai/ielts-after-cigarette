@@ -8,7 +8,7 @@ export const Route = createFileRoute('/admin_/preview')({
     if (!context.auth.isAuthenticated()) {
       throw redirect({ to: '/login', search: { redirect: '/admin' } })
     }
-    if (!context.auth.hasAnyRole(['ADMIN'])) {
+    if (!context.auth.hasAnyPermission(['CONTENT_EDITOR'])) {
       throw redirect({ to: '/forbidden' })
     }
   },

@@ -23,7 +23,9 @@ import {
 import type { SpeakingMaterial } from '@/features/speaking/api'
 
 export function SpeakingMaterialsPage() {
-  const [exportMaterial, setExportMaterial] = useState<SpeakingMaterial | null>(null)
+  const [exportMaterial, setExportMaterial] = useState<SpeakingMaterial | null>(
+    null,
+  )
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
 
   const materialsQuery = useQuery({
@@ -135,30 +137,30 @@ export function SpeakingMaterialsPage() {
                   /{material.slug} · версия {material.currentVersionNumber}
                 </p>
               </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={exportLoadingId === material.id}
-                    onClick={() => void handleExport(material.id)}
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={exportLoadingId === material.id}
+                  onClick={() => void handleExport(material.id)}
+                >
+                  <ExportCurve aria-hidden />
+                  {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
+                </Button>
+                <Button asChild variant="outline">
+                  <Link
+                    to="/admin/speaking/materials/$materialId"
+                    params={{ materialId: material.id }}
                   >
-                    <ExportCurve aria-hidden />
-                    {exportLoadingId === material.id ? 'Загрузка…' : 'Экспорт'}
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link
-                      to="/admin/speaking/materials/$materialId"
-                      params={{ materialId: material.id }}
-                    >
-                      <Edit aria-hidden />
-                      Редактировать
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    <Edit aria-hidden />
+                    Редактировать
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {exportMaterial ? (
         <DataExportDialog

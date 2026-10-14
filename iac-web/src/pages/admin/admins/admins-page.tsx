@@ -1,9 +1,4 @@
-import {
-  ShieldTick,
-  Trash,
-  UserAdd,
-  Warning2,
-} from 'iconsax-react'
+import { ShieldTick, Trash, UserAdd, Warning2 } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 

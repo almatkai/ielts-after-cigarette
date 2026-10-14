@@ -108,7 +108,12 @@ const listening = {
 }
 
 // All API requests are intercepted. Tests never use a real account or database.
-async function mockApi(page: Page, role = 'ADMIN', saveError = false) {
+async function mockApi(
+  page: Page,
+  role = 'ADMIN',
+  saveError = false,
+  permissions: string[] = [],
+) {
   const requests: { method: string; path: string }[] = []
   let readingData = structuredClone(reading)
   let listeningData = structuredClone(listening)
@@ -126,6 +131,7 @@ async function mockApi(page: Page, role = 'ADMIN', saveError = false) {
         user: {
           id: 'admin-id',
           role,
+          permissions,
           email: 'preview@example.test',
           displayName: 'Preview admin',
           timezone: 'UTC',
@@ -219,6 +225,11 @@ async function mockApi(page: Page, role = 'ADMIN', saveError = false) {
         }
       return json(isReading ? readingData : listeningData)
     }
+    if (url.pathname.endsWith('/publish'))
+      return json({
+        ...(isReading ? readingData : listeningData),
+        status: 'PUBLISHED',
+      })
     if (url.pathname.endsWith('/materials/reading-id')) return json(readingData)
     if (url.pathname.endsWith('/tests/listening-id')) return json(listeningData)
     if (url.pathname.endsWith('/reading/materials'))
@@ -353,7 +364,7 @@ for (const skill of ['reading', 'listening']) {
     await expect(page).toHaveURL(new RegExp(`/admin/preview/${skill}/`))
     await expect(
       page.getByRole('heading', {
-        name: `Предпросмотр ${skill === 'reading' ? 'Reading' : 'Listening'} · Только для администратора`,
+        name: `Предпросмотр ${skill === 'reading' ? 'Reading' : 'Listening'} · Без сохранения попытки`,
       }),
     ).toBeVisible()
     await expect(
@@ -380,7 +391,7 @@ test('failed save does not open a stale Reading preview', async ({ page }) => {
 })
 
 for (const skill of ['reading', 'listening']) {
-  test(`${skill} library offers preview only to administrators`, async ({
+  test(`${skill} library offers preview to administrators`, async ({
     page,
   }) => {
     await mockApi(page)
@@ -391,11 +402,11 @@ for (const skill of ['reading', 'listening']) {
     await expect(preview).toBeVisible()
     await preview.click()
     await expect(
-      page.getByRole('heading', { name: /Только для администратора/ }),
+      page.getByRole('heading', { name: /Без сохранения попытки/ }),
     ).toBeVisible()
     await page.reload()
     await expect(
-      page.getByRole('heading', { name: /Только для администратора/ }),
+      page.getByRole('heading', { name: /Без сохранения попытки/ }),
     ).toBeVisible()
   })
 
@@ -431,18 +442,44 @@ for (const skill of ['reading', 'listening']) {
   })
 }
 
-test('EDITOR library does not offer the admin-only preview action', async ({
+test('EDITOR without content capability cannot open the library', async ({
   page,
 }) => {
-  await mockApi(page, 'EDITOR')
+  const requests = await mockApi(page, 'EDITOR')
   await page.goto('admin/reading/materials')
-  await expect(
-    page.getByRole('heading', { name: 'Draft reading test' }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('link', { name: 'Предпросмотр теста' }),
-  ).toHaveCount(0)
+  await expect(page).toHaveURL(/forbidden/)
+  expect(
+    requests.some((request) => request.path.includes('/admin/reading')),
+  ).toBe(false)
 })
+
+for (const skill of ['reading', 'listening']) {
+  test(`content editor can publish and preview ${skill}`, async ({ page }) => {
+    const requests = await mockApi(page, 'EDITOR', false, ['CONTENT_EDITOR'])
+    await page.goto(
+      skill === 'reading'
+        ? 'admin/reading/materials/reading-id'
+        : 'admin/listening/tests/listening-id',
+    )
+    await page.getByRole('button', { name: /^Опубликовать/ }).click()
+    await expect
+      .poll(() =>
+        requests.some(
+          (request) =>
+            request.method === 'POST' && request.path.endsWith('/publish'),
+        ),
+      )
+      .toBe(true)
+    await page.getByRole('button', { name: 'Предпросмотр теста' }).click()
+    await expect(page).toHaveURL(
+      new RegExp(`admin/preview/${skill}/${skill}-id`),
+    )
+    await expect(
+      page.getByRole('heading', { name: /Без сохранения попытки/ }),
+    ).toBeVisible()
+    expectNoAttempts(requests)
+  })
+}
 
 test('clean Reading draft opens without creating another saved revision', async ({
   page,
@@ -915,7 +952,10 @@ for (const preview of [true, false]) {
       ),
     ).toBe(true)
     if (preview) expectNoAttempts(requests)
-    else await expect.poll(() => JSON.stringify(writes)).toContain('tower')
+    else
+      await expect
+        .poll(() => JSON.stringify(writes), { timeout: 20_000 })
+        .toContain('tower')
   })
 }
 
@@ -1143,19 +1183,22 @@ for (const skill of ['reading', 'listening']) {
       skill === 'reading' ? 'Введите ваш ответ здесь…' : 'Ваш ответ',
     )
     await input.fill('student answer')
-    await expect.poll(() => writes.length).toBeGreaterThan(0)
+    // Autosave intentionally waits for 15 seconds of inactivity.
+    await expect
+      .poll(() => writes.length, { timeout: 20_000 })
+      .toBeGreaterThan(0)
     await expect
       .poll(() =>
         page.evaluate(
           () =>
             Object.keys(localStorage).filter((k) =>
-              k.includes('deadline_normal-attempt'),
+              k.endsWith('deadline_normal-attempt'),
             ).length,
         ),
       )
       .toBe(1)
     await expect(
-      page.getByRole('heading', { name: /Только для администратора/ }),
+      page.getByRole('heading', { name: /Без сохранения попытки/ }),
     ).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: 'Показать ответ с объяснением' }),

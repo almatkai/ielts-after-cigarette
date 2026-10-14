@@ -69,7 +69,8 @@ export function DataExportDialog({
             </Badge>
           </div>
           <DialogDescription className="text-xs text-slate-500">
-            Данные в формате, полностью готовом для повторного импорта или сохранения резервной копии.
+            Данные в формате, полностью готовом для повторного импорта или
+            сохранения резервной копии.
           </DialogDescription>
         </DialogHeader>
 

@@ -1,9 +1,4 @@
-import {
-  ArrowDown2,
-  ArrowLeft2,
-  ArrowRight2,
-  Calendar,
-} from 'iconsax-react'
+import { ArrowDown2, ArrowLeft2, ArrowRight2, Calendar } from 'iconsax-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import {
@@ -150,7 +145,11 @@ export function ExamDatePicker({
   }
 
   const selectPreset = (monthsToAdd: number) => {
-    const target = new Date(today.getFullYear(), today.getMonth() + monthsToAdd, today.getDate())
+    const target = new Date(
+      today.getFullYear(),
+      today.getMonth() + monthsToAdd,
+      today.getDate(),
+    )
     const iso = formatIsoDate(target)
     onChange(iso)
     setViewYear(target.getFullYear())
@@ -372,10 +371,10 @@ export function ExamDatePicker({
                 cell.isSelected
                   ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30 scale-105 hover:bg-blue-700'
                   : cell.isToday
-                  ? 'text-blue-600 font-bold ring-1.5 ring-blue-500/40 hover:bg-blue-50'
-                  : !cell.disabled && cell.isCurrentMonth
-                  ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
-                  : '',
+                    ? 'text-blue-600 font-bold ring-1.5 ring-blue-500/40 hover:bg-blue-50'
+                    : !cell.disabled && cell.isCurrentMonth
+                      ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
+                      : '',
               )}
             >
               {cell.day}
@@ -391,8 +390,8 @@ export function ExamDatePicker({
               {daysRemaining === 0
                 ? 'Экзамен сегодня!'
                 : daysRemaining > 0
-                ? `Осталось ${daysRemaining} ${getDaysWord(daysRemaining)}`
-                : 'Дата в прошлом'}
+                  ? `Осталось ${daysRemaining} ${getDaysWord(daysRemaining)}`
+                  : 'Дата в прошлом'}
             </span>
           ) : (
             <span className="text-slate-400 text-[11px]">

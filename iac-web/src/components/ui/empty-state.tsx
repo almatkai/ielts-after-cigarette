@@ -4,7 +4,10 @@ import { cn } from '@/lib/utils'
 export type EmptyStateProps = {
   title?: string
   description?: string
-  icon?: ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>
+  icon?: ComponentType<{
+    className?: string
+    'aria-hidden'?: boolean | 'true' | 'false'
+  }>
   imageSrc?: string | null
   action?: ReactNode
   className?: string

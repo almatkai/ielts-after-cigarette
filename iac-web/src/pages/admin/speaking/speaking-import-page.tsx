@@ -1,8 +1,4 @@
-import {
-  ArrowLeft,
-  DocumentUpload,
-  TickCircle,
-} from 'iconsax-react'
+import { ArrowLeft, DocumentUpload, TickCircle } from 'iconsax-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -38,7 +34,10 @@ const speakingImportTemplate = JSON.stringify(
             cueCard: [],
             questions: [
               { position: 1, prompt: 'Do you enjoy traveling?' },
-              { position: 2, prompt: 'What kind of places do you prefer to visit?' },
+              {
+                position: 2,
+                prompt: 'What kind of places do you prefer to visit?',
+              },
               { position: 3, prompt: 'Who do you usually travel with?' },
             ],
           },
@@ -89,7 +88,8 @@ export function SpeakingImportPage() {
     mutationFn: () => parseSpeakingImport(source),
   })
   const importMutation = useMutation({
-    mutationFn: () => confirmSpeakingImport(parseMutation.data?.materials ?? []),
+    mutationFn: () =>
+      confirmSpeakingImport(parseMutation.data?.materials ?? []),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: speakingKeys.adminMaterials,
@@ -113,9 +113,8 @@ export function SpeakingImportPage() {
           Импорт Speaking
         </h1>
         <p className="mt-2 text-sm leading-6 text-[#69696d]">
-          Вставьте объект формата <code>IELTS_SPEAKING_IMPORT_V1</code>.
-          Импорт сначала проверяется, а материалы создаются только после
-          подтверждения.
+          Вставьте объект формата <code>IELTS_SPEAKING_IMPORT_V1</code>. Импорт
+          сначала проверяется, а материалы создаются только после подтверждения.
         </p>
       </div>
       <Card className="shadow-none">

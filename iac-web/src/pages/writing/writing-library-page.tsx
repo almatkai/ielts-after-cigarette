@@ -2,6 +2,7 @@ import { Edit2 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -78,17 +79,21 @@ export function WritingLibraryPage() {
                   </div>
                 </div>
                 <div className="flex justify-end border-t border-[#ededeb] pt-3">
-                  <Button
-                    asChild
-                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
-                  >
-                    <Link
-                      to="/exam/writing/$materialId"
-                      params={{ materialId: material.id }}
+                  {user ? (
+                    <Button
+                      asChild
+                      className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
                     >
-                      Начать Writing
-                    </Link>
-                  </Button>
+                      <Link
+                        to="/exam/writing/$materialId"
+                        params={{ materialId: material.id }}
+                      >
+                        Начать Writing
+                      </Link>
+                    </Button>
+                  ) : (
+                    <LoginToContinue />
+                  )}
                 </div>
               </CardContent>
             </Card>

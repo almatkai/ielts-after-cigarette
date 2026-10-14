@@ -105,12 +105,15 @@ export function DashboardHeader({
           variant="ghost"
           className="h-9 sm:h-11 gap-1.5 sm:gap-2 rounded-[10px] px-2 text-[#111111] sm:px-3"
         >
-          <Link to="/profile" aria-label="Открыть профиль">
+          <Link
+            to={user ? '/profile' : '/login'}
+            aria-label={user ? 'Открыть профиль' : 'Войти в аккаунт'}
+          >
             <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
               <User className="size-[17px]" strokeWidth={1.8} aria-hidden />
             </span>
             <span className="hidden text-sm font-semibold sm:inline">
-              {accountName}
+              {user ? accountName : 'Войти в аккаунт'}
             </span>
           </Link>
         </Button>

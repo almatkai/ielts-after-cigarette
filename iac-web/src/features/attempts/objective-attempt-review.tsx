@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { AttemptResultHeader, ErrorState, LoadingState } from './attempt-ui'
 import { MistakeRetryDialog } from './mistake-retry-dialog'
 import { MistakeRow } from './mistake-list'
@@ -68,12 +69,21 @@ export function ObjectiveAttemptReview({
         <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
           <CardContent className="grid gap-3 p-4 sm:p-5">
             {mistakes.map((item) => (
-              <MistakeRow
+              <div
                 key={item.questionId}
-                item={item}
-                attemptId={attempt.id}
-                onRetry={() => setSelected(item)}
-              />
+                data-testid={
+                  attempt.guestPreview
+                    ? `guest-mistake-${item.number}`
+                    : undefined
+                }
+              >
+                <MistakeRow
+                  item={item}
+                  attemptId={attempt.id}
+                  guestPreview={Boolean(attempt.guestPreview)}
+                  onRetry={() => setSelected(item)}
+                />
+              </div>
             ))}
           </CardContent>
         </Card>
@@ -109,6 +119,10 @@ export function ObjectiveAttemptResult({
   isRetaking?: boolean
 }) {
   const query = useAttemptDetail(attemptId)
+  if (fullMockSessionId || query.data?.reviewLocked) {
+    const sessionId = fullMockSessionId ?? query.data?.fullMockSessionId
+    return sessionId ? <FullMockSectionComplete sessionId={sessionId} /> : null
+  }
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader

@@ -61,3 +61,25 @@ test('identity change cancels a pending request from the previous student', asyn
   assert.equal(client.getQueryData(['private']), undefined)
   client.clear()
 })
+
+test('switching from a guest to an account clears guest result caches', () => {
+  const client = new QueryClient()
+  let snapshot = { user: null, guest: { id: 'guest-actor' } }
+  let notify
+  clearCacheOnUserChange(client, {
+    getSnapshot: () => snapshot,
+    subscribe: (listener) => {
+      notify = listener
+      return () => {}
+    },
+  })
+  client.setQueryData(['attempts', 'guest-writing'], {
+    essay: 'private guest work',
+  })
+  notify()
+  assert.ok(client.getQueryData(['attempts', 'guest-writing']))
+  snapshot = { user: { id: 'registered-student' }, guest: null }
+  notify()
+  assert.equal(client.getQueryData(['attempts', 'guest-writing']), undefined)
+  client.clear()
+})

@@ -2,6 +2,7 @@ import { Clock, PlayCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 
+import { GuestTrialCard } from '@/components/auth/guest-trial-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -23,6 +24,17 @@ const labels: Record<FullMockSkill, string> = {
 }
 
 export function FullMockLibraryPage() {
+  const { user } = useAuth()
+  return user ? (
+    <AccountFullMockLibraryPage />
+  ) : (
+    <div className="mx-auto max-w-[960px]">
+      <GuestTrialCard />
+    </div>
+  )
+}
+
+function AccountFullMockLibraryPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -108,7 +120,7 @@ export function FullMockLibraryPage() {
           </ol>
           <p className="mt-5 flex items-center gap-2 text-sm text-[#69696d]">
             <Clock className="size-4" aria-hidden /> {overview.durationMinutes}{' '}
-            минут · общий таймер
+            минут · отдельные таймеры секций
           </p>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
             После сдачи секции вы переходите к следующей. Ответы сохраняются, а
@@ -231,7 +243,7 @@ export function FullMockLibraryPage() {
               onClick={() => {
                 if (
                   window.confirm(
-                    `Начать Full Mock? После запуска начнётся общий таймер: ${overview.durationMinutes} минут.`,
+                    `Начать Full Mock? У каждой секции свой таймер. Общая продолжительность: ${overview.durationMinutes} минут.`,
                   )
                 )
                   start.mutate(false)

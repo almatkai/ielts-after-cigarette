@@ -1,20 +1,22 @@
-import { Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
+import { ArrowLeft, Clock, Lock, PlayCircle, TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import {
   advanceFullMockSession,
-  finishFullMockSession,
   fullMockKeys,
   getFullMockSession,
+  pauseFullMockSession,
 } from '@/features/fullmock/api'
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { FullMockReport } from './full-mock-report'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -24,12 +26,16 @@ const labels: Record<FullMockSkill, string> = {
 }
 
 export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
+  // Rebind the mounted query observer when sign-in clears the guest's cache.
+  const { initialized } = useAuth()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
+    enabled: initialized,
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
-    refetchInterval: (query) => {
-      const session = query.state.data
+    refetchInterval: (cachedQuery) => {
+      const session = cachedQuery.state.data
       return session?.status === 'IN_PROGRESS' ||
         session?.sections.some(
           (section) => section.attempt.status === 'PROCESSING',
@@ -38,9 +44,10 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
         : false
     },
   })
-  // Keep cross-tab/AI updates, but request expiration at the actual deadline
-  // rather than waiting for the next 10-second polling tick.
-  const deadline = query.data?.deadlineAt
+  const currentSection = query.data?.currentSection
+  const deadline = query.data?.sections.find(
+    (section) => section.position === currentSection,
+  )?.deadlineAt
   const sessionStatus = query.data?.status
   const refetchSession = query.refetch
   useEffect(() => {
@@ -56,10 +63,25 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     onSuccess: (session) =>
       queryClient.setQueryData(fullMockKeys.session(sessionId), session),
   })
-  const finish = useMutation({
-    mutationFn: () => finishFullMockSession(sessionId),
-    onSuccess: (session) =>
-      queryClient.setQueryData(fullMockKeys.session(sessionId), session),
+  const returnToSite = useMutation({
+    mutationFn: async () => {
+      const session = query.data
+      const current = session?.sections.find(
+        (section) => section.position === session.currentSection,
+      )
+      if (
+        session?.status === 'IN_PROGRESS' &&
+        current?.attempt.status === 'IN_PROGRESS' &&
+        current.deadlineAt
+      ) {
+        const paused = await pauseFullMockSession(sessionId)
+        queryClient.setQueryData(fullMockKeys.session(sessionId), paused)
+        queryClient.removeQueries({
+          queryKey: [...fullMockKeys.session(sessionId), 'sections'],
+        })
+      }
+    },
+    onSuccess: () => navigate({ to: '/' }),
   })
   if (query.isPending) {
     return (
@@ -83,29 +105,38 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     (section) => section.position === session.currentSection,
   )
   return (
-    <div className="mx-auto grid w-full min-w-0 max-w-[980px] gap-5">
+    <div className="mx-auto grid w-full min-w-0 max-w-[1120px] content-start gap-5 px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Badge variant="secondary">
-            Full Mock · {session.mockTest.examType}
+            Full Mock ·{' '}
+            {session.mockTest.examType === 'academic'
+              ? 'Academic'
+              : 'General Training'}
           </Badge>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
             {session.mockTest.title}
           </h1>
         </div>
-        {session.status === 'IN_PROGRESS' ? (
-          <ExamTimer deadlineAt={session.deadlineAt} />
-        ) : null}
+        <Button
+          variant="outline"
+          disabled={returnToSite.isPending || advance.isPending}
+          onClick={() => returnToSite.mutate()}
+        >
+          <ArrowLeft aria-hidden />
+          {returnToSite.isPending ? 'Сохраняем…' : 'Вернуться на сайт'}
+        </Button>
       </div>
+      {returnToSite.isError ? (
+        <p role="alert" className="text-sm text-[#e23b3b]">
+          Не удалось приостановить тест: {getErrorMessage(returnToSite.error)}
+        </p>
+      ) : null}
       {session.status === 'SUBMITTED' ? (
-        <FullMockReport session={session} />
+        <FullMockReport key={session.id} session={session} />
       ) : (
         <>
-          <p className="text-sm leading-6 text-[#69696d]">
-            Секции идут строго по порядку. Вернуться к прошлой секции через эту
-            сессию нельзя.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {session.sections.map((section) => (
               <SectionCard
                 key={section.position}
@@ -115,14 +146,17 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               />
             ))}
           </div>
-          {current?.attempt.status === 'SUBMITTED' ? (
+          {current &&
+          ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
+            current.attempt.status,
+          ) ? (
             <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} сдан. Можно перейти дальше.
+                  {labels[current.skill]} завершён. Можно перейти дальше.
                 </p>
                 <Button
-                  disabled={advance.isPending}
+                  disabled={advance.isPending || returnToSite.isPending}
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
@@ -134,37 +168,9 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               </CardContent>
             </Card>
           ) : null}
-          <Card className="border-[#f1e2c7] bg-[#fffaf0] shadow-none">
-            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-              <p className="text-sm text-[#69696d]">
-                Можно завершить Full Mock сейчас. Пустые секции останутся без
-                band и не попадут в общий результат.
-              </p>
-              <Button
-                variant="outline"
-                disabled={finish.isPending}
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      'Завершить Full Mock с незаполненными секциями?',
-                    )
-                  ) {
-                    finish.mutate()
-                  }
-                }}
-              >
-                {finish.isPending ? 'Завершаем…' : 'Завершить досрочно'}
-              </Button>
-            </CardContent>
-          </Card>
           {advance.isError ? (
             <p className="text-sm text-[#e23b3b]">
               {getErrorMessage(advance.error)}
-            </p>
-          ) : null}
-          {finish.isError ? (
-            <p className="text-sm text-[#e23b3b]">
-              {getErrorMessage(finish.error)}
             </p>
           ) : null}
         </>
@@ -182,22 +188,34 @@ function SectionCard({
   currentSection: number
   sessionId: string
 }) {
+  const client = useQueryClient()
+  const pause = useMutation({
+    mutationFn: () => pauseFullMockSession(sessionId),
+    onSuccess: (session) =>
+      client.setQueryData(fullMockKeys.session(sessionId), session),
+  })
   const isCurrent = section.position === currentSection
-  const completed = section.attempt.status === 'SUBMITTED'
+  const completed = ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
+    section.attempt.status,
+  )
   const locked = section.position > currentSection
   return (
     <Card
       className={isCurrent ? 'border-[#93c5fd] shadow-none' : 'shadow-none'}
     >
       <CardHeader>
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle>
+        <div className="flex flex-col items-start gap-2">
+          <CardTitle className="text-base">
             0{section.position} · {labels[section.skill]}
           </CardTitle>
           {completed ? (
             <Badge className="bg-emerald-600">
               <TickCircle aria-hidden />
-              Сдано
+              {section.attempt.status === 'ABANDONED'
+                ? 'Время вышло'
+                : section.attempt.status === 'PROCESSING'
+                  ? 'Проверяется'
+                  : 'Сдано'}
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
@@ -210,15 +228,41 @@ function SectionCard({
         </div>
       </CardHeader>
       <CardContent>
+        <p className="mb-4 text-sm text-[#69696d]">
+          {section.durationMinutes ??
+            (section.skill === 'listening'
+              ? 30
+              : section.skill === 'speaking'
+                ? 15
+                : 60)}{' '}
+          минут
+        </p>
         {isCurrent && !completed ? (
-          <SectionLink section={section} sessionId={sessionId} />
-        ) : (
-          <p className="text-sm text-[#69696d]">
-            {completed
-              ? 'Результат сохранён в сессии.'
-              : 'Станет доступна после предыдущей секции.'}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionLink section={section} sessionId={sessionId} />
+            {section.remainingMilliseconds != null ? (
+              <Badge variant="outline">
+                На паузе · {formatRemainingTime(section.remainingMilliseconds)}
+              </Badge>
+            ) : section.deadlineAt ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={pause.isPending}
+                  onClick={() => pause.mutate()}
+                >
+                  На паузу
+                </Button>
+                <ExamTimer deadlineAt={section.deadlineAt} />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+        {pause.isError ? (
+          <p role="alert" className="mt-3 text-sm text-red-600">
+            {getErrorMessage(pause.error)}
           </p>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   )
@@ -234,7 +278,7 @@ function SectionLink({
   const content = (
     <>
       <PlayCircle aria-hidden />
-      Открыть секцию
+      Продолжить
     </>
   )
   return (
@@ -242,6 +286,7 @@ function SectionLink({
       <Link
         to="/exam/full-mock-sessions/$sessionId/sections/$sectionPosition"
         params={{ sessionId, sectionPosition: String(section.position) }}
+        preload={false}
       >
         {content}
       </Link>
@@ -249,38 +294,9 @@ function SectionLink({
   )
 }
 
-function FullMockReport({ session }: { session: FullMockSession }) {
-  return (
-    <>
-      <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
-        <CardContent className="flex flex-wrap items-center gap-5 p-6">
-          <span className="grid size-14 place-items-center rounded-full bg-[#3b82f6] text-2xl font-semibold text-white">
-            {session.overallBand?.toFixed(1) ?? '—'}
-          </span>
-          <div>
-            <p className="font-semibold">Итоговый IELTS band</p>
-          </div>
-        </CardContent>
-      </Card>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {session.sections.map((section) => (
-          <Link
-            key={section.position}
-            to="/attempts/$attemptId"
-            params={{ attemptId: section.attempt.id }}
-            search={{ session: session.id }}
-            aria-label={`${labels[section.skill]}: работа над ошибками`}
-            className="flex min-h-28 items-center justify-between rounded-[16px] border border-[#e7e7e4] bg-white p-5 transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
-          >
-            <p className="font-semibold">{labels[section.skill]}</p>
-            <span className="text-2xl font-semibold text-[#3b82f6]">
-              {section.attempt.band?.toFixed(1) ?? '—'}
-            </span>
-          </Link>
-        ))}
-      </div>
-    </>
-  )
+function formatRemainingTime(milliseconds: number) {
+  const seconds = Math.max(0, Math.ceil(milliseconds / 1000))
+  return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
 }
 
 function ExamTimer({ deadlineAt }: { deadlineAt: string }) {

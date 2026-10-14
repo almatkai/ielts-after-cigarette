@@ -7,6 +7,8 @@ import {
 } from '@/features/auth/google-auth'
 import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-auth'
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
+import { claimGuestResults, getGuestSession } from '@/features/auth/guest'
+import type { GuestSession } from '@/features/auth/guest'
 
 export type UserRole = 'STUDENT' | 'WRITER' | 'EDITOR' | 'ADMIN'
 export type AdminPermission = 'BLOG_MODERATOR' | 'CONTENT_EDITOR'
@@ -36,6 +38,7 @@ export type AuthResponse = {
 
 type AuthSnapshot = {
   user: UserDto | null
+  guest: GuestSession | null
   accessToken: string | null
   initialized: boolean
   loading: boolean
@@ -44,6 +47,7 @@ type AuthSnapshot = {
 
 const initialSnapshot: AuthSnapshot = {
   user: null,
+  guest: null,
   accessToken: null,
   initialized: false,
   loading: false,
@@ -54,6 +58,10 @@ export class AuthStore {
   private snapshot = initialSnapshot
   private listeners = new Set<() => void>()
   private restorePromise: Promise<boolean> | null = null
+  private completedRegistration: {
+    token: string
+    response: AuthResponse
+  } | null = null
 
   constructor() {
     apiClient.configureAuth({
@@ -74,6 +82,14 @@ export class AuthStore {
 
   isAuthenticated = () =>
     Boolean(this.snapshot.accessToken && this.snapshot.user)
+
+  hasGuestSession = () => Boolean(this.snapshot.guest)
+
+  restoreGuest = async () => {
+    const guest = await getGuestSession()
+    this.patch({ guest })
+    return guest
+  }
 
   hasAnyRole = (roles: readonly UserRole[]) => {
     const role = this.snapshot.user?.role
@@ -109,7 +125,7 @@ export class AuthStore {
         this.patch({ loading: false })
         return response
       }
-      this.accept(response)
+      await this.accept(response)
       return response
     } catch (error) {
       this.patch({ loading: false, error: getErrorMessage(error) })
@@ -122,8 +138,14 @@ export class AuthStore {
   ) => {
     this.patch({ loading: true, error: null })
     try {
-      const response = await requestCompleteGoogleRegistration(input)
-      this.accept(response)
+      // Registration is one-shot. If claiming fails afterwards, retry only
+      // claiming rather than attempting to consume the registration token again.
+      const response =
+        this.completedRegistration?.token === input.registrationToken
+          ? this.completedRegistration.response
+          : await requestCompleteGoogleRegistration(input)
+      this.completedRegistration = { token: input.registrationToken, response }
+      await this.accept(response)
       return response.user
     } catch (error) {
       this.patch({ loading: false, error: getErrorMessage(error) })
@@ -150,6 +172,13 @@ export class AuthStore {
   private restore = async () => {
     this.patch({ loading: true, error: null })
     const token = await this.refreshForRequest()
+    if (!token) {
+      try {
+        await this.restoreGuest()
+      } catch {
+        // A visitor can browse the login/trial entry without a guest cookie.
+      }
+    }
     this.patch({ initialized: true, loading: false })
     return Boolean(token)
   }
@@ -164,7 +193,7 @@ export class AuthStore {
           retryAuthentication: false,
         },
       )
-      this.accept(response)
+      await this.accept(response)
       return response.accessToken
     } catch (error) {
       if (!(error instanceof ApiError) || error.status !== 401) {
@@ -175,9 +204,26 @@ export class AuthStore {
     }
   }
 
-  private accept(response: AuthResponse) {
+  private async accept(response: AuthResponse) {
+    // Finish ownership transfer before publishing the new identity and clearing
+    // its query cache. Otherwise the report would refetch under the account too
+    // early and turn into a 404. Explicit credentials avoid refresh recursion.
+    const guest =
+      this.snapshot.guest ??
+      (await getGuestSession().catch((error: unknown) => {
+        if (
+          error instanceof ApiError &&
+          [401, 403, 404].includes(error.status)
+        ) {
+          return null
+        }
+        throw error
+      }))
+    if (guest?.sessionId) await claimGuestResults(response.accessToken)
+    this.completedRegistration = null
     this.set({
       user: response.user,
+      guest: null,
       accessToken: response.accessToken,
       initialized: true,
       loading: false,
@@ -186,6 +232,7 @@ export class AuthStore {
   }
 
   private clear = (overrides: Partial<AuthSnapshot> = {}) => {
+    this.completedRegistration = null
     this.set({
       ...initialSnapshot,
       initialized: true,

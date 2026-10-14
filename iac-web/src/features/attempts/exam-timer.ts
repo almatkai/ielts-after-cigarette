@@ -10,6 +10,7 @@ export function useExamTimer({
   ready,
   enabled = true,
   finished = false,
+  deadlineAt,
 }: {
   attempt?: Pick<Attempt, 'id' | 'startedAt'>
   storagePrefix: string
@@ -17,13 +18,15 @@ export function useExamTimer({
   ready: boolean
   enabled?: boolean
   finished?: boolean
+  deadlineAt?: string | null
 }) {
-  const storageKey = attempt ? `${storagePrefix}${attempt.id}` : null
-  const remainingKey = attempt
-    ? `${storagePrefix}${attempt.id}_remaining`
-    : null
+  const storageKey =
+    attempt && !deadlineAt ? `${storagePrefix}${attempt.id}` : null
+  const remainingKey =
+    attempt && !deadlineAt ? `${storagePrefix}${attempt.id}_remaining` : null
 
   const [deadline, setDeadline] = useState<number | null>(() => {
+    if (enabled && deadlineAt) return new Date(deadlineAt).getTime()
     if (!enabled || !attempt || !storageKey || typeof window === 'undefined')
       return null
     const savedRemaining = remainingKey
@@ -50,12 +53,24 @@ export function useExamTimer({
       setDeadline(null)
       return
     }
+    if (deadlineAt) {
+      setDeadline(new Date(deadlineAt).getTime())
+      return
+    }
     if (ready && deadline === null && !finished) {
       const next = Date.now() + durationSeconds * 1000
       setDeadline(next)
       if (storageKey) localStorage.setItem(storageKey, String(next))
     }
-  }, [enabled, ready, deadline, finished, durationSeconds, storageKey])
+  }, [
+    enabled,
+    ready,
+    deadline,
+    finished,
+    durationSeconds,
+    storageKey,
+    deadlineAt,
+  ])
 
   useEffect(() => {
     if (finished) {

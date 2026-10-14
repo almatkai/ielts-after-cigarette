@@ -1,3 +1,4 @@
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
@@ -69,11 +70,13 @@ export function WritingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
 }: {
   attempt: Attempt
   material: PublicWritingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
@@ -117,6 +120,7 @@ export function WritingAttemptRunner({
     durationSeconds,
     ready: isReady,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   useEffect(() => {
@@ -466,6 +470,10 @@ export function WritingAttemptResult({
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt
+  if (fullMockSessionId || effectiveAttempt.reviewLocked) {
+    const sessionId = fullMockSessionId ?? effectiveAttempt.fullMockSessionId
+    return sessionId ? <FullMockSectionComplete sessionId={sessionId} /> : null
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">

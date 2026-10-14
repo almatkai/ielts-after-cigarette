@@ -145,6 +145,7 @@ type ReadingRunnerProps = {
   attempt: Attempt
   material: PublicReadingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }
 
@@ -178,6 +179,7 @@ function ReadingTestRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
   session,
   preview = false,
@@ -267,6 +269,7 @@ function ReadingTestRunner({
     ready: isReady,
     enabled: timerEnabled,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   useEffect(() => {

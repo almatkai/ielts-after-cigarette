@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
@@ -25,9 +25,23 @@ import { GoogleCompleteForm } from './google-complete-form'
 import type { PendingGoogleRegistration } from './google-complete-form'
 import type { LoginReturnPath } from '@/features/auth/google-identity'
 
-export function LoginForm() {
+type LoginFormProps = {
+  search?: {
+    redirect?: LoginReturnPath
+    google?: 'success' | 'registration' | 'error'
+  }
+  onSuccess?: () => Promise<void>
+  onContinueAsGuest?: () => void
+  description?: string
+}
+
+export function LoginForm({
+  search = {},
+  onSuccess,
+  onContinueAsGuest,
+  description,
+}: LoginFormProps) {
   const navigate = useNavigate()
-  const search = useSearch({ from: '/login' })
   const { loginWithGoogle } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [restoringGoogle, setRestoringGoogle] = useState(
@@ -79,12 +93,13 @@ export function LoginForm() {
           })
           return
         }
-        await navigate({ to: search.redirect ?? '/' })
+        if (onSuccess) await onSuccess()
+        else await navigate({ to: search.redirect ?? '/' })
       } catch (error) {
         setSubmissionError(getErrorMessage(error))
       }
     },
-    [loginWithGoogle, navigate, search.redirect],
+    [loginWithGoogle, navigate, search.redirect, onSuccess],
   )
 
   if (pendingGoogle) {
@@ -96,6 +111,7 @@ export function LoginForm() {
           setSubmissionError(null)
         }}
         redirect={googleRedirect}
+        onSuccess={onSuccess}
       />
     )
   }
@@ -106,6 +122,8 @@ export function LoginForm() {
       submissionError={submissionError}
       restoringGoogle={restoringGoogle}
       redirect={googleRedirect}
+      onContinueAsGuest={onContinueAsGuest}
+      description={description}
     />
   )
 }
@@ -115,7 +133,11 @@ function GoogleSignInCard({
   submissionError,
   restoringGoogle,
   redirect,
+  onContinueAsGuest,
+  description = 'Для входа и регистрации используйте Google.',
 }: {
+  description?: string
+  onContinueAsGuest?: () => void
   onCredential: (credential: string) => Promise<void>
   submissionError: string | null
   restoringGoogle: boolean
@@ -163,11 +185,26 @@ function GoogleSignInCard({
           Войти или создать аккаунт
         </CardTitle>
         <CardDescription className="mt-2 text-sm text-[#475569]">
-          Для входа и регистрации используйте Google.
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pt-6 pb-8 sm:px-8">
         <div ref={googleButtonRef} className="flex min-h-11 justify-center" />
+        <p className="mt-4 text-center text-sm">
+          {onContinueAsGuest ? (
+            <button
+              type="button"
+              onClick={onContinueAsGuest}
+              className="font-medium text-[#2563eb] underline"
+            >
+              Продолжить без регистрации
+            </button>
+          ) : (
+            <Link to="/try" className="font-medium text-[#2563eb] underline">
+              Попробовать один Full Mock без регистрации
+            </Link>
+          )}
+        </p>
         {restoringGoogle ? (
           <p className="text-center text-sm text-[#475569]" role="status">
             Завершаем вход через Google…

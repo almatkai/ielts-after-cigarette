@@ -88,6 +88,7 @@ type ListeningRunnerProps = {
   attempt: Attempt
   test: PublicListeningTest
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }
 
@@ -121,6 +122,7 @@ function ListeningTestRunner({
   attempt,
   test,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
   session,
   preview = false,
@@ -217,6 +219,7 @@ function ListeningTestRunner({
     ready: isReady,
     enabled: timerEnabled,
     finished: Boolean(session.submitted),
+    deadlineAt: sectionDeadlineAt,
   })
 
   const handleContinueLater = useContinueLater(session, { fullMockSessionId })

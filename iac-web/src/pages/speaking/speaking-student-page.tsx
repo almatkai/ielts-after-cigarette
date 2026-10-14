@@ -8,6 +8,7 @@ import {
 } from 'iconsax-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -45,6 +46,7 @@ import type {
   SpeakingPart,
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useExamTimer } from '@/features/attempts/exam-timer'
 
 type PartPhase = 'ready' | 'preparing' | 'recording' | 'uploading' | 'finished'
 
@@ -88,11 +90,13 @@ export function SpeakingAttemptRunner({
   attempt,
   material,
   fullMockSessionId,
+  sectionDeadlineAt,
   onSubmitted,
 }: {
   attempt: Attempt
   material: PublicSpeakingMaterial
   fullMockSessionId?: string
+  sectionDeadlineAt?: string | null
   onSubmitted?: (attempt: Attempt) => void
 }) {
   const session = useAttemptSession(attempt.id)
@@ -135,6 +139,16 @@ export function SpeakingAttemptRunner({
 
   const isReady =
     session.answers !== null && !detailQuery.isPending && !session.loadError
+
+  const { secondsLeft } = useExamTimer({
+    attempt,
+    storagePrefix: 'iac_speaking_deadline_',
+    durationSeconds: 15 * 60,
+    ready: isReady,
+    enabled: Boolean(sectionDeadlineAt),
+    deadlineAt: sectionDeadlineAt,
+    finished: Boolean(session.submitted),
+  })
 
   if (session.submitted) {
     return (
@@ -188,6 +202,13 @@ export function SpeakingAttemptRunner({
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {sectionDeadlineAt ? (
+              <TimeBadge
+                seconds={secondsLeft}
+                danger={secondsLeft <= 60}
+                label="Время секции Speaking"
+              />
+            ) : null}
             <SaveIndicator state={session.saveState} />
             <Button
               type="button"
@@ -572,6 +593,10 @@ export function SpeakingAttemptResult({
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
   const effectiveAttempt = detailQuery.data ?? attempt
+  if (fullMockSessionId || effectiveAttempt.reviewLocked) {
+    const sessionId = fullMockSessionId ?? effectiveAttempt.fullMockSessionId
+    return sessionId ? <FullMockSectionComplete sessionId={sessionId} /> : null
+  }
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader

@@ -15,6 +15,7 @@ const config = defineConfig(({ mode }) => {
       tailwindcss(),
       tanstackStart(),
       nitro({
+        baseURL: '/app/',
         compressPublicAssets: true,
         routeRules: {
           '/app/assets/**': {

@@ -14,6 +14,8 @@ export type AttemptStatus =
 export type StudentAnswer = Record<string, unknown>
 
 export type Attempt = {
+  reviewLocked?: boolean
+  fullMockSessionId?: string
   id: string
   materialType: string
   materialId: string
@@ -41,7 +43,6 @@ export type AttemptReviewItem = {
   isCorrect: boolean
   pointsAwarded: number
   correctAnswer: StudentAnswer | null
-  locked?: boolean
   explanation: string
   quote?: string
   hint?: string
@@ -51,6 +52,18 @@ export type AttemptReviewItem = {
   timestampEnd?: number
   audioAssetId?: string
   transcript?: string
+  locked?: boolean
+}
+
+export type GuestReviewPreview = {
+  totalMistakes: number
+  availableMistakes: number
+  improvements?: {
+    number: number
+    label: string
+    text?: string
+    locked: boolean
+  }[]
 }
 
 // IN_PROGRESS — только сохранённые ответы, SUBMITTED — полный разбор.
@@ -62,6 +75,7 @@ export type AttemptDetail = Attempt & {
   recordings?: SpeakingRecording[]
   speakingAssessment?: SpeakingAssessmentJob
   writingAssessment?: WritingAssessmentJob
+  guestPreview?: GuestReviewPreview
 }
 
 // Lightweight snapshot; no answers, recordings or evaluation payloads.

@@ -25,6 +25,9 @@ import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-review'
+import { useAuth } from '@/features/auth/auth-store'
+import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
+import { GuestAttemptReview } from './guest-attempt-review'
 
 export { formatDateTime } from '@/lib/date'
 
@@ -35,13 +38,18 @@ export function AttemptReviewPage({
   attemptId: string
   embedded?: boolean
 }) {
+  const { user } = useAuth()
   const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
   const isObjectiveAttempt =
     attempt?.materialType === 'listening' || attempt?.materialType === 'reading'
   const materialQuery = useQuery<PublicListeningTest | PublicReadingMaterial>({
     queryKey: ['attempts', attemptId, 'material'],
-    enabled: isObjectiveAttempt,
+    enabled:
+      isObjectiveAttempt &&
+      Boolean(user) &&
+      !attempt.guestPreview &&
+      !attempt.reviewLocked,
     retry: false,
     queryFn: ({ signal }) => {
       if (!attempt || !isObjectiveAttempt) {
@@ -65,8 +73,16 @@ export function AttemptReviewPage({
     )
   }
 
+  if (attempt.reviewLocked && attempt.fullMockSessionId) {
+    return <FullMockSectionComplete sessionId={attempt.fullMockSessionId} />
+  }
+
   const material = materialQuery.data ?? null
   const aiEvaluation = evaluationFor(attempt)
+
+  if (attempt.status === 'SUBMITTED' && (attempt.guestPreview || !user)) {
+    return <GuestAttemptReview attempt={attempt} embedded={embedded} />
+  }
 
   if (attempt.status === 'SUBMITTED' && isObjectiveAttempt) {
     return (
@@ -150,6 +166,7 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
 }
 
 function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
+  const { guest } = useAuth()
   if (attempt.status === 'ABANDONED') {
     return (
       <Card>
@@ -170,6 +187,18 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
               </p>
             </div>
           ))}
+        </CardContent>
+      </Card>
+    )
+  }
+  if (guest) {
+    return (
+      <Card>
+        <CardContent className="grid gap-3 p-6">
+          <p>Разбор появится после сдачи секции.</p>
+          <Button asChild>
+            <Link to="/try">Вернуться к пробному тесту</Link>
+          </Button>
         </CardContent>
       </Card>
     )

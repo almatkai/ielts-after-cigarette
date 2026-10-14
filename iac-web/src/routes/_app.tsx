@@ -1,11 +1,7 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
-import {
-  canGuestVisit,
-  canBrowseWithoutAccount,
-  getGuestConfig,
-} from '@/features/auth/guest'
+import { canGuestVisit, canBrowseWithoutAccount } from '@/features/auth/guest'
 import { GuestAccessGate } from '@/components/auth/guest-shell'
 
 export const Route = createFileRoute('/_app')({
@@ -13,11 +9,8 @@ export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context, location }) => {
     await context.auth.initialize()
     if (!context.auth.isAuthenticated()) {
-      const config = await context.queryClient.ensureQueryData({
-        queryKey: ['guest-config'],
-        queryFn: () => getGuestConfig(),
-      })
-      if (!config.enabled) throw redirect({ to: '/login' })
+      // The trial flag controls starting a mock, not visiting the app.
+      // Keep the overview reachable from login even when trials are unavailable.
       return {
         guestAccessDenied: !(
           canBrowseWithoutAccount(location.pathname) ||

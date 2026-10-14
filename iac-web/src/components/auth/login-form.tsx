@@ -200,7 +200,7 @@ function GoogleSignInCard({
               Продолжить без регистрации
             </button>
           ) : (
-            <Link to="/try" className="font-medium text-[#2563eb] underline">
+            <Link to="/" className="font-medium text-[#2563eb] underline">
               Попробовать один Full Mock без регистрации
             </Link>
           )}

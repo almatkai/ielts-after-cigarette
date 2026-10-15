@@ -50,7 +50,13 @@ export function hydrateMistake(detail: MistakeDetail, index: number) {
   return { ...item, ...detail.contexts[item.contextIndex] }
 }
 
-export function mistakeCountLabel(count: number) {
+export function mistakeCountLabel(
+  count: number,
+  language: 'ru' | 'kk' | 'en' = 'ru',
+) {
+  if (language === 'en')
+    return `${count} ${count === 1 ? 'mistake' : 'mistakes'}`
+  if (language === 'kk') return `${count} қате`
   const lastTwo = count % 100
   const last = count % 10
   const word =

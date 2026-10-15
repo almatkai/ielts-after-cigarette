@@ -1300,6 +1300,16 @@ const mistakeDialogTranslations: TranslationMap = {
   'Скрыть объяснение': { kk: 'Түсіндірмені жасыру', en: 'Hide explanation' },
   'Разобрать ошибку': { kk: 'Қатені талдау', en: 'Review mistake' },
   Разобрано: { kk: 'Талданды', en: 'Reviewed' },
+  'Работа над ошибками': {
+    kk: 'Қателермен жұмыс',
+    en: 'Reviewing mistakes',
+  },
+  'Нет ошибок': { kk: 'Қате жоқ', en: 'No mistakes' },
+  'Не удалось загрузить разбор': {
+    kk: 'Талдауды жүктеу мүмкін болмады',
+    en: 'Could not load the review',
+  },
+  'Загрузка…': { kk: 'Жүктелуде…', en: 'Loading…' },
   'Показать разбор и цитату': {
     kk: 'Талдау мен дәйексөзді көрсету',
     en: 'Show analysis and quote',

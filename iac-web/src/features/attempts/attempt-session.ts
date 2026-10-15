@@ -77,17 +77,16 @@ export function useAttemptSession(attemptId: string) {
     // Only unsynchronized changes may shadow server answers: entries the
     // server already returns are treated as synced, so a draft saved from
     // another device is never overwritten by a stale local snapshot.
-    const dirty = extractDirtyDraft(
-      serverAnswers,
-      readAttemptDraft(attemptId),
-    )
+    const dirty = extractDirtyDraft(serverAnswers, readAttemptDraft(attemptId))
     for (const [questionId, answer] of Object.entries(dirty)) {
       pending.current.set(questionId, answer)
     }
     writeAttemptDraft(attemptId, dirty)
 
     const initial =
-      Object.keys(dirty).length > 0 ? { ...serverAnswers, ...dirty } : serverAnswers
+      Object.keys(dirty).length > 0
+        ? { ...serverAnswers, ...dirty }
+        : serverAnswers
 
     answersRef.current = initial
     setAnswers(initial)

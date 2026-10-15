@@ -3,12 +3,13 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { publishedPostsQueryOptions } from '@/features/blog/api'
 import {
-  BLOG_DESCRIPTION,
   BLOG_SITE_NAME,
-  BLOG_TITLE,
+  blogDescription,
+  blogTitle,
   jsonLd,
   siteUrl,
 } from '@/features/blog/seo'
+import { translate } from '@/lib/i18n'
 import { BlogIndexPage } from '@/pages/blog/blog-index-page'
 
 export const Route = createFileRoute('/blog/')({
@@ -28,12 +29,13 @@ export const Route = createFileRoute('/blog/')({
     const canonical = siteUrl(page > 1 ? `/blog?page=${page}` : '/blog')
     const title =
       page > 1
-        ? `${BLOG_TITLE} — страница ${page}`
-        : `${BLOG_TITLE}: стратегии и опыт подготовки к IELTS`
+        ? `${blogTitle()} — ${translate('страница')} ${page}`
+        : translate('Блог Daiyndyq IELTS: стратегии и опыт подготовки к IELTS')
+    const description = blogDescription()
     return {
       meta: [
         { title },
-        { name: 'description', content: BLOG_DESCRIPTION },
+        { name: 'description', content: description },
         {
           name: 'robots',
           content: isPublicBlogEnabled()
@@ -44,18 +46,18 @@ export const Route = createFileRoute('/blog/')({
         { property: 'og:site_name', content: BLOG_SITE_NAME },
         { property: 'og:locale', content: 'ru_RU' },
         { property: 'og:title', content: title },
-        { property: 'og:description', content: BLOG_DESCRIPTION },
+        { property: 'og:description', content: description },
         { property: 'og:url', content: canonical },
         { name: 'twitter:card', content: 'summary' },
         { name: 'twitter:title', content: title },
-        { name: 'twitter:description', content: BLOG_DESCRIPTION },
+        { name: 'twitter:description', content: description },
       ],
       links: [
         { rel: 'canonical', href: canonical },
         {
           rel: 'alternate',
           type: 'application/rss+xml',
-          title: BLOG_TITLE,
+          title: blogTitle(),
           href: siteUrl('/blog/rss.xml'),
         },
       ],
@@ -65,8 +67,8 @@ export const Route = createFileRoute('/blog/')({
           children: jsonLd({
             '@context': 'https://schema.org',
             '@type': 'Blog',
-            name: BLOG_TITLE,
-            description: BLOG_DESCRIPTION,
+            name: blogTitle(),
+            description,
             url: siteUrl('/blog'),
             inLanguage: 'ru',
             publisher: { '@type': 'Organization', name: BLOG_SITE_NAME },

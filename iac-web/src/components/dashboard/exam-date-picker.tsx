@@ -7,23 +7,35 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
+import type { Language } from '@/lib/i18n'
 
-const MONTH_NAMES = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-] as const
+function localeFor(language: Language): string {
+  return language === 'kk' ? 'kk-KZ' : language === 'en' ? 'en-US' : 'ru-RU'
+}
 
-const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
+function capitalize(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value
+}
+
+function monthName(year: number, month: number, language: Language): string {
+  return capitalize(
+    new Intl.DateTimeFormat(localeFor(language), { month: 'long' }).format(
+      new Date(year, month, 1),
+    ),
+  )
+}
+
+function weekdayNames(language: Language): string[] {
+  // 2024-01-01 is a Monday; take 7 consecutive days.
+  return Array.from({ length: 7 }, (_, i) =>
+    capitalize(
+      new Intl.DateTimeFormat(localeFor(language), {
+        weekday: 'short',
+      }).format(new Date(2024, 0, 1 + i)),
+    ),
+  )
+}
 
 function formatIsoDate(d: Date): string {
   const y = d.getFullYear()
@@ -38,24 +50,40 @@ function parseIsoDate(iso: string): Date | null {
   return new Date(y, m - 1, d)
 }
 
-function formatRussianDate(iso: string): string {
+function formatExamDate(iso: string, language: Language): string {
   const date = parseIsoDate(iso)
   if (!date) return ''
-  return new Intl.DateTimeFormat('ru-RU', {
+  return new Intl.DateTimeFormat(localeFor(language), {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   }).format(date)
 }
 
-function getDaysWord(days: number): string {
+function getDaysWord(days: number, language: Language): string {
   const abs = Math.abs(days)
+  if (language === 'en') return abs === 1 ? 'day' : 'days'
+  if (language === 'kk') return 'күн'
   const mod10 = abs % 10
   const mod100 = abs % 100
   if (mod100 >= 11 && mod100 <= 19) return 'дней'
   if (mod10 === 1) return 'день'
   if (mod10 >= 2 && mod10 <= 4) return 'дня'
   return 'дней'
+}
+
+function formatDaysRemaining(days: number, language: Language): string {
+  if (days === 0)
+    return language === 'kk' ? 'Бүгін' : language === 'en' ? 'Today' : 'Сегодня'
+  if (language === 'kk') return `${days} ${getDaysWord(days, language)} қалды`
+  if (language === 'en') return `in ${days} ${getDaysWord(days, language)}`
+  return `через ${days} ${getDaysWord(days, language)}`
+}
+
+function formatDaysLeft(days: number, language: Language): string {
+  if (language === 'kk') return `Қалды: ${days} ${getDaysWord(days, language)}`
+  if (language === 'en') return `${days} ${getDaysWord(days, language)} left`
+  return `Осталось ${days} ${getDaysWord(days, language)}`
 }
 
 function getDaysRemaining(iso: string): number | null {
@@ -89,6 +117,7 @@ export function ExamDatePicker({
   contentClassName,
 }: ExamDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { language, t } = useLanguage()
 
   // Determine initial view month and year
   const initialDate = useMemo(() => {
@@ -230,10 +259,26 @@ export function ExamDatePicker({
   const daysRemaining = value ? getDaysRemaining(value) : null
 
   const presets = [
-    { label: '+1 мес.', months: 1 },
-    { label: '+2 мес.', months: 2 },
-    { label: '+3 мес.', months: 3 },
-    { label: '+6 мес.', months: 6 },
+    {
+      label:
+        language === 'kk' ? '+1 ай' : language === 'en' ? '+1 mo.' : '+1 мес.',
+      months: 1,
+    },
+    {
+      label:
+        language === 'kk' ? '+2 ай' : language === 'en' ? '+2 mo.' : '+2 мес.',
+      months: 2,
+    },
+    {
+      label:
+        language === 'kk' ? '+3 ай' : language === 'en' ? '+3 mo.' : '+3 мес.',
+      months: 3,
+    },
+    {
+      label:
+        language === 'kk' ? '+6 ай' : language === 'en' ? '+6 mo.' : '+6 мес.',
+      months: 6,
+    },
   ]
 
   return (
@@ -263,16 +308,16 @@ export function ExamDatePicker({
                 value ? 'font-medium text-[#111111]' : 'text-[#808084]',
               )}
             >
-              {value ? formatRussianDate(value) : 'Выберите дату экзамена'}
+              {value
+                ? formatExamDate(value, language)
+                : t('Выберите дату экзамена')}
             </span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             {daysRemaining !== null && daysRemaining >= 0 ? (
               <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-[#2563eb] border border-blue-100">
-                {daysRemaining === 0
-                  ? 'Сегодня'
-                  : `через ${daysRemaining} ${getDaysWord(daysRemaining)}`}
+                {formatDaysRemaining(daysRemaining, language)}
               </span>
             ) : null}
             <ArrowDown2
@@ -296,7 +341,7 @@ export function ExamDatePicker({
         {/* Header: Month & Year + Controls */}
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <span className="text-sm font-bold text-slate-900 tracking-tight">
-            {MONTH_NAMES[viewMonth]} {viewYear}
+            {monthName(viewYear, viewMonth, language)} {viewYear}
           </span>
 
           <div className="flex items-center gap-1">
@@ -310,7 +355,7 @@ export function ExamDatePicker({
                   ? 'text-slate-300 cursor-not-allowed opacity-50'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer',
               )}
-              aria-label="Предыдущий месяц"
+              aria-label={t('Предыдущий месяц')}
             >
               <ArrowLeft2 className="size-3.5" />
             </button>
@@ -318,7 +363,7 @@ export function ExamDatePicker({
               type="button"
               onClick={handleNextMonth}
               className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
-              aria-label="Следующий месяц"
+              aria-label={t('Следующий месяц')}
             >
               <ArrowRight2 className="size-3.5" />
             </button>
@@ -328,7 +373,7 @@ export function ExamDatePicker({
         {/* Quick Presets for IELTS preparation */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2 no-scrollbar">
           <span className="text-[11px] text-slate-400 font-medium shrink-0">
-            Быстро:
+            {t('Быстро:')}
           </span>
           {presets.map((preset) => (
             <button
@@ -344,7 +389,7 @@ export function ExamDatePicker({
 
         {/* Weekday Names */}
         <div className="grid grid-cols-7 gap-1 text-center py-1 border-t border-slate-100">
-          {WEEKDAYS.map((d) => (
+          {weekdayNames(language).map((d) => (
             <span
               key={d}
               className="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
@@ -388,14 +433,14 @@ export function ExamDatePicker({
             <span className="text-slate-600 text-[11px] font-medium flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
               {daysRemaining === 0
-                ? 'Экзамен сегодня!'
+                ? t('Экзамен сегодня!')
                 : daysRemaining > 0
-                  ? `Осталось ${daysRemaining} ${getDaysWord(daysRemaining)}`
-                  : 'Дата в прошлом'}
+                  ? formatDaysLeft(daysRemaining, language)
+                  : t('Дата в прошлом')}
             </span>
           ) : (
             <span className="text-slate-400 text-[11px]">
-              Выберите дату экзамена
+              {t('Выберите дату экзамена')}
             </span>
           )}
 
@@ -405,7 +450,7 @@ export function ExamDatePicker({
               onClick={handleClear}
               className="text-[11px] font-medium text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
             >
-              Очистить
+              {t('Очистить')}
             </button>
           ) : null}
         </div>

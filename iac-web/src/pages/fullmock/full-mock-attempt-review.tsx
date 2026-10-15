@@ -5,6 +5,7 @@ import { ArrowLeft } from 'iconsax-react'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { fullMockKeys, getFullMockSession } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import { AttemptReviewPage } from '@/pages/attempts/attempt-review-page'
 
 const skills = ['listening', 'reading', 'writing', 'speaking'] as const
@@ -22,15 +23,16 @@ export function FullMockAttemptReview({
   attemptId: string
   sessionId: string
 }) {
+  const { t } = useLanguage()
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
   })
-  if (query.isPending) return <LoadingState label="Загрузка…" />
+  if (query.isPending) return <LoadingState label={t('Загрузка…')} />
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
+        title={t('Не удалось загрузить Full Mock')}
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -39,7 +41,7 @@ export function FullMockAttemptReview({
   if (!session.sections.some((section) => section.attempt.id === attemptId)) {
     return (
       <p className="text-sm text-[#69696d]">
-        Попытка не относится к этому Full Mock.
+        {t('Попытка не относится к этому Full Mock.')}
       </p>
     )
   }
@@ -50,13 +52,14 @@ export function FullMockAttemptReview({
         params={{ sessionId }}
         className="inline-flex w-fit items-center gap-2 text-sm text-[#69696d] hover:text-[#111111]"
       >
-        <ArrowLeft className="size-4" aria-hidden />К результату
+        <ArrowLeft className="size-4" aria-hidden />
+        {t('К результату')}
       </Link>
       <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
-        Работа над ошибками
+        {t('Работа над ошибками')}
       </h1>
       <nav
-        aria-label="Секции Full Mock"
+        aria-label={t('Секции Full Mock')}
         className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#f0f0ed] p-1 sm:grid-cols-4"
       >
         {skills.map((skill) => {

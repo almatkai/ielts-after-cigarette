@@ -20,7 +20,7 @@ import {
   rememberGoogleReturnPath,
 } from '@/features/auth/google-identity'
 import { getErrorMessage } from '@/lib/api/client'
-import { useLanguage } from '@/lib/i18n'
+import { translate, useLanguage } from '@/lib/i18n'
 
 import { GoogleCompleteForm } from './google-complete-form'
 import type { PendingGoogleRegistration } from './google-complete-form'
@@ -43,7 +43,9 @@ export function LoginForm() {
   useEffect(() => {
     if (search.google === 'error' || search.google === 'success') {
       setSubmissionError(
-        'Не удалось завершить вход через Google. Попробуйте ещё раз.',
+        translate(
+          'Не удалось завершить вход через Google. Попробуйте ещё раз.',
+        ),
       )
     }
     if (search.google !== 'registration') return

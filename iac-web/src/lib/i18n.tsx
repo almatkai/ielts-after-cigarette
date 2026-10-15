@@ -10,6 +10,10 @@ import {
 import type { ReactNode } from 'react'
 
 import batch02 from './i18n-content/batch-02.json'
+import batch03Blog from './i18n-content/batch-03-blog.json'
+import batch04Legal from './i18n-content/batch-04-legal.json'
+import batch05Misc from './i18n-content/batch-05-misc.json'
+import batch06Core from './i18n-content/batch-06-core.json'
 
 export type Language = 'ru' | 'kk' | 'en'
 
@@ -1322,6 +1326,10 @@ const translations: TranslationMap = {
   ...baseTranslations,
   ...mistakeDialogTranslations,
   ...(batch02 as TranslationMap),
+  ...(batch03Blog as TranslationMap),
+  ...(batch04Legal as TranslationMap),
+  ...(batch05Misc as TranslationMap),
+  ...(batch06Core as TranslationMap),
 }
 
 type LanguageContextValue = {
@@ -1374,4 +1382,18 @@ export function useLanguage() {
   if (!context)
     throw new Error('useLanguage must be used within LanguageProvider')
   return context
+}
+
+/** Language stored on this device (no React context — for route heads, .ts modules). */
+export function getStoredLanguage(): Language {
+  if (typeof window === 'undefined') return 'ru'
+  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  return isLanguage(stored) ? stored : 'ru'
+}
+
+/** Translate outside React components (route titles, .ts data modules). */
+export function translate(source: string, language?: Language): string {
+  const lang = language ?? getStoredLanguage()
+  if (lang === 'ru') return source
+  return translations[source]?.[lang] ?? source
 }

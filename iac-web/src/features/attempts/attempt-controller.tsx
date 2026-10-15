@@ -6,6 +6,7 @@ import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import { attemptKeys } from '@/features/attempts/api'
 import type { Attempt } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function ExamAttemptShell<TMaterial>({
   skillBadge,
@@ -34,6 +35,7 @@ export function ExamAttemptShell<TMaterial>({
   }) => ReactNode
 }) {
   const queryClient = useQueryClient()
+  const { t } = useLanguage()
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null)
   const [isRetaking, setIsRetaking] = useState(false)
 
@@ -94,7 +96,7 @@ export function ExamAttemptShell<TMaterial>({
   if (!startQuery.data || !attempt || !material) {
     return (
       <ErrorState
-        title="Не удалось начать тест"
+        title={t('Не удалось начать тест')}
         message={getErrorMessage(startQuery.error)}
         onRetry={() => void startQuery.refetch()}
       />

@@ -1,0 +1,538 @@
+{
+  "Заявки принимаются только с официальным общим баллом IELTS 7.5+": {
+    "kk": "Өтінімдер ресми жалпы IELTS балы 7.5+ болғанда ғана қабылданады",
+    "en": "Applications are accepted only with an official overall IELTS band of 7.5+"
+  },
+  "Укажите баллы Reading, Writing и Speaking": {
+    "kk": "Reading, Writing және Speaking балдарын көрсетіңіз",
+    "en": "Enter your Reading, Writing and Speaking scores"
+  },
+  "Загрузите скан или фото сертификата IELTS": {
+    "kk": "IELTS сертификатының сканын немесе фотосын жүктеңіз",
+    "en": "Upload a scan or photo of your IELTS certificate"
+  },
+  "Общий балл (минимум 7.5) *": {
+    "kk": "Жалпы балл (кемінде 7.5) *",
+    "en": "Overall band (minimum 7.5) *"
+  },
+  "Не указан": {
+    "kk": "Көрсетілмеген",
+    "en": "Not specified"
+  },
+  "Номер сертификата (TRF) *": {
+    "kk": "Сертификат нөмірі (TRF) *",
+    "en": "Certificate number (TRF) *"
+  },
+  "Например: 25RU000123ALMATY01": {
+    "kk": "Мысалы: 25RU000123ALMATY01",
+    "en": "Example: 25RU000123ALMATY01"
+  },
+  "Дата сдачи теста": {
+    "kk": "Тест тапсырған күн",
+    "en": "Test date"
+  },
+  "Тип экзамена": {
+    "kk": "Емтихан түрі",
+    "en": "Exam type"
+  },
+  "Сертификат IELTS * (PNG, JPG, WebP или GIF)": {
+    "kk": "IELTS сертификаты * (PNG, JPG, WebP немесе GIF)",
+    "en": "IELTS certificate * (PNG, JPG, WebP or GIF)"
+  },
+  "Нажмите, чтобы загрузить скан или фото сертификата": {
+    "kk": "Сертификаттың сканын немесе фотосын жүктеу үшін басыңыз",
+    "en": "Click to upload a scan or photo of the certificate"
+  },
+  "Коротко о себе и темах, о которых хотите писать": {
+    "kk": "Өзіңіз және жазғыңыз келетін тақырыптар туралы қысқаша",
+    "en": "Briefly about yourself and the topics you want to write about"
+  },
+  "Например: сдал IELTS Academic на 8.0, готовлю студентов к Writing, хочу писать разборы эссе": {
+    "kk": "Мысалы: IELTS Academic-ті 8.0-ге тапсырдым, студенттерді Writing-ке дайындаймын, эссе талдауларын жазғым келеді",
+    "en": "Example: scored 8.0 on IELTS Academic, prepare students for Writing, want to write essay breakdowns"
+  },
+  "Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.": {
+    "kk": "Өтінімді жіберу мүмкін болмады. Деректерді тексеріп, қайталап көріңіз.",
+    "en": "Failed to submit the application. Check the details and try again."
+  },
+  "Не удалось загрузить сертификат. Попробуйте другой файл.": {
+    "kk": "Сертификатты жүктеу мүмкін болмады. Басқа файлды қолданып көріңіз.",
+    "en": "Failed to upload the certificate. Try a different file."
+  },
+  "Отправить заявку": {
+    "kk": "Өтінімді жіберу",
+    "en": "Submit application"
+  },
+  "Все статьи": {
+    "kk": "Барлық мақала",
+    "en": "All articles"
+  },
+  "Авторам": {
+    "kk": "Авторларға",
+    "en": "For authors"
+  },
+  "Стать автором блога": {
+    "kk": "Блог авторы болу",
+    "en": "Become a blog author"
+  },
+  "Публикации в блоге пишут авторы с подтверждённым официальным IELTS от 7.5. Заполните заявку — команда платформы проверит баллы и сертификат и откроет доступ к редактору.": {
+    "kk": "Блогтағы жарияланымдарды ресми IELTS балы 7.5-тен жоғары расталған авторлар жазады. Өтінімді толтырыңыз — платформа командасы балдар мен сертификатты тексеріп, редакторға қолжетімділік ашады.",
+    "en": "Blog posts are written by authors with a verified official IELTS score of 7.5+. Fill out the application — the platform team will verify your scores and certificate and grant editor access."
+  },
+  "Проверяем аккаунт…": {
+    "kk": "Аккаунтты тексеріп жатырмыз…",
+    "en": "Checking your account…"
+  },
+  "Войдите, чтобы подать заявку": {
+    "kk": "Өтінім беру үшін кіріңіз",
+    "en": "Sign in to apply"
+  },
+  "Заявка привязывается к вашему аккаунту на платформе.": {
+    "kk": "Өтінім платформадағы аккаунтыңызға байланыстырылады.",
+    "en": "The application is linked to your platform account."
+  },
+  "Войти": {
+    "kk": "Кіру",
+    "en": "Sign in"
+  },
+  "Вы уже автор": {
+    "kk": "Сіз авторсыз",
+    "en": "You are already an author"
+  },
+  "Редактор статей доступен в кабинете автора.": {
+    "kk": "Мақалалар редакторы автор кабинетінде қолжетімді.",
+    "en": "The article editor is available in the author dashboard."
+  },
+  "Заявка на проверке": {
+    "kk": "Өтінім тексерілуде",
+    "en": "Application under review"
+  },
+  "Вы отправили заявку с общим баллом": {
+    "kk": "Жалпы балмен өтінім жібердіңіз",
+    "en": "You submitted an application with an overall band of"
+  },
+  "Мы проверим сертификат и сообщим вам о решении.": {
+    "kk": "Біз сертификатты тексеріп, шешім туралы хабарлаймыз.",
+    "en": "We will verify the certificate and notify you of the decision."
+  },
+  "Заявка одобрена": {
+    "kk": "Өтінім мақұлданды",
+    "en": "Application approved"
+  },
+  "Обновите страницу, чтобы получить доступ к редактору.": {
+    "kk": "Редакторға қол жеткізу үшін бетті жаңартыңыз.",
+    "en": "Refresh the page to access the editor."
+  },
+  "Обновить доступ": {
+    "kk": "Қолжетімділікті жаңарту",
+    "en": "Refresh access"
+  },
+  "Заявка отклонена": {
+    "kk": "Өтінім қабылданбады",
+    "en": "Application rejected"
+  },
+  "Причина:": {
+    "kk": "Себебі:",
+    "en": "Reason:"
+  },
+  "Вы можете исправить данные и подать заново.": {
+    "kk": "Деректерді түзетіп, қайта жібере аласыз.",
+    "en": "You can correct the details and reapply."
+  },
+  "Читать блог": {
+    "kk": "Блогты оқу",
+    "en": "Read the blog"
+  },
+  "Вернуться к подготовке": {
+    "kk": "Дайындыққа оралу",
+    "en": "Back to preparation"
+  },
+  "Опыт и стратегии от авторов с IELTS 7.5+": {
+    "kk": "IELTS 7.5+ авторларынан тәжірибе мен стратегиялар",
+    "en": "Experience and strategies from authors with IELTS 7.5+"
+  },
+  "Разборы заданий, планы подготовки и личный опыт. Все статьи пишут авторы, чьи сертификаты IELTS проверила команда платформы.": {
+    "kk": "Тапсырмалар талдауы, дайындық жоспарлары және жеке тәжірибе. Барлық мақалаларды IELTS сертификаттарын платформа командасы тексерген авторлар жазады.",
+    "en": "Task breakdowns, study plans and personal experience. All articles are written by authors whose IELTS certificates were verified by the platform team."
+  },
+  "Статей пока нет — скоро здесь появятся первые публикации.": {
+    "kk": "Мақалалар әзірге жоқ — жақында алғашқы жарияланымдар шығады.",
+    "en": "No articles yet — the first posts will appear here soon."
+  },
+  "Хотите написать первую? Станьте автором": {
+    "kk": "Алғашқысын жазғыңыз келе ме? Автор болыңыз",
+    "en": "Want to write the first one? Become an author"
+  },
+  "Страницы блога": {
+    "kk": "Блог беттері",
+    "en": "Blog pages"
+  },
+  "Новее": {
+    "kk": "Жаңарақ",
+    "en": "Newer"
+  },
+  "Старее": {
+    "kk": "Ескірек",
+    "en": "Older"
+  },
+  "Страница": {
+    "kk": "Бет",
+    "en": "Page"
+  },
+  "Сдали IELTS на 7.5 или выше?": {
+    "kk": "IELTS-ті 7.5 немесе одан жоғары тапсырдыңыз ба?",
+    "en": "Scored 7.5 or higher on IELTS?"
+  },
+  "Делитесь опытом с теми, кто готовится. Подтвердите сертификат и получите доступ к редактору.": {
+    "kk": "Дайындалып жатқандармен тәжірибеңізбен бөлісіңіз. Сертификатты растап, редакторға қол жеткізіңіз.",
+    "en": "Share your experience with those preparing. Verify your certificate and get editor access."
+  },
+  "Стать автором": {
+    "kk": "Автор болу",
+    "en": "Become an author"
+  },
+  "мин чтения": {
+    "kk": "мин оқу",
+    "en": "min read"
+  },
+  "Заголовок должен содержать от 3 до 300 символов.": {
+    "kk": "Тақырып 3-тен 300 таңбаға дейін болуы керек.",
+    "en": "The title must be between 3 and 300 characters."
+  },
+  "Адрес: только латиница, цифры и дефисы.": {
+    "kk": "Мекенжай: тек латын әріптері, сандар және дефистер.",
+    "en": "URL: Latin letters, digits and hyphens only."
+  },
+  "Напишите текст статьи.": {
+    "kk": "Мақала мәтінін жазыңыз.",
+    "en": "Write the article text."
+  },
+  "Загружаем статью…": {
+    "kk": "Мақаланы жүктеп жатырмыз…",
+    "en": "Loading the article…"
+  },
+  "Статья не найдена.": {
+    "kk": "Мақала табылмады.",
+    "en": "Article not found."
+  },
+  "Не удалось загрузить обложку. Попробуйте другой файл.": {
+    "kk": "Мұқабаны жүктеу мүмкін болмады. Басқа файлды қолданып көріңіз.",
+    "en": "Failed to upload the cover. Try a different file."
+  },
+  "Такой адрес уже занят — измените его.": {
+    "kk": "Бұл мекенжай бос емес — оны өзгертіңіз.",
+    "en": "This URL is already taken — change it."
+  },
+  "Не удалось сохранить статью. Попробуйте ещё раз.": {
+    "kk": "Мақаланы сақтау мүмкін болмады. Қайталап көріңіз.",
+    "en": "Failed to save the article. Try again."
+  },
+  "Новая статья": {
+    "kk": "Жаңа мақала",
+    "en": "New article"
+  },
+  "Редактирование статьи": {
+    "kk": "Мақаланы өңдеу",
+    "en": "Edit article"
+  },
+  "Открыть": {
+    "kk": "Ашу",
+    "en": "Open"
+  },
+  "Сохранить черновик": {
+    "kk": "Жобаны сақтау",
+    "en": "Save draft"
+  },
+  "Сохранить": {
+    "kk": "Сақтау",
+    "en": "Save"
+  },
+  "Заголовок *": {
+    "kk": "Тақырып *",
+    "en": "Title *"
+  },
+  "О чём статья?": {
+    "kk": "Мақала не туралы?",
+    "en": "What is the article about?"
+  },
+  "Адрес статьи": {
+    "kk": "Мақала мекенжайы",
+    "en": "Article URL"
+  },
+  "Из заголовка": {
+    "kk": "Тақырыптан",
+    "en": "From title"
+  },
+  "Создаётся автоматически из заголовка. Можно изменить.": {
+    "kk": "Тақырыптан автоматты түрде жасалады. Өзгертуге болады.",
+    "en": "Generated automatically from the title. You can change it."
+  },
+  "Меняйте осторожно: старые ссылки на статью перестанут работать.": {
+    "kk": "Абайлап өзгертіңіз: мақалаға апаратын ескі сілтемелер істемей қалады.",
+    "en": "Change with care: old links to the article will stop working."
+  },
+  "Краткое описание": {
+    "kk": "Қысқаша сипаттама",
+    "en": "Short description"
+  },
+  "Один-два предложения для карточки статьи и превью в поиске": {
+    "kk": "Мақала карточкасы мен іздеу алдын ала көрінісіне арналған бір-екі сөйлем",
+    "en": "One or two sentences for the article card and search preview"
+  },
+  "Обложка": {
+    "kk": "Мұқаба",
+    "en": "Cover"
+  },
+  "Обложка статьи": {
+    "kk": "Мақала мұқабасы",
+    "en": "Article cover"
+  },
+  "Убрать": {
+    "kk": "Алып тастау",
+    "en": "Remove"
+  },
+  "Загрузить обложку (PNG, JPG, WebP или GIF)": {
+    "kk": "Мұқабаны жүктеу (PNG, JPG, WebP немесе GIF)",
+    "en": "Upload a cover (PNG, JPG, WebP or GIF)"
+  },
+  "Текст статьи *": {
+    "kk": "Мақала мәтіні *",
+    "en": "Article text *"
+  },
+  "Навигационная цепочка": {
+    "kk": "Навигация тізбегі",
+    "en": "Breadcrumb"
+  },
+  "IELTS 7.5+ подтверждён": {
+    "kk": "IELTS 7.5+ расталған",
+    "en": "IELTS 7.5+ verified"
+  },
+  "обновлено": {
+    "kk": "жаңартылды",
+    "en": "updated"
+  },
+  "Готовитесь к IELTS?": {
+    "kk": "IELTS-ке дайындалып жатырсыз ба?",
+    "en": "Preparing for IELTS?"
+  },
+  "Тренируйте Listening, Reading, Writing и Speaking на реальных форматах заданий с AI-проверкой и разбором ошибок.": {
+    "kk": "AI-тексеру және қателерді талдау арқылы нақты тапсырма форматтарында Listening, Reading, Writing және Speaking дағдыларын жаттықтырыңыз.",
+    "en": "Practise Listening, Reading, Writing and Speaking on real task formats with AI checking and mistake breakdowns."
+  },
+  "Начать подготовку": {
+    "kk": "Дайындықты бастау",
+    "en": "Start preparing"
+  },
+  "Другие статьи": {
+    "kk": "Басқа мақалалар",
+    "en": "More articles"
+  },
+  "Статья не найдена": {
+    "kk": "Мақала табылмады",
+    "en": "Article not found"
+  },
+  "Возможно, её сняли с публикации или ссылка устарела.": {
+    "kk": "Оны жарияланымнан алып тастаған немесе сілтеме ескірген болуы мүмкін.",
+    "en": "It may have been unpublished or the link is outdated."
+  },
+  "Опубликовано": {
+    "kk": "Жарияланды",
+    "en": "Published"
+  },
+  "В архиве": {
+    "kk": "Мұрағатта",
+    "en": "Archived"
+  },
+  "Черновик": {
+    "kk": "Жоба",
+    "en": "Draft"
+  },
+  "Не удалось опубликовать: заполните заголовок и текст (минимум 100 символов).": {
+    "kk": "Жариялау мүмкін болмады: тақырып пен мәтінді толтырыңыз (кемінде 100 таңба).",
+    "en": "Failed to publish: fill in the title and text (at least 100 characters)."
+  },
+  "У вас пока нет статей. Создайте первую!": {
+    "kk": "Сізде әзірге мақалалар жоқ. Алғашқысын жасаңыз!",
+    "en": "You have no articles yet. Create your first one!"
+  },
+  "Изменена": {
+    "kk": "Өзгертілді",
+    "en": "Updated"
+  },
+  "Редактировать": {
+    "kk": "Өңдеу",
+    "en": "Edit"
+  },
+  "Опубликовать": {
+    "kk": "Жариялау",
+    "en": "Publish"
+  },
+  "В архив": {
+    "kk": "Мұрағатқа",
+    "en": "Archive"
+  },
+  "Daiyndyq IELTS — главная": {
+    "kk": "Daiyndyq IELTS — басты бет",
+    "en": "Daiyndyq IELTS — home"
+  },
+  "Разделы блога": {
+    "kk": "Блог бөлімдері",
+    "en": "Blog sections"
+  },
+  "Статьи": {
+    "kk": "Мақалалар",
+    "en": "Articles"
+  },
+  "О платформе": {
+    "kk": "Платформа туралы",
+    "en": "About the platform"
+  },
+  "© 2026 Daiyndyq IELTS · Подготовка к IELTS": {
+    "kk": "© 2026 Daiyndyq IELTS · IELTS-ке дайындық",
+    "en": "© 2026 Daiyndyq IELTS · IELTS preparation"
+  },
+  "Ссылки в подвале": {
+    "kk": "Төменгі деректеме сілтемелері",
+    "en": "Footer links"
+  },
+  "Главная": {
+    "kk": "Басты бет",
+    "en": "Home"
+  },
+  "Конфиденциальность": {
+    "kk": "Құпиялылық",
+    "en": "Privacy"
+  },
+  "Условия": {
+    "kk": "Шарттар",
+    "en": "Terms"
+  },
+  "В кабинет": {
+    "kk": "Кабинетке",
+    "en": "To dashboard"
+  },
+  "Обычный текст": {
+    "kk": "Қарапайым мәтін",
+    "en": "Normal text"
+  },
+  "Заголовок": {
+    "kk": "Тақырып",
+    "en": "Heading"
+  },
+  "Подзаголовок": {
+    "kk": "Тақырыпша",
+    "en": "Subheading"
+  },
+  "Напишите статью: делитесь опытом подготовки, стратегиями и разборами заданий…": {
+    "kk": "Мақала жазыңыз: дайындық тәжірибеңізбен, стратегиялармен және тапсырмалар талдауымен бөлісіңіз…",
+    "en": "Write your article: share preparation experience, strategies and task breakdowns…"
+  },
+  "Не удалось загрузить": {
+    "kk": "Жүктеу мүмкін болмады",
+    "en": "Failed to upload"
+  },
+  "Сжимаем и загружаем изображение…": {
+    "kk": "Суретті сығып, жүктеп жатырмыз…",
+    "en": "Compressing and uploading the image…"
+  },
+  "Форматирование текста": {
+    "kk": "Мәтінді пішімдеу",
+    "en": "Text formatting"
+  },
+  "Отменить (Ctrl+Z)": {
+    "kk": "Болдырмау (Ctrl+Z)",
+    "en": "Undo (Ctrl+Z)"
+  },
+  "Повторить (Ctrl+Shift+Z)": {
+    "kk": "Қайталау (Ctrl+Shift+Z)",
+    "en": "Redo (Ctrl+Shift+Z)"
+  },
+  "Стиль абзаца": {
+    "kk": "Абзац стилі",
+    "en": "Paragraph style"
+  },
+  "Жирный (Ctrl+B)": {
+    "kk": "Қалың (Ctrl+B)",
+    "en": "Bold (Ctrl+B)"
+  },
+  "Курсив (Ctrl+I)": {
+    "kk": "Көлбеу (Ctrl+I)",
+    "en": "Italic (Ctrl+I)"
+  },
+  "Подчёркнутый (Ctrl+U)": {
+    "kk": "Асты сызылған (Ctrl+U)",
+    "en": "Underline (Ctrl+U)"
+  },
+  "Зачёркнутый": {
+    "kk": "Сызылған",
+    "en": "Strikethrough"
+  },
+  "Выделить маркером": {
+    "kk": "Маркермен белгілеу",
+    "en": "Highlight"
+  },
+  "Код в строке": {
+    "kk": "Жолдағы код",
+    "en": "Inline code"
+  },
+  "Ссылка": {
+    "kk": "Сілтеме",
+    "en": "Link"
+  },
+  "Маркированный список": {
+    "kk": "Таңбаланған тізім",
+    "en": "Bulleted list"
+  },
+  "Нумерованный список": {
+    "kk": "Нөмірленген тізім",
+    "en": "Numbered list"
+  },
+  "Блок кода или примера": {
+    "kk": "Код немесе мысал блогы",
+    "en": "Code or example block"
+  },
+  "Разделитель": {
+    "kk": "Бөлгіш",
+    "en": "Divider"
+  },
+  "По левому краю": {
+    "kk": "Сол жаққа туралау",
+    "en": "Align left"
+  },
+  "По центру": {
+    "kk": "Ортаға туралау",
+    "en": "Align center"
+  },
+  "По правому краю": {
+    "kk": "Оң жаққа туралау",
+    "en": "Align right"
+  },
+  "Изображение (или перетащите и вставьте из буфера)": {
+    "kk": "Сурет (немесе сүйреп апарып, алмасу буферінен қойыңыз)",
+    "en": "Image (or drag and drop, or paste from clipboard)"
+  },
+  "Адрес ссылки": {
+    "kk": "Сілтеме мекенжайы",
+    "en": "Link URL"
+  },
+  "Блог Daiyndyq IELTS": {
+    "kk": "Блог Daiyndyq IELTS",
+    "en": "Daiyndyq IELTS blog"
+  },
+  "Стратегии, разборы и личный опыт подготовки к IELTS от авторов с подтверждённым баллом 7.5+.": {
+    "kk": "IELTS-ке дайындық бойынша стратегиялар, талдаулар және балы 7.5+ расталған авторлардың жеке тәжірибесі.",
+    "en": "Strategies, breakdowns and personal IELTS preparation experience from authors with a verified score of 7.5+."
+  },
+  "Пишите статьи о подготовке к IELTS: подтвердите официальный балл 7.5+ и получите доступ к редактору блога.": {
+    "kk": "IELTS-ке дайындық туралы мақалалар жазыңыз: ресми 7.5+ балды растап, блог редакторына қол жеткізіңіз.",
+    "en": "Write articles about IELTS preparation: verify your official 7.5+ score and get access to the blog editor."
+  },
+  "Блог Daiyndyq IELTS: стратегии и опыт подготовки к IELTS": {
+    "kk": "Блог Daiyndyq IELTS: IELTS-ке дайындық стратегиялары мен тәжірибесі",
+    "en": "Daiyndyq IELTS blog: IELTS preparation strategies and experience"
+  },
+  "страница": {
+    "kk": "бет",
+    "en": "page"
+  }
+}

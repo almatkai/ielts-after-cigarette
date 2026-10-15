@@ -12,6 +12,7 @@ import { ReadingAttemptRunner } from '@/pages/reading/reading-student-page'
 import { SpeakingAttemptRunner } from '@/pages/speaking/speaking-student-page'
 import { WritingAttemptRunner } from '@/pages/writing/writing-student-page'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function FullMockSectionPage({
   sessionId,
@@ -21,6 +22,7 @@ export function FullMockSectionPage({
   sectionPosition: string
 }) {
   // Keep the server deadline active while the student is inside a section.
+  const { t } = useLanguage()
   const sessionQuery = useQuery({
     queryKey: fullMockKeys.session(sessionId),
     queryFn: ({ signal }) => getFullMockSession(sessionId, signal),
@@ -44,15 +46,17 @@ export function FullMockSectionPage({
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Открываем секцию экзамена…"
-        description="Инициализируем материалы следующей части полного пробного тестирования..."
+        label={t('Открываем секцию экзамена…')}
+        description={t(
+          'Инициализируем материалы следующей части полного пробного тестирования...',
+        )}
       />
     )
   }
   if (query.isError) {
     return (
       <ErrorState
-        title="Не удалось открыть секцию Full Mock"
+        title={t('Не удалось открыть секцию Full Mock')}
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />

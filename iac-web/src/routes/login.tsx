@@ -9,6 +9,7 @@ import {
 } from '#/features/auth/google-identity'
 import type { LoginReturnPath } from '#/features/auth/google-identity'
 import { useAuth } from '#/features/auth/auth-store'
+import { translate, useLanguage } from '@/lib/i18n'
 
 export const Route = createFileRoute('/login')({
   ssr: false,
@@ -45,10 +46,12 @@ export const Route = createFileRoute('/login')({
   },
   head: () => ({
     meta: [
-      { title: 'Войти в Daiyndyq IELTS — подготовка к IELTS' },
+      { title: translate('Войти в Daiyndyq IELTS — подготовка к IELTS') },
       {
         name: 'description',
-        content: 'Вход в личный кабинет платформы подготовки к IELTS.',
+        content: translate(
+          'Вход в личный кабинет платформы подготовки к IELTS.',
+        ),
       },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
@@ -57,6 +60,7 @@ export const Route = createFileRoute('/login')({
 })
 
 function LoginPage() {
+  const { t } = useLanguage()
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const { user, accessToken } = useAuth()
@@ -79,7 +83,7 @@ function LoginPage() {
           className="px-6 py-8 text-center text-sm text-[#475569]"
           role="status"
         >
-          Завершаем вход через Google…
+          {t('Завершаем вход через Google…')}
         </p>
       ) : (
         <LoginForm />

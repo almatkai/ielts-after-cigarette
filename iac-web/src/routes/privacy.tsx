@@ -1,16 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { translate } from '@/lib/i18n'
 import { PrivacyPage } from '@/pages/legal/privacy-page'
 
 export const Route = createFileRoute('/privacy')({
   ssr: false,
   head: () => ({
     meta: [
-      { title: 'Политика конфиденциальности — Daiyndyq IELTS' },
+      { title: translate('Политика конфиденциальности — Daiyndyq IELTS') },
       {
         name: 'description',
-        content:
+        content: translate(
           'Политика конфиденциальности и обработки персональных данных образовательной платформы подготовки к IELTS «Daiyndyq IELTS».',
+        ),
       },
       { name: 'robots', content: 'index, follow' },
     ],

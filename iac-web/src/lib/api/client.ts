@@ -159,7 +159,132 @@ async function parseApiError(response: Response) {
   })
 }
 
-export function getErrorMessage(error: unknown) {
+export function getErrorMessage(error: unknown, language?: 'ru' | 'kk' | 'en') {
+  const lang = language ?? storedLanguage()
+  const message = getErrorMessageRu(error)
+  if (lang === 'ru') return message
+  return errorTranslations[message]?.[lang] ?? message
+}
+
+function storedLanguage(): 'ru' | 'kk' | 'en' {
+  if (typeof window === 'undefined') return 'ru'
+  const stored = window.localStorage.getItem('daiyndyq-language')
+  return stored === 'kk' || stored === 'en' ? stored : 'ru'
+}
+
+const errorTranslations: Record<string, { kk: string; en: string }> = {
+  'Адрес API не настроен': {
+    kk: 'API мекенжайы көрсетілмеген',
+    en: 'API address is not configured',
+  },
+  'Не удалось связаться с сервером': {
+    kk: 'Серверге қосылу мүмкін болмады',
+    en: 'Could not reach the server',
+  },
+  'Произошла непредвиденная ошибка. Попробуйте ещё раз.': {
+    kk: 'Күтпеген қате пайда болды. Қайталап көріңіз.',
+    en: 'An unexpected error occurred. Please try again.',
+  },
+  'Неверная электронная почта или пароль.': {
+    kk: 'Электрондық пошта немесе құпиясөз қате.',
+    en: 'Incorrect email or password.',
+  },
+  'Не удалось подтвердить Google-аккаунт. Попробуйте снова.': {
+    kk: 'Google аккаунтын растау мүмкін болмады. Қайталап көріңіз.',
+    en: 'Could not verify your Google account. Please try again.',
+  },
+  'Аккаунт не найден. Проверьте данные и попробуйте снова.': {
+    kk: 'Аккаунт табылмады. Деректерді тексеріп, қайталап көріңіз.',
+    en: 'Account not found. Check your details and try again.',
+  },
+  'Аккаунт с такой электронной почтой уже существует.': {
+    kk: 'Бұл электрондық поштаға тіркелген аккаунт бар.',
+    en: 'An account with this email already exists.',
+  },
+  'Аккаунт с таким номером телефона уже существует.': {
+    kk: 'Бұл телефон нөміріне тіркелген аккаунт бар.',
+    en: 'An account with this phone number already exists.',
+  },
+  'Проверьте правильность заполнения полей.': {
+    kk: 'Өрістердің дұрыс толтырылғанын тексеріңіз.',
+    en: 'Check that all fields are filled in correctly.',
+  },
+  'Подтверждение номера истекло. Запросите новый код.': {
+    kk: 'Нөмірді растау мерзімі аяқталды. Жаңа код сұратыңыз.',
+    en: 'Phone verification expired. Request a new code.',
+  },
+  'Неверный или просроченный код WhatsApp.': {
+    kk: 'WhatsApp коды қате немесе мерзімі өткен.',
+    en: 'The WhatsApp code is invalid or expired.',
+  },
+  'Код уже отправлен. Подождите минуту перед повторной отправкой.': {
+    kk: 'Код жіберілді. Қайта сұрамас бұрын бір минут күтіңіз.',
+    en: 'A code was sent already. Wait a minute before requesting another.',
+  },
+  'Подтверждение через WhatsApp скоро будет доступно.': {
+    kk: 'WhatsApp арқылы растау жақында қолжетімді болады.',
+    en: 'WhatsApp verification will be available soon.',
+  },
+  'Слишком много попыток. Подождите минуту и попробуйте снова.': {
+    kk: 'Әрекет саны тым көп. Бір минут күтіп, қайталап көріңіз.',
+    en: 'Too many attempts. Wait a minute and try again.',
+  },
+  'Достигнут дневной лимит использования. Лимит обновится в полночь.': {
+    kk: 'Күндік шектеуге жеттіңіз. Шектеу түн ортасында жаңартылады.',
+    en: 'Daily limit reached. The limit resets at midnight.',
+  },
+  'Сервер недоступен. Проверьте, что backend запущен.': {
+    kk: 'Сервер қолжетімсіз. Backend іске қосылғанын тексеріңіз.',
+    en: 'Server unavailable. Check that the backend is running.',
+  },
+  'Не настроен VITE_API_BASE_URL.': {
+    kk: 'VITE_API_BASE_URL көрсетілмеген.',
+    en: 'VITE_API_BASE_URL is not configured.',
+  },
+  'Сервис временно недоступен. Попробуйте немного позже.': {
+    kk: 'Қызмет уақытша қолжетімсіз. Сәлден соң қайталап көріңіз.',
+    en: 'Service temporarily unavailable. Please try again later.',
+  },
+  'Хранилище файлов временно недоступно. Повторите загрузку немного позже.': {
+    kk: 'Файл қоймасы уақытша қолжетімсіз. Жүктеуді сәлден соң қайталаңыз.',
+    en: 'File storage is temporarily unavailable. Try uploading again later.',
+  },
+  'Черновик уже изменился. Обновите страницу и повторите действие.': {
+    kk: 'Нобай өзгертілді. Бетті жаңартып, әрекетті қайталаңыз.',
+    en: 'The draft has changed. Refresh the page and try again.',
+  },
+  'Заполните ответы для Task 1 и Task 2 перед отправкой.': {
+    kk: 'Жібермес бұрын Task 1 және Task 2 тапсырмаларын толтырыңыз.',
+    en: 'Complete both Task 1 and Task 2 before submitting.',
+  },
+  'Запишите или введите расшифровку для каждой из трёх частей Speaking.': {
+    kk: 'Speaking бөлімінің үш бөлігі үшін аудио жазыңыз немесе мәтін енгізіңіз.',
+    en: 'Record or enter a transcript for all three Speaking parts.',
+  },
+  'Запись слишком большая. Сократите её и попробуйте снова.': {
+    kk: 'Жазба тым үлкен. Қысқартып, қайталап көріңіз.',
+    en: 'The recording is too large. Shorten it and try again.',
+  },
+  'Автоматическая проверка пока не настроена. Обратитесь к администратору.': {
+    kk: 'Автоматты тексеру әзірше реттелмеген. Әкімшіге хабарласыңыз.',
+    en: 'Automatic assessment is not configured yet. Contact an administrator.',
+  },
+  'Сервис проверки временно недоступен. Черновики сохранены — попробуйте отправить работу ещё раз.':
+    {
+      kk: 'Тексеру қызметі уақытша қолжетімсіз. Нобайлар сақталды — жұмысты қайта жіберіп көріңіз.',
+      en: 'The assessment service is temporarily unavailable. Drafts are saved — try submitting again.',
+    },
+  'Сервер не смог обработать запрос. Попробуйте позже.': {
+    kk: 'Сервер сұрауды өңдей алмады. Кейінірек қайталап көріңіз.',
+    en: 'The server could not process the request. Please try again later.',
+  },
+  'Не удалось выполнить запрос': {
+    kk: 'Сұрауды орындау мүмкін болмады',
+    en: 'The request could not be completed',
+  },
+}
+
+function getErrorMessageRu(error: unknown) {
   if (!(error instanceof ApiError)) {
     return 'Произошла непредвиденная ошибка. Попробуйте ещё раз.'
   }

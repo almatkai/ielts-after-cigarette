@@ -15,6 +15,7 @@ import {
 } from '@/features/fullmock/api'
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -24,6 +25,7 @@ const labels: Record<FullMockSkill, string> = {
 }
 
 export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
+  const { language, t } = useLanguage()
   const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: fullMockKeys.session(sessionId),
@@ -65,15 +67,17 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Загружаем экзаменационную сессию…"
-        description="Получаем статус секций, таймеры и расписание Full Mock..."
+        label={t('Загружаем экзаменационную сессию…')}
+        description={t(
+          'Получаем статус секций, таймеры и расписание Full Mock...',
+        )}
       />
     )
   }
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
+        title={t('Не удалось загрузить Full Mock')}
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -87,7 +91,8 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Badge variant="secondary">
-            Full Mock · {session.mockTest.examType}
+            Full Mock ·{' '}
+            {session.mockTest.examType === 'academic' ? 'Academic' : 'General'}
           </Badge>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
             {session.mockTest.title}
@@ -102,8 +107,9 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
       ) : (
         <>
           <p className="text-sm leading-6 text-[#69696d]">
-            Секции идут строго по порядку. Вернуться к прошлой секции через эту
-            сессию нельзя.
+            {t(
+              'Секции идут строго по порядку. Вернуться к прошлой секции через эту сессию нельзя.',
+            )}
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {session.sections.map((section) => (
@@ -119,17 +125,21 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
             <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} сдан. Можно перейти дальше.
+                  {language === 'en'
+                    ? `${labels[current.skill]} submitted. You can move on.`
+                    : language === 'kk'
+                      ? `${labels[current.skill]} тапсырылды. Келесі бөлімге өтуге болады.`
+                      : `${labels[current.skill]} сдан. Можно перейти дальше.`}
                 </p>
                 <Button
                   disabled={advance.isPending}
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
-                    ? 'Переходим…'
+                    ? t('Переходим…')
                     : session.currentSection === 4
-                      ? 'Завершить и показать отчёт'
-                      : 'Продолжить к следующей секции'}
+                      ? t('Завершить и показать отчёт')
+                      : t('Продолжить к следующей секции')}
                 </Button>
               </CardContent>
             </Card>
@@ -137,8 +147,9 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           <Card className="border-[#f1e2c7] bg-[#fffaf0] shadow-none">
             <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
               <p className="text-sm text-[#69696d]">
-                Можно завершить Full Mock сейчас. Пустые секции останутся без
-                band и не попадут в общий результат.
+                {t(
+                  'Можно завершить Full Mock сейчас. Пустые секции останутся без band и не попадут в общий результат.',
+                )}
               </p>
               <Button
                 variant="outline"
@@ -146,14 +157,14 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
                 onClick={() => {
                   if (
                     window.confirm(
-                      'Завершить Full Mock с незаполненными секциями?',
+                      t('Завершить Full Mock с незаполненными секциями?'),
                     )
                   ) {
                     finish.mutate()
                   }
                 }}
               >
-                {finish.isPending ? 'Завершаем…' : 'Завершить досрочно'}
+                {finish.isPending ? t('Завершаем…') : t('Завершить досрочно')}
               </Button>
             </CardContent>
           </Card>
@@ -182,6 +193,7 @@ function SectionCard({
   currentSection: number
   sessionId: string
 }) {
+  const { t } = useLanguage()
   const isCurrent = section.position === currentSection
   const completed = section.attempt.status === 'SUBMITTED'
   const locked = section.position > currentSection
@@ -197,15 +209,15 @@ function SectionCard({
           {completed ? (
             <Badge className="bg-emerald-600">
               <TickCircle aria-hidden />
-              Сдано
+              {t('Сдано')}
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
               <Lock aria-hidden />
-              Закрыто
+              {t('Закрыто')}
             </Badge>
           ) : (
-            <Badge variant="secondary">Текущая</Badge>
+            <Badge variant="secondary">{t('Текущая')}</Badge>
           )}
         </div>
       </CardHeader>
@@ -215,8 +227,8 @@ function SectionCard({
         ) : (
           <p className="text-sm text-[#69696d]">
             {completed
-              ? 'Результат сохранён в сессии.'
-              : 'Станет доступна после предыдущей секции.'}
+              ? t('Результат сохранён в сессии.')
+              : t('Станет доступна после предыдущей секции.')}
           </p>
         )}
       </CardContent>
@@ -231,10 +243,11 @@ function SectionLink({
   section: FullMockSession['sections'][number]
   sessionId: string
 }) {
+  const { t } = useLanguage()
   const content = (
     <>
       <PlayCircle aria-hidden />
-      Открыть секцию
+      {t('Открыть секцию')}
     </>
   )
   return (
@@ -250,6 +263,7 @@ function SectionLink({
 }
 
 function FullMockReport({ session }: { session: FullMockSession }) {
+  const { language, t } = useLanguage()
   return (
     <>
       <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
@@ -258,7 +272,7 @@ function FullMockReport({ session }: { session: FullMockSession }) {
             {session.overallBand?.toFixed(1) ?? '—'}
           </span>
           <div>
-            <p className="font-semibold">Итоговый IELTS band</p>
+            <p className="font-semibold">{t('Итоговый IELTS band')}</p>
           </div>
         </CardContent>
       </Card>
@@ -269,7 +283,13 @@ function FullMockReport({ session }: { session: FullMockSession }) {
             to="/attempts/$attemptId"
             params={{ attemptId: section.attempt.id }}
             search={{ session: session.id }}
-            aria-label={`${labels[section.skill]}: работа над ошибками`}
+            aria-label={
+              language === 'en'
+                ? `${labels[section.skill]}: review mistakes`
+                : language === 'kk'
+                  ? `${labels[section.skill]}: қателерді талдау`
+                  : `${labels[section.skill]}: работа над ошибками`
+            }
             className="flex min-h-28 items-center justify-between rounded-[16px] border border-[#e7e7e4] bg-white p-5 transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-[#3b82f6]"
           >
             <p className="font-semibold">{labels[section.skill]}</p>

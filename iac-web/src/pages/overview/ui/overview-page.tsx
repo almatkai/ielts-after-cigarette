@@ -334,7 +334,8 @@ export function OverviewPage() {
                         {item.title}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-[#808084]">
-                        {skillLabels[item.skill]} · {item.durationMinutes} мин.
+                        {skillLabels[item.skill]} · {item.durationMinutes}{' '}
+                        {t('мин.')}
                       </p>
                     </li>
                   ))}

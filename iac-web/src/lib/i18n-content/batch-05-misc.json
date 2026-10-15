@@ -1,0 +1,209 @@
+{
+  "Не удалось загрузить Full Mock": {
+    "kk": "Full Mock жүктелмеді",
+    "en": "Could not load the Full Mock"
+  },
+  "Попытка не относится к этому Full Mock.": {
+    "kk": "Бұл әрекет осы Full Mock-қа тиесілі емес.",
+    "en": "This attempt does not belong to this Full Mock."
+  },
+  "К результату": { "kk": "Нәтижеге", "en": "Back to result" },
+  "Секции Full Mock": {
+    "kk": "Full Mock бөлімдері",
+    "en": "Full Mock sections"
+  },
+  "Проверяем доступные тесты…": {
+    "kk": "Қолжетімді тесттер тексерілуде…",
+    "en": "Checking available tests…"
+  },
+  "Учитываем уже выполненные задания, чтобы подобрать новые.": {
+    "kk": "Жаңа тапсырмаларды таңдау үшін орындалған жұмыстар ескеріледі.",
+    "en": "We are taking your completed tests into account to pick new ones."
+  },
+  "Не удалось подготовить Full Mock": {
+    "kk": "Full Mock дайындау мүмкін болмады",
+    "en": "Could not prepare the Full Mock"
+  },
+  "Полный пробный IELTS": {
+    "kk": "Толық сынақ IELTS",
+    "en": "Full IELTS practice test"
+  },
+  "Мы автоматически подберём тесты из общей библиотеки. Сначала — задания, которые вы ещё не выполняли. Выбирать отдельный mock-тест не нужно.": {
+    "kk": "Тесттерді ортақ кітапханадан автоматты түрде таңдаймыз. Алдымен — әлі орындамаған тапсырмаларыңыз. Жеке mock-тест таңдаудың қажеті жоқ.",
+    "en": "We automatically pick tests from the shared library, starting with ones you have not taken yet. There is no need to choose a specific mock test."
+  },
+  "Четыре секции в одной сессии": {
+    "kk": "Бір сессияда төрт бөлім",
+    "en": "Four sections in one session"
+  },
+  "Порядок секций экзамена": {
+    "kk": "Емтихан бөлімдерінің реті",
+    "en": "Exam section order"
+  },
+  "После сдачи секции вы переходите к следующей. Ответы сохраняются, а после проверки всех четырёх секций появится общий Band Score.": {
+    "kk": "Бөлімді тапсырғаннан кейін келесісіне өтесіз. Жауаптар сақталады, ал төрт бөлім де тексерілгеннен кейін жалпы Band Score көрсетіледі.",
+    "en": "After submitting a section you move on to the next one. Your answers are saved, and once all four sections are assessed you will see an overall Band Score."
+  },
+  "Ваш прогресс по доступным тестам": {
+    "kk": "Қолжетімді тесттер бойынша прогресіңіз",
+    "en": "Your progress on available tests"
+  },
+  "Учитываются выполненные тесты и в практике, и в Full Mock. Повторные попытки не увеличивают счётчик.": {
+    "kk": "Практикада да, Full Mock-та да орындалған тесттер ескеріледі. Қайта тапсыру есепті арттырмайды.",
+    "en": "Completed tests in both practice and Full Mock count. Retakes do not increase the count."
+  },
+  "В следующих mock-тестах будут повторы": {
+    "kk": "Келесі mock-тесттерде қайталаулар болады",
+    "en": "Upcoming mock tests will include repeats"
+  },
+  "Вы выполнили все доступные тесты. Full Mock будет собран из ранее выполненных заданий, выбранных случайно.": {
+    "kk": "Сіз барлық қолжетімді тестті орындадыңыз. Full Mock бұрын орындалған тапсырмалардан кездейсоқ құралады.",
+    "en": "You have completed all available tests. The Full Mock will be assembled from previously completed tasks, chosen at random."
+  },
+  "Вы выполнили все доступные тесты по секциям:": {
+    "kk": "Мына бөлімдер бойынша барлық қолжетімді тестті орындадыңыз:",
+    "en": "You have completed all available tests in:"
+  },
+  "В новых Full Mock эти секции будут выбраны случайно из ранее выполненных тестов. Для остальных секций сначала подберём непройденные задания.": {
+    "kk": "Жаңа Full Mock сынақтарында бұл бөлімдер бұрын орындалған тесттерден кездейсоқ таңдалады. Қалған бөлімдерге алдымен орындалмаған тапсырмалар таңдалады.",
+    "en": "In new Full Mocks these sections will be picked at random from previously completed tests. For the other sections we will first choose tests you have not taken."
+  },
+  "Состав уже начатой сессии не изменится.": {
+    "kk": "Басталған сессияның құрамы өзгермейді.",
+    "en": "The current session content will not change."
+  },
+  "Для нового Full Mock пока недостаточно полных опубликованных тестов:": {
+    "kk": "Жаңа Full Mock үшін толық жарияланған тесттер әзірге жеткіліксіз:",
+    "en": "There are not enough published tests yet for a new Full Mock:"
+  },
+  "Текущую сессию можно продолжить.": {
+    "kk": "Ағымдағы сессияны жалғастыруға болады.",
+    "en": "You can continue your current session."
+  },
+  "Пока можно заниматься отдельными секциями в практике.": {
+    "kk": "Әзірше практикада жеке бөлімдермен айналысуға болады.",
+    "en": "For now you can practise individual sections."
+  },
+  "Продолжить текущую сессию": {
+    "kk": "Ағымдағы сессияны жалғастыру",
+    "en": "Continue current session"
+  },
+  "Готовим экзамен…": {
+    "kk": "Емтихан дайындалуда…",
+    "en": "Preparing your exam…"
+  },
+  "Начать Full Mock": { "kk": "Full Mock бастау", "en": "Start Full Mock" },
+  "Начать заново": { "kk": "Қайта бастау", "en": "Start over" },
+  "К отдельным секциям": {
+    "kk": "Жеке бөлімдерге",
+    "en": "To individual sections"
+  },
+  "Начать заново? Текущая сессия будет закрыта. Мы подберём новый набор тестов, таймер начнётся заново.": {
+    "kk": "Қайта бастау керек пе? Ағымдағы сессия жабылады. Тесттердің жаңа жинағы таңдалып, таймер қайта басталады.",
+    "en": "Start over? Your current session will be closed. We will pick a new set of tests and restart the timer."
+  },
+  "Открываем секцию экзамена…": {
+    "kk": "Емтихан бөлімі ашылуда…",
+    "en": "Opening the exam section…"
+  },
+  "Инициализируем материалы следующей части полного пробного тестирования...": {
+    "kk": "Толық сынақ тестінің келесі бөлімінің материалдары дайындалуда...",
+    "en": "Preparing the materials for the next part of the full mock test..."
+  },
+  "Не удалось открыть секцию Full Mock": {
+    "kk": "Full Mock бөлімін ашу мүмкін болмады",
+    "en": "Could not open the Full Mock section"
+  },
+  "Загружаем экзаменационную сессию…": {
+    "kk": "Емтихан сессиясы жүктелуде…",
+    "en": "Loading the exam session…"
+  },
+  "Получаем статус секций, таймеры и расписание Full Mock...": {
+    "kk": "Бөлімдер күйі, таймерлер және Full Mock кестесі алынуда...",
+    "en": "Getting section statuses, timers, and the Full Mock schedule..."
+  },
+  "Секции идут строго по порядку. Вернуться к прошлой секции через эту сессию нельзя.": {
+    "kk": "Бөлімдер қатаң ретпен орындалады. Бұл сессия арқылы алдыңғы бөлімге оралу мүмкін емес.",
+    "en": "Sections must be completed in order. You cannot go back to a previous section in this session."
+  },
+  "Переходим…": { "kk": "Өтудеміз…", "en": "Moving on…" },
+  "Завершить и показать отчёт": {
+    "kk": "Аяқтап, есепті көрсету",
+    "en": "Finish and show report"
+  },
+  "Продолжить к следующей секции": {
+    "kk": "Келесі бөлімге өту",
+    "en": "Continue to the next section"
+  },
+  "Можно завершить Full Mock сейчас. Пустые секции останутся без band и не попадут в общий результат.": {
+    "kk": "Full Mock-ты қазір аяқтауға болады. Бос бөлімдер band-сыз қалып, жалпы нәтижеге кірмейді.",
+    "en": "You can finish the Full Mock now. Empty sections will have no band and will not count towards the overall result."
+  },
+  "Завершить Full Mock с незаполненными секциями?": {
+    "kk": "Full Mock-ты толтырылмаған бөлімдермен аяқтау керек пе?",
+    "en": "Finish the Full Mock with uncompleted sections?"
+  },
+  "Завершаем…": { "kk": "Аяқталуда…", "en": "Finishing…" },
+  "Завершить досрочно": {
+    "kk": "Мерзімінен бұрын аяқтау",
+    "en": "Finish early"
+  },
+  "Сдано": { "kk": "Тапсырылды", "en": "Submitted" },
+  "Закрыто": { "kk": "Жабық", "en": "Locked" },
+  "Текущая": { "kk": "Ағымдағы", "en": "Current" },
+  "Открыть секцию": { "kk": "Бөлімді ашу", "en": "Open section" },
+  "Результат сохранён в сессии.": {
+    "kk": "Нәтиже сессияда сақталды.",
+    "en": "Your result is saved in the session."
+  },
+  "Станет доступна после предыдущей секции.": {
+    "kk": "Алдыңғы бөлімнен кейін қолжетімді болады.",
+    "en": "Available after the previous section."
+  },
+  "Итоговый IELTS band": {
+    "kk": "Қорытынды IELTS band",
+    "en": "Overall IELTS band"
+  },
+  "Daiyndyq IELTS — к обзору": {
+    "kk": "Daiyndyq IELTS — шолуға",
+    "en": "Daiyndyq IELTS — to overview"
+  },
+  "Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза": {
+    "kk": "Daiyndyq IELTS — IELTS-ті бірінші рет 7.0-ден жоғары тапсыр",
+    "en": "Daiyndyq IELTS — score above 7.0 on your first try"
+  },
+  "Практика — Daiyndyq IELTS": {
+    "kk": "Практика — Daiyndyq IELTS",
+    "en": "Practice — Daiyndyq IELTS"
+  },
+  "Профиль — Daiyndyq IELTS": {
+    "kk": "Профиль — Daiyndyq IELTS",
+    "en": "Profile — Daiyndyq IELTS"
+  },
+  "Панель управления — Daiyndyq IELTS": {
+    "kk": "Басқару панелі — Daiyndyq IELTS",
+    "en": "Dashboard — Daiyndyq IELTS"
+  },
+  "Доступ запрещён — Daiyndyq IELTS": {
+    "kk": "Рұқсат жоқ — Daiyndyq IELTS",
+    "en": "Access denied — Daiyndyq IELTS"
+  },
+  "Войти в Daiyndyq IELTS — подготовка к IELTS": {
+    "kk": "Daiyndyq IELTS-ке кіру — IELTS дайындығы",
+    "en": "Sign in to Daiyndyq IELTS — IELTS preparation"
+  },
+  "Вход в личный кабинет платформы подготовки к IELTS.": {
+    "kk": "IELTS дайындық платформасының жеке кабинетіне кіру.",
+    "en": "Sign in to your IELTS preparation account."
+  },
+  "Недостаточно прав": {
+    "kk": "Құқығыңыз жеткіліксіз",
+    "en": "Not enough permissions"
+  },
+  "Этот раздел доступен редакторам и администраторам платформы.": {
+    "kk": "Бұл бөлім платформа редакторлары мен әкімшілеріне ғана қолжетімді.",
+    "en": "This section is available to platform editors and administrators."
+  },
+  "Вернуться в кабинет": { "kk": "Кабинетке оралу", "en": "Back to dashboard" },
+  "мин.": { "kk": "мин", "en": "min" }
+}

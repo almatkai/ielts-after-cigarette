@@ -474,7 +474,7 @@ export function AttemptResultSummary({
             {t('Баллы')}
           </p>
           <p className="mt-1 text-2xl font-semibold">
-            {attempt.score ?? '—'} из {attempt.maxScore ?? '—'}
+            {attempt.score ?? '—'} {t('из')} {attempt.maxScore ?? '—'}
           </p>
         </div>
         <div>
@@ -483,7 +483,7 @@ export function AttemptResultSummary({
           </p>
           <p className="mt-1 text-2xl font-semibold">
             {correctCount !== null && review !== null
-              ? `${correctCount} из ${review.length}`
+              ? `${correctCount} ${t('из')} ${review.length}`
               : '—'}
           </p>
         </div>
@@ -522,7 +522,9 @@ export function ReviewQuestion({
           {t('Ваш ответ')}:{' '}
           <strong>{formatAnswer(item.answer, options)}</strong>
         </span>
-        <span className="text-[#69696d]">+{item.pointsAwarded} б.</span>
+        <span className="text-[#69696d]">
+          +{item.pointsAwarded} {t('б.')}
+        </span>
       </p>
       {!item.isCorrect ? (
         <p>
@@ -725,7 +727,8 @@ export function AttemptPerformanceReport({
     if (timeSpentSeconds === null) return '—'
     const mins = Math.floor(timeSpentSeconds / 60)
     const secs = timeSpentSeconds % 60
-    const secondsLabel = language === 'en' ? 'sec' : 'сек'
+    const secondsLabel =
+      language === 'en' ? 'sec' : language === 'kk' ? 'с' : 'сек'
     const minutesLabel = language === 'en' ? 'min' : 'мин'
     if (mins === 0) return `${secs} ${secondsLabel}`
     return `${mins} ${minutesLabel} ${secs > 0 ? `${secs} ${secondsLabel}` : ''}`
@@ -738,7 +741,8 @@ export function AttemptPerformanceReport({
     const paceSec = Math.round(timeSpentSeconds / totalCount)
     const m = Math.floor(paceSec / 60)
     const s = paceSec % 60
-    const secondsLabel = language === 'en' ? 'sec' : 'сек'
+    const secondsLabel =
+      language === 'en' ? 'sec' : language === 'kk' ? 'с' : 'сек'
     const minutesLabel = language === 'en' ? 'min' : 'мин'
     if (m === 0) return `${s} ${secondsLabel} / ${t(paceUnit)}`
     return `${m} ${minutesLabel} ${s > 0 ? `${s} ${secondsLabel}` : ''} / ${t(paceUnit)}`

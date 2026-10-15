@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Brand } from '@/components/landing/brand'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 export type TocItem = {
@@ -29,6 +30,7 @@ export function LegalShell({
   toc,
   children,
 }: LegalShellProps) {
+  const { t } = useLanguage()
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
   const [activeSection, setActiveSection] = React.useState<string>(
@@ -69,7 +71,7 @@ export function LegalShell({
             <Brand />
             <nav
               className="hidden items-center gap-1 sm:flex"
-              aria-label="Юридические документы"
+              aria-label={t('Юридические документы')}
             >
               <Link
                 to="/privacy"
@@ -80,7 +82,7 @@ export function LegalShell({
                     : 'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
                 )}
               >
-                Политика конфиденциальности
+                {t('Политика конфиденциальности')}
               </Link>
               <Link
                 to="/terms"
@@ -91,7 +93,7 @@ export function LegalShell({
                     : 'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
                 )}
               >
-                Условия использования
+                {t('Условия использования')}
               </Link>
             </nav>
           </div>
@@ -102,17 +104,17 @@ export function LegalShell({
               size="sm"
               onClick={handlePrint}
               className="hidden h-9 items-center gap-1.5 rounded-[9px] border-[#deded9] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#f4f4f1] hover:text-[#111111] md:inline-flex"
-              title="Распечатать документ"
+              title={t('Распечатать документ')}
             >
               <Printer size={15} aria-hidden />
-              <span>Печать</span>
+              <span>{t('Печать')}</span>
             </Button>
             <Button
               asChild
               size="sm"
               className="h-9 rounded-[9px] bg-[#3b82f6] px-3.5 text-xs font-semibold text-white hover:bg-[#2563eb]"
             >
-              <Link to="/login">Войти в кабинет</Link>
+              <Link to="/login">{t('Войти в кабинет')}</Link>
             </Button>
           </div>
         </div>
@@ -127,7 +129,7 @@ export function LegalShell({
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#69696d] transition-colors hover:text-[#3b82f6]"
             >
               <ArrowLeft size={14} aria-hidden />
-              <span>Назад ко входу</span>
+              <span>{t('Назад ко входу')}</span>
             </Link>
             <span className="text-[#deded9]">•</span>
 
@@ -135,7 +137,7 @@ export function LegalShell({
               variant="outline"
               className="border-[#e7e7e4] text-[11px] font-normal text-[#69696d]"
             >
-              Редакция {version}
+              {t('Редакция')} {version}
             </Badge>
           </div>
 
@@ -148,17 +150,19 @@ export function LegalShell({
 
           <div className="mt-5 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-[#69696d]">
             <div>
-              <span className="text-[#94a3b8]">Последнее обновление: </span>
+              <span className="text-[#94a3b8]">
+                {t('Последнее обновление:')}{' '}
+              </span>
               <span className="font-medium text-[#475569]">{lastUpdated}</span>
             </div>
             <div>
-              <span className="text-[#94a3b8]">Юрисдикция: </span>
+              <span className="text-[#94a3b8]">{t('Юрисдикция:')} </span>
               <span className="font-medium text-[#475569]">
-                Республика Казахстан
+                {t('Республика Казахстан')}
               </span>
             </div>
             <div>
-              <span className="text-[#94a3b8]">Контакты: </span>
+              <span className="text-[#94a3b8]">{t('Контакты:')} </span>
               <a
                 href="mailto:kairatovalmat2003@gmail.com"
                 className="font-medium text-[#3b82f6] hover:underline"
@@ -179,7 +183,7 @@ export function LegalShell({
                   : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
               )}
             >
-              Политика конфиденциальности
+              {t('Политика конфиденциальности')}
             </Link>
             <Link
               to="/terms"
@@ -190,7 +194,7 @@ export function LegalShell({
                   : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
               )}
             >
-              Условия использования
+              {t('Условия использования')}
             </Link>
           </div>
         </div>
@@ -203,7 +207,7 @@ export function LegalShell({
           <aside className="hidden lg:col-span-4 lg:block">
             <div className="sticky top-26 rounded-[14px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
               <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#94a3b8]">
-                Содержание документа
+                {t('Содержание документа')}
               </h2>
               <nav className="flex flex-col space-y-1">
                 {toc.map((item) => {
@@ -227,10 +231,12 @@ export function LegalShell({
 
               <div className="mt-6 border-t border-[#f1f5f9] pt-4 text-xs text-[#64748b]">
                 <p className="mb-2 font-medium text-[#0f172a]">
-                  Возникли вопросы?
+                  {t('Возникли вопросы?')}
                 </p>
                 <p className="leading-relaxed">
-                  По любым вопросам обработки персональных данных пишите на{' '}
+                  {t(
+                    'По любым вопросам обработки персональных данных пишите на',
+                  )}{' '}
                   <a
                     href="mailto:kairatovalmat2003@gmail.com"
                     className="text-[#3b82f6] hover:underline"
@@ -254,7 +260,9 @@ export function LegalShell({
       {/* Footer */}
       <footer className="border-t border-[#e7e7e4] bg-white py-8 text-sm text-[#64748b]">
         <div className="container-shell flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p>© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.</p>
+          <p>
+            {t('© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.')}
+          </p>
           <div className="flex items-center gap-5 text-xs">
             <Link
               to="/privacy"
@@ -263,7 +271,7 @@ export function LegalShell({
                 isPrivacy && 'font-semibold text-[#3b82f6]',
               )}
             >
-              Политика конфиденциальности
+              {t('Политика конфиденциальности')}
             </Link>
             <span className="text-[#cbd5e1]">•</span>
             <Link
@@ -273,14 +281,14 @@ export function LegalShell({
                 isTerms && 'font-semibold text-[#3b82f6]',
               )}
             >
-              Условия использования
+              {t('Условия использования')}
             </Link>
             <span className="text-[#cbd5e1]">•</span>
             <Link
               to="/login"
               className="transition-colors hover:text-[#0f172a]"
             >
-              Вход
+              {t('Вход')}
             </Link>
           </div>
         </div>

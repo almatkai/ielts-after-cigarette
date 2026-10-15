@@ -1,0 +1,754 @@
+{
+  "Юридические документы": {
+    "kk": "Құқықтық құжаттар",
+    "en": "Legal documents"
+  },
+  "Распечатать документ": {
+    "kk": "Құжатты басып шығару",
+    "en": "Print document"
+  },
+  "Печать": {
+    "kk": "Басып шығару",
+    "en": "Print"
+  },
+  "Войти в кабинет": {
+    "kk": "Кабинетке кіру",
+    "en": "Sign in to your account"
+  },
+  "Назад ко входу": {
+    "kk": "Кіру бетіне оралу",
+    "en": "Back to sign in"
+  },
+  "Редакция": {
+    "kk": "Нұсқа",
+    "en": "Revision"
+  },
+  "Последнее обновление:": {
+    "kk": "Соңғы жаңарту:",
+    "en": "Last updated:"
+  },
+  "Юрисдикция:": {
+    "kk": "Юрисдикция:",
+    "en": "Jurisdiction:"
+  },
+  "Республика Казахстан": {
+    "kk": "Қазақстан Республикасы",
+    "en": "Republic of Kazakhstan"
+  },
+  "Контакты:": {
+    "kk": "Байланыс:",
+    "en": "Contacts:"
+  },
+  "Содержание документа": {
+    "kk": "Құжат мазмұны",
+    "en": "Document contents"
+  },
+  "Возникли вопросы?": {
+    "kk": "Сұрақтарыңыз бар ма?",
+    "en": "Have questions?"
+  },
+  "По любым вопросам обработки персональных данных пишите на": {
+    "kk": "Дербес деректерді өңдеуге қатысты кез келген сұрақтар бойынша жазыңыз",
+    "en": "For any questions regarding personal data processing, write to"
+  },
+  "© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.": {
+    "kk": "© 2026 Daiyndyq IELTS. Барлық құқықтар қорғалған. Астана, Қазақстан.",
+    "en": "© 2026 Daiyndyq IELTS. All rights reserved. Astana, Kazakhstan."
+  },
+  "Вход": {
+    "kk": "Кіру",
+    "en": "Sign in"
+  },
+  "Политика конфиденциальности": {
+    "kk": "Құпиялылық саясаты",
+    "en": "Privacy Policy"
+  },
+  "Условия использования": {
+    "kk": "Пайдалану шарттары",
+    "en": "Terms of Use"
+  },
+  "1. Общие положения": {
+    "kk": "1. Жалпы ережелер",
+    "en": "1. General provisions"
+  },
+  "2. Оператор данных и контакты": {
+    "kk": "2. Деректер операторы және байланыс",
+    "en": "2. Data controller and contacts"
+  },
+  "3. Собираемые данные": {
+    "kk": "3. Жинақталатын деректер",
+    "en": "3. Data collected"
+  },
+  "4. Цели обработки данных": {
+    "kk": "4. Деректерді өңдеу мақсаттары",
+    "en": "4. Purposes of data processing"
+  },
+  "5. Использование AI и анализ ответов": {
+    "kk": "5. ЖИ пайдалану және жауаптарды талдау",
+    "en": "5. Use of AI and analysis of responses"
+  },
+  "6. Правовые основания": {
+    "kk": "6. Құқықтық негіздер",
+    "en": "6. Legal grounds"
+  },
+  "7. Передача третьим лицам": {
+    "kk": "7. Үшінші тұлғаларға беру",
+    "en": "7. Disclosure to third parties"
+  },
+  "8. Шифрование и безопасность данных": {
+    "kk": "8. Деректерді шифрлау және қауіпсіздік",
+    "en": "8. Data encryption and security"
+  },
+  "9. Права пользователя": {
+    "kk": "9. Пайдаланушы құқықтары",
+    "en": "9. User rights"
+  },
+  "10. Файлы cookie и технические логи": {
+    "kk": "10. Cookie файлдары және техникалық журналдар",
+    "en": "10. Cookies and technical logs"
+  },
+  "11. Изменение политики": {
+    "kk": "11. Саясатқа өзгерістер енгізу",
+    "en": "11. Changes to the Policy"
+  },
+  "Настоящая Политика описывает, как платформа Daiyndyq IELTS собирает, использует, шифрует, хранит и защищает ваши персональные данные при использовании образовательного сервиса.": {
+    "kk": "Осы Саясат Daiyndyq IELTS платформасының білім беру сервисін пайдалану кезінде сіздің дербес деректеріңізді қалай жинайтынын, пайдаланатынын, шифрлайтынын, сақтайтынын және қорғайтынын сипаттайды.",
+    "en": "This Policy describes how the Daiyndyq IELTS platform collects, uses, encrypts, stores and protects your personal data when you use the educational service."
+  },
+  "5 октября 2026 г.": {
+    "kk": "5 қазан 2026 ж.",
+    "en": "October 5, 2026"
+  },
+  "Краткое резюме наших принципов безопасности:": {
+    "kk": "Қауіпсіздік қағидаттарымыздың қысқаша мазмұны:",
+    "en": "A brief summary of our security principles:"
+  },
+  "Криптографическое шифрование персональных данных:": {
+    "kk": "Дербес деректерді криптографиялық шифрлау:",
+    "en": "Cryptographic encryption of personal data:"
+  },
+  "номера телефонов и чувствительные данные пользователя хранятся в базе данных в зашифрованном виде. При физической краже или утечке базы данных прочитать эти данные невозможно без секретного ключа.": {
+    "kk": "пайдаланушының телефон нөмірлері мен сезімтал деректері дерекқорда шифрланған түрде сақталады. Дерекқор физикалық түрде ұрланған немесе сыртқа тараған жағдайда бұл деректерді құпия кілтсіз оқу мүмкін емес.",
+    "en": "users’ phone numbers and sensitive data are stored in the database in encrypted form. If the database is physically stolen or leaked, this data cannot be read without the secret key."
+  },
+  "Изоляция секретных ключей:": {
+    "kk": "Құпия кілттерді оқшаулау:",
+    "en": "Isolation of secret keys:"
+  },
+  "ключ дешифрования не хранится в коде или репозитории, а безопасно управляется через изолированное хранилище секретов CI/CD (GitHub Actions Secrets).": {
+    "kk": "дешифрлау кілті кодта немесе репозиторийде сақталмайды, ол оқшауланған CI/CD құпиялар қоймасы (GitHub Actions Secrets) арқылы қауіпсіз басқарылады.",
+    "en": "the decryption key is not stored in the code or repository; it is securely managed through an isolated CI/CD secrets store (GitHub Actions Secrets)."
+  },
+  "Строгий контроль доступа:": {
+    "kk": "Қатаң қолжетімділік бақылауы:",
+    "en": "Strict access control:"
+  },
+  "бэкенд расшифровывает данные динамически «на лету» строго для двух субъектов — самого авторизованного пользователя (владельца данных) и уполномоченного администратора платформы.": {
+    "kk": "бэкенд деректерді «ұшпалы» режимде динамикалық түрде тек екі субъект үшін ғана дешифрлайды — авторизациядан өткен пайдаланушының өзі (деректер иесі) және платформаның уәкілетті әкімшісі.",
+    "en": "the backend decrypts data dynamically “on the fly” strictly for two parties only — the authorized user themselves (the data owner) and an authorized platform administrator."
+  },
+  "Локальный мониторинг ошибок: логирование сбоев и ошибок ведется на нашей собственной инфраструктуре через локальный GlitchTip, без экспорта ваших данных в сторонние облачные трекеры.": {
+    "kk": "Жергілікті қате мониторингі: іркілістер мен қателерді тіркеу жергілікті GlitchTip арқылы өз инфрақұрылымымызда жүргізіледі, деректеріңіз үшінші тарап бұлтты трекерлерге жіберілмейді.",
+    "en": "Local error monitoring: failure and error logging is carried out on our own infrastructure via a local GlitchTip, without exporting your data to third-party cloud trackers."
+  },
+  "Мы не продаем и не передаем ваши персональные данные рекламным брокерам или сторонним маркетинговым сервисам.": {
+    "kk": "Біз сіздің дербес деректеріңізді жарнама брокерлеріне немесе үшінші тарап маркетингтік сервистерге сатпаймыз және бермейміз.",
+    "en": "We do not sell or disclose your personal data to advertising brokers or third-party marketing services."
+  },
+  "Вы можете запросить выгрузку или полное удаление ваших данных в любой момент.": {
+    "kk": "Сіз кез келген уақытта деректеріңіздің көшірмесін сұрай аласыз немесе оларды толық жоюды талап ете аласыз.",
+    "en": "You may request an export or complete deletion of your data at any time."
+  },
+  "1.1. Настоящая Политика конфиденциальности (далее — «Политика») определяет порядок сбора, накопления, хранения, использования, распространения, обезличивания, блокирования и уничтожения персональных данных пользователей онлайн-платформы подготовки к экзамену IELTS «Daiyndyq IELTS» (далее — «Сервис», «Платформа», «мы»).": {
+    "kk": "1.1. Осы Құпиялылық саясаты (бұдан әрі — «Саясат») IELTS емтиханына дайындық жөніндегі «Daiyndyq IELTS» онлайн-платформасы (бұдан әрі — «Сервис», «Платформа», «біз») пайдаланушыларының дербес деректерін жинау, жинақтау, сақтау, пайдалану, тарату, дербестендіру, бұғаттау және жою тәртібін айқындайды.",
+    "en": "1.1. This Privacy Policy (hereinafter the “Policy”) sets out the procedure for collecting, accumulating, storing, using, disclosing, anonymizing, blocking and destroying the personal data of users of the “Daiyndyq IELTS” online IELTS preparation platform (hereinafter the “Service”, the “Platform”, “we”)."
+  },
+  "1.2. Сервис соблюдает права и свободы граждан при обработке персональных данных, руководствуясь Конституцией Республики Казахстан, Законом Республики Казахстан от 21 мая 2013 года № 94-V «О персональных данных и их защите», а также применимыми нормами международного права в сфере защиты цифровой информации.": {
+    "kk": "1.2. Сервис дербес деректерді өңдеу кезінде азаматтардың құқықтары мен бостандықтарын сақтайды және Қазақстан Республикасының Конституциясын, 2013 жылғы 21 мамырдағы № 94-V «Дербес деректер және оларды қорғау туралы» Қазақстан Республикасының Заңын, сондай-ақ цифрлық ақпаратты қорғау саласындағы халықаралық құқықтың қолданылатын нормаларын басшылыққа алады.",
+    "en": "1.2. The Service respects the rights and freedoms of individuals when processing personal data, guided by the Constitution of the Republic of Kazakhstan, Law No. 94-V of the Republic of Kazakhstan dated May 21, 2013 “On Personal Data and Its Protection”, as well as applicable norms of international law on digital information protection."
+  },
+  "1.3. Прохождение процедуры авторизации через аккаунт Google и подтверждение чекбокса согласия («Принимаю условия использования и политику конфиденциальности») подтверждает факт ознакомления пользователя с настоящей Политикой и является его добровольным, осознанным и информированным согласием на обработку персональных данных на указанных условиях.": {
+    "kk": "1.3. Google аккаунты арқылы авторизация рәсімінен өту және келісім чекбоксын растау («Пайдалану шарттары мен құпиялылық саясатын қабылдаймын») пайдаланушының осы Саясатпен танысқанын растайды және оның дербес деректерді көрсетілген шарттарда өңдеуге берген ерікті, саналы және хабардар келісімі болып табылады.",
+    "en": "1.3. Completing authorization via a Google account and confirming the consent checkbox (“I accept the Terms of Use and Privacy Policy”) confirms that the user has read this Policy and constitutes their voluntary, informed consent to the processing of personal data on the stated terms."
+  },
+  "2. Оператор персональных данных и контакты": {
+    "kk": "2. Дербес деректер операторы және байланыс",
+    "en": "2. Personal data controller and contacts"
+  },
+  "2.1. Оператором базы персональных данных пользователей Сервиса является проект «Daiyndyq IELTS» (г. Астана, Республика Казахстан).": {
+    "kk": "2.1. Сервис пайдаланушыларының дербес деректер базасының операторы — «Daiyndyq IELTS» жобасы (Астана қ., Қазақстан Республикасы).",
+    "en": "2.1. The controller of the Service users’ personal data database is the “Daiyndyq IELTS” project (Astana, Republic of Kazakhstan)."
+  },
+  "2.2. Контактным каналом по всем вопросам обработки, изменения, выгрузки или отзыва согласия на обработку персональных данных является электронная почта:": {
+    "kk": "2.2. Дербес деректерді өңдеу, өзгерту, көшіріп алу немесе өңдеуге келісімді қайтарып алу мәселелері бойынша байланыс арнасы — электрондық пошта:",
+    "en": "2.2. The contact channel for all questions regarding the processing, rectification, export or withdrawal of consent to the processing of personal data is email:"
+  },
+  "Служба заботы о пользователях и защиты данных:": {
+    "kk": "Пайдаланушыларға қамқорлық және деректерді қорғау қызметі:",
+    "en": "User care and data protection service:"
+  },
+  "Время ответа: до 2 рабочих дней.": {
+    "kk": "Жауап беру уақыты: 2 жұмыс күніне дейін.",
+    "en": "Response time: up to 2 business days."
+  },
+  "3. Категории собираемых персональных данных": {
+    "kk": "3. Жинақталатын дербес деректер санаттары",
+    "en": "3. Categories of personal data collected"
+  },
+  "Мы собираем только те данные, которые необходимы для предоставления образовательных услуг, персонализации процесса подготовки к IELTS и связи со студентом:": {
+    "kk": "Біз тек білім беру қызметтерін ұсыну, IELTS-ке дайындық процесін дербестендіру және студентпен байланыс үшін қажетті деректерді ғана жинаймыз:",
+    "en": "We collect only the data necessary to provide educational services, personalize IELTS preparation, and communicate with the student:"
+  },
+  "3.1. Данные авторизации Google (OAuth 2.0)": {
+    "kk": "3.1. Google авторизация деректері (OAuth 2.0)",
+    "en": "3.1. Google sign-in data (OAuth 2.0)"
+  },
+  "При входе через Google мы получаем уникальный Google ID (sub), адрес электронной почты (email), а также имя и аватар профиля, предоставляемые Google в соответствии с вашими настройками доступа.": {
+    "kk": "Google арқылы кірген кезде біз бірегей Google ID (sub), электрондық пошта мекенжайын (email), сондай-ақ Google сіздің қолжетімділік баптауларыңызға сәйкес ұсынатын профиль атауы мен аватарын аламыз.",
+    "en": "When you sign in with Google, we receive your unique Google ID (sub), email address (email), as well as the profile name and avatar provided by Google according to your access settings."
+  },
+  "3.2. Профильные и контактные данные (защищенные шифрованием)": {
+    "kk": "3.2. Профильдік және байланыс деректері (шифрлаумен қорғалған)",
+    "en": "3.2. Profile and contact data (protected by encryption)"
+  },
+  "Имя пользователя, указанное при регистрации (для персонального обращения в интерфейсе), а также контактный номер телефона WhatsApp в международном формате (например, +7 700 123 45 67). Номер телефона шифруется перед записью в базу данных и используется исключительно для идентификации аккаунта и прямой связи с куратором или администратором. Внешние рекламные рассылки и сторонние спам-сервисы не используются.": {
+    "kk": "Тіркелу кезінде көрсетілген пайдаланушы аты (интерфейсте жеке қаралу үшін), сондай-ақ халықаралық форматтағы WhatsApp байланыс телефон нөмірі (мысалы, +7 700 123 45 67). Телефон нөмірі дерекқорға жазылмас бұрын шифрланады және тек аккаунтты сәйкестендіру мен куратор немесе әкімшімен тікелей байланыс үшін пайдаланылады. Сыртқы жарнамалық жіберілімдер мен үшінші тарап спам-сервистер пайдаланылмайды.",
+    "en": "The username provided at registration (for personal address in the interface) as well as the contact WhatsApp phone number in international format (e.g. +7 700 123 45 67). The phone number is encrypted before being written to the database and is used solely to identify the account and for direct communication with a curator or administrator. External advertising mailings and third-party spam services are not used."
+  },
+  "3.3. Образовательные данные и материалы подготовки": {
+    "kk": "3.3. Білім беру деректері және дайындық материалдары",
+    "en": "3.3. Educational data and study materials"
+  },
+  "Выбранный формат экзамена (Academic или General Training), целевой балл IELTS и дата сдачи, история выполнения практических заданий и полных симуляторов (Full Mock Exams), выбранные ответы в модулях Reading и Listening, тексты эссе в модуле Writing, аудиозаписи ответов и их расшифровки в модуле Speaking, а также диалоги с учебным AI-ассистентом («Юки»).": {
+    "kk": "Таңдалған емтихан форматы (Academic немесе General Training), мақсатты IELTS балы және тапсыру күні, практикалық тапсырмалар мен толық симуляторларды (Full Mock Exams) орындау тарихы, Reading және Listening модульдеріндегі таңдалған жауаптар, Writing модуліндегі эссе мәтіндері, Speaking модуліндегі жауаптардың аудиожазбалары мен олардың транскрипттері, сондай-ақ оқу ЖИ-көмекшісі («Юки») диалогтары.",
+    "en": "The selected exam format (Academic or General Training), target IELTS score and test date, history of completed practice tasks and full simulators (Full Mock Exams), selected answers in the Reading and Listening modules, essay texts in the Writing module, audio recordings of responses and their transcripts in the Speaking module, as well as dialogues with the study AI assistant (“Yuki”)."
+  },
+  "3.4. Техническая и системная информация": {
+    "kk": "3.4. Техникалық және жүйелік ақпарат",
+    "en": "3.4. Technical and system information"
+  },
+  "IP-адрес пользователя, тип и версия браузера, операционная система, язык интерфейса, метки времени запросов, сессионные JWT-токены авторизации, а также технические события об ошибках приложения, собираемые локально через собственную систему мониторинга без передачи сторонним коммерческим аналитическим компаниям.": {
+    "kk": "Пайдаланушының IP-мекенжайы, браузер түрі мен нұсқасы, операциялық жүйе, интерфейс тілі, сұраулардың уақыт белгілері, сессиялық JWT авторизация токендері, сондай-ақ үшінші тарап коммерциялық аналитикалық компанияларға берілместен, меншікті мониторинг жүйесі арқылы жергілікті жиналатын қолданба қателері туралы техникалық оқиғалар.",
+    "en": "The user’s IP address, browser type and version, operating system, interface language, request timestamps, session JWT authorization tokens, as well as technical application error events collected locally via our own monitoring system without disclosure to third-party commercial analytics companies."
+  },
+  "4. Цели обработки персональных данных": {
+    "kk": "4. Дербес деректерді өңдеу мақсаттары",
+    "en": "4. Purposes of personal data processing"
+  },
+  "Персональные данные собираются и обрабатываются исключительно в целях:": {
+    "kk": "Дербес деректер тек мына мақсаттарда жиналады және өңделеді:",
+    "en": "Personal data is collected and processed solely for the following purposes:"
+  },
+  "Создания и администрирования учетной записи пользователя в личном кабинете;": {
+    "kk": "Жеке кабинетте пайдаланушы аккаунтын құру және әкімшілендіру;",
+    "en": "Creating and administering the user’s account in the personal dashboard;"
+  },
+  "Безопасной идентификации и аутентификации пользователя при каждом входе через Google;": {
+    "kk": "Google арқылы әр кірген сайын пайдаланушыны қауіпсіз сәйкестендіру және аутентификациялау;",
+    "en": "Securely identifying and authenticating the user at each Google sign-in;"
+  },
+  "Обеспечения доступа к банку практических заданий, текстам, аудиозаписям и симуляторам тестов;": {
+    "kk": "Практикалық тапсырмалар банкіне, мәтіндерге, аудиожазбаларға және тест симуляторларына қолжетімділікті қамтамасыз ету;",
+    "en": "Providing access to the bank of practice tasks, texts, audio recordings and test simulators;"
+  },
+  "Автоматической проверки ответов, анализа допущенных ошибок и формирования персонального плана обучения;": {
+    "kk": "Жауаптарды автоматты тексеру, жіберілген қателерді талдау және дербес оқу жоспарын қалыптастыру;",
+    "en": "Automatically checking answers, analyzing mistakes and building a personal study plan;"
+  },
+  "Прямой связи по учебным вопросам и ответам на обращения пользователя;": {
+    "kk": "Оқу мәселелері бойынша тікелей байланыс және пайдаланушы өтініштеріне жауап беру;",
+    "en": "Direct communication on study matters and responding to user inquiries;"
+  },
+  "Предоставления оперативной технической поддержки и помощи при возникновении трудностей;": {
+    "kk": "Жедел техникалық қолдау көрсету және қиындықтар туындағанда көмектесу;",
+    "en": "Providing prompt technical support and assistance when difficulties arise;"
+  },
+  "Предотвращения несанкционированного доступа, защиты Сервиса от кибератак, мошенничества и злоупотреблений;": {
+    "kk": "Рұқсатсыз қолжетімділіктің алдын алу, Сервисті кибершабуылдардан, алаяқтықтан және теріс пайдаланудан қорғау;",
+    "en": "Preventing unauthorized access and protecting the Service from cyberattacks, fraud and abuse;"
+  },
+  "Аналитики и улучшения качества образовательного контента и удобства интерфейса платформы.": {
+    "kk": "Білім беру контентінің сапасы мен платформа интерфейсінің ыңғайлылығын талдау және жақсарту.",
+    "en": "Analyzing and improving the quality of educational content and the usability of the platform interface."
+  },
+  "5. Использование искусственного интеллекта и анализ ответов": {
+    "kk": "5. Жасанды интеллектіні пайдалану және жауаптарды талдау",
+    "en": "5. Use of artificial intelligence and analysis of responses"
+  },
+  "5.1. Для обеспечения качественной обратной связи по продуктивным навыкам IELTS (Writing и Speaking), а также для работы виртуального ассистента «Юки», Сервис применяет современные технологии искусственного интеллекта и языковые модели.": {
+    "kk": "5.1. IELTS өнімді дағдылары (Writing және Speaking) бойынша сапалы кері байланыс қамтамасыз ету, сондай-ақ «Юки» виртуалды көмекшісінің жұмысы үшін Сервис жасанды интеллекттің заманауи технологиялары мен тілдік модельдерін қолданады.",
+    "en": "5.1. To provide quality feedback on productive IELTS skills (Writing and Speaking), as well as to power the “Yuki” virtual assistant, the Service uses modern artificial intelligence technologies and language models."
+  },
+  "5.2. При отправке эссе или аудиоответов на проверку текст задания и ответ студента направляются через защищенный закрытый API доверенным провайдерам искусственного интеллекта (включая Anthropic, OpenAI, Google Cloud AI) исключительно в целях семантического анализа, выявления грамматических и лексических ошибок, оценки по критериям IELTS (Task Achievement, Coherence and Cohesion, Lexical Resource, Grammatical Range and Accuracy) и формирования рекомендаций.": {
+    "kk": "5.2. Эссе немесе аудиожауаптар тексеруге жіберілгенде тапсырма мәтіні мен студент жауабы семантикалық талдау, грамматикалық және лексикалық қателерді анықтау, IELTS критерийлері бойынша бағалау (Task Achievement, Coherence and Cohesion, Lexical Resource, Grammatical Range and Accuracy) және ұсынымдар қалыптастыру мақсатында ғана қорғалған жабық API арқылы сенімді жасанды интеллект провайдерлеріне (Anthropic, OpenAI, Google Cloud AI қоса алғанда) жіберіледі.",
+    "en": "5.2. When essays or audio responses are submitted for checking, the task text and the student’s response are sent via a secure private API to trusted artificial intelligence providers (including Anthropic, OpenAI, Google Cloud AI) solely for semantic analysis, detection of grammatical and lexical errors, assessment against IELTS criteria (Task Achievement, Coherence and Cohesion, Lexical Resource, Grammatical Range and Accuracy), and generating recommendations."
+  },
+  "5.3. Передаваемые тексты ответов обрабатываются в обезличенном виде: мы не передаем провайдерам AI ваши фамилию, email или номер телефона. Передаваемые данные не используются поставщиками AI для публичного обучения базовых моделей без специального согласия.": {
+    "kk": "5.3. Жіберілетін жауап мәтіндері дербестендірілмеген түрде өңделеді: біз ЖИ провайдерлеріне сіздің тегіңізді, email немесе телефон нөміріңізді бермейміз. Жіберілген деректер ЖИ жеткізушілерімен арнайы келісімсіз базалық модельдерді жария түрде оқыту үшін пайдаланылмайды.",
+    "en": "5.3. Submitted response texts are processed in anonymized form: we do not share your surname, email or phone number with AI providers. The transmitted data is not used by AI vendors to publicly train base models without specific consent."
+  },
+  "6. Правовые основания обработки данных": {
+    "kk": "6. Деректерді өңдеудің құқықтық негіздері",
+    "en": "6. Legal grounds for data processing"
+  },
+  "6.1. Правовым основанием обработки персональных данных является ст. 7, 8 и 9 Закона РК «О персональных данных и их защите», а именно:": {
+    "kk": "6.1. Дербес деректерді өңдеудің құқықтық негізі — «Дербес деректер және оларды қорғау туралы» ҚР Заңының 7, 8 және 9-баптары, атап айтқанда:",
+    "en": "6.1. The legal grounds for processing personal data are Articles 7, 8 and 9 of the Law of the Republic of Kazakhstan “On Personal Data and Its Protection”, namely:"
+  },
+  "Согласие субъекта персональных данных:": {
+    "kk": "Дербес деректер субъектісінің келісімі:",
+    "en": "Consent of the personal data subject:"
+  },
+  "выражается пользователем путем проставления электронной отметки согласия при завершении регистрации;": {
+    "kk": "пайдаланушы тіркелуді аяқтау кезінде электрондық келісім белгісін қою арқылы білдіреді;",
+    "en": "expressed by the user by marking electronic consent upon completing registration;"
+  },
+  "Исполнение пользовательского соглашения:": {
+    "kk": "Пайдаланушы келісімін орындау:",
+    "en": "Performance of the user agreement:"
+  },
+  "обработка данных необходима для надлежащего оказания образовательных услуг в соответствии с Условиями использования;": {
+    "kk": "деректерді өңдеу Пайдалану шарттарына сәйкес білім беру қызметтерін тиісінше көрсету үшін қажет;",
+    "en": "data processing is necessary for the proper provision of educational services in accordance with the Terms of Use;"
+  },
+  "Законный интерес оператора:": {
+    "kk": "Оператордың заңды мүддесі:",
+    "en": "Legitimate interest of the controller:"
+  },
+  "поддержание безопасности инфраструктуры, защита от несанкционированного доступа и обеспечение непрерывной работы Сервиса.": {
+    "kk": "инфрақұрылым қауіпсіздігін сақтау, рұқсатсыз қолжетімділіктен қорғау және Сервистің үздіксіз жұмысын қамтамасыз ету.",
+    "en": "maintaining infrastructure security, protecting against unauthorized access and ensuring the continuous operation of the Service."
+  },
+  "7. Передача данных третьим лицам и трансграничная передача": {
+    "kk": "7. Деректерді үшінші тұлғаларға беру және трансшекаралық беру",
+    "en": "7. Disclosure of data to third parties and cross-border transfer"
+  },
+  "7.1. Сервис не продает, не сдает в аренду и не раскрывает ваши персональные данные третьим лицам в маркетинговых или рекламных целях.": {
+    "kk": "7.1. Сервис сіздің дербес деректеріңізді маркетингтік немесе жарнамалық мақсаттарда үшінші тұлғаларға сатпайды, жалға бермейді және ашпайды.",
+    "en": "7.1. The Service does not sell, rent out or disclose your personal data to third parties for marketing or advertising purposes."
+  },
+  "7.2. Передача персональных данных допускается исключительно проверенным техническим партнерам, обеспечивающим функционирование инфраструктуры Сервиса:": {
+    "kk": "7.2. Дербес деректерді беруге Сервис инфрақұрылымының жұмысын қамтамасыз ететін тексерілген техникалық серіктестерге ғана жол беріледі:",
+    "en": "7.2. Personal data may be disclosed solely to verified technical partners that ensure the functioning of the Service infrastructure:"
+  },
+  "Google LLC (США):": {
+    "kk": "Google LLC (АҚШ):",
+    "en": "Google LLC (USA):"
+  },
+  "провайдер сервиса безопасной аутентификации Google Identity Services;": {
+    "kk": "қауіпсіз аутентификация сервисінің провайдері Google Identity Services;",
+    "en": "provider of the secure authentication service Google Identity Services;"
+  },
+  "Облачные провайдеры хостинга и баз данных:": {
+    "kk": "Хостинг және дерекқорлардың бұлтты провайдерлері:",
+    "en": "Cloud hosting and database providers:"
+  },
+  "защищенные серверы, где развернута база данных пользователей (с криптографическим шифрованием данных at rest) и изолированное хранилище файлов (MinIO/S3);": {
+    "kk": "пайдаланушылар дерекқоры (деректерді at rest криптографиялық шифрлаумен) және оқшауланған файл қоймасы (MinIO/S3) орналасқан қорғалған серверлер;",
+    "en": "secure servers hosting the user database (with cryptographic encryption of data at rest) and isolated file storage (MinIO/S3);"
+  },
+  "Провайдеры AI-аналитики:": {
+    "kk": "ЖИ-талдау провайдерлері:",
+    "en": "AI analytics providers:"
+  },
+  "закрытые API для автоматической оценки письменных и устных работ в обезличенном виде;": {
+    "kk": "жазбаша және ауызша жұмыстарды дербестендірілмеген түрде автоматты бағалауға арналған жабық API;",
+    "en": "private APIs for automated assessment of written and oral work in anonymized form;"
+  },
+  "Локальный мониторинг стабильности:": {
+    "kk": "Тұрақтылықтың жергілікті мониторингі:",
+    "en": "Local stability monitoring:"
+  },
+  "технические журналы ошибок обрабатываются с помощью open-source решения GlitchTip, развернутого на наших собственных серверах, без передачи персональных данных третьим лицам.": {
+    "kk": "қате журналдары дербес деректерді үшінші тұлғаларға берместен, өз серверлерімізде орналасқан open-source GlitchTip шешімі арқылы өңделеді.",
+    "en": "technical error logs are processed using the open-source GlitchTip solution deployed on our own servers, without disclosing personal data to third parties."
+  },
+  "7.3. Трансграничная передача данных на территорию иностранных государств осуществляется в случаях, когда это необходимо для предоставления услуг Сервиса (например, аутентификация через Google), и только при условии обеспечения защиты передаваемых данных в соответствии с применимым законодательством.": {
+    "kk": "7.3. Деректерді шет мемлекеттер аумағына трансшекаралық беру Сервис қызметтерін ұсыну үшін қажет болған жағдайларда (мысалы, Google арқылы аутентификация) және берілетін деректердің қорғалуы қолданылатын заңнамаға сәйкес қамтамасыз етілген жағдайда ғана жүзеге асырылады.",
+    "en": "7.3. Cross-border transfer of data to foreign states is carried out where necessary to provide the Service (e.g. authentication via Google), and only provided that the protection of the transferred data is ensured in accordance with applicable law."
+  },
+  "8. Шифрование, хранение и безопасность персональных данных": {
+    "kk": "8. Дербес деректерді шифрлау, сақтау және қауіпсіздік",
+    "en": "8. Encryption, storage and security of personal data"
+  },
+  "Безопасность ваших персональных данных является нашим ключевым приоритетом. Архитектура Сервиса спроектирована по принципу максимальной защиты от несанкционированного доступа:": {
+    "kk": "Дербес деректеріңіздің қауіпсіздігі — біздің басты басымдығымыз. Сервис архитектурасы рұқсатсыз қолжетімділіктен барынша қорғау қағидаты бойынша жобаланған:",
+    "en": "The security of your personal data is our key priority. The Service architecture is designed around maximum protection against unauthorized access:"
+  },
+  "8.1. Криптографическое шифрование данных при хранении (Encryption at Rest)": {
+    "kk": "8.1. Деректерді сақтау кезінде криптографиялық шифрлау (Encryption at Rest)",
+    "en": "8.1. Cryptographic encryption of data at rest (Encryption at Rest)"
+  },
+  "Все конфиденциальные поля профиля пользователя (включая контактный номер телефона WhatsApp) подвергаются симметричному криптографическому шифрованию перед записью в базу данных. В случае несанкционированного доступа к базе данных или ее физического хищения злоумышленник получает исключительно нечитаемый зашифрованный массив байтов (ciphertext), из которого невозможно восстановить персональные данные без мастер-ключа.": {
+    "kk": "Пайдаланушы профилінің барлық құпия өрістері (соның ішінде WhatsApp байланыс телефон нөмірі) дерекқорға жазылмас бұрын симметриялық криптографиялық шифрлаудан өтеді. Дерекқорға рұқсатсыз қол жеткізілген немесе ол физикалық түрде ұрланған жағдайда зиянкес тек мастер-кілтсіз дербес деректерді қалпына келтіру мүмкін емес оқылмайтын шифрланған байттар массивін (ciphertext) алады.",
+    "en": "All confidential fields of the user profile (including the WhatsApp contact phone number) undergo symmetric cryptographic encryption before being written to the database. In the event of unauthorized access to the database or its physical theft, an attacker obtains only an unreadable encrypted byte array (ciphertext) from which personal data cannot be recovered without the master key."
+  },
+  "8.2. Безопасное хранение и изоляция ключей дешифрования": {
+    "kk": "8.2. Дешифрлау кілттерін қауіпсіз сақтау және оқшаулау",
+    "en": "8.2. Secure storage and isolation of decryption keys"
+  },
+  "Ключ шифрования и дешифрования никогда не сохраняется в открытом виде в исходном коде или репозитории приложения. Ключ хранится в защищенном хранилище секретов CI/CD платформы (GitHub Actions Secrets) и передается в изолированное рантайм-окружение бэкенд-сервера только в момент деплоя через защищенные переменные окружения.": {
+    "kk": "Шифрлау және дешифрлау кілті ешқашан қолданбаның бастапқы кодында немесе репозиторийінде ашық түрде сақталмайды. Кілт CI/CD платформасының қорғалған құпиялар қоймасында (GitHub Actions Secrets) сақталады және бэкенд-сервердің оқшауланған рантайм-ортасына тек деплой сәтінде қорғалған орта айнымалылары арқылы беріледі.",
+    "en": "The encryption and decryption key is never stored in plain text in the application source code or repository. The key is kept in the CI/CD platform’s protected secrets store (GitHub Actions Secrets) and is passed to the backend server’s isolated runtime environment only at deploy time via protected environment variables."
+  },
+  "8.3. Динамическое дешифрование и строгий ролевой доступ": {
+    "kk": "8.3. Динамикалық дешифрлау және қатаң рөлдік қолжетімділік",
+    "en": "8.3. Dynamic decryption and strict role-based access"
+  },
+  "Бэкенд расшифровывает данные исключительно в оперативной памяти (in-memory) «на лету» строго при обработке аутентифицированного запроса. Расшифрованные данные доступны строго двум сторонам:": {
+    "kk": "Бэкенд деректерді тек аутентификациядан өткен сұрауды өңдеу кезінде жедел жадта (in-memory) «ұшпалы» режимде ғана дешифрлайды. Дешифрланған деректер тек екі тарапқа ғана қолжетімді:",
+    "en": "The backend decrypts data exclusively in memory (in-memory) “on the fly” strictly while processing an authenticated request. The decrypted data is available strictly to two parties:"
+  },
+  "Самому пользователю:": {
+    "kk": "Пайдаланушының өзіне:",
+    "en": "The user themselves:"
+  },
+  "прошедшему успешную аутентификацию в системе под своей учетной записью;": {
+    "kk": "жүйеде өз аккаунтымен сәтті аутентификациядан өткен;",
+    "en": "who has successfully authenticated in the system under their own account;"
+  },
+  "Уполномоченным администраторам платформы:": {
+    "kk": "Платформаның уәкілетті әкімшілеріне:",
+    "en": "Authorized platform administrators:"
+  },
+  "исключительно в рамках служебных обязанностей по технической поддержке и модерации через защищенную административную панель.": {
+    "kk": "қорғалған әкімшілік панель арқылы техникалық қолдау және модерация жөніндегі қызметтік міндеттері шеңберінде ғана.",
+    "en": "solely within their official duties of technical support and moderation via the protected admin panel."
+  },
+  "Никакой другой пользователь платформы или неавторизованное лицо не имеет технической возможности получить доступ к чужим персональным данным.": {
+    "kk": "Платформаның басқа ешбір пайдаланушысы немесе авторизациядан өтпеген тұлға бөтен дербес деректерге қол жеткізудің техникалық мүмкіндігіне ие емес.",
+    "en": "No other platform user or unauthorized person has the technical ability to access someone else’s personal data."
+  },
+  "8.4. Дополнительные меры защиты инфраструктуры": {
+    "kk": "8.4. Инфрақұрылымды қорғаудың қосымша шаралары",
+    "en": "8.4. Additional infrastructure protection measures"
+  },
+  "Использование криптографических протоколов TLS/HTTPS для шифрования всего сетевого трафика между браузером и сервером;": {
+    "kk": "Браузер мен сервер арасындағы барлық желілік трафикті шифрлау үшін TLS/HTTPS криптографиялық хаттамаларын пайдалану;",
+    "en": "Using TLS/HTTPS cryptographic protocols to encrypt all network traffic between the browser and the server;"
+  },
+  "Хранение сессионных токенов в защищенных cookies с атрибутами HttpOnly, Secure и SameSite;": {
+    "kk": "Сессиялық токендерді HttpOnly, Secure және SameSite атрибуттары бар қорғалған cookies ішінде сақтау;",
+    "en": "Storing session tokens in protected cookies with the HttpOnly, Secure and SameSite attributes;"
+  },
+  "Регулярное резервное копирование и изоляция базы данных;": {
+    "kk": "Дерекқордың тұрақты резервтік көшірмесін жасау және оқшаулау;",
+    "en": "Regular backups and isolation of the database;"
+  },
+  "Автоматический мониторинг сетевой активности и защита от атак перебора паролей и токенов.": {
+    "kk": "Желілік белсенділікті автоматты бақылау және құпиясөздер мен токендерді іріктеу шабуылдарынан қорғау.",
+    "en": "Automatic monitoring of network activity and protection against password and token brute-force attacks."
+  },
+  "8.5. Персональные данные хранятся в течение всего периода активности учетной записи пользователя в Сервисе либо до момента получения требования об их уничтожении от пользователя.": {
+    "kk": "8.5. Дербес деректер пайдаланушы аккаунты Сервисте белсенді болған бүкіл кезеңде немесе пайдаланушыдан оларды жою туралы талап алынған сәтке дейін сақталады.",
+    "en": "8.5. Personal data is stored for the entire period the user’s account remains active in the Service or until a request for its destruction is received from the user."
+  },
+  "В соответствии с Законом РК «О персональных данных и их защите» вы имеете право:": {
+    "kk": "«Дербес деректер және оларды қорғау туралы» ҚР Заңына сәйкес сіз мыналарға құқылысыз:",
+    "en": "In accordance with the Law of the Republic of Kazakhstan “On Personal Data and Its Protection” you have the right to:"
+  },
+  "Получать подтверждение факта обработки ваших персональных данных и информацию о способах их обработки;": {
+    "kk": "Дербес деректеріңіздің өңделіп жатқанын растауды және оларды өңдеу тәсілдері туралы ақпарат алуға;",
+    "en": "Obtain confirmation that your personal data is being processed and information about how it is processed;"
+  },
+  "Требовать уточнения, блокирования или уничтожения неполных, устаревших или неточных данных;": {
+    "kk": "Толық емес, ескірген немесе дәл емес деректерді нақтылауды, бұғаттауды немесе жоюды талап етуге;",
+    "en": "Demand rectification, blocking or destruction of incomplete, outdated or inaccurate data;"
+  },
+  "Отозвать свое согласие на обработку персональных данных в любой момент, направив обращение на": {
+    "kk": "Дербес деректерді өңдеуге берген келісіміңізді кез келген уақытта өтініш жіберу арқылы қайтарып алуға",
+    "en": "Withdraw your consent to the processing of personal data at any time by sending a request to"
+  },
+  "Требовать полного удаления аккаунта («право на забвение») и всех связанных с ним попыток прохождения тестов и эссе;": {
+    "kk": "Аккаунтты толық жоюды («ұмытылу құқығы») және оған байланысты барлық тест пен эссе әрекеттерін жоюды талап етуге;",
+    "en": "Demand complete deletion of your account (“right to be forgotten”) and all associated test attempts and essays;"
+  },
+  "Обжаловать неправомерные действия или бездействие оператора в уполномоченном органе по защите персональных данных РК или в судебном порядке.": {
+    "kk": "Оператордың заңсыз әрекеттеріне немесе әрекетсіздігіне ҚР дербес деректерді қорғау жөніндегі уәкілетті органында немесе сот тәртібімен шағымдануға.",
+    "en": "Appeal unlawful actions or omissions of the controller to the authorized personal data protection authority of the Republic of Kazakhstan or in court."
+  },
+  "Обратите внимание: при отзыве согласия или удалении персональных данных дальнейшее предоставление доступа к личному кабинету и истории результатов становится невозможным.": {
+    "kk": "Назар аударыңыз: келісім қайтарып алынған немесе дербес деректер жойылған жағдайда жеке кабинетке және нәтижелер тарихына қолжетімділікті одан әрі беру мүмкін болмайды.",
+    "en": "Please note: if you withdraw consent or delete your personal data, further access to your personal dashboard and results history becomes impossible."
+  },
+  "10. Файлы cookie и технические данные": {
+    "kk": "10. Cookie файлдары және техникалық деректер",
+    "en": "10. Cookies and technical data"
+  },
+  "10.1. Сервис использует файлы cookie (куки) и локальное хранилище браузера (localStorage, sessionStorage) для обеспечения корректной работы платформы:": {
+    "kk": "10.1. Сервис платформаның дұрыс жұмысын қамтамасыз ету үшін cookie файлдарын және браузердің жергілікті қоймасын (localStorage, sessionStorage) пайдаланады:",
+    "en": "10.1. The Service uses cookies and browser local storage (localStorage, sessionStorage) to ensure the platform works correctly:"
+  },
+  "Обязательные сессионные cookie:": {
+    "kk": "Міндетті сессиялық cookie:",
+    "en": "Strictly necessary session cookies:"
+  },
+  "необходимы для поддержания авторизации пользователя и защиты от межсайтовой подделки запросов (CSRF);": {
+    "kk": "пайдаланушы авторизациясын сақтау және сайтаралық сұрауларды қолдан жасаудан қорғау (CSRF) үшін қажет;",
+    "en": "necessary to maintain user authorization and protect against cross-site request forgery (CSRF);"
+  },
+  "Функциональные параметры:": {
+    "kk": "Функционалдық параметрлер:",
+    "en": "Functional settings:"
+  },
+  "сохранение выбранного языка интерфейса, масштаба и темы отображения, состояния таймера теста;": {
+    "kk": "таңдалған интерфейс тілі, масштаб және көрсету тақырыбы, тест таймерінің күйі сақталады;",
+    "en": "storing the selected interface language, scale and display theme, and test timer state;"
+  },
+  "Локальные диагностические метрики:": {
+    "kk": "Жергілікті диагностикалық метрикалар:",
+    "en": "Local diagnostic metrics:"
+  },
+  "отслеживание стабильности работы приложения через локальный GlitchTip.": {
+    "kk": "жергілікті GlitchTip арқылы қолданба жұмысының тұрақтылығын бақылау.",
+    "en": "tracking application stability via the local GlitchTip."
+  },
+  "10.2. Вы можете в любой момент удалить файлы cookie или заблокировать их сохранение через настройки своего интернет-браузера. При отключении обязательных cookie авторизация в Сервисе может стать недоступной.": {
+    "kk": "10.2. Сіз кез келген уақытта cookie файлдарын жоя аласыз немесе оларды сақтауға интернет-браузеріңіздің баптаулары арқылы тыйым сала аласыз. Міндетті cookie өшірілген жағдайда Сервистегі авторизация қолжетімсіз болуы мүмкін.",
+    "en": "10.2. You may delete cookies at any time or block them from being stored via your web browser settings. If strictly necessary cookies are disabled, authorization in the Service may become unavailable."
+  },
+  "11. Изменение политики конфиденциальности": {
+    "kk": "11. Құпиялылық саясатына өзгерістер енгізу",
+    "en": "11. Changes to the Privacy Policy"
+  },
+  "11.1. Мы оставляем за собой право вносить изменения и дополнения в настоящую Политику в связи с обновлением функционала платформы, изменением требований законодательства Республики Казахстан или внедрением новых мер защиты.": {
+    "kk": "11.1. Біз платформа функционалының жаңартылуына, Қазақстан Республикасы заңнамасы талаптарының өзгеруіне немесе жаңа қорғау шараларының енгізілуіне байланысты осы Саясатқа өзгерістер мен толықтырулар енгізу құқығын өзімізде қалдырамыз.",
+    "en": "11.1. We reserve the right to amend and supplement this Policy in connection with platform functionality updates, changes in the legislation of the Republic of Kazakhstan, or the introduction of new protection measures."
+  },
+  "11.2. Новая редакция Политики вступает в силу с момента ее размещения на сайте Сервиса, если иное не предусмотрено новой редакцией. Дата актуальной редакции всегда указывается в начале документа.": {
+    "kk": "11.2. Саясаттың жаңа нұсқасы жаңа нұсқада өзгеше көзделмесе, Сервис сайтында жарияланған сәттен бастап күшіне енеді. Қолданыстағы нұсқаның күні әрдайым құжаттың басында көрсетіледі.",
+    "en": "11.2. A new version of the Policy takes effect from the moment it is published on the Service website, unless otherwise provided by the new version. The date of the current version is always stated at the beginning of the document."
+  },
+  "11.3. При внесении существенных изменений мы уведомим пользователей сообщением в личном кабинете либо через указанные каналы связи. Продолжение использования Сервиса после вступления изменений в силу означает полное согласие с обновленной редакцией.": {
+    "kk": "11.3. Елеулі өзгерістер енгізілген жағдайда пайдаланушыларға жеке кабинеттегі хабарлама немесе көрсетілген байланыс арналары арқылы хабарлаймыз. Өзгерістер күшіне енгеннен кейін Сервисті пайдалануды жалғастыру жаңартылған нұсқамен толық келісімді білдіреді.",
+    "en": "11.3. In the event of material changes, we will notify users via a message in the personal dashboard or through the specified communication channels. Continued use of the Service after the changes take effect constitutes full agreement with the updated version."
+  },
+  "2. Учетная запись и авторизация": {
+    "kk": "2. Аккаунт және авторизация",
+    "en": "2. Account and authorization"
+  },
+  "3. Правила использования платформы": {
+    "kk": "3. Платформаны пайдалану ережелері",
+    "en": "3. Platform usage rules"
+  },
+  "4. Интеллектуальная собственность и бренд IELTS": {
+    "kk": "4. Зияткерлік меншік және IELTS бренді",
+    "en": "4. Intellectual property and the IELTS brand"
+  },
+  "5. Использование искусственного интеллекта": {
+    "kk": "5. Жасанды интеллектіні пайдалану",
+    "en": "5. Use of artificial intelligence"
+  },
+  "6. Подписки и платные услуги": {
+    "kk": "6. Жазылымдар және ақылы қызметтер",
+    "en": "6. Subscriptions and paid services"
+  },
+  "7. Ограничение ответственности": {
+    "kk": "7. Жауапкершілікті шектеу",
+    "en": "7. Limitation of liability"
+  },
+  "8. Прекращение действия соглашения": {
+    "kk": "8. Келісімнің қолданылуын тоқтату",
+    "en": "8. Termination of the agreement"
+  },
+  "9. Применимое право и споры": {
+    "kk": "9. Қолданылатын құқық және даулар",
+    "en": "9. Governing law and disputes"
+  },
+  "10. Контакты": {
+    "kk": "10. Байланыс",
+    "en": "10. Contacts"
+  },
+  "Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Daiyndyq IELTS».": {
+    "kk": "IELTS-ке дайындық жөніндегі «Daiyndyq IELTS» білім беру платформасын пайдалану тәртібі мен ережелерін реттейтін пайдаланушы келісімі.",
+    "en": "User agreement governing the terms and rules of use of the “Daiyndyq IELTS” IELTS preparation educational platform."
+  },
+  "Важная правовая оговорка о бренде IELTS:": {
+    "kk": "IELTS бренді туралы маңызды құқықтық ескерту:",
+    "en": "Important legal notice regarding the IELTS brand:"
+  },
+  "IELTS является зарегистрированным товарным знаком University of Cambridge ESOL Examinations Syndicate, British Council и IDP Education Australia. Платформа": {
+    "kk": "IELTS — University of Cambridge ESOL Examinations Syndicate, British Council және IDP Education Australia ұйымдарының тіркелген тауар белгісі. Платформа",
+    "en": "IELTS is a registered trademark of University of Cambridge ESOL Examinations Syndicate, British Council and IDP Education Australia. The platform"
+  },
+  "является независимым образовательным сервисом подготовки и не аффилирована, не одобрена и не спонсируется официальными правообладателями товарного знака IELTS.": {
+    "kk": "тәуелсіз білім беру дайындық сервисі болып табылады және IELTS тауар белгісінің ресми құқық иелерімен үлестес емес, олар мақұлдамаған және демеушілік көрсетпеген.",
+    "en": "is an independent educational preparation service and is not affiliated with, endorsed by, or sponsored by the official owners of the IELTS trademark."
+  },
+  "1.1. Настоящие Условия использования (далее — «Соглашение», «Условия») представляют собой публичную оферту сервиса «Daiyndyq IELTS» (далее — «Сервис», «Платформа», «мы») и определяют порядок доступа к онлайн-платформе подготовки к экзамену IELTS.": {
+    "kk": "1.1. Осы Пайдалану шарттары (бұдан әрі — «Келісім», «Шарттар») «Daiyndyq IELTS» сервисінің (бұдан әрі — «Сервис», «Платформа», «біз») жария офертасы болып табылады және IELTS емтиханына дайындық жөніндегі онлайн-платформаға қол жеткізу тәртібін айқындайды.",
+    "en": "1.1. These Terms of Use (hereinafter the “Agreement”, the “Terms”) constitute a public offer of the “Daiyndyq IELTS” service (hereinafter the “Service”, the “Platform”, “we”) and set out the procedure for accessing the online IELTS preparation platform."
+  },
+  "1.2. Пользователем признается любое физическое лицо, прошедшее авторизацию и начавшее использование платформы. Начало использования Сервиса или проставление отметки «Принимаю условия использования и политику конфиденциальности» означает безоговорочное согласие со всеми положениями настоящего Соглашения.": {
+    "kk": "1.2. Пайдаланушы деп авторизациядан өтіп, платформаны пайдалана бастаған кез келген жеке тұлға танылады. Сервисті пайдалана бастау немесе «Пайдалану шарттары мен құпиялылық саясатын қабылдаймын» деген белгі қою осы Келісімнің барлық ережелерімен сөзсіз келісімді білдіреді.",
+    "en": "1.2. A user is any individual who has completed authorization and started using the platform. Starting to use the Service or marking “I accept the Terms of Use and Privacy Policy” constitutes unconditional agreement with all provisions of this Agreement."
+  },
+  "1.3. Если вы не согласны с какими-либо условиями, вам следует воздержаться от регистрации и использования Сервиса.": {
+    "kk": "1.3. Егер қандай да бір шарттармен келіспесеңіз, тіркелуден және Сервисті пайдаланудан бас тартуыңыз керек.",
+    "en": "1.3. If you disagree with any of the terms, you should refrain from registering and using the Service."
+  },
+  "2.1. Авторизация на Платформе осуществляется через единую систему учетных записей Google Identity (Google Sign-In). Пользователь обязуется указывать достоверные данные о себе (имя и контактный номер телефона WhatsApp).": {
+    "kk": "2.1. Платформадағы авторизация бірыңғай Google Identity (Google Sign-In) аккаунттар жүйесі арқылы жүзеге асырылады. Пайдаланушы өзі туралы дұрыс деректерді (аты және WhatsApp байланыс телефон нөмірі) көрсетуге міндеттенеді.",
+    "en": "2.1. Authorization on the Platform is carried out via the unified Google Identity (Google Sign-In) account system. The user undertakes to provide accurate information about themselves (name and WhatsApp contact phone number)."
+  },
+  "2.2. Пользователь несет личную ответственность за сохранение конфиденциальности доступа к своему Google-аккаунту и за все действия, совершенные на Платформе под его учетной записью.": {
+    "kk": "2.2. Пайдаланушы өз Google-аккаунтына қолжетімділіктің құпиялылығын сақтауға және Платформада өз аккаунтымен жасалған барлық әрекеттерге жеке жауап береді.",
+    "en": "2.2. The user is personally responsible for keeping access to their Google account confidential and for all actions performed on the Platform under their account."
+  },
+  "2.3. Одна учетная запись предназначена для индивидуального использования одним студентом. Запрещается передавать учетные данные третьим лицам или использовать аккаунт совместно.": {
+    "kk": "2.3. Бір аккаунт бір студенттің жеке пайдалануына арналған. Аккаунт деректерін үшінші тұлғаларға беруге немесе аккаунтты бірлесіп пайдалануға тыйым салынады.",
+    "en": "2.3. One account is intended for individual use by a single student. Transferring account credentials to third parties or sharing an account is prohibited."
+  },
+  "3.1. Пользователь имеет право:": {
+    "kk": "3.1. Пайдаланушы мыналарға құқылы:",
+    "en": "3.1. The user has the right to:"
+  },
+  "Получать доступ к учебным материалам, практическим заданиям и симуляторам тестов согласно выбранному тарифному плану;": {
+    "kk": "Таңдалған тарифтік жоспарға сәйкес оқу материалдарына, практикалық тапсырмаларға және тест симуляторларына қол жеткізуге;",
+    "en": "Access study materials, practice tasks and test simulators according to the selected pricing plan;"
+  },
+  "Отслеживать собственный прогресс, сохранять историю решений, ошибок и заметок;": {
+    "kk": "Өз прогресіңізді бақылауға, шешімдер, қателер мен жазбалар тарихын сақтауға;",
+    "en": "Track their own progress and keep a history of solutions, mistakes and notes;"
+  },
+  "Использовать встроенные инструменты проверки и учебного AI-ассистента;": {
+    "kk": "Кірістірілген тексеру құралдары мен оқу ЖИ-көмекшісін пайдалануға;",
+    "en": "Use the built-in checking tools and the study AI assistant;"
+  },
+  "Обращаться в службу технической поддержки по вопросам работы платформы.": {
+    "kk": "Платформа жұмысына қатысты мәселелер бойынша техникалық қолдау қызметіне жүгінуге.",
+    "en": "Contact technical support with questions about how the platform works."
+  },
+  "3.2. Пользователю категорически запрещается:": {
+    "kk": "3.2. Пайдаланушыға қатаң тыйым салынады:",
+    "en": "3.2. The user is strictly prohibited from:"
+  },
+  "Копировать, распространять, публиковать или воспроизводить учебные материалы, тесты и программный код Сервиса без письменного разрешения администрации;": {
+    "kk": "Әкімшіліктің жазбаша рұқсатынсыз Сервистің оқу материалдарын, тесттерін және бағдарламалық кодын көшіруге, таратуға, жариялауға немесе қайта шығаруға;",
+    "en": "Copying, distributing, publishing or reproducing the Service’s study materials, tests and source code without the written permission of the administration;"
+  },
+  "Использовать автоматизированные скрипты, боты, парсеры или аналогичные программные средства для массового сбора контента или перегрузки инфраструктуры;": {
+    "kk": "Контентті жаппай жинау немесе инфрақұрылымға шамадан тыс жүктеме түсіру үшін автоматтандырылған скрипттер, боттар, парсерлер немесе ұқсас бағдарламалық құралдарды пайдалануға;",
+    "en": "Using automated scripts, bots, parsers or similar software to bulk-collect content or overload the infrastructure;"
+  },
+  "Предпринимать попытки взлома, декомпиляции или обхода технических ограничений системы;": {
+    "kk": "Жүйені бұзуға, декомпиляциялауға немесе техникалық шектеулерді айналып өтуге әрекеттенуге;",
+    "en": "Attempting to hack, decompile or circumvent the system’s technical restrictions;"
+  },
+  "Загружать в систему вредоносные программы, незаконный, оскорбительный или нарушающий права третьих лиц контент.": {
+    "kk": "Жүйеге зиянды бағдарламалар, заңсыз, қорлайтын немесе үшінші тұлғалардың құқықтарын бұзатын контент жүктеуге.",
+    "en": "Uploading malicious software or illegal, offensive or third-party-rights-infringing content to the system."
+  },
+  "4. Интеллектуальная собственность": {
+    "kk": "4. Зияткерлік меншік",
+    "en": "4. Intellectual property"
+  },
+  "4.1. Все элементы интерфейса, графические изображения, дизайн, логотипы («Daiyndyq IELTS»), программный код, структура тестов, методические материалы и алгоритмы оценки являются объектами исключительных прав правообладателя Сервиса и охраняются законом.": {
+    "kk": "4.1. Интерфейстің барлық элементтері, графикалық кескіндер, дизайн, логотиптер («Daiyndyq IELTS»), бағдарламалық код, тест құрылымы, әдістемелік материалдар мен бағалау алгоритмдері Сервис құқық иесінің айрықша құқықтарының объектілері болып табылады және заңмен қорғалады.",
+    "en": "4.1. All interface elements, graphics, design, logos (“Daiyndyq IELTS”), source code, test structure, methodological materials and assessment algorithms are the exclusive property of the Service rights holder and are protected by law."
+  },
+  "4.2. Права на тексты эссе и аудиозаписи ответов, созданные пользователем в процессе прохождения заданий, сохраняются за пользователем. Пользователь предоставляет Сервису неисключительную лицензию на обработку этих материалов в целях их анализа, проверки и генерации обратной связи.": {
+    "kk": "4.2. Тапсырмаларды орындау барысында пайдаланушы жасаған эссе мәтіндері мен жауаптардың аудиожазбаларына құқықтар пайдаланушыда сақталады. Пайдаланушы бұл материалдарды талдау, тексеру және кері байланыс қалыптастыру мақсатында өңдеуге Сервиске айрықша емес лицензия береді.",
+    "en": "4.2. Rights to essay texts and audio recordings of responses created by the user while completing tasks remain with the user. The user grants the Service a non-exclusive license to process these materials for analysis, checking and feedback generation."
+  },
+  "4.3. Обозначение «IELTS» используется исключительно в информационных целях для описания предмета подготовки в соответствии с принципом добросовестного использования (fair use).": {
+    "kk": "4.3. «IELTS» белгісі адал пайдалану (fair use) қағидатына сәйкес дайындық пәнін сипаттау үшін тек ақпараттық мақсатта пайдаланылады.",
+    "en": "4.3. The “IELTS” designation is used solely for informational purposes to describe the subject of preparation, in accordance with the fair use principle."
+  },
+  "5.1. Платформа предоставляет функции автоматической проверки письменных работ (Writing) и устной речи (Speaking), а также учебного ассистента («Юки») на базе передовых языковых моделей.": {
+    "kk": "5.1. Платформа жазбаша жұмыстарды (Writing) және ауызша сөйлеуді (Speaking) автоматты тексеру функцияларын, сондай-ақ озық тілдік модельдер негізіндегі оқу көмекшісін («Юки») ұсынады.",
+    "en": "5.1. The Platform provides automatic checking of written work (Writing) and spoken language (Speaking), as well as a study assistant (“Yuki”) powered by advanced language models."
+  },
+  "5.2. Оценки, комментарии и баллы, генерируемые искусственным интеллектом, носят ориентировочный образовательный характер и предназначены для самоконтроля. Они не являются официальными сертификатами или гарантиями получения аналогичного балла на официальном экзамене IELTS в тест-центрах IDP или British Council.": {
+    "kk": "5.2. Жасанды интеллект қалыптастыратын бағалар, пікірлер мен балдар бағдарлы білім беру сипатына ие және өзін-өзі бақылауға арналған. Олар ресми сертификаттар немесе IDP немесе British Council тест-орталықтарындағы ресми IELTS емтиханында ұқсас балл алу кепілдігі болып табылмайды.",
+    "en": "5.2. Scores, comments and grades generated by artificial intelligence are indicative and educational in nature and are intended for self-monitoring. They are not official certificates or guarantees of achieving a similar score on the official IELTS exam at IDP or British Council test centers."
+  },
+  "6. Подписки и платные услуги": {
+    "kk": "6. Жазылымдар және ақылы қызметтер",
+    "en": "6. Subscriptions and paid services"
+  },
+  "6.1. Отдельные расширенные функции Платформы (включая неограниченные AI-проверки, доступ к полному банку Mock-экзаменов и персональный трекинг) могут предоставляться на основе платной подписки (Premium) или разовых пакетов.": {
+    "kk": "6.1. Платформаның жекелеген кеңейтілген функциялары (шектеусіз ЖИ-тексерулер, Mock-емтихандардың толық банкіне қолжетімділік және дербес трекинг қоса алғанда) ақылы жазылым (Premium) немесе бір реттік пакеттер негізінде ұсынылуы мүмкін.",
+    "en": "6.1. Certain advanced Platform features (including unlimited AI checks, access to the full bank of Mock exams and personal tracking) may be provided on the basis of a paid subscription (Premium) or one-off packages."
+  },
+  "6.2. Стоимость, состав тарифов и период действия объявляются на соответствующих страницах Сервиса перед совершением оплаты. Все платежи обрабатываются через сертифицированных платежных провайдеров.": {
+    "kk": "6.2. Құны, тарифтер құрамы және қолданылу мерзімі төлем жасамас бұрын Сервистің тиісті беттерінде жарияланады. Барлық төлемдер сертификатталған төлем провайдерлері арқылы өңделеді.",
+    "en": "6.2. Pricing, plan details and validity periods are announced on the relevant Service pages before payment is made. All payments are processed through certified payment providers."
+  },
+  "7. Ограничение ответственности": {
+    "kk": "7. Жауапкершілікті шектеу",
+    "en": "7. Limitation of liability"
+  },
+  "7.1. Сервис предоставляется на условиях «как есть» (as is). Мы прилагаем максимальные усилия для обеспечения бесперебойной и точной работы Платформы, однако не гарантируем, что Сервис будет работать абсолютно безошибочно и непрерывно в любой момент времени.": {
+    "kk": "7.1. Сервис «қалпында» (as is) шарттарда ұсынылады. Біз Платформаның үздіксіз әрі дәл жұмысын қамтамасыз етуге барынша күш саламыз, алайда Сервистің кез келген уақытта мүлдем қатесіз және үздіксіз жұмыс істейтініне кепілдік бермейміз.",
+    "en": "7.1. The Service is provided on an “as is” basis. We make every effort to ensure the smooth and accurate operation of the Platform, but we do not guarantee that the Service will operate completely error-free and uninterrupted at all times."
+  },
+  "7.2. Сервис не несет ответственности за итоговые результаты, полученные студентом на официальном экзамене IELTS, так как результаты зависят от индивидуальных способностей, времени подготовки, условий сдачи экзамена и объективных факторов.": {
+    "kk": "7.2. Сервис студенттің ресми IELTS емтиханында алған қорытынды нәтижелеріне жауап бермейді, өйткені нәтижелер жеке қабілеттерге, дайындық уақытына, емтихан тапсыру жағдайларына және объективті факторларға байланысты.",
+    "en": "7.2. The Service is not responsible for the final results obtained by the student on the official IELTS exam, as results depend on individual abilities, preparation time, exam conditions and objective factors."
+  },
+  "7.3. Ни при каких обстоятельствах Сервис не несет ответственности за косвенные убытки, упущенную выгоду или потерю данных, возникшие в результате использования или невозможности использования платформы.": {
+    "kk": "7.3. Сервис ешқандай жағдайда платформаны пайдалану немесе пайдалана алмау салдарынан туындаған жанама залалдар, алынбай қалған пайда немесе деректердің жоғалуы үшін жауап бермейді.",
+    "en": "7.3. Under no circumstances shall the Service be liable for indirect losses, lost profits or data loss arising from the use of or inability to use the platform."
+  },
+  "8. Прекращение действия соглашения": {
+    "kk": "8. Келісімнің қолданылуын тоқтату",
+    "en": "8. Termination of the agreement"
+  },
+  "8.1. Пользователь вправе в любое время прекратить использование Сервиса и запросить удаление своего аккаунта, обратившись в службу поддержки.": {
+    "kk": "8.1. Пайдаланушы кез келген уақытта Сервисті пайдалануды тоқтатуға және қолдау қызметіне жүгіну арқылы өз аккаунтын жоюды сұрауға құқылы.",
+    "en": "8.1. The user may stop using the Service at any time and request deletion of their account by contacting support."
+  },
+  "8.2. Мы оставляем за собой право приостановить или заблокировать доступ пользователя к Сервису без предварительного уведомления в случае грубого нарушения настоящих Условий (включая попытки взлома, распространение материалов или злоупотребление AI-функциями).": {
+    "kk": "8.2. Біз осы Шарттарды өрескел бұзған жағдайда (бұзу әрекеттері, материалдарды тарату немесе ЖИ-функцияларын теріс пайдалану қоса алғанда) пайдаланушының Сервиске қолжетімділігін алдын ала ескертусіз тоқтата тұру немесе бұғаттау құқығын өзімізде қалдырамыз.",
+    "en": "8.2. We reserve the right to suspend or block a user’s access to the Service without prior notice in the event of a gross violation of these Terms (including hacking attempts, distribution of materials or abuse of AI features)."
+  },
+  "9. Применимое право и разрешение споров": {
+    "kk": "9. Қолданылатын құқық және дауларды шешу",
+    "en": "9. Governing law and dispute resolution"
+  },
+  "9.1. Настоящее Соглашение регулируется и толкуется в соответствии с законодательством Республики Казахстан.": {
+    "kk": "9.1. Осы Келісім Қазақстан Республикасының заңнамасына сәйкес реттеледі және түсіндіріледі.",
+    "en": "9.1. This Agreement is governed by and construed in accordance with the legislation of the Republic of Kazakhstan."
+  },
+  "9.2. Все споры и разногласия стороны стремятся урегулировать путем переговоров в досудебном претензионном порядке (срок рассмотрения претензии — 15 календарных дней). В случае недостижения согласия спор передается на рассмотрение в суд по месту нахождения оператора Сервиса в г. Астана в соответствии с законодательством РК.": {
+    "kk": "9.2. Тараптар барлық даулар мен келіспеушіліктерді сотқа дейінгі талап-арыз тәртібімен келіссөздер арқылы реттеуге ұмтылады (талап-арызды қарау мерзімі — 15 күнтізбелік күн). Келісімге қол жеткізілмеген жағдайда дау ҚР заңнамасына сәйкес Сервис операторы орналасқан жердегі Астана қаласының сотына беріледі.",
+    "en": "9.2. The parties shall seek to resolve all disputes and disagreements through negotiations in a pre-trial claims procedure (claim review period — 15 calendar days). If no agreement is reached, the dispute shall be referred to the court at the location of the Service operator in Astana in accordance with the legislation of the Republic of Kazakhstan."
+  },
+  "10. Контактная информация": {
+    "kk": "10. Байланыс ақпараты",
+    "en": "10. Contact information"
+  },
+  "По любым вопросам, связанным с настоящими Условиями, вы можете связаться с нами:": {
+    "kk": "Осы Шарттарға қатысты кез келген мәселелер бойынша бізбен байланыса аласыз:",
+    "en": "For any questions related to these Terms, you can contact us:"
+  },
+  "Служба поддержки «Daiyndyq IELTS»:": {
+    "kk": "«Daiyndyq IELTS» қолдау қызметі:",
+    "en": "“Daiyndyq IELTS” support service:"
+  },
+  "Электронная почта:": {
+    "kk": "Электрондық пошта:",
+    "en": "Email:"
+  },
+  "Локация: г. Астана, Республика Казахстан.": {
+    "kk": "Орналасқан жері: Астана қ., Қазақстан Республикасы.",
+    "en": "Location: Astana, Republic of Kazakhstan."
+  },
+  "Политика конфиденциальности — Daiyndyq IELTS": {
+    "kk": "Құпиялылық саясаты — Daiyndyq IELTS",
+    "en": "Privacy Policy — Daiyndyq IELTS"
+  },
+  "Политика конфиденциальности и обработки персональных данных образовательной платформы подготовки к IELTS «Daiyndyq IELTS».": {
+    "kk": "IELTS-ке дайындық жөніндегі «Daiyndyq IELTS» білім беру платформасының құпиялылық және дербес деректерді өңдеу саясаты.",
+    "en": "Privacy and personal data processing policy of the “Daiyndyq IELTS” IELTS preparation educational platform."
+  },
+  "Условия использования — Daiyndyq IELTS": {
+    "kk": "Пайдалану шарттары — Daiyndyq IELTS",
+    "en": "Terms of Use — Daiyndyq IELTS"
+  },
+  "Условия использования и пользовательское соглашение образовательной платформы подготовки к IELTS «Daiyndyq IELTS».": {
+    "kk": "IELTS-ке дайындық жөніндегі «Daiyndyq IELTS» білім беру платформасының пайдалану шарттары және пайдаланушы келісімі.",
+    "en": "Terms of use and user agreement of the “Daiyndyq IELTS” IELTS preparation educational platform."
+  }
+}

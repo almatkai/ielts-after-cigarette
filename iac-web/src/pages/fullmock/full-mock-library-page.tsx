@@ -14,6 +14,7 @@ import {
 } from '@/features/fullmock/api'
 import type { FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -23,6 +24,7 @@ const labels: Record<FullMockSkill, string> = {
 }
 
 export function FullMockLibraryPage() {
+  const { language, t } = useLanguage()
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -49,8 +51,10 @@ export function FullMockLibraryPage() {
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Проверяем доступные тесты…"
-        description="Учитываем уже выполненные задания, чтобы подобрать новые."
+        label={t('Проверяем доступные тесты…')}
+        description={t(
+          'Учитываем уже выполненные задания, чтобы подобрать новые.',
+        )}
         showTimerTip={false}
       />
     )
@@ -58,7 +62,7 @@ export function FullMockLibraryPage() {
   if (query.isError) {
     return (
       <ErrorState
-        title="Не удалось подготовить Full Mock"
+        title={t('Не удалось подготовить Full Mock')}
         message={getErrorMessage(query.error)}
         onRetry={() => void query.refetch()}
       />
@@ -79,23 +83,23 @@ export function FullMockLibraryPage() {
             : ''}
         </Badge>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-          Полный пробный IELTS
+          {t('Полный пробный IELTS')}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
-          Мы автоматически подберём тесты из общей библиотеки. Сначала —
-          задания, которые вы ещё не выполняли. Выбирать отдельный mock-тест не
-          нужно.
+          {t(
+            'Мы автоматически подберём тесты из общей библиотеки. Сначала — задания, которые вы ещё не выполняли. Выбирать отдельный mock-тест не нужно.',
+          )}
         </p>
       </header>
 
       <Card className="gap-0 overflow-hidden rounded-2xl border-[#e7e7e4] bg-white py-0 shadow-none">
         <CardContent className="p-5 sm:p-7">
           <h2 className="text-lg font-semibold">
-            Четыре секции в одной сессии
+            {t('Четыре секции в одной сессии')}
           </h2>
           <ol
             className="mt-5 grid gap-3 sm:grid-cols-4"
-            aria-label="Порядок секций экзамена"
+            aria-label={t('Порядок секций экзамена')}
           >
             {overview.banks.map((bank, index) => (
               <li key={bank.skill} className="flex items-center gap-3 text-sm">
@@ -107,12 +111,17 @@ export function FullMockLibraryPage() {
             ))}
           </ol>
           <p className="mt-5 flex items-center gap-2 text-sm text-[#69696d]">
-            <Clock className="size-4" aria-hidden /> {overview.durationMinutes}{' '}
-            минут · общий таймер
+            <Clock className="size-4" aria-hidden />{' '}
+            {language === 'en'
+              ? `${overview.durationMinutes} minutes · shared timer`
+              : language === 'kk'
+                ? `${overview.durationMinutes} минут · жалпы таймер`
+                : `${overview.durationMinutes} минут · общий таймер`}
           </p>
           <p className="mt-2 text-sm leading-6 text-[#69696d]">
-            После сдачи секции вы переходите к следующей. Ответы сохраняются, а
-            после проверки всех четырёх секций появится общий Band Score.
+            {t(
+              'После сдачи секции вы переходите к следующей. Ответы сохраняются, а после проверки всех четырёх секций появится общий Band Score.',
+            )}
           </p>
         </CardContent>
       </Card>
@@ -120,11 +129,12 @@ export function FullMockLibraryPage() {
       {overview.examType ? (
         <section aria-labelledby="mock-bank-title">
           <h2 id="mock-bank-title" className="text-lg font-semibold">
-            Ваш прогресс по доступным тестам
+            {t('Ваш прогресс по доступным тестам')}
           </h2>
           <p className="mt-1 text-sm leading-6 text-[#69696d]">
-            Учитываются выполненные тесты и в практике, и в Full Mock. Повторные
-            попытки не увеличивают счётчик.
+            {t(
+              'Учитываются выполненные тесты и в практике, и в Full Mock. Повторные попытки не увеличивают счётчик.',
+            )}
           </p>
           <div className="mt-4 divide-y divide-[#e7e7e4] rounded-2xl border border-[#e7e7e4] bg-white px-5 sm:px-7">
             {overview.banks.map((bank) => (
@@ -134,13 +144,23 @@ export function FullMockLibraryPage() {
               >
                 <h3 className="text-sm font-semibold">{labels[bank.skill]}</h3>
                 <progress
-                  aria-label={`${labels[bank.skill]}: выполнено тестов`}
+                  aria-label={
+                    language === 'en'
+                      ? `${labels[bank.skill]}: completed tests`
+                      : language === 'kk'
+                        ? `${labels[bank.skill]}: орындалған тесттер`
+                        : `${labels[bank.skill]}: выполнено тестов`
+                  }
                   max={Math.max(1, bank.total)}
                   value={bank.completed}
                   className="h-2 w-full appearance-none overflow-hidden rounded-full bg-[#e7e7e4] [&::-moz-progress-bar]:bg-[#2563eb] [&::-webkit-progress-bar]:bg-[#e7e7e4] [&::-webkit-progress-value]:bg-[#2563eb]"
                 />
                 <p className="text-sm text-[#69696d]">
-                  {bank.completed} из {bank.total} выполнено
+                  {language === 'en'
+                    ? `${bank.completed} of ${bank.total} completed`
+                    : language === 'kk'
+                      ? `${bank.completed} / ${bank.total} орындалды`
+                      : `${bank.completed} из ${bank.total} выполнено`}
                 </p>
               </div>
             ))}
@@ -151,14 +171,40 @@ export function FullMockLibraryPage() {
           role="status"
           className="rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm leading-6"
         >
-          Выберите Academic или General в{' '}
-          <Link
-            to="/profile"
-            className="font-semibold text-[#2563eb] underline"
-          >
-            профиле
-          </Link>
-          , чтобы мы подобрали подходящие тесты.
+          {language === 'en' ? (
+            <>
+              Choose Academic or General in your{' '}
+              <Link
+                to="/profile"
+                className="font-semibold text-[#2563eb] underline"
+              >
+                profile
+              </Link>{' '}
+              so we can pick suitable tests.
+            </>
+          ) : language === 'kk' ? (
+            <>
+              <Link
+                to="/profile"
+                className="font-semibold text-[#2563eb] underline"
+              >
+                Профильде
+              </Link>{' '}
+              Academic немесе General таңдаңыз, сонда сәйкес тесттерді
+              таңдаймыз.
+            </>
+          ) : (
+            <>
+              Выберите Academic или General в{' '}
+              <Link
+                to="/profile"
+                className="font-semibold text-[#2563eb] underline"
+              >
+                профиле
+              </Link>
+              , чтобы мы подобрали подходящие тесты.
+            </>
+          )}
         </div>
       )}
 
@@ -168,29 +214,36 @@ export function FullMockLibraryPage() {
           className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900"
         >
           <h2 className="font-semibold">
-            В следующих mock-тестах будут повторы
+            {t('В следующих mock-тестах будут повторы')}
           </h2>
           {exhausted.length === 4 ? (
             <p className="mt-1">
-              Вы выполнили все доступные тесты. Full Mock будет собран из ранее
-              выполненных заданий, выбранных случайно.
+              {t(
+                'Вы выполнили все доступные тесты. Full Mock будет собран из ранее выполненных заданий, выбранных случайно.',
+              )}
             </p>
           ) : (
             <p className="mt-1">
-              Вы выполнили все доступные тесты по секциям:{' '}
+              {t('Вы выполнили все доступные тесты по секциям:')}{' '}
               {exhausted
-                .map(
-                  (bank) =>
-                    `${labels[bank.skill]} (${bank.completed} из ${bank.total})`,
+                .map((bank) =>
+                  language === 'en'
+                    ? `${labels[bank.skill]} (${bank.completed} of ${bank.total})`
+                    : language === 'kk'
+                      ? `${labels[bank.skill]} (${bank.completed} / ${bank.total})`
+                      : `${labels[bank.skill]} (${bank.completed} из ${bank.total})`,
                 )
                 .join(', ')}
-              . В новых Full Mock эти секции будут выбраны случайно из ранее
-              выполненных тестов. Для остальных секций сначала подберём
-              непройденные задания.
+              .{' '}
+              {t(
+                'В новых Full Mock эти секции будут выбраны случайно из ранее выполненных тестов. Для остальных секций сначала подберём непройденные задания.',
+              )}
             </p>
           )}
           {active ? (
-            <p className="mt-1">Состав уже начатой сессии не изменится.</p>
+            <p className="mt-1">
+              {t('Состав уже начатой сессии не изменится.')}
+            </p>
           ) : null}
         </div>
       ) : null}
@@ -200,11 +253,13 @@ export function FullMockLibraryPage() {
           role="status"
           className="rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm leading-6"
         >
-          Для нового Full Mock пока недостаточно полных опубликованных тестов:{' '}
+          {t(
+            'Для нового Full Mock пока недостаточно полных опубликованных тестов:',
+          )}{' '}
           {missing.map((bank) => labels[bank.skill]).join(', ')}.{' '}
           {active
-            ? 'Текущую сессию можно продолжить.'
-            : 'Пока можно заниматься отдельными секциями в практике.'}
+            ? t('Текущую сессию можно продолжить.')
+            : t('Пока можно заниматься отдельными секциями в практике.')}
         </div>
       ) : null}
 
@@ -222,23 +277,24 @@ export function FullMockLibraryPage() {
                 params={{ sessionId: active.id }}
               >
                 <PlayCircle aria-hidden />
-                Продолжить текущую сессию
+                {t('Продолжить текущую сессию')}
               </Link>
             </Button>
           ) : (
             <Button
               disabled={!overview.ready || start.isPending}
               onClick={() => {
-                if (
-                  window.confirm(
-                    `Начать Full Mock? После запуска начнётся общий таймер: ${overview.durationMinutes} минут.`,
-                  )
-                )
-                  start.mutate(false)
+                const startMessage =
+                  language === 'en'
+                    ? `Start the Full Mock? A shared timer of ${overview.durationMinutes} minutes will start.`
+                    : language === 'kk'
+                      ? `Full Mock бастау керек пе? Іске қосқаннан кейін жалпы таймер басталады: ${overview.durationMinutes} минут.`
+                      : `Начать Full Mock? После запуска начнётся общий таймер: ${overview.durationMinutes} минут.`
+                if (window.confirm(startMessage)) start.mutate(false)
               }}
             >
               <PlayCircle aria-hidden />
-              {start.isPending ? 'Готовим экзамен…' : 'Начать Full Mock'}
+              {start.isPending ? t('Готовим экзамен…') : t('Начать Full Mock')}
             </Button>
           )}
           {active ? (
@@ -248,17 +304,19 @@ export function FullMockLibraryPage() {
               onClick={() => {
                 if (
                   window.confirm(
-                    'Начать заново? Текущая сессия будет закрыта. Мы подберём новый набор тестов, таймер начнётся заново.',
+                    t(
+                      'Начать заново? Текущая сессия будет закрыта. Мы подберём новый набор тестов, таймер начнётся заново.',
+                    ),
                   )
                 )
                   start.mutate(true)
               }}
             >
-              {start.isPending ? 'Готовим экзамен…' : 'Начать заново'}
+              {start.isPending ? t('Готовим экзамен…') : t('Начать заново')}
             </Button>
           ) : null}
           <Button asChild variant="ghost">
-            <Link to="/practice">К отдельным секциям</Link>
+            <Link to="/practice">{t('К отдельным секциям')}</Link>
           </Button>
         </div>
       </div>

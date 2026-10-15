@@ -1,16 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { translate } from '@/lib/i18n'
 import { TermsPage } from '@/pages/legal/terms-page'
 
 export const Route = createFileRoute('/terms')({
   ssr: false,
   head: () => ({
     meta: [
-      { title: 'Условия использования — Daiyndyq IELTS' },
+      { title: translate('Условия использования — Daiyndyq IELTS') },
       {
         name: 'description',
-        content:
+        content: translate(
           'Условия использования и пользовательское соглашение образовательной платформы подготовки к IELTS «Daiyndyq IELTS».',
+        ),
       },
       { name: 'robots', content: 'index, follow' },
     ],

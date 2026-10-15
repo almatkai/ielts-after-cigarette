@@ -5,13 +5,9 @@ import {
   blogMediaAbsoluteUrl,
   publishedPostQueryOptions,
 } from '@/features/blog/api'
-import {
-  BLOG_SITE_NAME,
-  BLOG_TITLE,
-  jsonLd,
-  siteUrl,
-} from '@/features/blog/seo'
+import { BLOG_SITE_NAME, blogTitle, jsonLd, siteUrl } from '@/features/blog/seo'
 import { ApiError } from '@/lib/api/client'
+import { translate } from '@/lib/i18n'
 import { BlogPostNotFound, BlogPostPage } from '@/pages/blog/blog-post-page'
 
 export const Route = createFileRoute('/blog/$slug')({
@@ -33,14 +29,14 @@ export const Route = createFileRoute('/blog/$slug')({
     if (!post) {
       return {
         meta: [
-          { title: `Статья не найдена — ${BLOG_TITLE}` },
+          { title: `${translate('Статья не найдена')} — ${blogTitle()}` },
           { name: 'robots', content: 'noindex, follow' },
         ],
       }
     }
     const url = siteUrl(`/blog/${params.slug}`)
-    const title = `${post.title} — ${BLOG_TITLE}`
-    const description = post.description || BLOG_TITLE
+    const title = `${post.title} — ${blogTitle()}`
+    const description = post.description || blogTitle()
     const image = post.coverMediaId
       ? blogMediaAbsoluteUrl(post.coverMediaId)
       : null
@@ -107,7 +103,7 @@ export const Route = createFileRoute('/blog/$slug')({
                   {
                     '@type': 'ListItem',
                     position: 1,
-                    name: 'Блог',
+                    name: translate('Блог'),
                     item: siteUrl('/blog'),
                   },
                   {

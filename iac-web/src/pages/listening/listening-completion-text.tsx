@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 
+import { useLanguage } from '@/lib/i18n'
 import type { StudentAnswer } from '@/features/attempts/api'
 import type { PublicListeningQuestion } from '@/features/listening/api'
 
@@ -31,6 +32,7 @@ export function ListeningCompletionText({
   onAnswer?: (questionId: string, answer: StudentAnswer) => void
   onActivate?: (questionId: string) => void
 }) {
+  const { t } = useLanguage()
   const segments = []
   let offset = 0
   let focusFirstGap = true
@@ -48,8 +50,8 @@ export function ListeningCompletionText({
       questionId && readOnly ? (
         <span
           key={index}
-          title={`Вопрос ${question.number}`}
-          aria-label={`Ответ на вопрос ${question.number}: ${answer || 'не отвечено'}`}
+          title={`${t('Вопрос')} ${question.number}`}
+          aria-label={`${t('Ответ на вопрос')} ${question.number}: ${answer || t('не отвечено')}`}
           className="inline-block max-w-full border-b border-slate-500 px-1 text-center"
           style={{ minWidth: '6ch' }}
         >
@@ -58,8 +60,8 @@ export function ListeningCompletionText({
       ) : questionId ? (
         <input
           key={index}
-          aria-label={`Ответ на вопрос ${question.number}`}
-          title={`Вопрос ${question.number}`}
+          aria-label={`${t('Ответ на вопрос')} ${question.number}`}
+          title={`${t('Вопрос')} ${question.number}`}
           aria-current={questionId === activeQuestionId ? 'step' : undefined}
           className={`inline-block max-w-full rounded-none border-0 border-b bg-transparent px-1 py-0 text-center text-base leading-normal text-inherit outline-none focus:border-[#3b82f6] focus:ring-0 sm:text-sm ${questionId === activeQuestionId ? 'border-[#3b82f6]' : 'border-slate-500'}`}
           style={{ width: `${Math.max(6, answer.length + 1)}ch` }}

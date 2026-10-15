@@ -19,6 +19,7 @@ import {
 import { useCallback, useRef, useState } from 'react'
 
 import { blogMediaUrl, uploadBlogMedia } from '@/features/blog/api'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 import type { Editor } from '@tiptap/react'
@@ -85,17 +86,12 @@ const DividerIcon = glyph(['M3 12h18', 'M8 6h8', 'M8 18h8'])
 
 type BlockType = 'paragraph' | 'h2' | 'h3'
 
-const blockTypes: { value: BlockType; label: string }[] = [
-  { value: 'paragraph', label: 'Обычный текст' },
-  { value: 'h2', label: 'Заголовок' },
-  { value: 'h3', label: 'Подзаголовок' },
-]
-
 export function BlogRichTextEditor({
   content,
   onChange,
   disabled = false,
 }: BlogRichTextEditorProps) {
+  const { t } = useLanguage()
   const uploadInputRef = useRef<HTMLInputElement | null>(null)
   const [uploading, setUploading] = useState(0)
   const [uploadError, setUploadError] = useState<string | null>(null)
@@ -110,8 +106,9 @@ export function BlogRichTextEditor({
       Highlight,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Placeholder.configure({
-        placeholder:
+        placeholder: t(
           'Напишите статью: делитесь опытом подготовки, стратегиями и разборами заданий…',
+        ),
       }),
     ],
     content,
@@ -136,7 +133,7 @@ export function BlogRichTextEditor({
             .setImage({ src: blogMediaUrl(media.id) })
             .run()
         } catch {
-          setUploadError(`Не удалось загрузить «${file.name}».`)
+          setUploadError(`${t('Не удалось загрузить')} «${file.name}».`)
         } finally {
           setUploading((count) => count - 1)
         }
@@ -170,7 +167,7 @@ export function BlogRichTextEditor({
             uploadError ? 'text-[#c92f2f]' : 'text-[#69696d]',
           )}
         >
-          {uploadError ?? 'Сжимаем и загружаем изображение…'}
+          {uploadError ?? t('Сжимаем и загружаем изображение…')}
         </p>
       ) : null}
       <EditorContent
@@ -204,14 +201,20 @@ function Toolbar({
 }) {
   // useEditor does not re-render on selection changes, so toolbar state is
   // read through a selector that updates on every transaction.
+  const { t } = useLanguage()
+  const blockTypes: { value: BlockType; label: string }[] = [
+    { value: 'paragraph', label: t('Обычный текст') },
+    { value: 'h2', label: t('Заголовок') },
+    { value: 'h3', label: t('Подзаголовок') },
+  ]
   const state = useEditorState({
     editor,
     selector: ({ editor: current }) => ({
-      block: (current.isActive('heading', { level: 2 })
+      block: current.isActive('heading', { level: 2 })
         ? 'h2'
         : current.isActive('heading', { level: 3 })
           ? 'h3'
-          : 'paragraph'),
+          : 'paragraph',
       bold: current.isActive('bold'),
       italic: current.isActive('italic'),
       underline: current.isActive('underline'),
@@ -242,7 +245,7 @@ function Toolbar({
 
   const editLink = () => {
     const previous = editor.getAttributes('link').href as string | undefined
-    const url = window.prompt('Адрес ссылки', previous ?? 'https://')
+    const url = window.prompt(t('Адрес ссылки'), previous ?? 'https://')
     if (url === null) return
     if (url.trim() === '') {
       chain().extendMarkRange('link').unsetLink().run()
@@ -254,24 +257,24 @@ function Toolbar({
   return (
     <div
       role="toolbar"
-      aria-label="Форматирование текста"
+      aria-label={t('Форматирование текста')}
       className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-[12px] border-b border-[#ededeb] bg-white/95 px-2 py-1.5 backdrop-blur"
     >
       <ToolButton
-        label="Отменить (Ctrl+Z)"
+        label={t('Отменить (Ctrl+Z)')}
         icon={UndoIcon}
         disabled={disabled || !state.canUndo}
         onClick={() => chain().undo().run()}
       />
       <ToolButton
-        label="Повторить (Ctrl+Shift+Z)"
+        label={t('Повторить (Ctrl+Shift+Z)')}
         icon={RedoIcon}
         disabled={disabled || !state.canRedo}
         onClick={() => chain().redo().run()}
       />
       <Divider />
       <select
-        aria-label="Стиль абзаца"
+        aria-label={t('Стиль абзаца')}
         value={state.block}
         disabled={disabled}
         onChange={(event) => setBlock(event.target.value as BlockType)}
@@ -285,49 +288,49 @@ function Toolbar({
       </select>
       <Divider />
       <ToolButton
-        label="Жирный (Ctrl+B)"
+        label={t('Жирный (Ctrl+B)')}
         icon={TextBold}
         active={state.bold}
         disabled={disabled}
         onClick={() => chain().toggleBold().run()}
       />
       <ToolButton
-        label="Курсив (Ctrl+I)"
+        label={t('Курсив (Ctrl+I)')}
         icon={TextItalic}
         active={state.italic}
         disabled={disabled}
         onClick={() => chain().toggleItalic().run()}
       />
       <ToolButton
-        label="Подчёркнутый (Ctrl+U)"
+        label={t('Подчёркнутый (Ctrl+U)')}
         icon={TextUnderline}
         active={state.underline}
         disabled={disabled}
         onClick={() => chain().toggleUnderline().run()}
       />
       <ToolButton
-        label="Зачёркнутый"
+        label={t('Зачёркнутый')}
         icon={StrikeIcon}
         active={state.strike}
         disabled={disabled}
         onClick={() => chain().toggleStrike().run()}
       />
       <ToolButton
-        label="Выделить маркером"
+        label={t('Выделить маркером')}
         icon={HighlightIcon}
         active={state.highlight}
         disabled={disabled}
         onClick={() => chain().toggleHighlight().run()}
       />
       <ToolButton
-        label="Код в строке"
+        label={t('Код в строке')}
         icon={Code}
         active={state.code}
         disabled={disabled}
         onClick={() => chain().toggleCode().run()}
       />
       <ToolButton
-        label="Ссылка"
+        label={t('Ссылка')}
         icon={Link1}
         active={state.link}
         disabled={disabled}
@@ -335,56 +338,56 @@ function Toolbar({
       />
       <Divider />
       <ToolButton
-        label="Маркированный список"
+        label={t('Маркированный список')}
         icon={BulletListIcon}
         active={state.bulletList}
         disabled={disabled}
         onClick={() => chain().toggleBulletList().run()}
       />
       <ToolButton
-        label="Нумерованный список"
+        label={t('Нумерованный список')}
         icon={OrderedListIcon}
         active={state.orderedList}
         disabled={disabled}
         onClick={() => chain().toggleOrderedList().run()}
       />
       <ToolButton
-        label="Цитата"
+        label={t('Цитата')}
         icon={QuoteUp}
         active={state.blockquote}
         disabled={disabled}
         onClick={() => chain().toggleBlockquote().run()}
       />
       <ToolButton
-        label="Блок кода или примера"
+        label={t('Блок кода или примера')}
         icon={CodeBlockIcon}
         active={state.codeBlock}
         disabled={disabled}
         onClick={() => chain().toggleCodeBlock().run()}
       />
       <ToolButton
-        label="Разделитель"
+        label={t('Разделитель')}
         icon={DividerIcon}
         disabled={disabled}
         onClick={() => chain().setHorizontalRule().run()}
       />
       <Divider />
       <ToolButton
-        label="По левому краю"
+        label={t('По левому краю')}
         icon={TextalignLeft}
         active={!state.alignCenter && !state.alignRight}
         disabled={disabled}
         onClick={() => chain().unsetTextAlign().run()}
       />
       <ToolButton
-        label="По центру"
+        label={t('По центру')}
         icon={TextalignCenter}
         active={state.alignCenter}
         disabled={disabled}
         onClick={() => chain().setTextAlign('center').run()}
       />
       <ToolButton
-        label="По правому краю"
+        label={t('По правому краю')}
         icon={TextalignRight}
         active={state.alignRight}
         disabled={disabled}
@@ -392,7 +395,7 @@ function Toolbar({
       />
       <Divider />
       <ToolButton
-        label="Изображение (или перетащите и вставьте из буфера)"
+        label={t('Изображение (или перетащите и вставьте из буфера)')}
         icon={Gallery}
         disabled={disabled}
         onClick={onPickImage}

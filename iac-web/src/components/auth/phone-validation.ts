@@ -1,3 +1,5 @@
+import { translate } from '@/lib/i18n'
+
 /**
  * Нормализует введённый пользователем номер к E.164.
  * Принимает привычные локальные форматы: «8 700 123 45 67»,
@@ -52,9 +54,10 @@ export function formatPhoneInput(value: string) {
 
 export function validatePhone(value: string) {
   const normalized = normalizePhone(value)
-  if (!normalized || normalized === '+') return 'Введите номер WhatsApp'
+  if (!normalized || normalized === '+')
+    return translate('Введите номер WhatsApp')
   if (!/^\+[1-9]\d{7,14}$/.test(normalized)) {
-    return 'Введите номер полностью, например +7 700 123 45 67'
+    return translate('Введите номер полностью, например +7 700 123 45 67')
   }
   return undefined
 }

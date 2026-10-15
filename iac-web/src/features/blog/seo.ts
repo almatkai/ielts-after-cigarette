@@ -1,10 +1,22 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestUrl } from '@tanstack/react-start/server'
 
+import { translate, type Language } from '@/lib/i18n'
+
 export const BLOG_SITE_NAME = 'Daiyndyq IELTS'
 export const BLOG_TITLE = `Блог ${BLOG_SITE_NAME}`
 export const BLOG_DESCRIPTION =
   'Стратегии, разборы и личный опыт подготовки к IELTS от авторов с подтверждённым баллом 7.5+.'
+
+/** Translated blog title for route heads and metadata (RU source is the key). */
+export function blogTitle(language?: Language) {
+  return translate(BLOG_TITLE, language)
+}
+
+/** Translated blog description for route heads and metadata. */
+export function blogDescription(language?: Language) {
+  return translate(BLOG_DESCRIPTION, language)
+}
 
 // VITE_SITE_URL pins canonical URLs in production; otherwise the public origin
 // comes from the proxied request on the server and the location in the browser.

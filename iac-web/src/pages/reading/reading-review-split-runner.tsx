@@ -17,6 +17,7 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
+import { useLanguage } from '@/lib/i18n'
 
 export function ReadingReviewSplitRunner({
   attempt,
@@ -443,6 +444,7 @@ function ReviewQuestionCard({
   onRetry: () => void
 }) {
   const [expandedExplanation, setExpandedExplanation] = useState(false)
+  const { t } = useLanguage()
   const isCorrect = item.isCorrect
 
   return (
@@ -553,8 +555,8 @@ function ReviewQuestionCard({
             <InfoCircle className="size-3.5" />
             <span>
               {expandedExplanation
-                ? 'Скрыть объяснение'
-                : 'Показать разбор и цитату'}
+                ? t('Скрыть объяснение')
+                : t('Показать разбор и цитату')}
             </span>
           </button>
 
@@ -563,7 +565,7 @@ function ReviewQuestionCard({
               {item.quote ? (
                 <div>
                   <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Цитата из текста:
+                    {t('Цитата из текста:')}
                   </span>
                   <blockquote className="font-serif italic text-slate-800 mt-1 pl-2 border-l-2 border-blue-400">
                     «{item.quote}»
@@ -573,10 +575,10 @@ function ReviewQuestionCard({
               {item.explanation ? (
                 <div>
                   <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Пояснение:
+                    {t('Пояснение:')}
                   </span>
                   <p className="whitespace-pre-wrap mt-0.5 text-slate-700">
-                    {item.explanation}
+                    {t(item.explanation)}
                   </p>
                 </div>
               ) : null}

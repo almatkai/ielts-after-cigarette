@@ -9,13 +9,15 @@ import {
 
 import type { ReactNode } from 'react'
 
+import batch02 from './i18n-content/batch-02.json'
+
 export type Language = 'ru' | 'kk' | 'en'
 
 const LANGUAGE_STORAGE_KEY = 'daiyndyq-language'
 
 type TranslationMap = Partial<Record<string, Partial<Record<Language, string>>>>
 
-const translations: TranslationMap = {
+const baseTranslations: TranslationMap = {
   Язык: { kk: 'Тіл', en: 'Language' },
   Обучение: { kk: 'Оқу', en: 'Study' },
   Обзор: { kk: 'Шолу', en: 'Overview' },
@@ -1201,6 +1203,115 @@ const translations: TranslationMap = {
     kk: 'Ағымдағы мақсатты жүктеу мүмкін болмады.',
     en: 'Could not load your current goal.',
   },
+}
+
+const mistakeDialogTranslations: TranslationMap = {
+  'Текст для чтения': { kk: 'Оқу мәтіні', en: 'Reading passage' },
+  'Аудиозапись и стенограмма': {
+    kk: 'Аудиожазба және стенограмма',
+    en: 'Audio and transcript',
+  },
+  Закрыть: { kk: 'Жабу', en: 'Close' },
+  'Аудио и стенограмма': {
+    kk: 'Аудио және стенограмма',
+    en: 'Audio and transcript',
+  },
+  'Текст пассажа': { kk: 'Мәтін', en: 'Passage text' },
+  'Вопрос и решение': {
+    kk: 'Сұрақ және шешімі',
+    en: 'Question and solution',
+  },
+  'Не удалось загрузить аудио': {
+    kk: 'Аудио жүктелмеді',
+    en: 'Could not load audio',
+  },
+  Аудио: { kk: 'Аудио', en: 'Audio' },
+  'Слушать аудио': { kk: 'Аудионы тыңдау', en: 'Listen to the audio' },
+  'К ответу в тексте': {
+    kk: 'Мәтіндегі жауапқа',
+    en: 'Go to answer in text',
+  },
+  'Работа над ошибкой': { kk: 'Қатені талдау', en: 'Reviewing the mistake' },
+  'Читать текст': { kk: 'Мәтінді оқу', en: 'Read the passage' },
+  'Заполните пропуск: [ _____ ]': {
+    kk: 'Бос орынды толтырыңыз: [ _____ ]',
+    en: 'Fill in the blank: [ _____ ]',
+  },
+  'Ваш ответ:': { kk: 'Сіздің жауабыңыз:', en: 'Your answer:' },
+  Ошибка: { kk: 'Қате', en: 'Incorrect' },
+  'Нет вариантов ответа': {
+    kk: 'Жауап нұсқалары жоқ',
+    en: 'No answer options',
+  },
+  Ответ: { kk: 'Жауап', en: 'Answer' },
+  'Попробуйте ещё раз.': { kk: 'Тағы да көріңіз.', en: 'Try again.' },
+  Проверить: { kk: 'Тексеру', en: 'Check' },
+  'Показать решение': { kk: 'Шешімді көрсету', en: 'Show solution' },
+  Подсказка: { kk: 'Кеңес', en: 'Hint' },
+  'Подсказка к поиску': { kk: 'Іздеуге кеңес', en: 'Search hint' },
+  'Слушать фрагмент': { kk: 'Үзіндіні тыңдау', en: 'Listen to the segment' },
+  'Показать в тексте': { kk: 'Мәтіннен көрсету', en: 'Show in text' },
+  'На что обратить внимание:': {
+    kk: 'Неге назар аудару керек:',
+    en: 'What to look for:',
+  },
+  'Цитата из текста': { kk: 'Мәтіннен дәйексөз', en: 'Quote from the text' },
+  'Подсвечена слева': {
+    kk: 'Сол жақта белгіленген',
+    en: 'Highlighted on the left',
+  },
+  'Подсказки нет.': { kk: 'Кеңес жоқ.', en: 'No hint available.' },
+  Решение: { kk: 'Шешім', en: 'Solution' },
+  'Слушать ответ': { kk: 'Жауапты тыңдау', en: 'Listen to the answer' },
+  'Правильный ответ:': { kk: 'Дұрыс жауап:', en: 'Correct answer:' },
+  'с 1-й попытки': { kk: '1-ші әрекетте', en: 'on the 1st attempt' },
+  Цитата: { kk: 'Дәйексөз', en: 'Quote' },
+  'Подробное объяснение:': {
+    kk: 'Толық түсіндірме:',
+    en: 'Detailed explanation:',
+  },
+  'Следующая ошибка': { kk: 'Келесі қате', en: 'Next mistake' },
+  'Стенограмма скрыта': {
+    kk: 'Стенограмма жасырылған',
+    en: 'Transcript hidden',
+  },
+  Показать: { kk: 'Көрсету', en: 'Show' },
+  'Фрагмент с подсказкой (~3–5 реплик)': {
+    kk: 'Кеңеспен үзінді (~3–5 реплика)',
+    en: 'Hint segment (~3–5 lines)',
+  },
+  Слушать: { kk: 'Тыңдау', en: 'Listen' },
+  'Показать текст фрагмента': {
+    kk: 'Үзінді мәтінін көрсету',
+    en: 'Show the segment text',
+  },
+  '✓ Текст открыт': { kk: '✓ Мәтін ашық', en: '✓ Text visible' },
+  Скрыть: { kk: 'Жасыру', en: 'Hide' },
+  'Разбор ошибки': { kk: 'Қатені талдау', en: 'Mistake review' },
+  Аудиозапись: { kk: 'Аудиожазба', en: 'Audio recording' },
+  'Загрузка аудио…': { kk: 'Аудио жүктелуде…', en: 'Loading audio…' },
+  'Нет стенограммы': { kk: 'Стенограмма жоқ', en: 'No transcript' },
+  Фрагмент: { kk: 'Үзінді', en: 'Segment' },
+  'Обратите внимание на то, для какого предмета дети создают специальный защитный чехол.':
+    {
+      kk: 'Балалардың қандай затқа арнайы қорғаныс қабын жасайтынына назар аударыңыз.',
+      en: 'Pay attention to what item the children are making a special protective cover for.',
+    },
+  'Скрыть объяснение': { kk: 'Түсіндірмені жасыру', en: 'Hide explanation' },
+  'Разобрать ошибку': { kk: 'Қатені талдау', en: 'Review mistake' },
+  Разобрано: { kk: 'Талданды', en: 'Reviewed' },
+  'Показать разбор и цитату': {
+    kk: 'Талдау мен дәйексөзді көрсету',
+    en: 'Show analysis and quote',
+  },
+  'Цитата из текста:': { kk: 'Мәтіннен дәйексөз:', en: 'Quote from the text:' },
+  'Пояснение:': { kk: 'Түсіндірме:', en: 'Explanation:' },
+}
+
+const translations: TranslationMap = {
+  ...baseTranslations,
+  ...mistakeDialogTranslations,
+  ...(batch02 as TranslationMap),
 }
 
 type LanguageContextValue = {

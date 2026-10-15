@@ -533,7 +533,9 @@ export function ReviewQuestion({
         </p>
       ) : null}
       {item.explanation ? (
-        <p className="whitespace-pre-wrap text-[#69696d]">{item.explanation}</p>
+        <p className="whitespace-pre-wrap text-[#69696d]">
+          {t(item.explanation)}
+        </p>
       ) : null}
     </div>
   )
@@ -1001,7 +1003,7 @@ export function EnhancedReviewQuestion({
             <span>{t('Разбор и цитата:')}</span>
           </div>
           <div className="whitespace-pre-wrap text-slate-700">
-            {item.explanation}
+            {t(item.explanation)}
           </div>
         </div>
       ) : null}

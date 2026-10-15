@@ -1653,6 +1653,13 @@ function isLanguage(value: string | null): value is Language {
   return value === 'ru' || value === 'kk' || value === 'en'
 }
 
+/** Device language outside React (API query params, .ts modules). */
+export function getStoredLanguage(): Language {
+  if (typeof window === 'undefined') return 'ru'
+  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  return isLanguage(stored) ? stored : 'ru'
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('ru')
 

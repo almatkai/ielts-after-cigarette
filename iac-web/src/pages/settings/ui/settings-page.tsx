@@ -43,7 +43,6 @@ const selectClassName =
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(2, 'Укажите имя не короче 2 символов'),
-  timezone: z.string().trim(),
 })
 
 const goalSchema = z.object({
@@ -108,14 +107,12 @@ export function SettingsPage() {
   const profileForm = useForm({
     defaultValues: {
       displayName: profile?.displayName ?? '',
-      timezone: profile?.timezone ?? '',
     },
     onSubmit: async ({ value }) => {
       setProfileMessage(null)
       try {
         const updated = await updateProfile({
           displayName: value.displayName.trim(),
-          ...(value.timezone.trim() ? { timezone: value.timezone.trim() } : {}),
         })
         authStore.updateUser(updated)
         queryClient.setQueryData(queryKeys.profile, updated)
@@ -157,7 +154,6 @@ export function SettingsPage() {
     if (profile && !initialized) {
       profileForm.reset({
         displayName: profile.displayName,
-        timezone: profile.timezone,
       })
       goalForm.reset({
         targetBand: profile.targetBand?.toFixed(1) ?? '',
@@ -199,7 +195,7 @@ export function SettingsPage() {
             Профиль
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Имя и часовой пояс аккаунта.
+            Имя аккаунта.
           </CardDescription>
         </CardHeader>
         <form
@@ -211,7 +207,7 @@ export function SettingsPage() {
             void profileForm.handleSubmit()
           }}
         >
-          <CardContent className="grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-6 [&>*]:min-w-0">
+          <CardContent className="grid min-w-0 gap-5 p-5 sm:p-6 [&>*]:min-w-0">
             <profileForm.Field
               name="displayName"
               validators={{ onSubmit: profileSchema.shape.displayName }}
@@ -233,21 +229,6 @@ export function SettingsPage() {
                       {firstError(field.state.meta.errors)}
                     </p>
                   ) : null}
-                </div>
-              )}
-            </profileForm.Field>
-            <profileForm.Field name="timezone">
-              {(field) => (
-                <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Часовой пояс</Label>
-                  <Input
-                    id={field.name}
-                    placeholder="Например, Asia/Almaty"
-                    value={field.state.value}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                    className={fieldClassName}
-                  />
                 </div>
               )}
             </profileForm.Field>

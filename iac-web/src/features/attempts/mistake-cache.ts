@@ -1,12 +1,36 @@
 import type { QueryClient } from '@tanstack/react-query'
+
+import type { Language } from '@/lib/i18n'
 import type { AttemptMaterialType } from './api'
+
+// Same key as LANGUAGE_STORAGE_KEY in lib/i18n (inlined: node regression
+// tests resolve this module without the @ alias or React).
+function storedLanguage(): Language {
+  if (typeof window === 'undefined') return 'ru'
+  const stored = window.localStorage.getItem('daiyndyq-language')
+  return stored === 'kk' || stored === 'en' ? stored : 'ru'
+}
 
 export const mistakeKeys = {
   all: ['attempts', 'mistakes'] as const,
   lists: ['attempts', 'mistakes', 'list'] as const,
-  list: (skill: AttemptMaterialType, page: number) =>
-    ['attempts', 'mistakes', 'list', skill, page] as const,
-  detail: (id: string) => ['attempts', 'mistakes', 'detail', id] as const,
+  list: (skill: AttemptMaterialType, page: number, language?: Language) =>
+    [
+      'attempts',
+      'mistakes',
+      'list',
+      skill,
+      page,
+      language ?? storedLanguage(),
+    ] as const,
+  detail: (id: string, language?: Language) =>
+    [
+      'attempts',
+      'mistakes',
+      'detail',
+      id,
+      language ?? storedLanguage(),
+    ] as const,
 }
 
 // In-memory, per signed-in session. Keep inactive pages/results for an hour

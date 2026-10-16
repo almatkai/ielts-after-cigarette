@@ -1,5 +1,5 @@
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
-import { ArrowLeft, Book, Edit2 } from 'iconsax-react'
+import { ArrowLeft } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { Link } from '@tanstack/react-router'
@@ -16,7 +16,6 @@ import { ExamAttemptShell } from '@/features/attempts/attempt-controller'
 import { useExamTimer } from '@/features/attempts/exam-timer'
 import { attemptStartQueryKey } from '@/features/attempts/exam-attempt-routes'
 import {
-  AttemptPerformanceReport,
   AttemptResultHeader,
   AttemptSubmitBar,
   ErrorState,
@@ -25,7 +24,8 @@ import {
   TimeBadge,
 } from '@/features/attempts/attempt-ui'
 import { startWritingAttempt } from '@/features/attempts/api'
-import type { Attempt, WritingEvaluation } from '@/features/attempts/api'
+import type { Attempt } from '@/features/attempts/api'
+import { WritingReview } from '@/features/attempts/writing-review'
 import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
@@ -509,137 +509,13 @@ export function WritingAttemptResult({
       ) : !evaluation ? (
         <WritingProcessingCard fullMockSessionId={fullMockSessionId} />
       ) : (
-        <WritingEvaluationView
+        <WritingReview
           attempt={effectiveAttempt}
-          material={material}
+          durationMinutes={material.durationMinutes}
+          totalQuestions={material.tasks.length}
           evaluation={evaluation}
         />
       )}
-    </div>
-  )
-}
-
-function WritingEvaluationView({
-  attempt,
-  material,
-  evaluation,
-}: {
-  attempt: Attempt
-  material: PublicWritingMaterial
-  evaluation: WritingEvaluation
-}) {
-  const criteriaList = [
-    {
-      label: 'Task Achievement / Response',
-      band: evaluation.criteria.taskResponse.band,
-    },
-    { label: 'Coherence & Cohesion', band: evaluation.criteria.coherence.band },
-    {
-      label: 'Lexical Resource',
-      band: evaluation.criteria.lexicalResource.band,
-    },
-    { label: 'Grammar Accuracy', band: evaluation.criteria.grammar.band },
-  ] as const
-
-  return (
-    <div className="space-y-6">
-      <AttemptPerformanceReport
-        band={evaluation.overallBand}
-        bandNote="Оценка сформирована по 4 критериям IELTS Writing"
-        criteria={criteriaList}
-        totalQuestions={material.tasks.length}
-        startedAt={attempt.startedAt}
-        submittedAt={attempt.submittedAt}
-        durationMinutes={material.durationMinutes}
-        paceUnit="эссе"
-      />
-
-      {evaluation.summary ? (
-        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-            Резюме проверки
-          </p>
-          <p className="text-sm leading-relaxed text-slate-700">
-            {evaluation.summary}
-          </p>
-        </Card>
-      ) : null}
-
-      {[...evaluation.tasks]
-        .sort((left, right) => left.position - right.position)
-        .map((task) => (
-          <Card
-            key={task.taskId}
-            className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs"
-          >
-            <CardHeader>
-              <div className="flex items-center justify-between gap-3">
-                <CardTitle className="flex items-center gap-2 text-slate-900">
-                  <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
-                  Task {task.position}
-                </CardTitle>
-                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
-                  Band {task.band.toFixed(1)}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-4 text-sm leading-6">
-              <p className="text-slate-700">{task.feedback}</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {[
-                  [
-                    task.position === 1 ? 'Task Achievement' : 'Task Response',
-                    task.criteria.taskResponse,
-                  ],
-                  ['Coherence & Cohesion', task.criteria.coherence],
-                  ['Lexical Resource', task.criteria.lexicalResource],
-                  ['Grammar Range & Accuracy', task.criteria.grammar],
-                ].map(([label, criterion]) => {
-                  const typedCriterion = criterion as {
-                    band: number
-                    feedback: string
-                  }
-                  return (
-                    <div
-                      key={label as string}
-                      className="rounded-xl bg-[#f7f7f5] p-3"
-                    >
-                      <div className="flex items-center justify-between gap-2 font-semibold">
-                        <span>{label as string}</span>
-                        <span>{typedCriterion.band.toFixed(1)}</span>
-                      </div>
-                      <p className="mt-1 text-[#69696d]">
-                        {typedCriterion.feedback}
-                      </p>
-                    </div>
-                  )
-                })}
-              </div>
-              <FeedbackList title="Сильные стороны" items={task.strengths} />
-              <FeedbackList title="Что улучшить" items={task.improvements} />
-            </CardContent>
-          </Card>
-        ))}
-
-      <p className="flex items-center gap-2 text-xs text-[#808084]">
-        <Book className="size-4" aria-hidden />
-        Оценка носит учебный характер; фактический результат IELTS определяет
-        экзаменатор.
-      </p>
-    </div>
-  )
-}
-
-function FeedbackList({ title, items }: { title: string; items: string[] }) {
-  if (items.length === 0) return null
-  return (
-    <div>
-      <p className="font-semibold">{title}</p>
-      <ul className="mt-1 list-disc pl-5 text-[#69696d]">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
     </div>
   )
 }

@@ -380,16 +380,64 @@ test('visitor browses the normal site with locked tests and no private API reads
   expect(privateReads).toEqual([])
 })
 
+test('login logo opens the app overview even when guest trials are disabled', async ({
+  page,
+}) => {
+  const { privateReads, starts } = await guestAPI(page, false, false)
+  await page.goto('./login')
+  const brand = page.getByRole('link', { name: 'Daiyndyq IELTS — к обзору' })
+  await expect(brand).toHaveAttribute('href', '/app/')
+  await brand.click()
+  await expect(page).toHaveURL(/\/app\/$/)
+  await expect(
+    page.getByRole('heading', { name: 'Полный пробный IELTS' }),
+  ).toBeVisible()
+  expect(privateReads).toEqual([])
+  expect(starts).toEqual([])
+})
+
+for (const enabled of [true, false]) {
+  test(`login trial link opens the trial card with guest mode ${enabled ? 'enabled' : 'disabled'}`, async ({
+    page,
+  }) => {
+    const { privateReads, starts } = await guestAPI(page, false, enabled)
+    await page.goto('./login')
+    const trial = page.getByRole('link', {
+      name: 'Попробовать один Full Mock без регистрации',
+    })
+    await expect(trial).toHaveAttribute('href', '/app/')
+    await trial.click()
+    await expect(page).toHaveURL(/\/app\/$/)
+    const start = page.getByRole('button', {
+      name: 'Начать бесплатный Full Mock',
+    })
+    if (enabled) {
+      await expect(start).toBeEnabled()
+      await start.click()
+      await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
+      expect(starts).toHaveLength(1)
+    } else {
+      await expect(
+        page.getByText(/Гостевой запуск пока недоступен/),
+      ).toBeVisible()
+      await expect(start).toBeDisabled()
+      expect(starts).toEqual([])
+    }
+    expect(privateReads).toEqual([])
+  })
+}
+
 test('disabled guest mode explains availability and never enables start on mobile', async ({
   page,
 }, testInfo) => {
   await guestAPI(page, false, false)
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('./')
-  await expect(page).toHaveURL(/\/login(?:\?.*)?$/)
+  await page.goto('./try')
+  await expect(page).toHaveURL(/\/app\/$/)
+  await expect(page.getByText(/Гостевой запуск пока недоступен/)).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Начать бесплатный Full Mock' }),
-  ).toHaveCount(0)
+  ).toBeDisabled()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

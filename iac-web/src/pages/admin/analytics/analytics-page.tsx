@@ -32,6 +32,8 @@ import {
   rampColor,
 } from './charts'
 
+import { GuestConversionContent } from './guest-conversion'
+
 import type {
   AnalyticsDataset,
   AnalyticsDays,
@@ -385,6 +387,13 @@ function OverviewContent({
           detail="Оценка HyperLogLog, точность ±1%"
         />
       </div>
+
+      <Panel
+        title="Гости → Full Mock → регистрация"
+        icon={<Profile2User className="size-[18px]" aria-hidden />}
+      >
+        <GuestConversionContent conversion={overview.guestConversion} />
+      </Panel>
 
       <Panel
         title="Регистрации и заявки по дням"

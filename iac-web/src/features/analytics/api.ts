@@ -42,6 +42,17 @@ export type AnalyticsSkill = {
   medianDurationSec: number | null
 }
 
+export type GuestConversionCounts = {
+  guests: number
+  started: number
+  completed: number
+  registered: number
+}
+
+export type GuestConversion = GuestConversionCounts & {
+  daily: (GuestConversionCounts & { day: string })[]
+}
+
 export type AnalyticsOverview = {
   days: number
   timeZone: string
@@ -52,6 +63,8 @@ export type AnalyticsOverview = {
   sources: { source: string; users: number }[]
   heatmap: { weekday: number; hour: number; attempts: number }[]
   cohorts: { week: string; size: number; retained: number[] }[]
+  // Optional while the frontend and API are rolled out independently.
+  guestConversion?: GuestConversion
   generatedAt: string
 }
 

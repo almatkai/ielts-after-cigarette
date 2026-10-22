@@ -28,11 +28,11 @@ const statusFilters: StatusFilter[] = ['PENDING', 'APPROVED', 'REJECTED']
 function statusBadge(status: WriterApplicationDto['status']) {
   switch (status) {
     case 'APPROVED':
-      return 'bg-[#ecfdf5] text-[#047857]'
+      return 'bg-success-bg text-success'
     case 'REJECTED':
-      return 'bg-[#fef2f2] text-[#c92f2f]'
+      return 'bg-destructive-soft text-destructive'
     default:
-      return 'bg-[#eff6ff] text-[#1d4ed8]'
+      return 'bg-primary-soft text-primary'
   }
 }
 
@@ -82,10 +82,10 @@ export function AdminWriterApplicationsPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-[-0.03em]">
+        <h1 className="text-2xl font-semibold tracking-normal">
           {t('Заявки авторов')}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[#69696d]">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {t(
             'Проверьте заявленный балл IELTS (минимум 7.5) и сертификат перед одобрением. Одобренные заявители получают роль автора блога.',
           )}
@@ -100,8 +100,8 @@ export function AdminWriterApplicationsPage() {
             onClick={() => setFilter(candidate)}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
               filter === candidate
-                ? 'bg-[#111111] text-white'
-                : 'bg-white text-[#69696d] hover:bg-[#f4f4f1]'
+                ? 'bg-foreground text-primary-foreground'
+                : 'bg-card text-muted-foreground hover:bg-muted'
             }`}
           >
             {candidate === 'PENDING'
@@ -114,30 +114,30 @@ export function AdminWriterApplicationsPage() {
       </div>
 
       {actionError ? (
-        <p className="rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
+        <p className="rounded-[10px] bg-destructive-soft px-4 py-3 text-sm text-destructive">
           {actionError}
         </p>
       ) : null}
 
       <div className="grid gap-3">
         {applicationsQuery.isPending ? (
-          <p className="text-sm text-[#69696d]">{t('Загружаем…')}</p>
+          <p className="text-sm text-muted-foreground">{t('Загружаем…')}</p>
         ) : applications.length === 0 ? (
-          <p className="rounded-[16px] border border-[#e7e7e4] bg-white px-5 py-10 text-center text-sm text-[#69696d]">
+          <p className="rounded-[10px] border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
             {t('Заявок в этой категории нет.')}
           </p>
         ) : (
           applications.map((application) => (
             <div
               key={application.id}
-              className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[16px] border border-[#e7e7e4] bg-white p-5"
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border border-border bg-card p-5"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold text-[#111111]">
+                  <span className="text-sm font-semibold text-foreground">
                     {application.userDisplayName}
                   </span>
-                  <span className="text-xs text-[#808084]">
+                  <span className="text-xs text-muted-foreground">
                     {application.userEmail}
                   </span>
                   <span
@@ -146,7 +146,7 @@ export function AdminWriterApplicationsPage() {
                     {application.status}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-[#69696d]">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Overall {application.overallBand}
                   {' · '}Reading {application.readingBand}
                   {' · '}Writing {application.writingBand}
@@ -204,7 +204,7 @@ export function AdminWriterApplicationsPage() {
               </DialogHeader>
 
               <div className="grid gap-3">
-                <div className="rounded-[12px] border border-[#e7e7e4] bg-[#fbfbfa] p-4 text-sm leading-6 text-[#525256]">
+                <div className="rounded-[10px] border border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
                   <p>
                     <b>Listening:</b>{' '}
                     {reviewTarget.application.listeningBand ?? '—'}
@@ -238,14 +238,14 @@ export function AdminWriterApplicationsPage() {
                   type={
                     reviewTarget.application.certificateMime || 'image/jpeg'
                   }
-                  className="h-72 w-full rounded-[12px] border border-[#e7e7e4] bg-white"
+                  className="h-72 w-full rounded-[10px] border border-border bg-card"
                 >
-                  <p className="p-4 text-sm text-[#69696d]">
+                  <p className="p-4 text-sm text-muted-foreground">
                     {t(
                       'Не удалось показать сертификат встроенно — откройте файл по ссылке',
                     )}{' '}
                     <a
-                      className="text-[#1d4ed8] underline"
+                      className="text-primary underline"
                       href={`/api/v1/writers/applications/${reviewTarget.application.id}/certificate`}
                       target="_blank"
                       rel="noreferrer"

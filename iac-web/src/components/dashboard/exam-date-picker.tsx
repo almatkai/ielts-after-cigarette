@@ -300,23 +300,23 @@ export function ExamDatePicker({
           id={id}
           disabled={disabled}
           className={cn(
-            'group/btn h-11 w-full rounded-[9px] border bg-white px-3.5 flex items-center justify-between text-left text-sm transition-all shadow-none cursor-pointer',
+            'group/btn h-11 w-full rounded-[9px] border bg-card px-3.5 flex items-center justify-between text-left text-sm transition-all shadow-none cursor-pointer',
             error
-              ? 'border-[#c92f2f] ring-1 ring-[#c92f2f]/30'
-              : 'border-[#deded9] hover:border-[#3b82f6]/70 focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/20',
-            disabled && 'opacity-60 cursor-not-allowed bg-slate-50',
+              ? 'border-destructive ring-1 ring-destructive/30'
+              : 'border-border hover:border-primary/70 focus:border-primary focus:ring-2 focus:ring-ring',
+            disabled && 'opacity-60 cursor-not-allowed bg-card',
             className,
           )}
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <Calendar
-              className="size-4 shrink-0 text-[#9a9a9d] transition-colors group-hover/btn:text-[#3b82f6]"
+              className="size-4 shrink-0 text-muted-foreground transition-colors group-hover/btn:text-primary"
               aria-hidden
             />
             <span
               className={cn(
                 'truncate',
-                value ? 'font-medium text-[#111111]' : 'text-[#808084]',
+                value ? 'font-medium text-foreground' : 'text-muted-foreground',
               )}
             >
               {value
@@ -327,7 +327,7 @@ export function ExamDatePicker({
 
           <div className="flex items-center gap-2 shrink-0">
             {daysRemaining !== null && daysRemaining >= 0 ? (
-              <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-[#2563eb] border border-blue-100">
+              <span className="hidden sm:inline-flex items-center rounded-sm bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary-hover border border-border-strong">
                 {daysRemaining === 0
                   ? t('Сегодня')
                   : formatDaysUntil(daysRemaining, language)}
@@ -335,8 +335,8 @@ export function ExamDatePicker({
             ) : null}
             <ArrowDown2
               className={cn(
-                'size-3.5 text-slate-400 transition-transform duration-200 group-hover/btn:text-slate-600',
-                isOpen && 'rotate-180 text-blue-600',
+                'size-3.5 text-muted-foreground transition-transform duration-200 group-hover/btn:text-muted-foreground',
+                isOpen && 'rotate-180 text-primary',
               )}
             />
           </div>
@@ -347,13 +347,13 @@ export function ExamDatePicker({
         align="start"
         sideOffset={6}
         className={cn(
-          'w-[316px] sm:w-[332px] p-3.5 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(15,23,42,0.14),0_0_0_1px_rgba(226,232,240,0.8)] z-[70] select-none',
+          'w-[316px] sm:w-[332px] p-3.5 rounded-xl border border-border bg-card  shadow-popover z-[70] select-none',
           contentClassName,
         )}
       >
         {/* Header: Month & Year + Controls */}
-        <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-          <span className="text-sm font-bold text-slate-900 tracking-tight">
+        <div className="flex items-center justify-between pb-2.5 border-b border-border">
+          <span className="text-sm font-bold text-foreground tracking-tight">
             {MONTH_NAMES[language][viewMonth]} {viewYear}
           </span>
 
@@ -365,8 +365,8 @@ export function ExamDatePicker({
               className={cn(
                 'size-7 rounded-lg flex items-center justify-center transition-colors',
                 isPrevMonthDisabled
-                  ? 'text-slate-300 cursor-not-allowed opacity-50'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer',
+                  ? 'text-muted-foreground cursor-not-allowed opacity-50'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
               )}
               aria-label={t('Предыдущий месяц')}
             >
@@ -375,7 +375,7 @@ export function ExamDatePicker({
             <button
               type="button"
               onClick={handleNextMonth}
-              className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+              className="size-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
               aria-label={t('Следующий месяц')}
             >
               <ArrowRight2 className="size-3.5" />
@@ -385,7 +385,7 @@ export function ExamDatePicker({
 
         {/* Quick Presets for IELTS preparation */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2 no-scrollbar">
-          <span className="text-[11px] text-slate-400 font-medium shrink-0">
+          <span className="text-[11px] text-muted-foreground font-medium shrink-0">
             {t('Быстро:')}
           </span>
           {presets.map((preset) => (
@@ -393,7 +393,7 @@ export function ExamDatePicker({
               key={preset.label}
               type="button"
               onClick={() => selectPreset(preset.months)}
-              className="rounded-full px-2 py-0.5 text-[11px] font-medium border border-slate-200 bg-slate-50/70 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 transition-all shrink-0 cursor-pointer active:scale-95"
+              className="rounded-sm px-2 py-0.5 text-[11px] font-medium border border-border bg-card/70 text-muted-foreground hover:border-border-strong hover:bg-primary-soft hover:text-primary transition-all shrink-0 cursor-pointer active:scale-95"
             >
               {t(preset.label)}
             </button>
@@ -401,11 +401,11 @@ export function ExamDatePicker({
         </div>
 
         {/* Weekday Names */}
-        <div className="grid grid-cols-7 gap-1 text-center py-1 border-t border-slate-100">
+        <div className="grid grid-cols-7 gap-1 text-center py-1 border-t border-border">
           {WEEKDAYS[language].map((d) => (
             <span
               key={d}
-              className="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+              className="text-[10px] font-bold text-muted-foreground normal-case"
             >
               {d}
             </span>
@@ -422,16 +422,16 @@ export function ExamDatePicker({
               onClick={() => handleSelectDate(cell.iso)}
               className={cn(
                 'size-8 mx-auto rounded-full text-xs flex items-center justify-center transition-all',
-                cell.isCurrentMonth ? '' : 'text-slate-300 opacity-30',
+                cell.isCurrentMonth ? '' : 'text-muted-foreground opacity-30',
                 cell.disabled
-                  ? 'text-slate-300 cursor-not-allowed pointer-events-none'
+                  ? 'text-muted-foreground cursor-not-allowed pointer-events-none'
                   : 'cursor-pointer active:scale-95',
                 cell.isSelected
-                  ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30 scale-105 hover:bg-blue-700'
+                  ? 'bg-gold text-gold-foreground font-semibold'
                   : cell.isToday
-                    ? 'text-blue-600 font-bold ring-1.5 ring-blue-500/40 hover:bg-blue-50'
+                    ? 'text-primary font-bold ring-1 ring-primary hover:bg-primary-soft'
                     : !cell.disabled && cell.isCurrentMonth
-                      ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
+                      ? 'text-foreground hover:bg-primary-soft hover:text-primary'
                       : '',
               )}
             >
@@ -441,10 +441,10 @@ export function ExamDatePicker({
         </div>
 
         {/* Footer: Remaining Days & Reset */}
-        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+        <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-xs">
           {daysRemaining !== null ? (
-            <span className="text-slate-600 text-[11px] font-medium flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-muted-foreground text-[11px] font-medium flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-success animate-pulse" />
               {daysRemaining === 0
                 ? t('Экзамен сегодня!')
                 : daysRemaining > 0
@@ -452,7 +452,7 @@ export function ExamDatePicker({
                   : t('Дата в прошлом')}
             </span>
           ) : (
-            <span className="text-slate-400 text-[11px]">
+            <span className="text-muted-foreground text-[11px]">
               {t('Выберите дату экзамена')}
             </span>
           )}
@@ -461,7 +461,7 @@ export function ExamDatePicker({
             <button
               type="button"
               onClick={handleClear}
-              className="text-[11px] font-medium text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+              className="text-[11px] font-medium text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
             >
               {t('Очистить')}
             </button>

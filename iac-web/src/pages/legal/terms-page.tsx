@@ -21,13 +21,13 @@ const TERMS_TOC: TocItem[] = [
 
 /** Renders the brand name inside a translated string with the original bold emphasis. */
 function BrandEmphasis({ text }: { text: string }) {
-  const [before, ...rest] = text.split('Daiyndyq IELTS')
+  const [before, ...rest] = text.split('Yrys Academy')
   return (
     <>
       {before}
       {rest.map((chunk, index) => (
         <Fragment key={index}>
-          <strong>Daiyndyq IELTS</strong>
+          <strong>Yrys Academy</strong>
           {chunk}
         </Fragment>
       ))}
@@ -41,22 +41,22 @@ export function TermsPage() {
     <LegalShell
       title={t('Условия использования')}
       subtitle={t(
-        'Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Daiyndyq IELTS».',
+        'Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Yrys Academy».',
       )}
       lastUpdated={t('5 октября 2026 г.')}
       version="1.0"
       toc={TERMS_TOC.map((item) => ({ ...item, title: t(item.title) }))}
     >
-      <div className="space-y-10 text-sm leading-relaxed text-[#334155]">
+      <div className="space-y-10 text-sm leading-relaxed text-foreground">
         {/* Important IELTS Disclaimer Callout */}
-        <div className="rounded-[12px] border border-[#fde68a] bg-[#fffbeb] p-5 text-[#92400e]">
-          <p className="font-semibold text-[#78350f]">
+        <div className="rounded-[10px] border border-warning-bg bg-warning-bg p-5 text-warning-fg">
+          <p className="font-semibold text-warning-fg">
             {t('Важная правовая оговорка о бренде IELTS:')}
           </p>
           <p className="mt-1.5 text-xs sm:text-sm">
             <BrandEmphasis
               text={t(
-                'IELTS является зарегистрированным товарным знаком University of Cambridge ESOL Examinations Syndicate, British Council и IDP Education Australia. Платформа Daiyndyq IELTS является независимым образовательным сервисом подготовки и не аффилирована, не одобрена и не спонсируется официальными правообладателями товарного знака IELTS.',
+                'IELTS является зарегистрированным товарным знаком University of Cambridge ESOL Examinations Syndicate, British Council и IDP Education Australia. Платформа Yrys Academy является независимым образовательным сервисом подготовки и не аффилирована, не одобрена и не спонсируется официальными правообладателями товарного знака IELTS.',
               )}
             />
           </p>
@@ -64,12 +64,12 @@ export function TermsPage() {
 
         {/* Section 1 */}
         <section id="general" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('1. Общие положения')}
           </h2>
           <p>
             {t(
-              '1.1. Настоящие Условия использования (далее — «Соглашение», «Условия») представляют собой публичную оферту сервиса «Daiyndyq IELTS» (далее — «Сервис», «Платформа», «мы») и определяют порядок доступа к онлайн-платформе подготовки к экзамену IELTS.',
+              '1.1. Настоящие Условия использования (далее — «Соглашение», «Условия») представляют собой публичную оферту сервиса «Yrys Academy» (далее — «Сервис», «Платформа», «мы») и определяют порядок доступа к онлайн-платформе подготовки к экзамену IELTS.',
             )}
           </p>
           <p>
@@ -86,7 +86,7 @@ export function TermsPage() {
 
         {/* Section 2 */}
         <section id="account" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('2. Учетная запись и авторизация')}
           </h2>
           <p>
@@ -108,7 +108,7 @@ export function TermsPage() {
 
         {/* Section 3 */}
         <section id="rules" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('3. Правила использования платформы')}
           </h2>
           <p>{t('3.1. Пользователь имеет право:')}</p>
@@ -163,12 +163,12 @@ export function TermsPage() {
 
         {/* Section 4 */}
         <section id="ip-disclaimer" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('4. Интеллектуальная собственность')}
           </h2>
           <p>
             {t(
-              '4.1. Все элементы интерфейса, графические изображения, дизайн, логотипы («Daiyndyq IELTS»), программный код, структура тестов, методические материалы и алгоритмы оценки являются объектами исключительных прав правообладателя Сервиса и охраняются законом.',
+              '4.1. Все элементы интерфейса, графические изображения, дизайн, логотипы («Yrys Academy»), программный код, структура тестов, методические материалы и алгоритмы оценки являются объектами исключительных прав правообладателя Сервиса и охраняются законом.',
             )}
           </p>
           <p>
@@ -185,7 +185,7 @@ export function TermsPage() {
 
         {/* Section 5 */}
         <section id="ai-tools" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('5. Использование искусственного интеллекта')}
           </h2>
           <p>
@@ -202,7 +202,7 @@ export function TermsPage() {
 
         {/* Section 6 */}
         <section id="subscriptions" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('6. Подписки и платные услуги')}
           </h2>
           <p>
@@ -219,7 +219,7 @@ export function TermsPage() {
 
         {/* Section 7 */}
         <section id="liability" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('7. Ограничение ответственности')}
           </h2>
           <p>
@@ -241,7 +241,7 @@ export function TermsPage() {
 
         {/* Section 8 */}
         <section id="termination" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('8. Прекращение действия соглашения')}
           </h2>
           <p>
@@ -258,7 +258,7 @@ export function TermsPage() {
 
         {/* Section 9 */}
         <section id="governing-law" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('9. Применимое право и разрешение споров')}
           </h2>
           <p>
@@ -275,7 +275,7 @@ export function TermsPage() {
 
         {/* Section 10 */}
         <section id="contacts" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             {t('10. Контактная информация')}
           </h2>
           <p>
@@ -283,20 +283,20 @@ export function TermsPage() {
               'По любым вопросам, связанным с настоящими Условиями, вы можете связаться с нами:',
             )}
           </p>
-          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4 text-xs sm:text-sm">
-            <p className="font-semibold text-[#0f172a]">
-              {t('Служба поддержки «Daiyndyq IELTS»:')}
+          <div className="rounded-lg border border-border bg-background p-4 text-xs sm:text-sm">
+            <p className="font-semibold text-foreground">
+              {t('Служба поддержки «Yrys Academy»:')}
             </p>
             <p className="mt-1">
               {t('Электронная почта')}:{' '}
               <a
                 href="mailto:kairatovalmat2003@gmail.com"
-                className="font-medium text-[#2563eb] hover:underline"
+                className="font-medium text-primary-hover hover:underline"
               >
                 kairatovalmat2003@gmail.com
               </a>
             </p>
-            <p className="mt-0.5 text-[#64748b]">
+            <p className="mt-0.5 text-muted-foreground">
               {t('Локация: г. Астана, Республика Казахстан.')}
             </p>
           </div>

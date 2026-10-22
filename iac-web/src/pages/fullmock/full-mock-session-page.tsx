@@ -115,7 +115,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               ? 'Academic'
               : 'General Training'}
           </Badge>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+          <h1 className="text-[28px] sm:text-[36px] mt-2 font-semibold tracking-normal">
             {session.mockTest.title}
           </h1>
         </div>
@@ -129,7 +129,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
         </Button>
       </div>
       {returnToSite.isError ? (
-        <p role="alert" className="text-sm text-[#e23b3b]">
+        <p role="alert" className="text-sm text-destructive">
           Could not pause the test: {tr(getErrorMessage(returnToSite.error))}
         </p>
       ) : null}
@@ -151,7 +151,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
             current.attempt.status,
           ) ? (
-            <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
+            <Card className="border-primary-soft bg-primary-soft shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
                   {labels[current.skill]} is complete. You can continue.
@@ -170,7 +170,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
             </Card>
           ) : null}
           {advance.isError ? (
-            <p className="text-sm text-[#e23b3b]">
+            <p className="text-sm text-destructive">
               {tr(getErrorMessage(advance.error))}
             </p>
           ) : null}
@@ -202,7 +202,7 @@ function SectionCard({
   const locked = section.position > currentSection
   return (
     <Card
-      className={isCurrent ? 'border-[#93c5fd] shadow-none' : 'shadow-none'}
+      className={isCurrent ? 'border-primary-soft shadow-none' : 'shadow-none'}
     >
       <CardHeader>
         <div className="flex flex-col items-start gap-2">
@@ -210,7 +210,7 @@ function SectionCard({
             0{section.position} · {labels[section.skill]}
           </CardTitle>
           {completed ? (
-            <Badge className="bg-emerald-600">
+            <Badge className="bg-success">
               <TickCircle aria-hidden />
               {section.attempt.status === 'ABANDONED'
                 ? 'Time is up'
@@ -229,7 +229,7 @@ function SectionCard({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="mb-4 text-sm text-[#69696d]">
+        <p className="mb-4 text-sm text-muted-foreground">
           {section.durationMinutes ??
             (section.skill === 'listening'
               ? 30
@@ -260,7 +260,7 @@ function SectionCard({
           </div>
         ) : null}
         {pause.isError ? (
-          <p role="alert" className="mt-3 text-sm text-red-600">
+          <p role="alert" className="mt-3 text-sm text-destructive">
             {tr(getErrorMessage(pause.error))}
           </p>
         ) : null}

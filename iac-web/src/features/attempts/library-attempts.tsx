@@ -24,9 +24,9 @@ export function LibraryAttemptResult({ items }: { items: AttemptListItem[] }) {
   const { latest, previous, count } = summarizeMaterialAttempts(items)
   if (!latest) return null
   return (
-    <div className="rounded-[10px] border border-[#dcece1] bg-[#f4faf6] px-3.5 py-3">
+    <div className="rounded-[10px] border border-success-bg bg-success-bg px-3.5 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-medium text-emerald-700">
+        <span className="text-xs font-medium text-success">
           {language === 'en'
             ? `Completed · ${count} ${count === 1 ? 'attempt' : 'attempts'}`
             : language === 'kk'
@@ -36,14 +36,14 @@ export function LibraryAttemptResult({ items }: { items: AttemptListItem[] }) {
         <BandChange value={bandChange(latest, previous)} />
       </div>
       <div className="mt-1.5 flex items-baseline gap-3">
-        <span className="text-lg font-semibold tracking-tight text-[#111111]">
+        <span className="text-lg font-semibold tracking-tight text-foreground">
           Band {latest.band?.toFixed(1) ?? '—'}
         </span>
-        <span className="text-sm text-[#69696d]">
+        <span className="text-sm text-muted-foreground">
           {latest.score ?? '—'}/{latest.maxScore ?? '—'}
         </span>
       </div>
-      <p className="mt-1 text-[11px] text-[#808084]">
+      <p className="mt-1 text-[11px] text-muted-foreground">
         {t('Последняя попытка')} ·{' '}
         {formatDateTime(latest.submittedAt ?? latest.startedAt)}
       </p>
@@ -79,7 +79,7 @@ export function LibraryAttemptActions({
   }
   if (!user)
     return (
-      <div className="flex justify-end border-t border-[#ededeb] pt-3">
+      <div className="flex justify-end border-t border-border pt-3">
         <LoginToContinue />
       </div>
     )
@@ -95,7 +95,7 @@ export function LibraryAttemptActions({
             ? 'Открыть тест'
             : 'Открыть текст'
   return (
-    <div className="flex flex-wrap justify-end gap-2 border-t border-[#ededeb] pt-3">
+    <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
       {latest ? (
         <Button
           asChild
@@ -120,14 +120,14 @@ export function LibraryAttemptActions({
       ) : pending ? (
         <Button
           disabled
-          className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none"
+          className="h-10 rounded-[9px] bg-primary px-5 shadow-none"
         >
           {t(label)}
         </Button>
       ) : (
         <Button
           asChild
-          className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+          className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
         >
           {skill === 'listening' ? (
             <Link

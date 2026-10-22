@@ -13,3 +13,5 @@ dist-ssr
 __unconfig*
 todos.json
 .vscode
+
+.brand-venv/

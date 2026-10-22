@@ -23,7 +23,7 @@ export const Route = createFileRoute('/_app')({
   },
   head: () => ({
     meta: [
-      { title: tr('Панель управления — Daiyndyq IELTS') },
+      { title: tr('Панель управления — Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

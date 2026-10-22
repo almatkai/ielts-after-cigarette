@@ -75,7 +75,7 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         {retake.isError ? (
-          <p role="alert" className="text-sm text-[#e23b3b]">
+          <p role="alert" className="text-sm text-destructive">
             {tr(getErrorMessage(retake.error))}
           </p>
         ) : null}

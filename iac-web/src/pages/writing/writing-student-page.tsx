@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { ArrowLeft } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
@@ -185,7 +186,8 @@ export function WritingAttemptRunner({
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="sr-only">{material.title}</h1>
+          <BrandLogo variant="mark" />
+          <h1 className="font-sans sr-only">{material.title}</h1>
           <div className="flex items-center gap-3">
             <SaveIndicator state={session.saveState} />
             <TimeBadge
@@ -200,7 +202,7 @@ export function WritingAttemptRunner({
             size="sm"
             disabled={session.isSavingAndExiting || session.isSubmitting}
             onClick={handleContinueLater}
-            className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+            className="gap-1.5 rounded-[10px] border-border text-xs font-semibold text-foreground hover:bg-card shadow-none"
           >
             {session.isSavingAndExiting ? 'Saving…' : 'Continue later'}
           </Button>
@@ -215,7 +217,7 @@ export function WritingAttemptRunner({
       {session.exitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
           {'Could not save draft:'} {tr(session.exitError)}
         </p>
@@ -223,7 +225,7 @@ export function WritingAttemptRunner({
       {session.submitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
           {'Could not submit your work:'} {tr(session.submitError)}
         </p>
@@ -237,7 +239,7 @@ export function WritingAttemptRunner({
           }
         />
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-border bg-card p-3">
         <Button
           type="button"
           variant="outline"
@@ -246,7 +248,7 @@ export function WritingAttemptRunner({
         >
           {'Back'}
         </Button>
-        <p className="text-sm text-[#69696d]">
+        <p className="text-sm text-muted-foreground">
           {'Task'} {activeTaskIndex + 1} {'of'} {material.tasks.length}
         </p>
         <Button
@@ -291,7 +293,7 @@ function WritingTaskEditor({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle>Task {task.position}</CardTitle>
-            <p className="mt-1 text-sm text-[#69696d]">
+            <p className="mt-1 text-sm text-muted-foreground">
               {task.position === 1
                 ? 'Suggested time: 20 minutes'
                 : 'Suggested time: 40 minutes'}
@@ -300,18 +302,18 @@ function WritingTaskEditor({
             </p>
           </div>
           {task.position === 1 && task.visualType ? (
-            <span className="rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-medium text-[#1d4ed8]">
+            <span className="rounded-sm bg-primary-soft px-3 py-1 text-xs font-medium text-primary">
               {task.visualType.replaceAll('_', ' ')}
             </span>
           ) : task.position === 1 && task.letterTone ? (
-            <span className="rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-medium text-[#1d4ed8]">
+            <span className="rounded-sm bg-primary-soft px-3 py-1 text-xs font-medium text-primary">
               {task.letterTone} {'letter'}
             </span>
           ) : null}
         </div>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="whitespace-pre-wrap rounded-xl bg-[#f7f7f5] p-4 text-sm leading-6">
+        <div className="whitespace-pre-wrap rounded-xl bg-background p-4 text-sm leading-6">
           {task.prompt}
         </div>
         {task.visualAssetId ? (
@@ -330,12 +332,12 @@ function WritingTaskEditor({
           value={text}
           onChange={(event) => onChange(event.target.value)}
           rows={15}
-          className="resize-y font-serif text-base leading-7"
+          className="resize-y font-sans text-base leading-7"
           placeholder={'Write your answer in English…'}
           aria-label={`${'Answer for'} Writing Task ${task.position}`}
         />
         <p
-          className={`text-right text-xs ${words < task.minimumWords ? 'text-amber-700' : 'text-emerald-700'}`}
+          className={`text-right text-xs ${words < task.minimumWords ? 'text-warning-fg' : 'text-success'}`}
         >
           {words} {wordEnding(words)} · {'recommended minimum'}{' '}
           {task.minimumWords}
@@ -370,10 +372,10 @@ function ProtectedWritingImage({
     [url],
   )
   if (query.isPending) {
-    return <p className="text-sm text-[#69696d]">{'Loading image…'}</p>
+    return <p className="text-sm text-muted-foreground">{'Loading image…'}</p>
   }
   if (!url) {
-    return <p className="text-sm text-[#e23b3b]">{'Image unavailable.'}</p>
+    return <p className="text-sm text-destructive">{'Image unavailable.'}</p>
   }
   return (
     <a href={url} target="_blank" rel="noreferrer" title={'Open full size'}>
@@ -392,9 +394,9 @@ function WritingProcessingCard({
   fullMockSessionId?: string
 }) {
   return (
-    <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 sm:p-8 shadow-xs">
+    <Card className="rounded-[10px] border border-border bg-card p-6 sm:p-8 shadow-none">
       <div className="flex flex-col items-center text-center max-w-lg mx-auto py-4">
-        <div className="size-12 rounded-full bg-blue-50 flex items-center justify-center text-[#3b82f6] mb-4">
+        <div className="size-12 rounded-full bg-primary-soft flex items-center justify-center text-primary mb-4">
           <svg
             className="size-6 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
@@ -416,21 +418,21 @@ function WritingProcessingCard({
             />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-slate-900 mb-2">
+        <h2 className="text-xl font-bold text-foreground mb-2">
           {'Your essay was submitted and is being assessed by AI'}
         </h2>
-        <p className="text-sm text-slate-600 leading-relaxed mb-4">
+        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
           'AI reviews task response, coherence and structure, vocabulary, and
           grammar. Assessment usually takes 30 to 90 seconds.'
         </p>
-        <div className="rounded-xl bg-[#f7f7f5] p-4 text-xs text-slate-500 mb-6 text-left w-full">
+        <div className="rounded-xl bg-background p-4 text-xs text-muted-foreground mb-6 text-left w-full">
           💡 <strong>{'You don’t need to wait here:'}</strong> 'close this tab
           or move to another section. Assessment will finish in the background,
           and your score and feedback will be saved to your profile.'
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
           {fullMockSessionId ? (
-            <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+            <Button asChild className="bg-primary hover:bg-primary-hover">
               <Link
                 to="/exam/full-mock-sessions/$sessionId"
                 params={{ sessionId: fullMockSessionId }}
@@ -483,10 +485,10 @@ export function WritingAttemptResult({
       />
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           {'Review your work'}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (

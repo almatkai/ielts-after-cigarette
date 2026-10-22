@@ -44,7 +44,7 @@ export function ObjectiveAttemptReview({
   return (
     <section className="grid min-w-0 gap-5">
       {showHeading ? (
-        <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
           {t('Работа над ошибками')}
         </h1>
       ) : null}
@@ -55,21 +55,21 @@ export function ObjectiveAttemptReview({
               {title}
             </h2>
           ) : null}
-          <p className="mt-1 text-sm text-[#69696d]">
+          <p className="mt-1 text-sm text-muted-foreground">
             {skill} · {mistakeCountLabel(mistakes.length, language)}
           </p>
         </div>
         {attempt.band !== null ? (
-          <p className="shrink-0 text-sm font-semibold text-[#3b82f6]">
+          <p className="shrink-0 text-sm font-semibold text-primary">
             Band {attempt.band.toFixed(1)}
-            <span className="ml-3 font-normal text-[#69696d]">
+            <span className="ml-3 font-normal text-muted-foreground">
               {review.filter((item) => item.isCorrect).length}/{review.length}
             </span>
           </p>
         ) : null}
       </div>
       {mistakes.length ? (
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
+        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
           <CardContent className="grid gap-3 p-4 sm:p-5">
             {mistakes.map((item) => (
               <div
@@ -91,7 +91,7 @@ export function ObjectiveAttemptReview({
           </CardContent>
         </Card>
       ) : (
-        <p className="py-6 text-sm text-[#69696d]">{t('Нет ошибок')}</p>
+        <p className="py-6 text-sm text-muted-foreground">{t('Нет ошибок')}</p>
       )}
       <MistakeRetryDialog
         item={selected}

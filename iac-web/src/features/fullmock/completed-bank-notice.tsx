@@ -24,7 +24,7 @@ export function CompletedBankNotice({ attemptId }: { attemptId: string }) {
   return (
     <div
       role="status"
-      className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900"
+      className="rounded-xl border border-warning-bg bg-warning-bg p-5 text-sm leading-6 text-warning-fg"
     >
       <p className="font-semibold">
         Вы выполнили все доступные тесты Listening ({bank.completed} из{' '}

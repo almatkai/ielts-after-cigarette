@@ -1,3 +1,4 @@
+import { useThemePreference } from '@/features/theme/theme'
 import { useForm } from '@tanstack/react-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -36,13 +37,13 @@ import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 import { LanguagePicker } from '@/components/ui/language-picker'
 
-const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
+const cardClassName = 'gap-0 rounded-[10px] border-border py-0 shadow-none'
 
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(2, 'Укажите имя не короче 2 символов'),
@@ -96,6 +97,7 @@ function firstError(errors: unknown[]) {
 }
 
 export function SettingsPage() {
+  const { preference, setPreference } = useThemePreference()
   const { t } = useLanguage()
   const { user } = useAuth()
   const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
@@ -176,7 +178,7 @@ export function SettingsPage() {
       <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
         <LanguageSettingsCard />
         <Card className={cardClassName}>
-          <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+          <CardHeader className="border-b border-border p-5 sm:p-6">
             <CardTitle className="text-base tracking-[-0.02em]">
               {t('Профиль и цель')}
             </CardTitle>
@@ -211,10 +213,10 @@ export function SettingsPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <LanguageSettingsCard />
       <div>
-        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-foreground">
           {t('Настройте профиль и цель')}
         </h2>
-        <p className="mt-1 text-sm leading-6 text-[#69696d]">
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
           {t(
             'Укажите целевой балл и дату экзамена — по ним строится ваш план подготовки.',
           )}
@@ -222,7 +224,38 @@ export function SettingsPage() {
       </div>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="p-5 sm:p-6">
+          <CardTitle className="text-base">{t('Тема оформления')}</CardTitle>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 sm:px-6">
+          <div
+            role="group"
+            aria-label={t('Тема оформления')}
+            className="inline-flex flex-wrap gap-1 rounded-lg border border-border bg-muted p-1"
+          >
+            {(
+              [
+                { value: 'system', label: 'Системная' },
+                { value: 'light', label: 'Светлая' },
+                { value: 'dark', label: 'Тёмная' },
+              ] as const
+            ).map((theme) => (
+              <button
+                type="button"
+                key={theme.value}
+                aria-pressed={preference === theme.value}
+                onClick={() => setPreference(theme.value)}
+                className={`min-h-11 rounded-md px-3 text-sm font-semibold transition-colors ${preference === theme.value ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-card'}`}
+              >
+                {t(theme.label)}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
             {t('Профиль')}
           </CardTitle>
@@ -257,7 +290,7 @@ export function SettingsPage() {
                     className={fieldClassName}
                   />
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className="text-xs text-destructive" role="alert">
                       {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
@@ -265,18 +298,21 @@ export function SettingsPage() {
               )}
             </profileForm.Field>
             {profileMessage ? (
-              <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
+              <p
+                className="text-sm text-muted-foreground sm:col-span-2"
+                role="status"
+              >
                 {t(profileMessage)}
               </p>
             ) : null}
           </CardContent>
-          <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+          <CardFooter className="justify-end border-t border-border px-5 py-4 sm:px-6">
             <profileForm.Subscribe selector={(state) => state.isSubmitting}>
               {(isSubmitting) => (
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                 >
                   {isSubmitting ? t('Сохраняем…') : t('Сохранить профиль')}
                 </Button>
@@ -287,7 +323,7 @@ export function SettingsPage() {
       </Card>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
             {t('Цель подготовки')}
           </CardTitle>
@@ -328,7 +364,7 @@ export function SettingsPage() {
                     </SelectContent>
                   </Select>
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className="text-xs text-destructive" role="alert">
                       {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
@@ -355,7 +391,7 @@ export function SettingsPage() {
                     </SelectContent>
                   </Select>
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className="text-xs text-destructive" role="alert">
                       {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
@@ -381,7 +417,7 @@ export function SettingsPage() {
                     className={fieldClassName}
                   />
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
+                    <p className="text-xs text-destructive" role="alert">
                       {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
@@ -389,18 +425,21 @@ export function SettingsPage() {
               )}
             </goalForm.Field>
             {goalMessage ? (
-              <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
+              <p
+                className="text-sm text-muted-foreground sm:col-span-2"
+                role="status"
+              >
                 {t(goalMessage)}
               </p>
             ) : null}
           </CardContent>
-          <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+          <CardFooter className="justify-end border-t border-border px-5 py-4 sm:px-6">
             <goalForm.Subscribe selector={(state) => state.isSubmitting}>
               {(isSubmitting) => (
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                 >
                   {isSubmitting ? t('Сохраняем…') : t('Сохранить цель')}
                 </Button>
@@ -411,12 +450,12 @@ export function SettingsPage() {
       </Card>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            {t('Персонаж-помощник')}
+            {t('Помощник Юки')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            {t('Управление отображением питомца Юки в интерфейсе.')}
+            {t('Управление подсказкой помощника в интерфейсе.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-5 sm:p-6">
@@ -424,13 +463,13 @@ export function SettingsPage() {
             <div className="space-y-0.5">
               <Label
                 htmlFor="mascot-toggle"
-                className="text-sm font-medium text-[#111111] cursor-pointer"
+                className="text-sm font-medium text-foreground cursor-pointer"
               >
-                {t('Показывать питомца (Юки)')}
+                {t('Показывать подсказку Юки')}
               </Label>
-              <p className="text-xs leading-5 text-[#69696d]">
+              <p className="text-xs leading-5 text-muted-foreground">
                 {t(
-                  'Отображать анимированного лисёнка в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
+                  'Отображать подсказку помощника в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
                 )}
               </p>
             </div>
@@ -438,7 +477,7 @@ export function SettingsPage() {
               id="mascot-toggle"
               checked={isMascotVisible}
               onCheckedChange={setMascotVisible}
-              className="data-[state=checked]:bg-[#3b82f6]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
         </CardContent>
@@ -452,7 +491,7 @@ function LanguageSettingsCard() {
   const { t } = useLanguage()
   return (
     <Card className={cardClassName}>
-      <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+      <CardHeader className="border-b border-border p-5 sm:p-6">
         <CardTitle className="text-base tracking-[-0.02em]">
           {t('Язык интерфейса')}
         </CardTitle>

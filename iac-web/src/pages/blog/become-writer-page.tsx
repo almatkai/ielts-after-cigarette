@@ -210,23 +210,23 @@ function ApplicationForm() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-3 rounded-[12px] border border-dashed border-[#c9c9c4] bg-[#fbfbfa] px-4 py-4 text-left transition-colors hover:bg-[#f4f4f1]"
+          className="flex items-center gap-3 rounded-[10px] border border-dashed border-border-strong bg-background px-4 py-4 text-left transition-colors hover:bg-muted"
         >
           <DocumentUpload
-            className="size-5 shrink-0 text-[#69696d]"
+            className="size-5 shrink-0 text-muted-foreground"
             aria-hidden
           />
           {certificateName ? (
-            <span className="min-w-0 truncate text-sm font-semibold text-[#111111]">
+            <span className="min-w-0 truncate text-sm font-semibold text-foreground">
               {certificateName}
             </span>
           ) : (
-            <span className="text-sm text-[#69696d]">
+            <span className="text-sm text-muted-foreground">
               {t('Нажмите, чтобы загрузить скан или фото сертификата')}
             </span>
           )}
           {uploadMutation.isPending ? (
-            <span className="ml-auto text-xs text-[#808084]">
+            <span className="ml-auto text-xs text-muted-foreground">
               {t('Загружаем…')}
             </span>
           ) : null}
@@ -260,7 +260,7 @@ function ApplicationForm() {
       </div>
 
       {(validationError || applyMutation.isError || uploadMutation.isError) && (
-        <p className="rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
+        <p className="rounded-[10px] bg-destructive-soft px-4 py-3 text-sm text-destructive">
           {t(
             validationError ??
               (applyMutation.isError
@@ -298,20 +298,22 @@ export function BecomeWriterPage() {
     <BlogShell width="narrow">
       <BlogBackLink to="/blog">{t('Все статьи')}</BlogBackLink>
 
-      <p className="mt-6 text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+      <p className="mt-6 text-xs font-semibold text-primary normal-case">
         {t('Авторам')}
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+      <h1 className="text-[28px] sm:text-[36px] mt-2 font-semibold tracking-normal">
         {t('Стать автором блога')}
       </h1>
-      <p className="mt-3 text-sm leading-6 text-[#69696d]">
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">
         {t(
           'Публикации в блоге пишут авторы с подтверждённым официальным IELTS от 7.5. Заполните заявку — команда платформы проверит баллы и сертификат и откроет доступ к редактору.',
         )}
       </p>
 
       {!auth.initialized || (authenticated && applicationQuery.isPending) ? (
-        <p className="mt-8 text-sm text-[#69696d]">{t('Проверяем аккаунт…')}</p>
+        <p className="mt-8 text-sm text-muted-foreground">
+          {t('Проверяем аккаунт…')}
+        </p>
       ) : !authenticated ? (
         <StatusCard title={t('Войдите, чтобы подать заявку')}>
           <p>{t('Заявка привязывается к вашему аккаунту на платформе.')}</p>
@@ -326,7 +328,7 @@ export function BecomeWriterPage() {
       ) : alreadyWriter ? (
         <StatusCard
           title={t('Вы уже автор')}
-          icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
+          icon={<TickCircle className="size-5 text-success" aria-hidden />}
         >
           <p>{t('Редактор статей доступен в кабинете автора.')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -347,7 +349,7 @@ export function BecomeWriterPage() {
       ) : application?.status === 'APPROVED' ? (
         <StatusCard
           title={t('Заявка одобрена')}
-          icon={<TickCircle className="size-5 text-emerald-600" aria-hidden />}
+          icon={<TickCircle className="size-5 text-success" aria-hidden />}
         >
           <p>{t('Обновите страницу, чтобы получить доступ к редактору.')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -358,8 +360,8 @@ export function BecomeWriterPage() {
         </StatusCard>
       ) : application?.status === 'REJECTED' ? (
         <div className="mt-8 grid gap-6">
-          <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-            <p className="font-semibold text-[#111111]">
+          <div className="rounded-[10px] border border-border bg-card p-6 text-sm leading-6 text-muted-foreground">
+            <p className="font-semibold text-foreground">
               {t('Заявка отклонена')}
             </p>
             {application.reviewNotes ? (
@@ -395,8 +397,8 @@ function StatusCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="mt-8 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-sm leading-6 text-[#69696d]">
-      <p className="flex items-center gap-2 font-semibold text-[#111111]">
+    <div className="mt-8 rounded-[10px] border border-border bg-card p-6 text-sm leading-6 text-muted-foreground">
+      <p className="flex items-center gap-2 font-semibold text-foreground">
         {icon}
         {title}
       </p>

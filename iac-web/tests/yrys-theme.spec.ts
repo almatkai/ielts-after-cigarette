@@ -463,9 +463,9 @@ for (const locale of ['ru', 'kk', 'en'] as const) {
       const labels = localizedBrand[locale]
       await fixtures(page, true, 'ADMIN')
       await page.addInitScript(
-        ({ locale, theme }) => {
-          localStorage.setItem('daiyndyq-language', locale)
-          localStorage.setItem('yrys-theme', theme)
+        ({ locale: storedLocale, theme: storedTheme }) => {
+          localStorage.setItem('daiyndyq-language', storedLocale)
+          localStorage.setItem('yrys-theme', storedTheme)
         },
         { locale, theme },
       )

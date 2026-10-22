@@ -123,12 +123,12 @@ export function AttemptReviewPage({
                 <ArrowLeft aria-hidden />{t('К прогрессу')}
               </Link>
             </Button>
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-[28px] sm:text-[36px] mt-3 font-semibold tracking-normal">
               {t('Работа над ошибками')}
             </h1>
           </>
         ) : null}
-        <p className="mt-2 text-sm text-[#69696d]">
+        <p className="mt-2 text-sm text-muted-foreground">
           {skillLabel(attempt.materialType)}
         </p>
       </div>
@@ -153,7 +153,7 @@ export function AttemptReviewPage({
           ) : null}
         </>
       ) : (
-        <p className="text-sm text-[#69696d]">{t('Нет ошибок')}</p>
+        <p className="text-sm text-muted-foreground">{t('Нет ошибок')}</p>
       )}
     </div>
   )
@@ -163,9 +163,9 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
   const { t } = useLanguage()
   const assessment = attempt.writingAssessment ?? attempt.speakingAssessment
   return (
-    <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+    <Card className="rounded-[10px] border-border shadow-none">
       <CardContent className="p-6">
-        <p className="text-sm text-[#69696d]">
+        <p className="text-sm text-muted-foreground">
           {assessment?.status === 'FAILED'
             ? t('Не удалось проверить')
             : t('Проверяется')}
@@ -220,7 +220,7 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
     <Card className="shadow-none">
       <CardContent className="grid justify-items-center gap-3 p-10 text-center">
         <p className="font-semibold">{t('Попытка ещё не завершена')}</p>
-        <p className="text-sm text-[#69696d]">
+        <p className="text-sm text-muted-foreground">
           {t('Разбор появится после сдачи.')}
         </p>
         <Button asChild>
@@ -354,11 +354,11 @@ function AIEvaluationReview({
         paceUnit={attempt.materialType === 'writing' ? t('эссе') : t('часть')}
       />
       {evaluation.summary ? (
-        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
+          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
             {t('Резюме проверки')}
           </p>
-          <p className="text-sm leading-relaxed text-slate-700">
+          <p className="text-sm leading-relaxed text-foreground">
             {evaluation.summary}
           </p>
         </Card>
@@ -367,26 +367,26 @@ function AIEvaluationReview({
         {evaluation.criteria.map(([label, criterion]) => (
           <Card
             key={label}
-            className={`rounded-[16px] border bg-white shadow-xs ${
+            className={`rounded-[10px] border bg-card shadow-none ${
               criterion.unavailable
-                ? 'border-amber-200/80 bg-amber-50/20'
-                : 'border-[#e7e7e4]'
+                ? 'border-warning-bg/80 bg-warning-bg/20'
+                : 'border-border'
             }`}
           >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <h2 className="font-semibold text-foreground">{label}</h2>
                 {criterion.unavailable ? (
-                  <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
+                  <span className="rounded-md bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg border border-warning-bg">
                     {t('Пока не определяется')}
                   </span>
                 ) : (
-                  <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
+                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-sm font-bold text-primary">
                     {criterion.band.toFixed(1)}
                   </span>
                 )}
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {criterion.feedback ||
                   (criterion.unavailable
                     ? t(
@@ -406,7 +406,7 @@ function AIEvaluationReview({
           <CardContent className="grid gap-3 text-sm leading-6">
             <p>{part.feedback}</p>
             {part.transcript ? (
-              <p className="whitespace-pre-wrap rounded-xl bg-[#f7f7f5] p-4">
+              <p className="whitespace-pre-wrap rounded-xl bg-background p-4">
                 {part.transcript}
               </p>
             ) : null}
@@ -472,14 +472,16 @@ function SpeakingRecordingPlayer({
   })
   const source = useBlobUrl(query.data)
   return (
-    <div className="grid gap-2 rounded-xl border border-[#ededeb] p-4">
+    <div className="grid gap-2 rounded-xl border border-border p-4">
       <p className="text-sm font-medium">{label}</p>
       {source ? <audio controls src={source} className="w-full" /> : null}
       {query.isPending ? (
-        <p className="text-sm text-[#69696d]">{t('Загружаем запись…')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('Загружаем запись…')}
+        </p>
       ) : null}
       {query.isError ? (
-        <p className="text-sm text-[#e23b3b]">
+        <p className="text-sm text-destructive">
           {t('Не удалось загрузить аудиозапись.')}
         </p>
       ) : null}

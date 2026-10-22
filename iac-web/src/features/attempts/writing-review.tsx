@@ -32,21 +32,21 @@ export function WritingReview({
     <div className="space-y-6">
       <AttemptPerformanceReport
         band={evaluation.overallBand}
-        bandNote={'Оценка сформирована по 4 критериям IELTS Writing'}
+        bandNote={'Score based on the 4 IELTS Writing criteria'}
         criteria={criteriaList}
         totalQuestions={totalQuestions}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
         durationMinutes={durationMinutes}
-        paceUnit={'эссе'}
+        paceUnit={'essay'}
       />
 
       {evaluation.summary ? (
-        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-            {'Резюме проверки'}
+        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
+          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
+            {'Assessment summary'}
           </p>
-          <p className="text-sm leading-relaxed text-slate-700">
+          <p className="text-sm leading-relaxed text-foreground">
             {evaluation.summary}
           </p>
         </Card>
@@ -71,10 +71,10 @@ export function WritingReview({
           )
         })}
 
-      <p className="flex items-center gap-2 text-xs text-[#808084]">
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <Book className="size-4" aria-hidden />
         {
-          'Оценка носит учебный характер; фактический результат IELTS определяет экзаменатор.'
+          'This score is for practice only; your official IELTS result is determined by an examiner.'
         }
       </p>
     </div>

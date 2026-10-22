@@ -83,24 +83,24 @@ export function AnnotatedEssayView({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-[#e7e7e4] bg-[#fbfbf9] p-5 sm:p-6 shadow-2xs">
-        <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200/70">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            {'Текст вашего эссе с замечаниями'}
+      <div className="rounded-xl border border-border bg-background p-5 sm:p-6 shadow-none">
+        <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-border/70">
+          <p className="text-xs font-semibold normal-case text-muted-foreground">
+            {'Your essay with feedback'}
           </p>
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="size-2 rounded-full bg-red-500" />
-              {'Ошибки'}
+              <span className="size-2 rounded-full bg-destructive" />
+              {'Errors'}
             </span>
             <span className="flex items-center gap-1">
-              <span className="size-2 rounded-full bg-amber-500" />
-              {'Рекомендации'}
+              <span className="size-2 rounded-full bg-warning-fg" />
+              {'Suggestions'}
             </span>
           </div>
         </div>
 
-        <div className="font-serif text-base sm:text-lg leading-relaxed sm:leading-loose text-slate-800 whitespace-pre-wrap">
+        <div className="font-sans text-base sm:text-lg leading-relaxed sm:leading-loose text-foreground whitespace-pre-wrap">
           {segments.map((seg, idx) => {
             if (!seg.annotation) {
               return <span key={idx}>{seg.text}</span>
@@ -116,8 +116,8 @@ export function AnnotatedEssayView({
                 text={seg.text}
                 selected={isSelected}
                 open={openSegmentIndex === idx}
-                label={isError ? 'Ошибка' : 'Рекомендация'}
-                closeLabel="Закрыть"
+                label={isError ? 'Error' : 'Suggestion'}
+                closeLabel="Close"
                 onOpenChange={(open) => {
                   if (open) setSelectedId(ann.id)
                   setOpenSegmentIndex((current) =>
@@ -132,12 +132,12 @@ export function AnnotatedEssayView({
 
       {annotations.length === 0 ? (
         <p role="status" className="text-sm text-muted-foreground">
-          Замечаний к отдельным фрагментам в этой проверке нет.
+          This assessment has no feedback on individual text passages.
         </p>
       ) : (
         <div className="space-y-2.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            {'Разбор ошибок и улучшений'} ({annotations.length})
+          <p className="text-xs font-semibold normal-case text-muted-foreground">
+            {'Feedback and improvements'} ({annotations.length})
           </p>
           <div className="grid gap-2.5 sm:grid-cols-2">
             {annotations.map((ann) => {
@@ -149,7 +149,7 @@ export function AnnotatedEssayView({
                   id={`annotation-card-${annotationPrefix}-${ann.id}`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${isError ? 'Ошибка' : 'Рекомендация'} ${ann.id}`}
+                  aria-label={`${isError ? 'Error' : 'Suggestion'} ${ann.id}`}
                   aria-pressed={isSelected}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
@@ -158,57 +158,57 @@ export function AnnotatedEssayView({
                     }
                   }}
                   onClick={() => setSelectedId(ann.id)}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                     isSelected
                       ? isError
-                        ? 'border-red-400 bg-red-50/50 shadow-xs ring-1 ring-red-400'
-                        : 'border-amber-400 bg-amber-50/50 shadow-xs ring-1 ring-amber-400'
-                      : 'border-[#e7e7e4] bg-white hover:border-slate-300 hover:shadow-xs'
+                        ? 'border-destructive bg-destructive-soft/50 shadow-none ring-1 ring-destructive'
+                        : 'border-warning-fg bg-warning-bg/50 shadow-none ring-1 ring-warning-fg'
+                      : 'border-border bg-card hover:border-border-strong hover:shadow-none'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
                     <span
-                      className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-2xs ${
-                        isError ? 'bg-red-500' : 'bg-amber-500'
+                      className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-primary-foreground shadow-none ${
+                        isError ? 'bg-destructive' : 'bg-warning-fg'
                       }`}
                     >
                       {ann.id}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline gap-1.5">
-                        <span className="font-serif text-sm line-through text-slate-400">
+                        <span className="font-sans text-sm line-through text-muted-foreground">
                           {ann.quote}
                         </span>
-                        <span className="text-xs text-slate-400">→</span>
-                        <span className="font-serif text-sm font-bold text-emerald-700">
+                        <span className="text-xs text-muted-foreground">→</span>
+                        <span className="font-sans text-sm font-bold text-success">
                           {ann.replacement}
                         </span>
                         <span
-                          className={`ml-auto text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                          className={`ml-auto text-[10px] font-semibold normal-case px-1.5 py-0.5 rounded ${
                             isError
-                              ? 'bg-red-50 text-red-700'
-                              : 'bg-amber-50 text-amber-700'
+                              ? 'bg-destructive-soft text-destructive'
+                              : 'bg-warning-bg text-warning-fg'
                           }`}
                         >
-                          {isError ? 'Ошибка' : 'Рекомендация'} · {ann.type}
+                          {isError ? 'Error' : 'Suggestion'} · {ann.type}
                         </span>
                       </div>
 
                       {ann.explanationRu && (
-                        <p className="mt-1.5 text-xs text-slate-700 leading-relaxed">
+                        <p className="mt-1.5 text-xs text-foreground leading-relaxed">
                           {ann.explanationRu}
                         </p>
                       )}
 
                       {ann.alternatives && ann.alternatives.length > 0 && (
-                        <div className="mt-2 flex flex-wrap items-center gap-1 pt-1.5 border-t border-slate-100">
-                          <span className="text-[11px] text-slate-400">
-                            {'Варианты'}:
+                        <div className="mt-2 flex flex-wrap items-center gap-1 pt-1.5 border-t border-border">
+                          <span className="text-[11px] text-muted-foreground">
+                            {'Alternatives'}:
                           </span>
                           {ann.alternatives.map((alt, i) => (
                             <span
                               key={i}
-                              className="rounded bg-slate-100 px-1.5 py-0.2 text-[11px] font-medium text-slate-700"
+                              className="rounded bg-muted px-1.5 py-0.2 text-[11px] font-medium text-foreground"
                             >
                               {alt}
                             </span>

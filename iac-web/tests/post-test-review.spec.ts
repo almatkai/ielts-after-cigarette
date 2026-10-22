@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import type { AttemptReviewItem } from '../src/features/attempts/api'
+import type {
+  AttemptReviewItem,
+  WritingTaskFeedback,
+} from '../src/features/attempts/api'
 
 const criterion = { band: 7, feedback: 'Criterion feedback' }
 const base = {
@@ -59,10 +62,17 @@ const detail = (skill: string) => ({
             {
               taskId: 'task',
               position: 1,
+              band: 7,
+              criteria: {
+                taskResponse: criterion,
+                coherence: criterion,
+                lexicalResource: criterion,
+                grammar: criterion,
+              },
               feedback: 'Essay feedback',
               strengths: [],
               improvements: ['Writing suggestion'],
-            },
+            } satisfies WritingTaskFeedback,
           ],
         },
       }
@@ -84,6 +94,7 @@ const detail = (skill: string) => ({
           parts: [
             {
               partId: 'part',
+              transcript: '',
               feedback: 'Speech feedback',
               strengths: [],
               improvements: ['Speaking suggestion'],

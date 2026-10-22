@@ -79,7 +79,7 @@ export function Turnstile({
     <div>
       <div ref={container} />
       {failed ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-destructive">
           {t('Не удалось загрузить проверку безопасности. Обновите страницу.')}
         </p>
       ) : null}

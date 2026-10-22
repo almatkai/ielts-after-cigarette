@@ -39,7 +39,7 @@ export function FullMockAttemptReview({
   const session = query.data
   if (!session.sections.some((section) => section.attempt.id === attemptId)) {
     return (
-      <p className="text-sm text-[#69696d]">
+      <p className="text-sm text-muted-foreground">
         This attempt does not belong to this Full Mock.
       </p>
     )
@@ -49,17 +49,17 @@ export function FullMockAttemptReview({
       <Link
         to="/exam/full-mock-sessions/$sessionId"
         params={{ sessionId }}
-        className="inline-flex w-fit items-center gap-2 text-sm text-[#69696d] hover:text-[#111111]"
+        className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Back to the report
       </Link>
-      <h1 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
+      <h1 className="text-[28px] sm:text-[36px] font-semibold tracking-normal ">
         Review
       </h1>
       <nav
         aria-label="Full Mock sections"
-        className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#f0f0ed] p-1 sm:grid-cols-4"
+        className="grid grid-cols-2 gap-1 rounded-[10px] bg-muted p-1 sm:grid-cols-4"
       >
         {skills.map((skill) => {
           const section = session.sections.find((item) => item.skill === skill)
@@ -72,7 +72,7 @@ export function FullMockAttemptReview({
               params={{ attemptId: section.attempt.id }}
               search={{ session: sessionId }}
               aria-current={selected ? 'page' : undefined}
-              className={`rounded-[9px] px-3 py-2 text-center text-sm focus-visible:outline-2 focus-visible:outline-[#3b82f6] ${selected ? 'bg-white text-[#111111]' : 'text-[#69696d] hover:text-[#111111]'}`}
+              className={`rounded-[9px] px-3 py-2 text-center text-sm focus-visible:outline-2 focus-visible:outline-primary ${selected ? 'bg-card text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
             >
               {labels[skill]}
             </Link>

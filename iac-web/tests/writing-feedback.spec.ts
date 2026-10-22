@@ -217,8 +217,8 @@ test('each task opens inline feedback and keeps its detailed card', async ({
     name: 'Рекомендация 1',
     exact: true,
   })
-  await expect(error).toHaveClass(/decoration-red-500/)
-  await expect(suggestion).toHaveClass(/decoration-amber-500/)
+  await expect(error).toHaveClass(/decoration-destructive/)
+  await expect(suggestion).toHaveClass(/decoration-warning-fg/)
   await expect(
     taskTwo.getByText('A phrase never written by the student'),
   ).toHaveCount(0)

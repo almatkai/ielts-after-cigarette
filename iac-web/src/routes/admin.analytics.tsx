@@ -8,6 +8,6 @@ export const Route = createFileRoute('/admin/analytics')({
     if (!context.auth.hasAnyRole(['ADMIN']))
       throw redirect({ to: '/forbidden' })
   },
-  head: () => ({ meta: [{ title: tr('Аналитика — Daiyndyq IELTS') }] }),
+  head: () => ({ meta: [{ title: tr('Аналитика — Yrys Academy') }] }),
   component: AnalyticsPage,
 })

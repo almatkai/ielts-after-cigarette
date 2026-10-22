@@ -16,7 +16,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/auth-store'
 import { GuestTrialCard } from '@/components/auth/guest-trial-card'
 import { PracticePage } from '@/pages/practice/ui/practice-page'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -54,7 +53,7 @@ const quickActions = [
 ] as const
 
 const cardClassName =
-  'group gap-0 rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300'
+  'group gap-0 rounded-[10px] sm:rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong'
 
 const skillLabels: Record<SkillId, string> = {
   listening: 'Listening',
@@ -91,7 +90,7 @@ function AccountOverviewPage() {
   if (dashboardQuery.isPending) {
     return (
       <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
-        <CardContent className="p-8 text-center text-sm text-[#69696d]">
+        <CardContent className="p-8 text-center text-sm text-muted-foreground">
           {t('Загружаем ваш dashboard…')}
         </CardContent>
       </Card>
@@ -102,11 +101,11 @@ function AccountOverviewPage() {
     return (
       <Card className={`${cardClassName} mx-auto max-w-[1120px]`}>
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
-          <p className="mt-3 text-sm font-semibold text-[#111111]">
+          <Warning2 className="size-6 text-destructive" aria-hidden />
+          <p className="mt-3 text-sm font-semibold text-foreground">
             {t('Не удалось загрузить dashboard')}
           </p>
-          <p className="mt-1 text-sm text-[#69696d]">
+          <p className="mt-1 text-sm text-muted-foreground">
             {t('Проверьте соединение с сервером и попробуйте ещё раз.')}
           </p>
           <Button
@@ -166,6 +165,9 @@ function AccountOverviewPage() {
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
+      <h1 className="text-[28px] sm:text-[36px] font-semibold tracking-normal">
+        {t('Обзор')}
+      </h1>
       <section
         className="grid min-w-0 gap-2.5 sm:gap-4 sm:grid-cols-3"
         aria-label={t('Основные показатели')}
@@ -176,7 +178,7 @@ function AccountOverviewPage() {
           return (
             <Card key={metric.label} className={cardClassName}>
               <CardContent className="flex min-w-0 items-center sm:items-start gap-2.5 sm:gap-4 p-3 sm:p-5">
-                <span className="grid size-8 sm:size-10 shrink-0 place-items-center rounded-[8px] sm:rounded-[10px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-10 shrink-0 place-items-center rounded-[8px] sm:rounded-[10px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <Icon
                     className="size-4 sm:size-[19px] transition-colors"
                     strokeWidth={1.8}
@@ -184,16 +186,22 @@ function AccountOverviewPage() {
                   />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] sm:text-xs font-semibold tracking-[0.03em] text-[#69696d]">
+                  <p className="text-[11px] sm:text-xs font-semibold text-muted-foreground">
                     {metric.label}
                   </p>
                   <p
-                    className="mt-0.5 sm:mt-1 text-lg sm:text-2xl leading-none font-semibold tracking-[-0.04em] text-[#111111]"
+                    className={`mt-0.5 sm:mt-1 text-lg sm:text-2xl leading-none font-semibold tracking-normal ${metric.label === 'Целевой балл' ? 'inline-block rounded-sm bg-gold px-2 py-1 text-gold-foreground' : 'text-foreground'}`}
+                    style={{
+                      fontFamily:
+                        metric.label === 'Дата экзамена'
+                          ? undefined
+                          : 'var(--font-display)',
+                    }}
                     aria-label={`${metric.label}: ${metric.value}`}
                   >
                     {metric.value}
                   </p>
-                  <p className="mt-0.5 sm:mt-2 text-[10px] sm:text-xs leading-tight sm:leading-5 text-[#8b8b8e]">
+                  <p className="mt-0.5 sm:mt-2 text-[10px] sm:text-xs leading-tight sm:leading-5 text-muted-foreground">
                     {metric.hint}
                   </p>
                 </div>
@@ -209,24 +217,20 @@ function AccountOverviewPage() {
         <div className="grid min-w-0 gap-3.5 sm:gap-5 [&>*]:min-w-0">
           <Card className={cardClassName}>
             <CardContent className="relative overflow-hidden p-3.5 sm:p-8">
-              <div
-                className="pointer-events-none absolute top-0 right-0 size-56 translate-x-16 -translate-y-16 rounded-full bg-[#eff6ff] opacity-70 blur-3xl"
-                aria-hidden
-              />
               <div className="relative max-w-[620px]">
-                <Badge className="border border-[#dbeafe] bg-[#eff6ff] px-2 py-0.5 text-[11px] sm:text-xs text-[#1d4ed8] shadow-none hover:bg-[#eff6ff]">
+                <p className="text-xs font-semibold text-muted-foreground">
                   {t('Рекомендуемый шаг')}
-                </Badge>
-                <h2 className="mt-2.5 sm:mt-5 text-base sm:text-[clamp(1.65rem,3vw,2.35rem)] leading-snug sm:leading-[1.08] font-semibold tracking-tight sm:tracking-[-0.045em] text-[#111111]">
+                </p>
+                <h2 className="mt-2.5 sm:mt-5 text-base sm:text-[clamp(1.65rem,3vw,2.35rem)] leading-snug sm:leading-[1.08] font-semibold tracking-tight sm:tracking-[-0.045em] text-foreground">
                   {t(dashboard.recommendedAction.title)}
                 </h2>
-                <p className="mt-1.5 sm:mt-3 max-w-[560px] text-xs sm:text-[15px] leading-5 sm:leading-6 text-[#69696d]">
+                <p className="mt-1.5 sm:mt-3 max-w-[560px] text-xs sm:text-[15px] leading-5 sm:leading-6 text-muted-foreground">
                   {t(dashboard.recommendedAction.description)}
                 </p>
                 <div className="mt-3.5 sm:mt-6 flex flex-col gap-2 sm:flex-row">
                   <Button
                     asChild
-                    className="h-9 sm:h-11 rounded-[9px] bg-[#3b82f6] px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-[#2563eb]"
+                    className="h-9 sm:h-11 rounded-[9px] bg-primary px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-primary-hover"
                   >
                     <Link to={recommendedTarget}>
                       {t('Перейти к следующему шагу')}
@@ -237,7 +241,7 @@ function AccountOverviewPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-9 sm:h-11 rounded-[9px] border-[#deded9] bg-white px-4 sm:px-5 text-xs sm:text-sm shadow-none"
+                      className="h-9 sm:h-11 rounded-[9px] border-border bg-card px-4 sm:px-5 text-xs sm:text-sm shadow-none"
                     >
                       {t('Настроить цель')}
                     </Button>
@@ -248,9 +252,9 @@ function AccountOverviewPage() {
           </Card>
 
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
+            <CardHeader className="border-b border-border p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <Chart
                     className="size-4 sm:size-[18px] transition-colors"
                     aria-hidden
@@ -272,19 +276,19 @@ function AccountOverviewPage() {
               {dashboard.skillProgress.map((progress) => (
                 <div
                   key={progress.skill}
-                  className="rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4"
+                  className="rounded-[10px] sm:rounded-[10px] border border-border bg-background p-3 sm:p-4"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs sm:text-sm font-semibold text-[#111111]">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground">
                       {skillLabels[progress.skill]}
                     </p>
-                    <span className="text-xs sm:text-sm font-semibold text-[#3b82f6]">
+                    <span className="text-xs sm:text-sm font-semibold text-primary">
                       {progress.estimatedBand === null
                         ? '—'
                         : progress.estimatedBand.toFixed(1)}
                     </span>
                   </div>
-                  <p className="mt-1 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
+                  <p className="mt-1 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
                     {progress.completedTasks === 0
                       ? t('Нет выполненных заданий')
                       : language === 'en'
@@ -298,7 +302,7 @@ function AccountOverviewPage() {
               <Button
                 asChild
                 variant="outline"
-                className="h-9 sm:h-10 rounded-[9px] border-[#deded9] bg-white px-4 text-xs sm:text-sm shadow-none sm:col-span-2"
+                className="h-9 sm:h-10 rounded-[9px] border-border bg-card px-4 text-xs sm:text-sm shadow-none sm:col-span-2"
               >
                 <Link to="/progress">{t('Открыть прогресс')}</Link>
               </Button>
@@ -308,9 +312,9 @@ function AccountOverviewPage() {
 
         <aside className="grid min-w-0 gap-3.5 sm:gap-5 [&>*]:min-w-0">
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
+            <CardHeader className="border-b border-border p-3.5 sm:p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <CalendarTick
                     className="size-4 sm:size-[18px] transition-colors"
                     aria-hidden
@@ -325,16 +329,16 @@ function AccountOverviewPage() {
             </CardHeader>
             <CardContent className="p-3.5 sm:p-5">
               {dashboard.todayPlan.length === 0 ? (
-                <div className="rounded-[10px] sm:rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-3.5 py-5 sm:px-4 sm:py-6 text-center">
+                <div className="rounded-[10px] sm:rounded-[10px] border border-dashed border-border bg-background px-3.5 py-5 sm:px-4 sm:py-6 text-center">
                   <ClipboardTick
-                    className="mx-auto size-4 sm:size-5 text-[#9a9a9d]"
+                    className="mx-auto size-4 sm:size-5 text-muted-foreground"
                     strokeWidth={1.8}
                     aria-hidden
                   />
-                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-[#111111]">
+                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-foreground">
                     {t('Заданий пока нет')}
                   </p>
-                  <p className="mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
+                  <p className="mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
                     {t('Добавьте первое занятие в план.')}
                   </p>
                 </div>
@@ -343,12 +347,12 @@ function AccountOverviewPage() {
                   {dashboard.todayPlan.map((item) => (
                     <li
                       key={item.id}
-                      className="rounded-[9px] sm:rounded-[10px] border border-[#ededeb] p-2.5 sm:p-3"
+                      className="rounded-[9px] sm:rounded-[10px] border border-border p-2.5 sm:p-3"
                     >
-                      <p className="text-xs sm:text-sm font-semibold text-[#111111]">
+                      <p className="text-xs sm:text-sm font-semibold text-foreground">
                         {t(item.title)}
                       </p>
-                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-[#808084]">
+                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">
                         {skillLabels[item.skill]} · {item.durationMinutes} мин.
                       </p>
                     </li>
@@ -358,7 +362,7 @@ function AccountOverviewPage() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-3 sm:mt-4 h-9 sm:h-10 w-full rounded-[9px] border-[#deded9] bg-white text-xs sm:text-sm shadow-none"
+                className="mt-3 sm:mt-4 h-9 sm:h-10 w-full rounded-[9px] border-border bg-card text-xs sm:text-sm shadow-none"
               >
                 <Link to="/plan">{t('Настроить план')}</Link>
               </Button>
@@ -366,12 +370,12 @@ function AccountOverviewPage() {
           </Card>
 
           <Card className={cardClassName}>
-            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
+            <CardHeader className="border-b border-border p-3.5 sm:p-5">
               <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
                 {t('Быстрые действия')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="divide-y divide-[#ededeb] p-0">
+            <CardContent className="divide-y divide-border p-0">
               {quickActions.map((action) => {
                 const Icon = action.icon
 
@@ -379,9 +383,9 @@ function AccountOverviewPage() {
                   <Link
                     key={action.to}
                     to={action.to}
-                    className="group flex min-h-[58px] sm:min-h-[72px] items-center gap-2.5 sm:gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 text-[#111111] no-underline transition-colors hover:bg-[#fafaf8]"
+                    className="group flex min-h-[58px] sm:min-h-[72px] items-center gap-2.5 sm:gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 text-foreground no-underline transition-colors hover:bg-background"
                   >
-                    <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                    <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                       <Icon
                         className="size-4 sm:size-[18px] transition-colors"
                         aria-hidden
@@ -391,12 +395,12 @@ function AccountOverviewPage() {
                       <span className="block text-xs sm:text-sm font-semibold">
                         {t(action.label)}
                       </span>
-                      <span className="mt-0.5 block text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
+                      <span className="mt-0.5 block text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
                         {t(action.description)}
                       </span>
                     </span>
                     <ArrowRight
-                      className="size-3.5 sm:size-4 shrink-0 text-[#a0a0a3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#3b82f6]"
+                      className="size-3.5 sm:size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
                       aria-hidden
                     />
                   </Link>

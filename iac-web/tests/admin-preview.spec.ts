@@ -265,11 +265,11 @@ test('Reading preview reuses the exam, answers locally, shows every passage and 
   ).toBeVisible()
   const option = page.locator('label').filter({ hasText: 'First option' })
   await option.click()
-  await expect(option).toHaveClass(/border-blue-600/)
+  await expect(option).toHaveClass(/border-primary/)
   await page.getByRole('button', { name: 'Сбросить ответы' }).click()
   await expect(
     page.locator('label').filter({ hasText: 'First option' }),
-  ).not.toHaveClass(/border-blue-600/)
+  ).not.toHaveClass(/border-primary/)
   await page
     .getByRole('button', { name: /Раздел 2/ })
     .first()
@@ -544,7 +544,7 @@ test('Reading reveals the answer and evidence, hides it, resets it and uses the 
   )
   await expect(
     page.locator('label').filter({ hasText: 'First option' }),
-  ).not.toHaveClass(/border-blue-600/)
+  ).not.toHaveClass(/border-primary/)
   await page.screenshot({
     path: testInfo.outputPath('reading-answer-revealed.png'),
     fullPage: true,

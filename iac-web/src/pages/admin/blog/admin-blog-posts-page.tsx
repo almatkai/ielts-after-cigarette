@@ -14,10 +14,10 @@ import { useLanguage } from '@/lib/i18n'
 function PostStatusBadge({ post }: { post: BlogPostDto }) {
   const styles =
     post.status === 'PUBLISHED'
-      ? 'bg-[#ecfdf5] text-[#047857]'
+      ? 'bg-success-bg text-success'
       : post.status === 'ARCHIVED'
-        ? 'bg-[#f4f4f1] text-[#69696d]'
-        : 'bg-[#eff6ff] text-[#1d4ed8]'
+        ? 'bg-muted text-muted-foreground'
+        : 'bg-primary-soft text-primary'
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles}`}>
       {post.status}
@@ -54,10 +54,10 @@ export function AdminBlogPostsPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-[-0.03em]">
+        <h1 className="text-2xl font-semibold tracking-normal">
           {t('Статьи блога')}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[#69696d]">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {t(
             'Все статьи платформы: черновики авторов и опубликованные материалы. Опубликованная статья недоступна, если её заархивировать.',
           )}
@@ -66,21 +66,21 @@ export function AdminBlogPostsPage() {
 
       <div className="grid gap-3">
         {postsQuery.isPending ? (
-          <p className="text-sm text-[#69696d]">{t('Загружаем…')}</p>
+          <p className="text-sm text-muted-foreground">{t('Загружаем…')}</p>
         ) : posts.length === 0 ? (
-          <p className="rounded-[16px] border border-[#e7e7e4] bg-white px-5 py-10 text-center text-sm text-[#69696d]">
+          <p className="rounded-[10px] border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
             {t('Статей пока нет.')}
           </p>
         ) : (
           posts.map((post) => (
             <div
               key={post.id}
-              className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[16px] border border-[#e7e7e4] bg-white p-5"
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border border-border bg-card p-5"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <PostStatusBadge post={post} />
-                  <span className="text-xs text-[#808084]">
+                  <span className="text-xs text-muted-foreground">
                     {post.author.displayName} ·{' '}
                     {new Date(post.updatedAt).toLocaleDateString('ru-RU')}
                   </span>
@@ -88,7 +88,7 @@ export function AdminBlogPostsPage() {
                 <Link
                   to="/blog/$slug"
                   params={{ slug: post.slug }}
-                  className="mt-1.5 block truncate text-base font-semibold text-[#111111] no-underline"
+                  className="mt-1.5 block truncate text-base font-semibold text-foreground no-underline"
                 >
                   {post.title}
                 </Link>

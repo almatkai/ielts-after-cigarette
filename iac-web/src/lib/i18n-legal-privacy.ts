@@ -55,10 +55,10 @@ export const legalPrivacyTranslations: TranslationMap = {
       kk: 'Сіз кез келген уақытта деректеріңізді жүктеп алуды немесе толық жойылуын сұрай аласыз.',
       en: 'You may request an export of your data or its complete deletion at any time.',
     },
-  '1.1. Настоящая Политика конфиденциальности (далее — «Политика») определяет порядок сбора, накопления, хранения, использования, распространения, обезличивания, блокирования и уничтожения персональных данных пользователей онлайн-платформы подготовки к экзамену IELTS «Daiyndyq IELTS» (далее — «Сервис», «Платформа», «мы»).':
+  '1.1. Настоящая Политика конфиденциальности (далее — «Политика») определяет порядок сбора, накопления, хранения, использования, распространения, обезличивания, блокирования и уничтожения персональных данных пользователей онлайн-платформы подготовки к экзамену IELTS «Yrys Academy» (далее — «Сервис», «Платформа», «мы»).':
     {
-      kk: '1.1. Осы Құпиялық саясаты (бұдан әрі — «Саясат») «Daiyndyq IELTS» IELTS емтиханына дайындықтың онлайн-платформасы пайдаланушыларының жеке деректерін жинау, жинақтау, сақтау, пайдалану, тарату, анонимдеу, бұғаттау және жою тәртібін айқындайды (бұдан әрі — «Қызмет», «Платформа», «біз»).',
-      en: '1.1. This Privacy Policy (the “Policy”) sets out the procedure for the collection, accumulation, storage, use, disclosure, depersonalisation, blocking, and destruction of the personal data of users of the “Daiyndyq IELTS” online IELTS preparation platform (the “Service”, the “Platform”, “we”).',
+      kk: '1.1. Осы Құпиялық саясаты (бұдан әрі — «Саясат») «Yrys Academy» IELTS емтиханына дайындықтың онлайн-платформасы пайдаланушыларының жеке деректерін жинау, жинақтау, сақтау, пайдалану, тарату, анонимдеу, бұғаттау және жою тәртібін айқындайды (бұдан әрі — «Қызмет», «Платформа», «біз»).',
+      en: '1.1. This Privacy Policy (the “Policy”) sets out the procedure for the collection, accumulation, storage, use, disclosure, depersonalisation, blocking, and destruction of the personal data of users of the “Yrys Academy” online IELTS preparation platform (the “Service”, the “Platform”, “we”).',
     },
   '1.2. Сервис соблюдает права и свободы граждан при обработке персональных данных, руководствуясь Конституцией Республики Казахстан, Законом Республики Казахстан от 21 мая 2013 года № 94-V «О персональных данных и их защите», а также применимыми нормами международного права в сфере защиты цифровой информации.':
     {
@@ -74,10 +74,10 @@ export const legalPrivacyTranslations: TranslationMap = {
     kk: '2. Жеке деректерді өңдеуші және байланыс',
     en: '2. Personal data controller and contacts',
   },
-  '2.1. Оператором базы персональных данных пользователей Сервиса является проект «Daiyndyq IELTS» (г. Астана, Республика Казахстан).':
+  '2.1. Оператором базы персональных данных пользователей Сервиса является проект «Yrys Academy» (г. Астана, Республика Казахстан).':
     {
-      kk: '2.1. Қызмет пайдаланушыларының жеке деректер базасының операторы «Daiyndyq IELTS» жобасы болып табылады (Астана қ., Қазақстан Республикасы).',
-      en: '2.1. The operator of the personal-data database of the Service is the “Daiyndyq IELTS” project (Astana, Republic of Kazakhstan).',
+      kk: '2.1. Қызмет пайдаланушыларының жеке деректер базасының операторы «Yrys Academy» жобасы болып табылады (Астана қ., Қазақстан Республикасы).',
+      en: '2.1. The operator of the personal-data database of the Service is the “Yrys Academy” project (Astana, Republic of Kazakhstan).',
     },
   '2.2. Контактным каналом по всем вопросам обработки, изменения, выгрузки или отзыва согласия на обработку персональных данных является электронная почта:':
     {

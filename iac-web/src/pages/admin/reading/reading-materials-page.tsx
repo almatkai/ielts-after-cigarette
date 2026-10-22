@@ -61,13 +61,13 @@ export function ReadingMaterialsPage() {
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+          <p className="text-xs font-semibold text-primary normal-case">
             Reading
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
             {t('Библиотека материалов')}
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {t(
               'Материалы и полные тесты. Проверяйте черновики перед публикацией.',
             )}
@@ -83,7 +83,7 @@ export function ReadingMaterialsPage() {
           </Button>
           <Button
             type="button"
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
             onClick={() =>
               void navigate({ to: '/admin/reading/materials/new' })
             }
@@ -94,15 +94,15 @@ export function ReadingMaterialsPage() {
       </div>
 
       {materialsQuery.isPending ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
-          <CardContent className="p-8 text-center text-sm text-[#69696d]">
+        <Card className="rounded-[10px] border-border shadow-none">
+          <CardContent className="p-8 text-center text-sm text-muted-foreground">
             {t('Загружаем материалы…')}
           </CardContent>
         </Card>
       ) : materialsQuery.isError ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+        <Card className="rounded-[10px] border-border shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-destructive" aria-hidden />
             <p className="mt-3 text-sm">
               {t('Не удалось загрузить библиотеку.')}
             </p>
@@ -117,13 +117,13 @@ export function ReadingMaterialsPage() {
           </CardContent>
         </Card>
       ) : materialsQuery.data.items.length === 0 ? (
-        <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
+        <Card className="rounded-[10px] border-dashed border-border-strong bg-card shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <Book className="size-8 text-[#9a9a9d]" aria-hidden />
+            <Book className="size-8 text-muted-foreground" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">
               {t('Материалов пока нет')}
             </h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               {t(
                 'Создайте или импортируйте материал, добавьте вопросы и проверьте тест перед публикацией.',
               )}
@@ -135,7 +135,7 @@ export function ReadingMaterialsPage() {
           {materialsQuery.data.items.map((material) => (
             <Card
               key={material.id}
-              className="gap-0 rounded-[14px] border-[#e7e7e4] py-0 shadow-none"
+              className="gap-0 rounded-[10px] border-border py-0 shadow-none"
             >
               <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
@@ -147,14 +147,14 @@ export function ReadingMaterialsPage() {
                     <Badge
                       className={
                         material.status === 'PUBLISHED'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-[#f4f4f1] text-[#69696d]'
+                          ? 'bg-success-bg text-success'
+                          : 'bg-muted text-muted-foreground'
                       }
                     >
                       {material.status}
                     </Badge>
                     {material.hasUnpublishedChanges ? (
-                      <span className="text-xs text-amber-700">
+                      <span className="text-xs text-warning-fg">
                         {t('Есть неопубликованные изменения')}
                       </span>
                     ) : null}
@@ -162,7 +162,7 @@ export function ReadingMaterialsPage() {
                   <h2 className="mt-3 truncate text-base font-semibold">
                     {material.title}
                   </h2>
-                  <p className="mt-1 truncate text-xs text-[#808084]">
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
                     /{material.slug} · {t('версия')}{' '}
                     {material.currentVersionNumber}
                   </p>

@@ -35,7 +35,7 @@ export function UsersPage() {
   return (
     <div className="grid gap-5">
       <div className="flex items-baseline gap-3">
-        <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="text-3xl font-semibold tracking-normal">
           {t('Пользователи')}
         </h1>
         {query.data && (
@@ -55,7 +55,7 @@ export function UsersPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('Имя, email или телефон')}
             aria-label={t('Поиск пользователей')}
-            className="h-10 bg-white pl-10"
+            className="h-10 bg-card pl-10"
           />
         </div>
         <select
@@ -65,7 +65,7 @@ export function UsersPage() {
             setRole(e.target.value)
             setPage(1)
           }}
-          className="h-10 rounded-lg border border-[#e7e7e4] bg-white px-3 text-sm"
+          className="h-10 rounded-lg border border-border bg-card px-3 text-sm"
         >
           <option value="">{t('Все роли')}</option>
           {Object.entries(roles).map(([value, label]) => (
@@ -81,9 +81,9 @@ export function UsersPage() {
           retry={() => void query.refetch()}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[#e7e7e4] bg-white">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full min-w-[680px] text-left text-sm">
-            <thead className="border-b border-[#e7e7e4] bg-[#fafaf8] text-xs text-muted-foreground">
+            <thead className="border-b border-border bg-background text-xs text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-medium">{t('Пользователь')}</th>
                 <th className="px-4 py-3 font-medium">{t('Роль')}</th>
@@ -108,7 +108,7 @@ export function UsersPage() {
                 query.data.items.map((user) => (
                   <tr
                     key={user.id}
-                    className="border-b border-[#eeeeeb] last:border-0 hover:bg-[#fafaf8]"
+                    className="border-b border-border last:border-0 hover:bg-background"
                   >
                     <td className="px-5 py-4">
                       <Link
@@ -135,7 +135,7 @@ export function UsersPage() {
                     <td className="px-4 py-4">
                       <span
                         className={
-                          user.role === 'WRITER' ? 'text-[#2563eb]' : ''
+                          user.role === 'WRITER' ? 'text-primary-hover' : ''
                         }
                       >
                         {t(roles[user.role])}
@@ -166,7 +166,7 @@ export function UsersPage() {
                         to="/admin/users/$userId"
                         params={{ userId: user.id }}
                         aria-label={`${t('Открыть')} ${user.displayName}`}
-                        className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-[#eff6ff] hover:text-primary"
+                        className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-primary-soft hover:text-primary"
                       >
                         <ArrowRight2 className="size-4" aria-hidden />
                       </Link>

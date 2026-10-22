@@ -49,12 +49,16 @@ export function BlogPostEditorPage() {
 
   if (!postId) return <EditorForm post={null} />
   if (existingQuery.isPending) {
-    return <p className="text-sm text-[#69696d]">{t('Загружаем статью…')}</p>
+    return (
+      <p className="text-sm text-muted-foreground">{t('Загружаем статью…')}</p>
+    )
   }
   if (!existingQuery.data) {
     return (
       <div className="mx-auto grid w-full max-w-[880px] gap-4">
-        <p className="text-sm text-[#69696d]">{t('Статья не найдена.')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('Статья не найдена.')}
+        </p>
         <Button asChild variant="outline" className="justify-self-start">
           <Link to="/writer/posts">{t('Мои статьи')}</Link>
         </Button>
@@ -154,12 +158,12 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
         <div className="min-w-0">
           <Link
             to="/writer/posts"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#69696d] no-underline transition-colors hover:text-[#2563eb]"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary-hover"
           >
             <ArrowLeft className="size-4" aria-hidden />
             {t('Мои статьи')}
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">
+          <h1 className="text-[28px] sm:text-[36px] mt-2 font-semibold tracking-normal">
             {isNew ? t('Новая статья') : t('Редактирование статьи')}
           </h1>
         </div>
@@ -186,7 +190,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
       </div>
 
       {error ? (
-        <p className="rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
+        <p className="rounded-[10px] bg-destructive-soft px-4 py-3 text-sm text-destructive">
           {t(error)}
         </p>
       ) : null}
@@ -208,8 +212,10 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
 
       <div className="grid gap-1.5">
         <Label htmlFor="post-slug">{t('Адрес статьи')}</Label>
-        <div className="flex min-w-0 items-center rounded-[10px] border border-[#e7e7e4] bg-white focus-within:border-[#93b4f5]">
-          <span className="shrink-0 pl-3 text-sm text-[#a0a0a4]">/blog/</span>
+        <div className="flex min-w-0 items-center rounded-[10px] border border-border bg-card focus-within:border-primary-soft">
+          <span className="shrink-0 pl-3 text-sm text-muted-foreground">
+            /blog/
+          </span>
           <input
             id="post-slug"
             value={effectiveSlug}
@@ -230,7 +236,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
                 setSlugEdited(false)
                 setSlug('')
               }}
-              className="shrink-0 px-3 text-xs font-semibold text-[#2563eb]"
+              className="shrink-0 px-3 text-xs font-semibold text-primary-hover"
             >
               {t('Из заголовка')}
             </button>
@@ -239,7 +245,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
         {fieldErrors.slug ? (
           <FieldError message={fieldErrors.slug} />
         ) : (
-          <p className="text-xs text-[#808084]">
+          <p className="text-xs text-muted-foreground">
             {isNew
               ? t('Создаётся автоматически из заголовка. Можно изменить.')
               : t(
@@ -265,7 +271,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
       <div className="grid gap-1.5">
         <Label>{t('Обложка')}</Label>
         {coverMediaId ? (
-          <div className="relative overflow-hidden rounded-[12px] border border-[#e7e7e4]">
+          <div className="relative overflow-hidden rounded-[10px] border border-border">
             <img
               src={blogMediaUrl(coverMediaId)}
               alt={t('Обложка статьи')}
@@ -274,7 +280,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
             <button
               type="button"
               onClick={() => setCoverMediaId(null)}
-              className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-[8px] bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#111111] shadow-sm hover:bg-white"
+              className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-[8px] bg-card px-2.5 py-1.5 text-xs font-semibold text-foreground shadow-none hover:bg-card"
             >
               <CloseCircle className="size-4" aria-hidden />
               {t('Убрать')}
@@ -284,13 +290,13 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
           <button
             type="button"
             onClick={() => coverInputRef.current?.click()}
-            className="flex items-center gap-3 rounded-[12px] border border-dashed border-[#c9c9c4] bg-[#fbfbfa] px-4 py-4 text-left transition-colors hover:bg-[#f4f4f1]"
+            className="flex items-center gap-3 rounded-[10px] border border-dashed border-border-strong bg-background px-4 py-4 text-left transition-colors hover:bg-muted"
           >
             <DocumentUpload
-              className="size-5 shrink-0 text-[#69696d]"
+              className="size-5 shrink-0 text-muted-foreground"
               aria-hidden
             />
-            <span className="text-sm text-[#69696d]">
+            <span className="text-sm text-muted-foreground">
               {coverMutation.isPending
                 ? t('Загружаем…')
                 : t('Загрузить обложку (PNG, JPG, WebP или GIF)')}
@@ -328,5 +334,5 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
 function FieldError({ message }: { message?: string }) {
   const { t } = useLanguage()
   if (!message) return null
-  return <p className="text-xs text-[#c92f2f]">{t(message)}</p>
+  return <p className="text-xs text-destructive">{t(message)}</p>
 }

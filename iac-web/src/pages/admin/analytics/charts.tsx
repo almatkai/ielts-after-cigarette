@@ -4,23 +4,27 @@ import { useLanguage } from '@/lib/i18n'
 
 // Validated categorical slots (light surface), assigned in fixed order.
 export const seriesColors = [
-  '#2a78d6',
-  '#eb6834',
-  '#1baf7a',
-  '#eda100',
+  'var(--primary)',
+  'var(--chart-gold)',
+  'var(--muted-foreground)',
+  'var(--success)',
 ] as const
-// Sequential blue ramp, "near zero" → "most".
-const blueRamp = [
-  '#cde2fb',
-  '#9ec5f4',
-  '#6da7ec',
-  '#3987e5',
-  '#256abf',
-  '#184f95',
-  '#0d366b',
+// Sequential teal scale keeps intensity meaningful in both themes.
+const tealRamp = [
+  'color-mix(in srgb, var(--primary) 12%, var(--card))',
+  'color-mix(in srgb, var(--primary) 22%, var(--card))',
+  'color-mix(in srgb, var(--primary) 35%, var(--card))',
+  'color-mix(in srgb, var(--primary) 55%, var(--card))',
+  'color-mix(in srgb, var(--primary) 70%, var(--card))',
+  'color-mix(in srgb, var(--primary) 85%, var(--card))',
+  'var(--primary)',
 ] as const
-const emptyCell = '#f0efec'
-const ink = { muted: '#898781', grid: '#e1e0d9', axis: '#c3c2b7' }
+const emptyCell = 'var(--muted)'
+const ink = {
+  muted: 'var(--muted-foreground)',
+  grid: 'var(--border)',
+  axis: 'var(--border-strong)',
+}
 
 const numberFormat = new Intl.NumberFormat('ru-RU')
 export const formatNumber = (value: number) => numberFormat.format(value)
@@ -33,10 +37,10 @@ export function formatDay(day: string, withYear = false) {
 export function rampColor(value: number, max: number) {
   if (value <= 0 || max <= 0) return emptyCell
   const index = Math.min(
-    blueRamp.length - 1,
-    Math.floor((value / max) * blueRamp.length),
+    tealRamp.length - 1,
+    Math.floor((value / max) * tealRamp.length),
   )
-  return blueRamp[index]
+  return tealRamp[index]
 }
 
 function niceTicks(maxValue: number, count = 4) {
@@ -73,7 +77,7 @@ export type ChartSeries = { label: string; values: number[] }
 export function Legend({ labels }: { labels: string[] }) {
   if (labels.length < 2) return null
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#52514e]">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
       {labels.map((label, index) => (
         <li key={label} className="flex items-center gap-1.5">
           <span
@@ -210,7 +214,7 @@ export function LineChart({
                     cy={y(s.values[hover] ?? 0)}
                     r={4}
                     fill={seriesColors[index]}
-                    stroke="#fff"
+                    stroke="var(--card)"
                     strokeWidth={2}
                   />
                 ))}
@@ -220,18 +224,18 @@ export function LineChart({
         )}
         {hover !== null && width > 0 && (
           <div
-            className="pointer-events-none absolute top-1 z-10 min-w-36 rounded-[10px] border border-[#e7e7e4] bg-white px-3 py-2 text-xs shadow-lg"
+            className="pointer-events-none absolute top-1 z-10 min-w-36 rounded-[10px] border border-border bg-card px-3 py-2 text-xs shadow-none"
             style={{
               left: Math.min(Math.max(0, x(hover) + 12), width - 160),
             }}
           >
-            <p className="font-semibold text-[#111]">
+            <p className="font-semibold text-foreground">
               {formatDay(days[hover], true)}
             </p>
             {series.map((s, index) => (
               <p
                 key={s.label}
-                className="mt-1 flex items-center justify-between gap-4 text-[#52514e]"
+                className="mt-1 flex items-center justify-between gap-4 text-muted-foreground"
               >
                 <span className="flex items-center gap-1.5">
                   <span
@@ -240,7 +244,7 @@ export function LineChart({
                   />
                   {s.label}
                 </span>
-                <span className="font-semibold text-[#111] tabular-nums">
+                <span className="font-semibold text-foreground tabular-nums">
                   {formatNumber(s.values[hover] ?? 0)}
                 </span>
               </p>
@@ -268,19 +272,21 @@ export function BarList({
       {rows.map((row, index) => (
         <li key={row.label} className="grid gap-1.5" title={row.note}>
           <div className="flex items-baseline justify-between gap-3 text-sm">
-            <span className="min-w-0 truncate text-[#111]">{row.label}</span>
-            <span className="shrink-0 text-[#52514e] tabular-nums">
-              <b className="font-semibold text-[#111]">
+            <span className="min-w-0 truncate text-foreground">
+              {row.label}
+            </span>
+            <span className="shrink-0 text-muted-foreground tabular-nums">
+              <b className="font-semibold text-foreground">
                 {formatNumber(row.value)}
               </b>
               {suffix?.(row, index) ? (
-                <span className="ml-2 text-xs text-[#898781]">
+                <span className="ml-2 text-xs text-muted-foreground">
                   {suffix(row, index)}
                 </span>
               ) : null}
             </span>
           </div>
-          <div className="h-2 rounded-full bg-[#f0efec]">
+          <div className="h-2 rounded-full bg-muted">
             <div
               className="h-2 rounded-full"
               style={{
@@ -316,7 +322,7 @@ export function ActivityHeatmap({
   return (
     <div className="grid gap-2">
       <div className="overflow-x-auto">
-        <div className="grid min-w-[420px] grid-cols-[24px_repeat(24,minmax(0,1fr))] gap-[2px] text-[10px] text-[#898781]">
+        <div className="grid min-w-[420px] grid-cols-[24px_repeat(24,minmax(0,1fr))] gap-[2px] text-[10px] text-muted-foreground">
           <span />
           {Array.from({ length: 24 }, (_, hour) => (
             <span key={hour} className="text-center tabular-nums">
@@ -345,7 +351,7 @@ export function ActivityHeatmap({
           ))}
         </div>
       </div>
-      <p className="min-h-5 text-xs text-[#52514e]" aria-live="polite">
+      <p className="min-h-5 text-xs text-muted-foreground" aria-live="polite">
         {hover
           ? `${t(weekdays[hover.weekday])}, ${String(hover.hour).padStart(2, '0')}:00–${String(hover.hour + 1).padStart(2, '0')}:00 — ${formatNumber(hover.attempts)} ${t('попыток')}`
           : max > 0

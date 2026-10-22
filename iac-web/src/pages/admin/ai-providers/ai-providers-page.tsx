@@ -176,10 +176,10 @@ export function AIProvidersPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-normal text-foreground">
             {t('AI-провайдеры')}
           </h1>
-          <p className="text-sm leading-6 text-slate-600">
+          <p className="text-sm leading-6 text-muted-foreground">
             {t(
               'Собери провайдеров в уровни. Запросы по очереди распределяются между участниками одного уровня: A, B, C, снова A. Каждый запрос идёт одному провайдеру, следующий уровень — резерв.',
             )}
@@ -201,7 +201,7 @@ export function AIProvidersPage() {
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
           {t(error)}
           <Button
@@ -222,14 +222,14 @@ export function AIProvidersPage() {
         </div>
       )}
       {notice && (
-        <p role="status" className="text-sm text-emerald-700">
+        <p role="status" className="text-sm text-success">
           {t(notice)}
         </p>
       )}
       {data?.migrationRequired && (
         <div
           role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+          className="rounded-xl border border-warning-bg bg-warning-bg p-4 text-sm leading-6 text-warning-fg"
         >
           <p>
             {t(
@@ -242,7 +242,7 @@ export function AIProvidersPage() {
         </div>
       )}
       {data && (!data.encryptionConfigured || telemetryUnavailable) && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+        <div className="rounded-xl border border-warning-bg bg-warning-bg p-4 text-sm leading-6 text-warning-fg">
           {!data.encryptionConfigured && (
             <p>
               {t(
@@ -264,28 +264,30 @@ export function AIProvidersPage() {
       >
         <section
           aria-label={t('Цепочка провайдеров')}
-          className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          className="min-w-0 overflow-hidden rounded-xl border border-border bg-card"
         >
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h2 className="font-semibold text-slate-900">
+          <div className="border-b border-border px-5 py-4">
+            <h2 className="font-semibold text-foreground">
               {t('Уровни провайдеров')}
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {t(
                 'Перетащи провайдер в нужный стек или выбери уровень в его карточке. Одинаковый приоритет объединяет провайдеров. Отключённые пропускаются; изменения действуют для новых запросов.',
               )}
             </p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
               {t(
                 'Один запрос не дублируется всем участникам. Другой провайдер получает его только при ошибке или таймауте.',
               )}
             </p>
           </div>
           {!data && !error && (
-            <p className="p-5 text-sm text-slate-500">{t('Загрузка…')}</p>
+            <p className="p-5 text-sm text-muted-foreground">
+              {t('Загрузка…')}
+            </p>
           )}
           {data?.items.length === 0 && !data.migrationRequired && (
-            <p className="p-5 text-sm leading-6 text-slate-600">
+            <p className="p-5 text-sm leading-6 text-muted-foreground">
               {t(
                 'Добавьте первый провайдер, проверьте подключение и включите его. Отдельный ключ нужен только при сохранении — существующий ключ не раскрывается.',
               )}
@@ -347,29 +349,29 @@ export function AIProvidersPage() {
                             <div className="flex items-start gap-3">
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <h3 className="font-semibold text-slate-900">
+                                  <h3 className="font-semibold text-foreground">
                                     {provider.name}
                                   </h3>
                                   <span
-                                    className={`rounded-full px-2 py-0.5 text-xs ${provider.enabled ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
+                                    className={`rounded-full px-2 py-0.5 text-xs ${provider.enabled ? 'bg-success-bg text-success' : 'bg-muted text-muted-foreground'}`}
                                   >
                                     {provider.enabled
                                       ? t('Включён')
                                       : t('Выключен')}
                                   </span>
                                   {provider.fromEnv && (
-                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                                    <span className="rounded-sm bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                       .env
                                     </span>
                                   )}
                                 </div>
-                                <p className="mt-1 break-all text-sm text-slate-700">
+                                <p className="mt-1 break-all text-sm text-foreground">
                                   {provider.model}
                                 </p>
-                                <p className="mt-1 break-all text-xs text-slate-500">
+                                <p className="mt-1 break-all text-xs text-muted-foreground">
                                   {provider.endpoint}
                                 </p>
-                                <p className="mt-2 text-xs text-slate-600">
+                                <p className="mt-2 text-xs text-muted-foreground">
                                   {provider.scopes
                                     .map((scope) => t(scopeNames[scope]))
                                     .join(', ')}{' '}
@@ -386,13 +388,13 @@ export function AIProvidersPage() {
                             {providerResult && (
                               <p
                                 role="status"
-                                className={`mt-3 text-sm ${providerResult.ok ? 'text-emerald-700' : 'text-amber-800'}`}
+                                className={`mt-3 text-sm ${providerResult.ok ? 'text-success' : 'text-warning-fg'}`}
                               >
                                 {resultLabel(providerResult)}
                               </p>
                             )}
                             <div className="mt-3">
-                              <label className="text-xs text-slate-500">
+                              <label className="text-xs text-muted-foreground">
                                 {t('Уровень')}
                                 <select
                                   aria-label={`${t('Уровень')} ${provider.name}`}
@@ -402,7 +404,7 @@ export function AIProvidersPage() {
                                     !data.encryptionConfigured ||
                                     data.migrationRequired
                                   }
-                                  className="ml-2 max-w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700"
+                                  className="ml-2 max-w-full rounded-md border border-border bg-card px-2 py-1 text-sm text-foreground"
                                   onChange={(event) =>
                                     moveToLevel(
                                       provider,
@@ -497,11 +499,11 @@ export function AIProvidersPage() {
             </SortableContext>
           </DndContext>
           {data && !data.items.some((provider) => provider.fromEnv) && (
-            <div className="border-t border-dashed border-slate-200 bg-slate-50 px-5 py-4">
-              <h3 className="text-sm font-medium text-slate-700">
+            <div className="border-t border-dashed border-border bg-card px-5 py-4">
+              <h3 className="text-sm font-medium text-foreground">
                 {t('Последний резерв: .env')}
               </h3>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {data.envFallbackConfigured
                   ? t(
                       'Уже настроен на сервере. Используется, если остальные провайдеры не ответили.',
@@ -518,7 +520,7 @@ export function AIProvidersPage() {
             aria-label={
               editing ? t('Изменить провайдера') : t('Новый провайдер')
             }
-            className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5"
+            className="space-y-4 rounded-xl border border-border bg-card p-5"
             onSubmit={(event) => {
               event.preventDefault()
               void perform(async () => {
@@ -531,7 +533,7 @@ export function AIProvidersPage() {
               })
             }}
           >
-            <h2 className="font-semibold text-slate-900">
+            <h2 className="font-semibold text-foreground">
               {editing ? t('Изменить провайдера') : t('Новый провайдер')}
             </h2>
             <div className="space-y-1.5">
@@ -564,7 +566,7 @@ export function AIProvidersPage() {
                 }
                 placeholder="https://api.example.com/v1/chat/completions"
               />
-              <p className="text-xs leading-5 text-slate-500">
+              <p className="text-xs leading-5 text-muted-foreground">
                 {editingEnv
                   ? t(
                       'URL и модели берутся из .env. Название и приоритет сохраняются в админке; ключ остаётся на сервере.',
@@ -622,7 +624,7 @@ export function AIProvidersPage() {
                       : t('Будет зашифрован при сохранении')
                   }
                 />
-                <p className="text-xs leading-5 text-slate-500">
+                <p className="text-xs leading-5 text-muted-foreground">
                   {t(
                     'Ключ никогда не возвращается из API и не сохраняется в браузере.',
                   )}
@@ -641,7 +643,7 @@ export function AIProvidersPage() {
                   >
                     <input
                       type="checkbox"
-                      className="size-4 accent-blue-600"
+                      className="size-4 accent-primary"
                       checked={input.scopes.includes(scope)}
                       onChange={() => toggleScope(scope)}
                     />
@@ -664,7 +666,7 @@ export function AIProvidersPage() {
                     setInput({ ...input, priority: Number(event.target.value) })
                   }
                 />
-                <p className="mt-1 text-xs leading-5 text-slate-500">
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
                   {t(
                     'Одинаковый приоритет = один уровень и ротация запросов между провайдерами. Меньшее число — более ранний уровень.',
                   )}
@@ -693,7 +695,7 @@ export function AIProvidersPage() {
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                className="size-4 accent-blue-600"
+                className="size-4 accent-primary"
                 checked={input.enabled}
                 disabled={telemetryUnavailable}
                 onChange={(event) =>
@@ -705,7 +707,7 @@ export function AIProvidersPage() {
             {formResult && (
               <p
                 role="status"
-                className={`text-sm ${formResult.ok ? 'text-emerald-700' : 'text-amber-800'}`}
+                className={`text-sm ${formResult.ok ? 'text-success' : 'text-warning-fg'}`}
               >
                 {resultLabel(formResult)}
               </p>
@@ -755,7 +757,7 @@ export function AIProvidersPage() {
       <DailyLimitsControls />
       {data && <RoutingControls />}
       <ProviderStats revision={statsRevision} />
-      <p className="max-w-3xl text-xs leading-5 text-slate-500">
+      <p className="max-w-3xl text-xs leading-5 text-muted-foreground">
         {data?.errorReportingRequired === false &&
         !data.errorReportingConfigured
           ? t(

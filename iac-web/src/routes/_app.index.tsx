@@ -6,7 +6,7 @@ import { tr } from '@/lib/i18n'
 export const Route = createFileRoute('/_app/')({
   head: () => ({
     meta: [
-      { title: tr('Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза') },
+      { title: tr('Yrys Academy — подготовка к IELTS онлайн') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

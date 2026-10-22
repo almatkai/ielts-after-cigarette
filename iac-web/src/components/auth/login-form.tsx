@@ -183,10 +183,14 @@ function GoogleSignInCard({
   return (
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
-        <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
+        <CardTitle
+          role="heading"
+          aria-level={1}
+          className="font-display font-semibold tracking-normal text-[28px] text-foreground"
+        >
           {t('Войти или создать аккаунт')}
         </CardTitle>
-        <CardDescription className="mt-2 text-sm text-[#475569]">
+        <CardDescription className="mt-2 text-sm text-muted-foreground">
           {t(description)}
         </CardDescription>
       </CardHeader>
@@ -197,47 +201,50 @@ function GoogleSignInCard({
             <button
               type="button"
               onClick={onContinueAsGuest}
-              className="font-medium text-[#2563eb] underline"
+              className="font-medium text-primary-hover underline"
             >
               Продолжить без регистрации
             </button>
           ) : (
-            <Link to="/" className="font-medium text-[#2563eb] underline">
+            <Link to="/" className="font-medium text-primary-hover underline">
               Попробовать один Full Mock без регистрации
             </Link>
           )}
         </p>
         {restoringGoogle ? (
-          <p className="text-center text-sm text-[#475569]" role="status">
+          <p
+            className="text-center text-sm text-muted-foreground"
+            role="status"
+          >
             {t('Завершаем вход через Google…')}
           </p>
         ) : null}
-        <p className="mt-3 text-center text-xs leading-5 text-[#64748b]">
+        <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
           {t(
             'Если вы открыли сайт из Telegram или Instagram, используйте меню браузера «Открыть в Safari» или «Открыть в браузере» для входа.',
           )}
         </p>
         {googleFailed ? (
-          <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
+          <p className="mt-3 text-center text-sm text-destructive" role="alert">
             {t(
               'Не удалось загрузить вход через Google. Проверьте подключение и обновите страницу.',
             )}
           </p>
         ) : null}
         {submissionError ? (
-          <p className="mt-3 text-center text-sm text-[#dc2626]" role="alert">
+          <p className="mt-3 text-center text-sm text-destructive" role="alert">
             {t(submissionError)}
           </p>
         ) : null}
       </CardContent>
-      <CardFooter className="justify-center border-t border-[#f1f5f9] px-6 py-4 text-center text-xs leading-5 text-[#64748b] sm:px-8">
+      <CardFooter className="justify-center border-t border-muted px-6 py-4 text-center text-xs leading-5 text-muted-foreground sm:px-8">
         <p>
           {t('Входя в систему, вы соглашаетесь с')}{' '}
           <Link
             to="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+            className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
           >
             {t('условиями использования')}
           </Link>{' '}
@@ -246,7 +253,7 @@ function GoogleSignInCard({
             to="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+            className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
           >
             {t('политикой конфиденциальности')}
           </Link>

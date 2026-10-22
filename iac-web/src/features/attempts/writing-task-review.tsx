@@ -15,23 +15,23 @@ export function WritingTaskReview({
     <Card
       role="region"
       aria-label={`Writing Task ${task.position}`}
-      className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs overflow-hidden"
+      className="rounded-[10px] border border-border bg-card shadow-none overflow-hidden"
     >
-      <CardHeader className="border-b border-slate-100 bg-[#fafafa]/80 py-4">
+      <CardHeader className="border-b border-border bg-background/80 py-4">
         <div className="flex items-center justify-between gap-3">
-          <CardTitle className="flex items-center gap-2 text-slate-900 text-lg">
-            <Edit2 className="size-4 text-[#3b82f6]" aria-hidden />
+          <CardTitle className="flex items-center gap-2 text-foreground text-lg">
+            <Edit2 className="size-4 text-primary" aria-hidden />
             Task {task.position}
           </CardTitle>
-          <span className="rounded-md bg-blue-50 px-2.5 py-1 text-sm font-bold text-[#3b82f6]">
+          <span className="rounded-md bg-primary-soft px-2.5 py-1 text-sm font-bold text-primary">
             Band {task.band.toFixed(1)}
           </span>
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 p-5 sm:p-6 text-sm leading-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-            {'Оценки по критериям'}
+          <p className="text-xs font-semibold normal-case text-muted-foreground mb-2">
+            {'Criterion scores'}
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -50,17 +50,17 @@ export function WritingTaskReview({
               return (
                 <div
                   key={label as string}
-                  className="flex flex-col justify-between rounded-xl border border-[#ecece8] bg-[#fbfbf9] p-3.5 transition-all hover:border-slate-300"
+                  className="flex flex-col justify-between rounded-xl border border-border bg-background p-3.5 transition-all hover:border-border-strong"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-semibold normal-case text-muted-foreground">
                       {label as string}
                     </span>
-                    <span className="rounded-md bg-blue-50 px-1.5 py-0.5 text-xs font-bold text-[#3b82f6]">
+                    <span className="rounded-md bg-primary-soft px-1.5 py-0.5 text-xs font-bold text-primary">
                       {typedCriterion.band.toFixed(1)}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-700">
+                  <p className="mt-2 text-xs leading-relaxed text-foreground">
                     {typedCriterion.feedback}
                   </p>
                 </div>
@@ -70,9 +70,9 @@ export function WritingTaskReview({
         </div>
 
         {task.feedback && (
-          <div className="rounded-xl bg-[#f7f7f5] p-4 text-slate-700">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-              {'Общий комментарий'}
+          <div className="rounded-xl bg-background p-4 text-foreground">
+            <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
+              {'Overall feedback'}
             </p>
             <p className="text-sm leading-relaxed">{task.feedback}</p>
           </div>
@@ -85,7 +85,7 @@ export function WritingTaskReview({
           />
         ) : (
           <p role="status" className="text-sm text-muted-foreground">
-            Текст ответа недоступен для этой сохранённой попытки.
+            The original answer is not available for this saved attempt.
           </p>
         )}
 
@@ -93,9 +93,9 @@ export function WritingTaskReview({
           <ModelParagraphCard modelParagraph={task.modelParagraph} />
         ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-slate-100">
-          <FeedbackList title={'Сильные стороны'} items={task.strengths} />
-          <FeedbackList title={'Что улучшить'} items={task.improvements} />
+        <div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-border">
+          <FeedbackList title={'Strengths'} items={task.strengths} />
+          <FeedbackList title={'Areas to improve'} items={task.improvements} />
         </div>
       </CardContent>
     </Card>
@@ -107,7 +107,7 @@ function FeedbackList({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
       <p className="font-semibold">{title}</p>
-      <ul className="mt-1 list-disc pl-5 text-[#69696d]">
+      <ul className="mt-1 list-disc pl-5 text-muted-foreground">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}

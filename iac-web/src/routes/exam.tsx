@@ -2,6 +2,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { canGuestVisit, getGuestConfig } from '@/features/auth/guest'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { GuestAccessGate } from '@/components/auth/guest-shell'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/exam')({
   ssr: false,
@@ -23,7 +24,7 @@ export const Route = createFileRoute('/exam')({
   },
   head: () => ({
     meta: [
-      { title: 'IELTS test — Daiyndyq IELTS' },
+      { title: tr('IELTS test — Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),
@@ -39,7 +40,7 @@ function ExamLayout() {
       </DashboardShell>
     )
   return (
-    <main className="min-h-dvh bg-[#f7f7f5] text-[#111111]">
+    <main className="min-h-dvh bg-background text-foreground">
       <Outlet />
     </main>
   )

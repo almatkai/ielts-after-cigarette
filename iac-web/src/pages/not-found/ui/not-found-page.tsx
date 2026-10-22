@@ -1,27 +1,27 @@
 import { ArrowLeft, Category } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
-import { Brand } from '@/components/landing/brand'
+import { BrandLogo } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/lib/i18n'
 
 export function NotFoundPage() {
   const { t } = useLanguage()
   return (
-    <div className="min-h-screen overflow-hidden bg-[#fafaf8] text-[#111111]">
+    <div className="min-h-screen overflow-hidden bg-background text-foreground">
       <header className="container-shell flex h-20 items-center">
-        <Brand />
+        <BrandLogo />
       </header>
 
       <main className="container-shell grid min-h-[calc(100vh-80px)] items-center gap-8 py-10 lg:grid-cols-12 lg:gap-14 lg:py-14">
         <div className="relative z-10 lg:col-span-6">
-          <p className="text-xs font-semibold tracking-[0.1em] text-[#3b82f6] uppercase">
+          <p className="text-xs font-semibold text-primary normal-case">
             {t('Ошибка 404')}
           </p>
-          <h1 className="mt-5 max-w-[650px] text-[clamp(3.25rem,7vw,6.8rem)] leading-[0.92] font-medium tracking-[-0.07em] text-balance">
+          <h1 className="text-[28px] sm:text-[36px] mt-5 max-w-[650px] leading-tight font-semibold text-balance">
             {t('Кажется, эта страница потерялась.')}
           </h1>
-          <p className="mt-7 max-w-lg text-base leading-7 text-[#69696d] sm:text-lg sm:leading-8">
+          <p className="mt-7 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
             {t(
               'Здесь ничего нет. Вернитесь на главную или продолжите подготовку в личном кабинете.',
             )}
@@ -31,7 +31,7 @@ export function NotFoundPage() {
             <Button
               asChild
               size="lg"
-              className="h-12 rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white hover:bg-[#2563eb]"
+              className="h-12 rounded-[10px] bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
               <Link to="/">
                 <ArrowLeft aria-hidden />
@@ -42,7 +42,7 @@ export function NotFoundPage() {
               asChild
               size="lg"
               variant="outline"
-              className="h-12 rounded-[10px] border-[#dededb] bg-white px-5 text-sm font-semibold hover:bg-[#f4f4f1]"
+              className="h-12 rounded-[10px] border-border bg-card px-5 text-sm font-semibold hover:bg-muted"
             >
               <Link to="/">
                 <Category aria-hidden />
@@ -53,21 +53,7 @@ export function NotFoundPage() {
         </div>
 
         <div className="relative mx-auto flex w-full max-w-[580px] items-center justify-center lg:col-span-6">
-          <div
-            className="pointer-events-none absolute size-[78%] rounded-full border border-[#e7e7e4]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute size-[58%] rounded-full border border-[#f2dcdc]"
-            aria-hidden
-          />
-          <img
-            src={`${import.meta.env.BASE_URL}fox_404_transparent.webp`}
-            alt={t('Растерянная красная лиса')}
-            width={1600}
-            height={1600}
-            className="relative z-10 h-auto w-full max-w-[520px] object-contain"
-          />
+          <BrandLogo variant="stacked" className="h-[120px]" />
         </div>
       </main>
     </div>

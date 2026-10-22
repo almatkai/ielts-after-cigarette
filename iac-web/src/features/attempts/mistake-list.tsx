@@ -37,11 +37,11 @@ export function MistakeRow({
   const content = (
     <>
       <span className="flex flex-wrap items-center justify-between gap-3">
-        <span className="min-w-0 flex-1 basis-[200px] font-semibold text-slate-900 group-hover:text-blue-900">
-          <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
+        <span className="min-w-0 flex-1 basis-[200px] font-semibold text-foreground group-hover:text-primary">
+          <span className="mr-2 text-primary">{item.number}.</span>
           <span>{item.prompt.replaceAll('{{answer}}', '_____')}</span>
         </span>
-        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#1d4ed8]">
+        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-primary">
           {item.locked ? (
             <Lock className="size-4" aria-hidden />
           ) : (
@@ -50,13 +50,13 @@ export function MistakeRow({
           {t('Разобрать ошибку')}
         </span>
       </span>
-      <span className="flex flex-wrap items-center gap-2.5 text-xs text-slate-600">
+      <span className="flex flex-wrap items-center gap-2.5 text-xs text-muted-foreground">
         {t('Ваш ответ')}:{' '}
-        <strong className="text-slate-900">
+        <strong className="text-foreground">
           {formatAnswer(item.answer, reviewOptions(item))}
         </strong>
         <span
-          className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${reviewed ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`}
+          className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${reviewed ? 'border-success-bg bg-success-bg text-success' : 'border-destructive-soft bg-destructive-soft text-destructive'}`}
         >
           {reviewed ? t('Разобрано') : t('Ошибка')}
         </span>
@@ -64,7 +64,7 @@ export function MistakeRow({
     </>
   )
   const className =
-    'group grid w-full gap-2.5 rounded-[12px] border border-[#ededeb] bg-white p-4 text-left text-sm transition-colors hover:border-[#3b82f6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]'
+    'group grid w-full gap-2.5 rounded-[10px] border border-border bg-card p-4 text-left text-sm transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   return item.locked && guestPreview ? (
     <GuestSignInButton
       className={className}

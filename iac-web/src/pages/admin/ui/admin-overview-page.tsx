@@ -21,22 +21,22 @@ export function AdminOverviewPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+        <p className="text-xs font-semibold text-primary normal-case">
           {t('Администрирование')}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-2 text-3xl font-semibold tracking-normal">
           {t('Рабочее пространство')}
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69696d]">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
           {t('Материалы, статьи и пользователи доступны по выданным правам.')}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+          <CardHeader className="border-b border-border p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
+              <span className="grid size-9 place-items-center rounded-[9px] bg-primary-soft text-primary">
                 <ShieldTick className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">
@@ -46,16 +46,16 @@ export function AdminOverviewPage() {
           </CardHeader>
           <CardContent className="p-5">
             {accessQuery.isPending ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-muted-foreground">
                 {t('Проверяем backend…')}
               </p>
             ) : accessQuery.isError ? (
-              <p className="text-sm text-[#c92f2f]">
+              <p className="text-sm text-destructive">
                 {t('Backend не подтвердил административный доступ.')}
               </p>
             ) : (
               <div className="flex items-center gap-3 text-sm">
-                <TickCircle className="size-5 text-emerald-600" aria-hidden />
+                <TickCircle className="size-5 text-success" aria-hidden />
                 <span>
                   {t('Доступ подтверждён сервером:')}{' '}
                   <b>{accessQuery.data.role}</b>
@@ -65,10 +65,10 @@ export function AdminOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+          <CardHeader className="border-b border-border p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
+              <span className="grid size-9 place-items-center rounded-[9px] bg-muted text-muted-foreground">
                 <Book className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">
@@ -76,7 +76,7 @@ export function AdminOverviewPage() {
               </CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="p-5 text-sm leading-6 text-[#69696d]">
+          <CardContent className="p-5 text-sm leading-6 text-muted-foreground">
             {t(
               'Редактор тестов работает с учебными материалами. Модератор блога — с авторами и статьями.',
             )}
@@ -84,10 +84,10 @@ export function AdminOverviewPage() {
         </Card>
       </div>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="border-b border-border p-5">
           <div className="flex items-center gap-3">
-            <Data className="size-5 text-[#69696d]" aria-hidden />
+            <Data className="size-5 text-muted-foreground" aria-hidden />
             <CardTitle className="text-base">
               {t('Готово на этом этапе')}
             </CardTitle>
@@ -97,7 +97,7 @@ export function AdminOverviewPage() {
           <ul className="grid gap-3">
             {milestones.map((milestone) => (
               <li key={milestone} className="flex items-center gap-3 text-sm">
-                <TickCircle className="size-4 text-emerald-600" aria-hidden />
+                <TickCircle className="size-4 text-success" aria-hidden />
                 {t(milestone)}
               </li>
             ))}

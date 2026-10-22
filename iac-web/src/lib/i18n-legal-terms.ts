@@ -5,15 +5,15 @@ export const legalTermsTranslations: TranslationMap = {
     kk: 'IELTS бренді туралы маңызды құқықтық ескерту:',
     en: 'Important legal notice regarding the IELTS brand:',
   },
-  'IELTS является зарегистрированным товарным знаком University of Cambridge ESOL Examinations Syndicate, British Council и IDP Education Australia. Платформа Daiyndyq IELTS является независимым образовательным сервисом подготовки и не аффилирована, не одобрена и не спонсируется официальными правообладателями товарного знака IELTS.':
+  'IELTS является зарегистрированным товарным знаком University of Cambridge ESOL Examinations Syndicate, British Council и IDP Education Australia. Платформа Yrys Academy является независимым образовательным сервисом подготовки и не аффилирована, не одобрена и не спонсируется официальными правообладателями товарного знака IELTS.':
     {
-      kk: 'IELTS — University of Cambridge ESOL Examinations Syndicate, British Council және IDP Education Australia-ның тіркелген тауар белгісі. «Daiyndyq IELTS» платформасы тәуелсіз дайындық білім беру сервисі болып табылады және IELTS тауар белгісінің ресми құқық иелерімен аффилиирленбеген, олардан мақұлданбаған және олар тарапынан демеушілік көрсетілмеген.',
-      en: 'IELTS is a registered trade mark of University of Cambridge ESOL Examinations Syndicate, British Council and IDP Education Australia. The Daiyndyq IELTS platform is an independent educational preparation service and is not affiliated with, endorsed by or sponsored by the official owners of the IELTS trade mark.',
+      kk: 'IELTS — University of Cambridge ESOL Examinations Syndicate, British Council және IDP Education Australia-ның тіркелген тауар белгісі. «Yrys Academy» платформасы тәуелсіз дайындық білім беру сервисі болып табылады және IELTS тауар белгісінің ресми құқық иелерімен аффилиирленбеген, олардан мақұлданбаған және олар тарапынан демеушілік көрсетілмеген.',
+      en: 'IELTS is a registered trade mark of University of Cambridge ESOL Examinations Syndicate, British Council and IDP Education Australia. The Yrys Academy platform is an independent educational preparation service and is not affiliated with, endorsed by or sponsored by the official owners of the IELTS trade mark.',
     },
-  '1.1. Настоящие Условия использования (далее — «Соглашение», «Условия») представляют собой публичную оферту сервиса «Daiyndyq IELTS» (далее — «Сервис», «Платформа», «мы») и определяют порядок доступа к онлайн-платформе подготовки к экзамену IELTS.':
+  '1.1. Настоящие Условия использования (далее — «Соглашение», «Условия») представляют собой публичную оферту сервиса «Yrys Academy» (далее — «Сервис», «Платформа», «мы») и определяют порядок доступа к онлайн-платформе подготовки к экзамену IELTS.':
     {
-      kk: '1.1. Осы Пайдалану шарттары (бұдан әрі — «Келісім», «Шарттар») «Daiyndyq IELTS» сервисінің жария оферасы болып табылады (бұдан әрі — «Сервис», «Платформа», «біз») және IELTS емтиханына дайындықтың онлайн-платформасына қатынау тәртібін айқындайды.',
-      en: '1.1. These Terms of Use (hereinafter — the “Agreement”, “Terms”) constitute a public offer of the Daiyndyq IELTS service (hereinafter — the “Service”, “Platform”, “we”) and govern access to the online IELTS examination preparation platform.',
+      kk: '1.1. Осы Пайдалану шарттары (бұдан әрі — «Келісім», «Шарттар») «Yrys Academy» сервисінің жария оферасы болып табылады (бұдан әрі — «Сервис», «Платформа», «біз») және IELTS емтиханына дайындықтың онлайн-платформасына қатынау тәртібін айқындайды.',
+      en: '1.1. These Terms of Use (hereinafter — the “Agreement”, “Terms”) constitute a public offer of the Yrys Academy service (hereinafter — the “Service”, “Platform”, “we”) and govern access to the online IELTS examination preparation platform.',
     },
   '1.2. Пользователем признается любое физическое лицо, прошедшее авторизацию и начавшее использование платформы. Начало использования Сервиса или проставление отметки «Принимаю условия использования и политику конфиденциальности» означает безоговорочное согласие со всеми положениями настоящего Соглашения.':
     {
@@ -90,10 +90,10 @@ export const legalTermsTranslations: TranslationMap = {
     kk: '4. Зияткерлік меншік',
     en: '4. Intellectual property',
   },
-  '4.1. Все элементы интерфейса, графические изображения, дизайн, логотипы («Daiyndyq IELTS»), программный код, структура тестов, методические материалы и алгоритмы оценки являются объектами исключительных прав правообладателя Сервиса и охраняются законом.':
+  '4.1. Все элементы интерфейса, графические изображения, дизайн, логотипы («Yrys Academy»), программный код, структура тестов, методические материалы и алгоритмы оценки являются объектами исключительных прав правообладателя Сервиса и охраняются законом.':
     {
-      kk: '4.1. Интерфейстің барлық элементтері, графикалық бейнелер, дизайн, логотиптер («Daiyndyq IELTS»), бағдарламалық код, тест құрылымы, әдістемелік материалдар және бағалау алгоритмдері Сервис құқық иесінің ерекше құқықтарының объектілері болып табылады және заңмен қорғалады.',
-      en: '4.1. All interface elements, graphic images, design, logos (“Daiyndyq IELTS”), software code, test structure, methodological materials and scoring algorithms are objects of the exclusive rights of the Service’s rights holder and are protected by law.',
+      kk: '4.1. Интерфейстің барлық элементтері, графикалық бейнелер, дизайн, логотиптер («Yrys Academy»), бағдарламалық код, тест құрылымы, әдістемелік материалдар және бағалау алгоритмдері Сервис құқық иесінің ерекше құқықтарының объектілері болып табылады және заңмен қорғалады.',
+      en: '4.1. All interface elements, graphic images, design, logos (“Yrys Academy”), software code, test structure, methodological materials and scoring algorithms are objects of the exclusive rights of the Service’s rights holder and are protected by law.',
     },
   '4.2. Права на тексты эссе и аудиозаписи ответов, созданные пользователем в процессе прохождения заданий, сохраняются за пользователем. Пользователь предоставляет Сервису неисключительную лицензию на обработку этих материалов в целях их анализа, проверки и генерации обратной связи.':
     {
@@ -173,9 +173,9 @@ export const legalTermsTranslations: TranslationMap = {
       kk: 'Осы Шарттарға қатысты кез келген сұрақтар бойынша бізбен байланыса аласыз:',
       en: 'For any questions relating to these Terms, you can contact us:',
     },
-  'Служба поддержки «Daiyndyq IELTS»:': {
-    kk: '«Daiyndyq IELTS» қолдау қызметі:',
-    en: 'Daiyndyq IELTS support service:',
+  'Служба поддержки «Yrys Academy»:': {
+    kk: '«Yrys Academy» қолдау қызметі:',
+    en: 'Yrys Academy support service:',
   },
   'Локация: г. Астана, Республика Казахстан.': {
     kk: 'Орналасқан жері: Астана қ., Қазақстан Республикасы.',

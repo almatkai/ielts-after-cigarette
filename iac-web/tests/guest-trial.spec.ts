@@ -385,7 +385,7 @@ test('login logo opens the app overview even when guest trials are disabled', as
 }) => {
   const { privateReads, starts } = await guestAPI(page, false, false)
   await page.goto('./login')
-  const brand = page.getByRole('link', { name: 'Daiyndyq IELTS — к обзору' })
+  const brand = page.getByRole('link', { name: 'Yrys Academy — к обзору' })
   await expect(brand).toHaveAttribute('href', '/app/')
   await brand.click()
   await expect(page).toHaveURL(/\/app\/$/)

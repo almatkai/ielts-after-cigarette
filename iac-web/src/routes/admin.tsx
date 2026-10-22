@@ -16,7 +16,7 @@ export const Route = createFileRoute('/admin')({
   },
   head: () => ({
     meta: [
-      { title: tr('Администрирование — IAC') },
+      { title: tr('Администрирование — Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

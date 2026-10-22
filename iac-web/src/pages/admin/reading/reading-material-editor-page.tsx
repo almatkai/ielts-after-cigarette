@@ -63,7 +63,7 @@ const emptyForm: EditorForm = {
 }
 
 const fieldClassName =
-  'h-11 rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 function materialToForm(material: ReadingMaterial): EditorForm {
   return {
@@ -267,13 +267,17 @@ export function ReadingMaterialEditorPage({
   }
 
   if (editing && materialQuery.isPending) {
-    return <p className="text-sm text-[#69696d]">{t('Загружаем материал…')}</p>
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t('Загружаем материал…')}
+      </p>
+    )
   }
   if (editing && materialQuery.isError) {
     return (
-      <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+      <Card className="rounded-[10px] border-border shadow-none">
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
+          <Warning2 className="size-6 text-destructive" aria-hidden />
           <p className="mt-3 text-sm">{t('Материал не удалось загрузить.')}</p>
           <Button asChild variant="outline" className="mt-4">
             <Link to="/admin/reading/materials">
@@ -295,14 +299,18 @@ export function ReadingMaterialEditorPage({
     <form className="grid gap-5" onSubmit={(event) => void handleSubmit(event)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
+          >
             <Link to="/admin/reading/materials">
               <ArrowLeft aria-hidden />
               {t('К библиотеке')}
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-3xl font-semibold tracking-normal">
               {editing ? t('Редактор материала') : t('Новый Reading материал')}
             </h1>
             {material ? (
@@ -310,7 +318,7 @@ export function ReadingMaterialEditorPage({
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
+            <p className="mt-2 text-xs text-muted-foreground">
               {t('Версия текста')} {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
@@ -366,7 +374,7 @@ export function ReadingMaterialEditorPage({
           <Button
             type="submit"
             disabled={pending}
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
           >
             <Save2 aria-hidden />
             {saveMutation.isPending ? t('Сохраняем…') : t('Сохранить черновик')}
@@ -387,19 +395,19 @@ export function ReadingMaterialEditorPage({
 
       {message ? (
         <div
-          className="flex items-center gap-2 rounded-[10px] border border-[#e7e7e4] bg-white px-4 py-3 text-sm"
+          className="flex items-center gap-2 rounded-[10px] border border-border bg-card px-4 py-3 text-sm"
           role="status"
         >
-          <TickCircle className="size-4 text-[#69696d]" aria-hidden />
+          <TickCircle className="size-4 text-muted-foreground" aria-hidden />
           {message}
         </div>
       ) : null}
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border p-5">
           <div>
             <CardTitle className="text-base">{t('Группы вопросов')}</CardTitle>
-            <p className="mt-1 text-xs text-[#808084]">
+            <p className="mt-1 text-xs text-muted-foreground">
               {t(
                 'Все официальные типы IELTS Reading доступны в списке. Ответы хранятся отдельно от текста.',
               )}
@@ -416,7 +424,7 @@ export function ReadingMaterialEditorPage({
         </CardHeader>
         <CardContent className="grid gap-4 p-5">
           {form.questionGroups.length === 0 ? (
-            <p className="text-sm text-[#69696d]">
+            <p className="text-sm text-muted-foreground">
               {form.kind === 'TEST'
                 ? t(
                     'Это полный тест. Вопросы находятся внутри {count} passage и публикуются вместе.',
@@ -431,12 +439,12 @@ export function ReadingMaterialEditorPage({
             ? materialQuery.data?.passages?.map((passage, index) => (
                 <div
                   key={passage.id}
-                  className="rounded-[12px] border border-[#e7e7e4] p-4"
+                  className="rounded-[10px] border border-border p-4"
                 >
                   <p className="font-semibold">
                     Passage {index + 1}: {passage.title}
                   </p>
-                  <p className="mt-1 text-sm text-[#69696d]">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {t('{count} вопросов').replace(
                       '{count}',
                       String(
@@ -458,7 +466,7 @@ export function ReadingMaterialEditorPage({
           {form.questionGroups.map((group, groupIndex) => (
             <div
               key={`${group.position}-${groupIndex}`}
-              className="grid gap-4 rounded-[12px] border border-[#e7e7e4] p-4"
+              className="grid gap-4 rounded-[10px] border border-border p-4"
             >
               <div className="flex items-end gap-3">
                 <div className="grid flex-1 gap-2">
@@ -511,7 +519,7 @@ export function ReadingMaterialEditorPage({
               {group.questions.map((question, questionIndex) => (
                 <div
                   key={`${question.position}-${questionIndex}`}
-                  className="grid gap-3 rounded-[10px] bg-[#f7f7f5] p-3"
+                  className="grid gap-3 rounded-[10px] bg-background p-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">
@@ -570,7 +578,7 @@ export function ReadingMaterialEditorPage({
                       placeholder={t(
                         'Точная фраза или предложение из текста, где чётко даётся ответ',
                       )}
-                      className="text-xs font-serif"
+                      className="text-xs font-sans"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -650,8 +658,8 @@ export function ReadingMaterialEditorPage({
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="border-b border-border p-5">
           <CardTitle className="text-base">{t('Метаданные')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
@@ -720,8 +728,8 @@ export function ReadingMaterialEditorPage({
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="border-b border-border p-5">
           <CardTitle className="text-base">Passage</CardTitle>
         </CardHeader>
         <CardContent className="p-5">
@@ -733,17 +741,17 @@ export function ReadingMaterialEditorPage({
             value={form.body}
             onChange={(event) => update('body', event.target.value)}
             rows={22}
-            className="font-serif text-base leading-7"
+            className="font-sans text-base leading-7"
             placeholder={t('Вставьте текст Reading passage…')}
           />
-          <p className="mt-2 text-right text-xs text-[#808084]">
+          <p className="mt-2 text-right text-xs text-muted-foreground">
             {form.body.trim().length} {t('символов')}
           </p>
         </CardContent>
       </Card>
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="border-b border-border p-5">
           <CardTitle className="text-base">{t('Источник и права')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5 sm:grid-cols-2">
@@ -769,7 +777,7 @@ export function ReadingMaterialEditorPage({
             />
           </div>
         </CardContent>
-        <CardFooter className="border-t border-[#ededeb] px-5 py-4 text-xs leading-5 text-[#808084]">
+        <CardFooter className="border-t border-border px-5 py-4 text-xs leading-5 text-muted-foreground">
           {t(
             'Добавляйте только собственные или лицензированные материалы и фиксируйте источник.',
           )}
@@ -817,7 +825,7 @@ function ReadingQuestionFields({
   const multiSelect = groupType === 'multiple_choice' && question.points > 1
 
   return (
-    <div className="grid gap-4 rounded-lg border border-[#deded9] bg-white p-4">
+    <div className="grid gap-4 rounded-lg border border-border bg-card p-4">
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="grid gap-2">
           <Label>{t('Номер в тесте')}</Label>

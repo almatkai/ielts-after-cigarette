@@ -38,13 +38,13 @@ export function GuestTrialCard() {
   return (
     <section
       aria-label={t('Бесплатный Full Mock')}
-      className="grid gap-4 rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7"
+      className="grid gap-4 rounded-xl border border-primary-soft bg-card p-5 sm:p-7"
     >
       <div>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">
           {t('Полный пробный IELTS')}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#69696d]">
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
           {t('Проверьте свой уровень IELTS — пройдите полный пробный тест.')}
         </p>
       </div>
@@ -67,14 +67,14 @@ export function GuestTrialCard() {
             />
           ) : null}
           {config.data && !config.data.enabled ? (
-            <p role="status" className="text-sm text-[#69696d]">
+            <p role="status" className="text-sm text-muted-foreground">
               {t(
                 'Гостевой запуск пока недоступен. Войдите в аккаунт для подготовки.',
               )}
             </p>
           ) : null}
           {config.isError || start.isError ? (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-destructive">
               {t(getErrorMessage(start.error ?? config.error))}
             </p>
           ) : null}
@@ -93,7 +93,7 @@ export function GuestTrialCard() {
               ? t('Готовим тест…')
               : t('Начать бесплатный Full Mock')}
           </Button>
-          <p className="text-xs leading-5 text-[#808084]">
+          <p className="text-xs leading-5 text-muted-foreground">
             {t('Нажимая «Начать», вы принимаете')}{' '}
             <Link to="/terms" className="underline">
               {t('условия использования')}
@@ -108,9 +108,12 @@ export function GuestTrialCard() {
           </p>
         </>
       )}
-      <p className="text-sm text-[#69696d]">
+      <p className="text-sm text-muted-foreground">
         {t('Для других тестов')}{' '}
-        <Link to="/login" className="font-semibold text-[#2563eb] underline">
+        <Link
+          to="/login"
+          className="font-semibold text-primary-hover underline"
+        >
           {t('войдите в аккаунт')}
         </Link>
         .

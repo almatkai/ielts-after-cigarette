@@ -37,7 +37,7 @@ import { useLanguage } from '@/lib/i18n'
 import type { ProfileForm } from '@/features/ielts/api'
 
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const emptyProfileForm: ProfileForm = {
   firstName: '',
@@ -124,8 +124,8 @@ export function ProfilePage() {
 
   if (profileQuery.isPending) {
     return (
-      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
-        <CardContent className="p-8 text-center text-sm text-[#69696d]">
+      <Card className="mx-auto max-w-[1120px] rounded-[10px] border-border">
+        <CardContent className="p-8 text-center text-sm text-muted-foreground">
           {t('Загружаем профиль…')}
         </CardContent>
       </Card>
@@ -134,9 +134,9 @@ export function ProfilePage() {
 
   if (profileQuery.isError) {
     return (
-      <Card className="mx-auto max-w-[1120px] rounded-[16px] border-[#e7e7e4]">
+      <Card className="mx-auto max-w-[1120px] rounded-[10px] border-border">
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <p className="text-sm font-semibold text-[#111111]">
+          <p className="text-sm font-semibold text-foreground">
             {t('Не удалось загрузить профиль')}
           </p>
           <Button
@@ -155,9 +155,9 @@ export function ProfilePage() {
   return (
     <div className="mx-auto w-full min-w-0 max-w-[1120px]">
       {/* 1. Блок Фото профиля */}
-      <Card className="group mb-4 sm:mb-5 gap-0 overflow-hidden rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
+      <Card className="group mb-4 sm:mb-5 gap-0 overflow-hidden rounded-[10px] sm:rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong">
         <CardContent className="flex flex-col gap-4 p-3.5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-          <div className="grid size-16 shrink-0 place-items-center rounded-full border border-[#e7e7e4] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:border-blue-200 sm:size-24">
+          <div className="grid size-16 shrink-0 place-items-center rounded-full border border-border bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary group-hover:border-border-strong sm:size-24">
             <User
               className="size-7 sm:size-11 transition-colors"
               strokeWidth={1.45}
@@ -166,10 +166,10 @@ export function ProfilePage() {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-[#111111]">
+            <h3 className="text-sm sm:text-base font-semibold tracking-[-0.02em] text-foreground">
               {t('Фото профиля')}
             </h3>
-            <p className="mt-0.5 sm:mt-1 max-w-lg text-xs sm:text-sm leading-5 sm:leading-6 text-[#69696d]">
+            <p className="mt-0.5 sm:mt-1 max-w-lg text-xs sm:text-sm leading-5 sm:leading-6 text-muted-foreground">
               {t(
                 'Загрузите JPG, PNG или WebP. Рекомендуемый размер — от 400 × 400 пикселей.',
               )}
@@ -188,10 +188,10 @@ export function ProfilePage() {
             type="button"
             variant="outline"
             onClick={() => photoInputRef.current?.click()}
-            className="h-10 shrink-0 rounded-[9px] border-[#deded9] bg-white px-4 shadow-none hover:border-blue-300 hover:text-blue-600 transition-colors"
+            className="h-10 shrink-0 rounded-[9px] border-border bg-card px-4 shadow-none hover:border-border-strong hover:text-primary transition-colors"
           >
             <Camera
-              className="transition-colors group-hover:text-blue-600"
+              className="transition-colors group-hover:text-primary"
               aria-hidden
             />
             {t('Загрузить фото')}
@@ -202,10 +202,10 @@ export function ProfilePage() {
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
         <div className="grid min-w-0 gap-5 [&>*]:min-w-0">
           {/* 2. Блок Личные данные */}
-          <Card className="group gap-0 rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
+          <Card className="group gap-0 rounded-[10px] sm:rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong">
+            <CardHeader className="border-b border-border p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <User
                     className="size-4 sm:size-[18px] transition-colors"
                     aria-hidden
@@ -256,7 +256,7 @@ export function ProfilePage() {
                   <Label htmlFor="email">{t('Электронная почта')}</Label>
                   <div className="relative">
                     <Sms
-                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#9a9a9d] transition-colors group-hover:text-[#3b82f6]"
+                      className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-hover:text-primary"
                       aria-hidden
                     />
                     <Input
@@ -271,24 +271,24 @@ export function ProfilePage() {
                       className={`${fieldClassName} pl-10`}
                     />
                   </div>
-                  <p className="text-xs text-[#808084]">
+                  <p className="text-xs text-muted-foreground">
                     {t('Изменение email пока не поддерживается backend.')}
                   </p>
                 </div>
                 {profileMessage ? (
                   <p
-                    className="text-sm text-[#69696d] sm:col-span-2"
+                    className="text-sm text-muted-foreground sm:col-span-2"
                     role="status"
                   >
                     {t(profileMessage)}
                   </p>
                 ) : null}
               </CardContent>
-              <CardFooter className="justify-end border-t border-[#ededeb] px-3.5 py-3 sm:px-6 sm:py-4">
+              <CardFooter className="justify-end border-t border-border px-3.5 py-3 sm:px-6 sm:py-4">
                 <Button
                   type="submit"
                   disabled={profileMutation.isPending}
-                  className="h-9 sm:h-10 rounded-[9px] bg-[#3b82f6] px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-[#2563eb]"
+                  className="h-9 sm:h-10 rounded-[9px] bg-primary px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-primary-hover"
                 >
                   {profileMutation.isPending
                     ? t('Сохраняем…')
@@ -299,10 +299,10 @@ export function ProfilePage() {
           </Card>
 
           {/* 3. Блок Параметры подготовки */}
-          <Card className="group gap-0 rounded-[14px] sm:rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-6">
+          <Card className="group gap-0 rounded-[10px] sm:rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong">
+            <CardHeader className="border-b border-border p-3.5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <DirectRight
                     className="size-4 sm:size-[18px] transition-colors"
                     aria-hidden
@@ -328,16 +328,16 @@ export function ProfilePage() {
                   idPrefix="profile-goal"
                 />
                 {goalMessage ? (
-                  <p className="text-sm text-[#69696d]" role="status">
+                  <p className="text-sm text-muted-foreground" role="status">
                     {t(goalMessage)}
                   </p>
                 ) : null}
               </CardContent>
-              <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+              <CardFooter className="justify-end border-t border-border px-5 py-4 sm:px-6">
                 <Button
                   type="submit"
                   disabled={goalMutation.isPending}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                 >
                   {goalMutation.isPending
                     ? t('Сохраняем…')
@@ -350,10 +350,10 @@ export function ProfilePage() {
 
         <aside className="grid min-w-0 gap-5 [&>*]:min-w-0">
           {/* 4. Блок Уведомления */}
-          <Card className="group gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)] transition-all hover:border-slate-300">
-            <CardHeader className="border-b border-[#ededeb] p-5">
+          <Card className="group gap-0 rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong">
+            <CardHeader className="border-b border-border p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d] transition-all duration-200 group-hover:bg-[#eff6ff] group-hover:text-[#3b82f6] group-hover:scale-105">
+                <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
                   <NotificationStatus
                     className="size-[18px] transition-colors"
                     aria-hidden
@@ -369,47 +369,47 @@ export function ProfilePage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="divide-y divide-[#ededeb] p-0">
+            <CardContent className="divide-y divide-border p-0">
               <div className="flex items-start justify-between gap-4 px-5 py-4">
                 <div>
                   <Label
                     htmlFor="lesson-reminders"
-                    className="leading-5 text-[#111111]"
+                    className="leading-5 text-foreground"
                   >
                     {t('Напоминания о занятиях')}
                   </Label>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {t('Перед запланированной практикой.')}
                   </p>
                 </div>
                 <Switch
                   id="lesson-reminders"
                   aria-label={t('Напоминания о занятиях')}
-                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
+                  className="mt-0.5 data-[state=checked]:bg-primary"
                 />
               </div>
               <div className="flex items-start justify-between gap-4 px-5 py-4">
                 <div>
                   <Label
                     htmlFor="weekly-report"
-                    className="leading-5 text-[#111111]"
+                    className="leading-5 text-foreground"
                   >
                     {t('Еженедельный отчёт')}
                   </Label>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {t('Краткая сводка прогресса за неделю.')}
                   </p>
                 </div>
                 <Switch
                   id="weekly-report"
                   aria-label={t('Еженедельный отчёт')}
-                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
+                  className="mt-0.5 data-[state=checked]:bg-primary"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
             <CardHeader className="p-5">
               <CardTitle className="text-base">
                 {t('Персонаж-помощник')}
@@ -423,11 +423,11 @@ export function ProfilePage() {
                 <div>
                   <Label
                     htmlFor="profile-mascot-toggle"
-                    className="leading-5 text-[#111111] cursor-pointer"
+                    className="leading-5 text-foreground cursor-pointer"
                   >
                     {t('Показывать питомца (Юки)')}
                   </Label>
-                  <p className="mt-1 text-xs leading-5 text-[#808084]">
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {t('Если скрыть, останется маленькая кнопка чата.')}
                   </p>
                 </div>
@@ -436,13 +436,13 @@ export function ProfilePage() {
                   checked={isMascotVisible}
                   onCheckedChange={setMascotVisible}
                   aria-label={t('Показывать питомца')}
-                  className="mt-0.5 data-[state=checked]:bg-[#3b82f6]"
+                  className="mt-0.5 data-[state=checked]:bg-primary"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-[0_10px_36px_rgba(17,17,17,0.035)]">
+          <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
             <CardHeader className="p-5">
               <CardTitle className="text-base">{t('Безопасность')}</CardTitle>
               <CardDescription>

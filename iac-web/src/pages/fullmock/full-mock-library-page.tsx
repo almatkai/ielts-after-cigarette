@@ -90,17 +90,17 @@ function AccountFullMockLibraryPage() {
             ? ` · ${overview.examType === 'academic' ? 'Academic' : 'General'}`
             : ''}
         </Badge>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="text-[28px] sm:text-[36px] mt-3 font-semibold tracking-normal">
           Полный пробный IELTS
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
           Мы автоматически подберём тесты из общей библиотеки. Сначала —
           задания, которые вы ещё не выполняли. Выбирать отдельный mock-тест не
           нужно.
         </p>
       </header>
 
-      <Card className="gap-0 overflow-hidden rounded-2xl border-[#e7e7e4] bg-white py-0 shadow-none">
+      <Card className="gap-0 overflow-hidden rounded-xl border-border bg-card py-0 shadow-none">
         <CardContent className="p-5 sm:p-7">
           <h2 className="text-lg font-semibold">
             Четыре секции в одной сессии
@@ -111,18 +111,18 @@ function AccountFullMockLibraryPage() {
           >
             {overview.banks.map((bank, index) => (
               <li key={bank.skill} className="flex items-center gap-3 text-sm">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#eff6ff] font-semibold text-[#2563eb]">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft font-semibold text-primary-hover">
                   {index + 1}
                 </span>
                 {labels[bank.skill]}
               </li>
             ))}
           </ol>
-          <p className="mt-5 flex items-center gap-2 text-sm text-[#69696d]">
+          <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="size-4" aria-hidden /> {overview.durationMinutes}{' '}
             минут · отдельные таймеры секций
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             После сдачи секции вы переходите к следующей. Ответы сохраняются, а
             после проверки всех четырёх секций появится общий Band Score.
           </p>
@@ -134,11 +134,11 @@ function AccountFullMockLibraryPage() {
           <h2 id="mock-bank-title" className="text-lg font-semibold">
             Ваш прогресс по доступным тестам
           </h2>
-          <p className="mt-1 text-sm leading-6 text-[#69696d]">
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
             Учитываются выполненные тесты и в практике, и в Full Mock. Повторные
             попытки не увеличивают счётчик.
           </p>
-          <div className="mt-4 divide-y divide-[#e7e7e4] rounded-2xl border border-[#e7e7e4] bg-white px-5 sm:px-7">
+          <div className="mt-4 divide-y divide-border rounded-xl border border-border bg-card px-5 sm:px-7">
             {overview.banks.map((bank) => (
               <div
                 key={bank.skill}
@@ -149,9 +149,9 @@ function AccountFullMockLibraryPage() {
                   aria-label={`${labels[bank.skill]}: выполнено тестов`}
                   max={Math.max(1, bank.total)}
                   value={bank.completed}
-                  className="h-2 w-full appearance-none overflow-hidden rounded-full bg-[#e7e7e4] [&::-moz-progress-bar]:bg-[#2563eb] [&::-webkit-progress-bar]:bg-[#e7e7e4] [&::-webkit-progress-value]:bg-[#2563eb]"
+                  className="h-2 w-full appearance-none overflow-hidden rounded-full bg-border [&::-moz-progress-bar]:bg-primary-hover [&::-webkit-progress-bar]:bg-border [&::-webkit-progress-value]:bg-primary-hover"
                 />
-                <p className="text-sm text-[#69696d]">
+                <p className="text-sm text-muted-foreground">
                   {bank.completed} из {bank.total} выполнено
                 </p>
               </div>
@@ -161,12 +161,12 @@ function AccountFullMockLibraryPage() {
       ) : (
         <div
           role="status"
-          className="rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm leading-6"
+          className="rounded-xl border border-border bg-card p-5 text-sm leading-6"
         >
           Выберите Academic или General в{' '}
           <Link
             to="/profile"
-            className="font-semibold text-[#2563eb] underline"
+            className="font-semibold text-primary-hover underline"
           >
             профиле
           </Link>
@@ -177,7 +177,7 @@ function AccountFullMockLibraryPage() {
       {exhausted.length > 0 ? (
         <div
           role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900"
+          className="rounded-xl border border-warning-bg bg-warning-bg p-5 text-sm leading-6 text-warning-fg"
         >
           <h2 className="font-semibold">
             В следующих mock-тестах будут повторы
@@ -210,7 +210,7 @@ function AccountFullMockLibraryPage() {
       {overview.examType && missing.length > 0 ? (
         <div
           role="status"
-          className="rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm leading-6"
+          className="rounded-xl border border-border bg-card p-5 text-sm leading-6"
         >
           Для нового Full Mock пока недостаточно полных опубликованных тестов:{' '}
           {missing.map((bank) => labels[bank.skill]).join(', ')}.{' '}
@@ -222,7 +222,7 @@ function AccountFullMockLibraryPage() {
 
       <div className="grid gap-3">
         {start.isError ? (
-          <p role="alert" className="text-sm text-[#e23b3b]">
+          <p role="alert" className="text-sm text-destructive">
             {getErrorMessage(start.error)}
           </p>
         ) : null}

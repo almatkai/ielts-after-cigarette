@@ -32,7 +32,7 @@ export function GuestAttemptReview({
   const skill =
     attempt.materialType.charAt(0).toUpperCase() + attempt.materialType.slice(1)
   const buttonClass =
-    'inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+    'inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   // An explicit server projection is required, including during mixed-version rollouts.
   const safeAttempt = {
     ...attempt,
@@ -63,13 +63,15 @@ export function GuestAttemptReview({
               </Link>
             </Button>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h1 className="text-2xl font-semibold">{skill}: разбор ошибок</h1>
+              <h1 className="text-[28px] sm:text-[36px] font-semibold">
+                {skill}: разбор ошибок
+              </h1>
               <GuestLockedBand skill={skill} />
             </div>
           </>
         ) : null}
         {preview && preview.totalMistakes > 0 ? (
-          <p className="text-sm text-[#69696d]">
+          <p className="text-sm text-muted-foreground">
             <span>Без аккаунта доступны 30% ошибок</span> ·{' '}
             {preview.availableMistakes} из {preview.totalMistakes} разборов.
           </p>
@@ -84,7 +86,7 @@ export function GuestAttemptReview({
           <>
             <h2 className="text-lg font-semibold">{skill} · рекомендации</h2>
             {!preview?.totalMistakes ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-muted-foreground">
                 ИИ не выделил отдельных рекомендаций. Полный отчёт доступен
                 после входа.
               </p>
@@ -101,7 +103,7 @@ export function GuestAttemptReview({
                   </p>
                   {item.locked ? (
                     <GuestSignInButton
-                      className={`${buttonClass} border-[#e7e7e4] text-[#69696d]`}
+                      className={`${buttonClass} border-border text-muted-foreground`}
                       label={`Разобрать рекомендацию ${item.number}: войти в аккаунт`}
                     >
                       <Lock aria-hidden className="size-4" />
@@ -110,7 +112,7 @@ export function GuestAttemptReview({
                   ) : (
                     <button
                       type="button"
-                      className={`${buttonClass} border-blue-200 text-[#2563eb] hover:bg-blue-50`}
+                      className={`${buttonClass} border-border-strong text-primary-hover hover:bg-primary-soft`}
                       onClick={() => setImprovement(item.text ?? '')}
                       aria-label={`Разобрать рекомендацию ${item.number}`}
                     >

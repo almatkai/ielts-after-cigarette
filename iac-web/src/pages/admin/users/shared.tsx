@@ -34,7 +34,7 @@ export function UserAvatar({
   return (
     <span
       aria-hidden
-      className="grid size-10 shrink-0 place-items-center rounded-full bg-[#eff6ff] text-sm font-semibold text-[#2563eb]"
+      className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-primary-hover"
     >
       {user.displayName
         .trim()
@@ -66,7 +66,7 @@ export function Pagination({
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
-          className="border-[#deded9]"
+          className="border-border"
           size="sm"
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
@@ -78,7 +78,7 @@ export function Pagination({
         </span>
         <Button
           variant="outline"
-          className="border-[#deded9]"
+          className="border-border"
           size="sm"
           disabled={page >= pages}
           onClick={() => onChange(page + 1)}
@@ -97,16 +97,9 @@ export function QueryError({
   retry: () => void
 }) {
   return (
-    <div
-      role="alert"
-      className="rounded-xl border border-[#e7e7e4] bg-white p-6"
-    >
+    <div role="alert" className="rounded-xl border border-border bg-card p-6">
       <p className="text-sm text-destructive">{message}</p>
-      <Button
-        className="mt-3 border-[#deded9]"
-        variant="outline"
-        onClick={retry}
-      >
+      <Button className="mt-3 border-border" variant="outline" onClick={retry}>
         Повторить
       </Button>
     </div>

@@ -11,11 +11,11 @@ export function LoginToContinue() {
 
 export function GuestAccessGate() {
   return (
-    <section className="mx-auto grid max-w-2xl gap-4 rounded-2xl border border-[#e7e7e4] bg-white p-6 sm:p-8">
+    <section className="mx-auto grid max-w-2xl gap-4 rounded-xl border border-border bg-card p-6 sm:p-8">
       <h2 className="text-xl font-semibold">
         Войдите в аккаунт, чтобы продолжить
       </h2>
-      <p className="text-sm leading-6 text-[#69696d]">
+      <p className="text-sm leading-6 text-muted-foreground">
         Другие тесты, план подготовки и история прогресса доступны в аккаунте.
         Без регистрации можно пройти один полный пробный IELTS и разобрать
         результаты.

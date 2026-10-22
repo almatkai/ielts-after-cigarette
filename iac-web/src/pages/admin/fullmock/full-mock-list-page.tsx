@@ -25,10 +25,8 @@ export function FullMockListPage() {
     <div className="grid gap-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-[-0.04em]">
-            Full Mock
-          </h1>
-          <p className="mt-1 text-sm text-[#69696d]">
+          <h1 className="text-2xl font-semibold tracking-normal">Full Mock</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Архив ручных наборов. Новые Full Mock собираются автоматически из
             опубликованных тестов Listening, Reading, Writing и Speaking.
           </p>
@@ -36,7 +34,7 @@ export function FullMockListPage() {
       </div>
       {query.data.items.length === 0 ? (
         <Card className="shadow-none">
-          <CardContent className="p-8 text-sm text-[#69696d]">
+          <CardContent className="p-8 text-sm text-muted-foreground">
             В архиве нет ручных наборов. Создавать отдельные Full Mock больше не
             нужно.
           </CardContent>
@@ -49,12 +47,12 @@ export function FullMockListPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <ClipboardTick
-                      className="size-5 text-[#3b82f6]"
+                      className="size-5 text-primary"
                       aria-hidden
                     />
                     {item.title}
                   </CardTitle>
-                  <p className="mt-2 text-sm text-[#69696d]">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {item.examType} · {item.durationMinutes} минут · {item.slug}
                   </p>
                 </div>

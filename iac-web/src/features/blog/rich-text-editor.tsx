@@ -146,7 +146,7 @@ export function BlogRichTextEditor({
   )
 
   return (
-    <div className="rounded-[12px] border border-[#e7e7e4] bg-white">
+    <div className="rounded-[10px] border border-border bg-card">
       <Toolbar
         editor={editor}
         disabled={disabled}
@@ -166,8 +166,8 @@ export function BlogRichTextEditor({
       {uploading > 0 || uploadError ? (
         <p
           className={cn(
-            'border-b border-[#ededeb] px-4 py-2 text-xs',
-            uploadError ? 'text-[#c92f2f]' : 'text-[#69696d]',
+            'border-b border-border px-4 py-2 text-xs',
+            uploadError ? 'text-destructive' : 'text-muted-foreground',
           )}
         >
           {uploadError ?? 'Сжимаем и загружаем изображение…'}
@@ -207,11 +207,11 @@ function Toolbar({
   const state = useEditorState({
     editor,
     selector: ({ editor: current }) => ({
-      block: (current.isActive('heading', { level: 2 })
+      block: current.isActive('heading', { level: 2 })
         ? 'h2'
         : current.isActive('heading', { level: 3 })
           ? 'h3'
-          : 'paragraph'),
+          : 'paragraph',
       bold: current.isActive('bold'),
       italic: current.isActive('italic'),
       underline: current.isActive('underline'),
@@ -255,7 +255,7 @@ function Toolbar({
     <div
       role="toolbar"
       aria-label="Форматирование текста"
-      className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-[12px] border-b border-[#ededeb] bg-white/95 px-2 py-1.5 backdrop-blur"
+      className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-[10px] border-b border-border bg-card px-2 py-1.5 "
     >
       <ToolButton
         label="Отменить (Ctrl+Z)"
@@ -275,7 +275,7 @@ function Toolbar({
         value={state.block}
         disabled={disabled}
         onChange={(event) => setBlock(event.target.value as BlockType)}
-        className="h-8 rounded-[8px] bg-transparent px-1.5 text-sm font-medium text-[#111111] outline-none hover:bg-[#f4f4f1]"
+        className="h-8 rounded-[8px] bg-transparent px-1.5 text-sm font-medium text-foreground outline-none hover:bg-muted"
       >
         {blockTypes.map((type) => (
           <option key={type.value} value={type.value}>
@@ -425,8 +425,8 @@ function ToolButton({
       aria-pressed={active}
       title={label}
       className={cn(
-        'grid size-8 place-items-center rounded-[8px] text-[#525256] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111] disabled:pointer-events-none disabled:opacity-35',
-        active && 'bg-[#eff6ff] text-[#1d4ed8] hover:bg-[#e3eefe]',
+        'grid size-8 place-items-center rounded-[8px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-35',
+        active && 'bg-primary-soft text-primary hover:bg-primary-soft',
       )}
     >
       <Icon className="size-[18px]" />
@@ -435,5 +435,5 @@ function ToolButton({
 }
 
 function Divider() {
-  return <span className="mx-0.5 h-5 w-px bg-[#e7e7e4]" aria-hidden />
+  return <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
 }

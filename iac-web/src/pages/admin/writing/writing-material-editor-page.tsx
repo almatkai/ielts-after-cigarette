@@ -35,7 +35,7 @@ import type {
 } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
 
-const fieldClassName = 'border-[#deded9] bg-white shadow-none'
+const fieldClassName = 'border-border bg-card shadow-none'
 
 const emptyForm: WritingMaterialInput = {
   slug: '',
@@ -180,12 +180,12 @@ export function WritingMaterialEditorPage({
   }
 
   if (materialQuery.isPending && editing) {
-    return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
+    return <p className="text-sm text-muted-foreground">Загружаем материал…</p>
   }
   if (materialQuery.isError) {
     return (
       <Card className="shadow-none">
-        <CardContent className="p-6 text-center text-sm text-[#e23b3b]">
+        <CardContent className="p-6 text-center text-sm text-destructive">
           Не удалось загрузить материал.
         </CardContent>
       </Card>
@@ -211,13 +211,17 @@ export function WritingMaterialEditorPage({
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
+          >
             <Link to="/admin/writing/materials">
               <ArrowLeft aria-hidden />К библиотеке
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-3xl font-semibold tracking-normal">
               {editing ? 'Редактор Writing' : 'Новый Writing-материал'}
             </h1>
             {material ? (
@@ -225,7 +229,7 @@ export function WritingMaterialEditorPage({
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
+            <p className="mt-2 text-xs text-muted-foreground">
               Версия {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
@@ -290,7 +294,7 @@ export function WritingMaterialEditorPage({
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
           role="status"
         >
-          <TickCircle className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-success" aria-hidden />
           {message}
         </p>
       ) : null}
@@ -299,7 +303,7 @@ export function WritingMaterialEditorPage({
       archiveMutation.isError ||
       uploadMutation.isError ? (
         <p
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-sm text-destructive"
           role="alert"
         >
           {getErrorMessage(
@@ -485,7 +489,7 @@ function TaskEditor({
                 </select>
               </Field>
               <Field label="Изображение задания">
-                <label className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#deded9] bg-white px-3 text-sm font-medium">
+                <label className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-border bg-card px-3 text-sm font-medium">
                   <DocumentUpload className="size-4" aria-hidden />
                   {uploadPending
                     ? 'Загружаем…'
@@ -505,7 +509,7 @@ function TaskEditor({
                   />
                 </label>
                 {task.visualAssetId ? (
-                  <p className="text-xs text-emerald-700">
+                  <p className="text-xs text-success">
                     Изображение прикреплено: {task.visualAssetId}
                   </p>
                 ) : null}
@@ -521,7 +525,7 @@ function TaskEditor({
                 placeholder="Опишите все ключевые факты, значения, изменения и обязательные сравнения. Студент этот текст не увидит."
               />
             </Field>
-            <p className="text-xs leading-5 text-[#69696d]">
+            <p className="text-xs leading-5 text-muted-foreground">
               Текстовая AI-модель использует эту разметку, чтобы проверить
               точность описания изображения. Не добавляйте готовое эссе — только
               проверяемые факты и ожидаемые сравнения.

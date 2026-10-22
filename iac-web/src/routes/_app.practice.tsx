@@ -5,7 +5,7 @@ import { PracticePage } from '@/pages/practice/ui/practice-page'
 export const Route = createFileRoute('/_app/practice')({
   head: () => ({
     meta: [
-      { title: 'Практика — Daiyndyq IELTS' },
+      { title: 'Практика — Yrys Academy' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

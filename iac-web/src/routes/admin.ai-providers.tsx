@@ -6,6 +6,6 @@ export const Route = createFileRoute('/admin/ai-providers')({
     if (!context.auth.hasAnyRole(['ADMIN']))
       throw redirect({ to: '/forbidden' })
   },
-  head: () => ({ meta: [{ title: 'AI-провайдеры — Daiyndyq IELTS' }] }),
+  head: () => ({ meta: [{ title: 'AI-провайдеры — Yrys Academy' }] }),
   component: AIProvidersPage,
 })

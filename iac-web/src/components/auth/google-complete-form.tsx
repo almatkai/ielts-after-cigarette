@@ -113,10 +113,10 @@ export function GoogleCompleteForm({
   return (
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
-        <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
+        <CardTitle className="text-3xl tracking-[-0.04em] text-foreground">
           Давайте создадим вам аккаунт
         </CardTitle>
-        <CardDescription className="mt-2 text-[#475569]">
+        <CardDescription className="mt-2 text-muted-foreground">
           Вход через Google выполнен: {pending.profile.email}. Заполните данные
           ниже, чтобы завершить регистрацию.
         </CardDescription>
@@ -198,7 +198,7 @@ export function GoogleCompleteForm({
                 getFieldError(field.state.meta.errors)
               return (
                 <div className="mb-5">
-                  <div className="flex min-h-11 items-start gap-3 text-sm leading-6 text-[#475569]">
+                  <div className="flex min-h-11 items-start gap-3 text-sm leading-6 text-muted-foreground">
                     <input
                       id="acceptedTerms"
                       type="checkbox"
@@ -207,7 +207,7 @@ export function GoogleCompleteForm({
                         field.handleChange(event.target.checked)
                         clearFieldError('acceptedTerms')
                       }}
-                      className="mt-1 size-4 shrink-0 cursor-pointer rounded border-[#cbd5e1] accent-[#3b82f6]"
+                      className="mt-1 size-4 shrink-0 cursor-pointer rounded border-border-strong accent-primary"
                       aria-invalid={Boolean(termsError)}
                     />
                     <span>
@@ -218,7 +218,7 @@ export function GoogleCompleteForm({
                         to="/terms"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+                        className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
                       >
                         условия использования
                       </Link>
@@ -230,7 +230,7 @@ export function GoogleCompleteForm({
                         to="/privacy"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+                        className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
                       >
                         политику конфиденциальности
                       </Link>
@@ -240,7 +240,7 @@ export function GoogleCompleteForm({
                     </span>
                   </div>
                   {termsError ? (
-                    <p className="mt-1 text-xs text-[#dc2626]" role="alert">
+                    <p className="mt-1 text-xs text-destructive" role="alert">
                       {termsError}
                     </p>
                   ) : null}
@@ -257,7 +257,7 @@ export function GoogleCompleteForm({
                 type="submit"
                 size="lg"
                 disabled={!canSubmit || isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {isSubmitting ? 'Создаём аккаунт…' : 'Создать аккаунт'}
               </Button>
@@ -266,7 +266,7 @@ export function GoogleCompleteForm({
 
           {submissionError ? (
             <div className="mt-4 text-center">
-              <p className="text-sm leading-6 text-[#dc2626]" role="alert">
+              <p className="text-sm leading-6 text-destructive" role="alert">
                 {submissionError}
               </p>
               {sessionExpired ? (
@@ -274,7 +274,7 @@ export function GoogleCompleteForm({
                   type="button"
                   variant="link"
                   onClick={onBack}
-                  className="mt-1 inline-block h-auto p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
+                  className="mt-1 inline-block h-auto p-0 text-sm font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-primary"
                 >
                   Вернуться ко входу
                 </Button>
@@ -285,13 +285,13 @@ export function GoogleCompleteForm({
       </CardContent>
 
       <CardFooter className="justify-center px-6 pt-7 pb-8 sm:px-8">
-        <p className="text-center text-sm text-[#475569]">
+        <p className="text-center text-sm text-muted-foreground">
           Уже есть аккаунт?{' '}
           <Button
             type="button"
             variant="link"
             onClick={onBack}
-            className="h-auto min-h-11 p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
+            className="h-auto min-h-11 p-0 text-sm font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-primary"
           >
             Вернуться ко входу
           </Button>

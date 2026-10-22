@@ -8,10 +8,10 @@ export function BandChange({ value }: { value: number | null }) {
       className={cn(
         'text-[11px] font-medium tabular-nums',
         value > 0
-          ? 'text-emerald-700'
+          ? 'text-success'
           : value < 0
-            ? 'text-amber-700'
-            : 'text-[#808084]',
+            ? 'text-warning-fg'
+            : 'text-muted-foreground',
       )}
     >
       {value === 0

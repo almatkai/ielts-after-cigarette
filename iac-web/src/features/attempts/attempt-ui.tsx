@@ -59,7 +59,7 @@ export function ExamLoadingScreen({
         {/* Sleek Minimalist Spinner */}
         <div className="relative mb-4 flex size-10 items-center justify-center">
           <svg
-            className="size-8 animate-spin text-blue-600"
+            className="size-8 animate-spin text-primary"
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
@@ -81,26 +81,29 @@ export function ExamLoadingScreen({
         </div>
 
         {/* Title */}
-        <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">
+        <h2 className="text-base sm:text-lg font-semibold tracking-tight text-foreground">
           {label}
         </h2>
 
         {/* Subtitle */}
         {description ? (
-          <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500 max-w-[320px]">
+          <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-muted-foreground max-w-[320px]">
             {description}
           </p>
         ) : null}
 
         {/* Minimalist Progress Line */}
-        <div className="relative mt-5 h-1 w-36 sm:w-44 overflow-hidden rounded-full bg-slate-100">
-          <div className="animate-exam-loading-bar h-full w-full rounded-full bg-blue-600" />
+        <div className="relative mt-5 h-1 w-36 sm:w-44 overflow-hidden rounded-full bg-muted">
+          <div className="animate-exam-loading-bar h-full w-full rounded-full bg-primary" />
         </div>
 
         {/* Discreet Timer Tip */}
         {showTimerTip ? (
-          <p className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
-            <Clock className="size-3.5 text-slate-400" aria-hidden="true" />
+          <p className="mt-5 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+            <Clock
+              className="size-3.5 text-muted-foreground"
+              aria-hidden="true"
+            />
             <span>Таймер запустится только после загрузки</span>
           </p>
         ) : null}
@@ -119,15 +122,15 @@ export function LibraryCardsSkeleton({ count = 4 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <Card
           key={i}
-          className="rounded-[16px] border border-[#e7e7e4] bg-white shadow-[0_10px_36px_rgba(17,17,17,0.035)]"
+          className="rounded-[10px] border border-border bg-card shadow-none"
         >
           <CardContent className="grid gap-3 p-5 sm:p-6">
-            <div className="size-10 animate-pulse rounded-[10px] bg-[#f1f5f9]" />
+            <div className="size-10 animate-pulse rounded-[10px] bg-muted" />
             <div className="space-y-2">
-              <div className="h-5 w-3/5 animate-pulse rounded bg-[#f1f5f9]" />
-              <div className="h-4 w-2/5 animate-pulse rounded bg-[#f1f5f9]" />
+              <div className="h-5 w-3/5 animate-pulse rounded bg-muted" />
+              <div className="h-4 w-2/5 animate-pulse rounded bg-muted" />
             </div>
-            <div className="h-10 w-28 animate-pulse rounded-[9px] bg-[#f1f5f9]" />
+            <div className="h-10 w-28 animate-pulse rounded-[9px] bg-muted" />
           </CardContent>
         </Card>
       ))}
@@ -151,9 +154,9 @@ export function LoadingState({
       aria-busy="true"
       aria-live="polite"
     >
-      <div className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+      <div className="flex size-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
         <svg
-          className="keep-motion size-5 animate-spin text-blue-600"
+          className="keep-motion size-5 animate-spin text-primary"
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
@@ -174,7 +177,7 @@ export function LoadingState({
         </svg>
       </div>
       {label ? (
-        <p className="text-sm font-medium text-[#64748b]">{label}</p>
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
       ) : null}
     </div>
   )
@@ -191,15 +194,17 @@ export function ErrorState({
 }) {
   return (
     <div className="flex min-h-[60dvh] w-full flex-1 items-center justify-center p-4 sm:p-6">
-      <Card className="w-full max-w-[460px] rounded-2xl border border-[#e2e8f0] bg-white p-7 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-9">
+      <Card className="w-full max-w-[460px] rounded-xl border border-border bg-card p-7 text-center shadow-none sm:p-9">
         <CardContent className="grid justify-items-center gap-4 p-0 text-center">
-          <div className="flex size-14 items-center justify-center rounded-2xl border border-red-100 bg-red-50 text-[#e23b3b]">
+          <div className="flex size-14 items-center justify-center rounded-xl border border-destructive-soft bg-destructive-soft text-destructive">
             <CloseCircle className="size-7" aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-[#0f172a]">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
             {title}
           </h2>
-          <p className="text-sm leading-relaxed text-[#64748b]">{message}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {message}
+          </p>
           <Button onClick={onRetry} className="mt-2 w-full sm:w-auto">
             Повторить попытку
           </Button>
@@ -219,7 +224,7 @@ export function SaveIndicator({ state }: { state: SaveState }) {
         : 'Не удалось сохранить'
   return (
     <span
-      className={`text-xs ${state === 'error' ? 'text-[#e23b3b]' : 'text-[#69696d]'}`}
+      className={`text-xs ${state === 'error' ? 'text-destructive' : 'text-muted-foreground'}`}
       role="status"
     >
       {text}
@@ -248,7 +253,9 @@ export function TimeBadge({
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium tabular-nums ${
-        danger ? 'border-red-200 bg-red-50 text-[#e23b3b]' : 'bg-white'
+        danger
+          ? 'border-destructive-soft bg-destructive-soft text-destructive'
+          : 'bg-card'
       }`}
       aria-label={label}
     >
@@ -307,7 +314,7 @@ export function ChoiceOptions({
           {options.map((option) => (
             <label
               key={option.id}
-              className="flex cursor-pointer gap-2 rounded-lg border bg-white p-3 text-sm"
+              className="flex cursor-pointer gap-2 rounded-lg border bg-card p-3 text-sm"
             >
               <input
                 type="checkbox"
@@ -332,7 +339,7 @@ export function ChoiceOptions({
             </label>
           ))}
         </div>
-        <p className="text-xs text-[#69696d]">
+        <p className="text-xs text-muted-foreground">
           Выберите {limit} варианта: {selected.length} из {limit}.
         </p>
       </>
@@ -345,7 +352,7 @@ export function ChoiceOptions({
       {options.map((option) => (
         <label
           key={option.id}
-          className="flex cursor-pointer gap-2 rounded-lg border bg-white p-3 text-sm"
+          className="flex cursor-pointer gap-2 rounded-lg border bg-card p-3 text-sm"
         >
           <input
             type="radio"
@@ -384,19 +391,19 @@ export function AttemptSubmitBar({
   isSavingAndExiting?: boolean
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-4">
-      <p className="text-sm text-[#69696d]">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card p-4">
+      <p className="text-sm text-muted-foreground">
         Отвечено на {answeredCount} из {totalQuestions} вопросов.
         {disabledMessage ? ` ${disabledMessage}` : ''}
       </p>
-      <div className="flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
         {onContinueLater ? (
           <Button
             type="button"
             variant="outline"
             disabled={isSubmitting || isSavingAndExiting || disabled}
             onClick={onContinueLater}
-            className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
+            className="rounded-[10px] border-border text-foreground hover:bg-card"
           >
             {isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
           </Button>
@@ -443,15 +450,15 @@ export function AttemptResultSummary({
     <Card className="shadow-none">
       <CardContent className="grid gap-6 p-6 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
+          <p className="text-xs font-semibold normal-case text-muted-foreground">
             Band
           </p>
-          <p className="mt-1 text-5xl font-semibold tracking-[-0.04em] text-[#3b82f6]">
+          <p className="font-display mt-1 text-5xl font-semibold tracking-normal text-primary">
             {attempt.band !== null ? attempt.band.toFixed(1) : '—'}
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
+          <p className="text-xs font-semibold normal-case text-muted-foreground">
             Баллы
           </p>
           <p className="mt-1 text-2xl font-semibold">
@@ -459,7 +466,7 @@ export function AttemptResultSummary({
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#69696d]">
+          <p className="text-xs font-semibold normal-case text-muted-foreground">
             Верных ответов
           </p>
           <p className="mt-1 text-2xl font-semibold">
@@ -483,36 +490,38 @@ export function ReviewQuestion({
   return (
     <div className="grid gap-2 rounded-lg border p-3 text-sm">
       <p className="font-medium">
-        <span className="mr-2 text-[#3b82f6]">{item.number}.</span>
+        <span className="mr-2 text-primary">{item.number}.</span>
         {item.prompt.replace('{{answer}}', '_____')}
       </p>
       <p className="flex items-center gap-2">
         {item.isCorrect ? (
           <TickCircle
-            className="size-4 shrink-0 text-emerald-600"
+            className="size-4 shrink-0 text-success"
             aria-label="Верно"
           />
         ) : (
           <CloseCircle
-            className="size-4 shrink-0 text-[#3b82f6]"
+            className="size-4 shrink-0 text-primary"
             aria-label="Неверно"
           />
         )}
         <span>
           Ваш ответ: <strong>{formatAnswer(item.answer, options)}</strong>
         </span>
-        <span className="text-[#69696d]">+{item.pointsAwarded} б.</span>
+        <span className="text-muted-foreground">+{item.pointsAwarded} б.</span>
       </p>
       {!item.isCorrect ? (
         <p>
           Правильный ответ:{' '}
-          <strong className="text-emerald-700">
+          <strong className="text-success">
             {formatAnswer(item.correctAnswer, options)}
           </strong>
         </p>
       ) : null}
       {item.explanation ? (
-        <p className="whitespace-pre-wrap text-[#69696d]">{item.explanation}</p>
+        <p className="whitespace-pre-wrap text-muted-foreground">
+          {item.explanation}
+        </p>
       ) : null}
     </div>
   )
@@ -596,7 +605,7 @@ export function AttemptResultHeader({
           asChild
           variant="ghost"
           size="sm"
-          className="gap-2 rounded-[10px] text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+          className="gap-2 rounded-[10px] text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           {fullMockSessionId ? (
             <Link
@@ -615,13 +624,13 @@ export function AttemptResultHeader({
         </Button>
       </div>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
         {onRetake && (
           <Button
             size="sm"
             onClick={onRetake}
             disabled={isRetaking}
-            className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
+            className="gap-1.5 rounded-[10px] bg-primary text-primary-foreground hover:bg-primary shadow-none"
           >
             <Refresh2
               className={cn('size-3.5', isRetaking && 'animate-spin')}
@@ -634,7 +643,7 @@ export function AttemptResultHeader({
           asChild
           variant="outline"
           size="sm"
-          className="rounded-[10px] border-[#e7e7e4] text-slate-700 hover:bg-slate-50"
+          className="rounded-[10px] border-border text-foreground hover:bg-card"
         >
           <Link to={`/${skill}`}>К списку тестов</Link>
         </Button>
@@ -724,30 +733,30 @@ export function AttemptPerformanceReport({
   const incorrectCount = Math.max(0, effectiveTotal - effectiveCorrect)
 
   return (
-    <div className="rounded-[20px] border border-[#e7e7e4] bg-white p-5 sm:p-7 shadow-xs">
-      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 gap-0">
+    <div className="rounded-[10px] border border-border bg-card p-5 sm:p-7 shadow-none">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border gap-0">
         {/* ЗОНА 1: IELTS Band Score */}
         <div className="pb-4 md:pb-0 md:pr-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold normal-case text-muted-foreground">
                 IELTS Band Score
               </span>
-              <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#3b82f6] border border-blue-100/80">
+              <span className="inline-flex items-center rounded-sm bg-primary-soft px-2.5 py-0.5 text-xs font-semibold text-primary border border-border-strong/80">
                 {cefrDescription}
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-5xl sm:text-6xl font-extrabold tracking-tight text-[#3b82f6]">
+              <span className="font-display text-5xl sm:text-6xl font-semibold tracking-normal text-primary">
                 {band !== null && band !== undefined ? band.toFixed(1) : '—'}
               </span>
-              <span className="text-sm font-semibold text-slate-400">
+              <span className="text-sm font-semibold text-muted-foreground">
                 из 9.0
               </span>
             </div>
           </div>
           {bandNote ? (
-            <p className="mt-3 text-xs text-slate-500">{bandNote}</p>
+            <p className="mt-3 text-xs text-muted-foreground">{bandNote}</p>
           ) : null}
         </div>
 
@@ -756,10 +765,10 @@ export function AttemptPerformanceReport({
           {criteria && criteria.length > 0 ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-bold normal-case text-muted-foreground">
                   Критерии IELTS
                 </span>
-                <span className="text-xs font-bold text-[#3b82f6]">
+                <span className="text-xs font-bold text-primary">
                   {criteria.filter((c) => !c.unavailable).length <
                   criteria.length
                     ? `${criteria.filter((c) => !c.unavailable).length} критерия`
@@ -772,25 +781,25 @@ export function AttemptPerformanceReport({
                     key={c.label}
                     className={`rounded-[10px] border p-2 text-center ${
                       c.unavailable
-                        ? 'border-amber-100 bg-amber-50/50'
-                        : 'border-slate-100 bg-slate-50/70'
+                        ? 'border-warning-bg bg-warning-bg/50'
+                        : 'border-border bg-card/70'
                     }`}
                   >
                     <span
-                      className="block text-[11px] font-medium text-slate-500 truncate"
+                      className="block text-[11px] font-medium text-muted-foreground truncate"
                       title={c.label}
                     >
                       {c.label}
                     </span>
                     {c.unavailable ? (
                       <span
-                        className="block mt-1 text-[11px] font-semibold text-amber-600 truncate"
+                        className="block mt-1 text-[11px] font-semibold text-warning-fg truncate"
                         title="Пока не определяется нашей системой"
                       >
                         {c.displayBand ?? 'Не определяется'}
                       </span>
                     ) : (
-                      <span className="text-base font-bold text-slate-900">
+                      <span className="text-base font-bold text-foreground">
                         {c.displayBand ?? c.band.toFixed(1)}
                       </span>
                     )}
@@ -802,44 +811,44 @@ export function AttemptPerformanceReport({
             <div>
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-xs font-bold normal-case text-muted-foreground">
                     Точность и баллы
                   </span>
-                  <span className="text-xs font-bold text-[#3b82f6]">
+                  <span className="text-xs font-bold text-primary">
                     {scorePercent}% точности
                   </span>
                 </div>
                 <div className="mt-3 flex items-baseline gap-2">
-                  <span className="text-4xl sm:text-5xl font-bold text-slate-900">
+                  <span className="font-display text-4xl sm:text-5xl font-semibold text-foreground">
                     {effectiveCorrect}
                   </span>
-                  <span className="text-sm font-medium text-slate-400">
+                  <span className="text-sm font-medium text-muted-foreground">
                     из {effectiveTotal} правильных
                   </span>
                 </div>
               </div>
 
               <div className="mt-4 space-y-2.5">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full rounded-full bg-[#3b82f6] transition-all duration-500"
+                    className="h-full rounded-full bg-primary transition-all duration-500"
                     style={{ width: `${scorePercent}%` }}
                   />
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
-                    <TickCircle className="size-3.5 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1 rounded-md bg-success-bg px-2.5 py-1 text-xs font-semibold text-success border border-success-bg/60">
+                    <TickCircle className="size-3.5 text-success" />
                     {effectiveCorrect} верно
                   </span>
                   {incorrectCount > 0 ? (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 border border-rose-200/60">
-                      <CloseCircle className="size-3.5 text-rose-600" />
+                    <span className="inline-flex items-center gap-1 rounded-md bg-destructive-soft px-2.5 py-1 text-xs font-semibold text-destructive border border-destructive-soft/60">
+                      <CloseCircle className="size-3.5 text-destructive" />
                       {incorrectCount}{' '}
                       {incorrectCount === 1 ? 'ошибка' : 'ошибок'}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-success-bg px-2.5 py-1 text-xs font-semibold text-success border border-success-bg/60">
                       Без ошибок
                     </span>
                   )}
@@ -853,31 +862,31 @@ export function AttemptPerformanceReport({
         <div className="pt-4 md:pt-0 md:pl-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold normal-case text-muted-foreground">
                 Время выполнения
               </span>
               {durationMinutes ? (
-                <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-                  <Clock className="size-3.5 text-slate-400" />
+                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3.5 text-muted-foreground" />
                   Лимит: {durationMinutes} мин
                 </span>
               ) : null}
             </div>
             <div className="mt-3 flex items-baseline gap-2 flex-wrap">
-              <span className="text-3xl sm:text-4xl font-bold text-slate-900">
+              <span className="font-display text-3xl sm:text-4xl font-semibold text-foreground">
                 {timeSpentFormatted}
               </span>
               {isTimeOverLimit && (
-                <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 border border-amber-200/80">
+                <span className="inline-flex items-center rounded-sm bg-warning-bg px-2 py-0.5 text-[11px] font-semibold text-warning-fg border border-warning-bg/80">
                   Лимит исчерпан
                 </span>
               )}
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
             <span>Средний темп:</span>
-            <strong className="font-semibold text-slate-700">
+            <strong className="font-semibold text-foreground">
               {paceFormatted ?? '—'}
             </strong>
           </div>
@@ -901,32 +910,32 @@ export function EnhancedReviewQuestion({
     <div
       id={`review-q-${item.questionId}`}
       className={cn(
-        'rounded-[14px] border bg-white p-5 transition-all shadow-2xs space-y-3.5',
+        'rounded-[10px] border bg-card p-5 transition-all shadow-none space-y-3.5',
         isCorrect
-          ? 'border-emerald-200/80 hover:border-emerald-300'
-          : 'border-rose-200/80 hover:border-rose-300',
+          ? 'border-success-bg/80 hover:border-success'
+          : 'border-destructive-soft/80 hover:border-destructive',
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="flex size-7 items-center justify-center rounded-[7px] bg-slate-100 text-xs font-bold text-slate-800">
+          <span className="flex size-7 items-center justify-center rounded-[7px] bg-muted text-xs font-bold text-foreground">
             {item.number}
           </span>
           {isCorrect ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
-              <TickCircle className="size-3.5 text-emerald-600" />
+            <span className="inline-flex items-center gap-1.5 rounded-sm bg-success-bg px-2.5 py-0.5 text-xs font-semibold text-success border border-success-bg">
+              <TickCircle className="size-3.5 text-success" />
               Верно (+{item.pointsAwarded} б.)
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
-              <CloseCircle className="size-3.5 text-rose-600" />
+            <span className="inline-flex items-center gap-1.5 rounded-sm bg-destructive-soft px-2.5 py-0.5 text-xs font-semibold text-destructive border border-destructive-soft">
+              <CloseCircle className="size-3.5 text-destructive" />
               {isAnswered ? 'Ошибка (0 б.)' : 'Не отвечено (0 б.)'}
             </span>
           )}
         </div>
       </div>
 
-      <p className="text-sm font-medium text-slate-800 leading-relaxed">
+      <p className="text-sm font-medium text-foreground leading-relaxed">
         {item.prompt.replace('{{answer}}', '_____')}
       </p>
 
@@ -936,17 +945,17 @@ export function EnhancedReviewQuestion({
           className={cn(
             'rounded-[10px] border p-3',
             isCorrect
-              ? 'border-emerald-200 bg-emerald-50/50 text-emerald-950'
-              : 'border-rose-200 bg-rose-50/50 text-rose-950',
+              ? 'border-success-bg bg-success-bg/50 text-success'
+              : 'border-destructive-soft bg-destructive-soft/50 text-destructive',
           )}
         >
-          <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+          <span className="block text-[11px] font-semibold normal-case text-muted-foreground mb-1">
             Ваш ответ
           </span>
           <span
             className={cn(
               'font-semibold text-sm',
-              !isCorrect && 'line-through text-rose-800',
+              !isCorrect && 'line-through text-destructive',
             )}
           >
             {formatAnswer(item.answer, options)}
@@ -954,11 +963,11 @@ export function EnhancedReviewQuestion({
         </div>
 
         {!isCorrect && (
-          <div className="rounded-[10px] border border-emerald-200 bg-emerald-50/70 p-3 text-emerald-950">
-            <span className="block text-[11px] font-semibold uppercase tracking-wider text-emerald-700 mb-1">
+          <div className="rounded-[10px] border border-success-bg bg-success-bg/70 p-3 text-success">
+            <span className="block text-[11px] font-semibold normal-case text-success mb-1">
               Правильный ответ
             </span>
-            <span className="font-bold text-sm text-emerald-900">
+            <span className="font-bold text-sm text-success">
               {formatAnswer(item.correctAnswer, options)}
             </span>
           </div>
@@ -967,12 +976,12 @@ export function EnhancedReviewQuestion({
 
       {/* Объяснение (если есть в базе) */}
       {item.explanation ? (
-        <div className="rounded-[10px] border border-blue-100 bg-[#f0f7ff] p-3 text-xs leading-relaxed text-slate-700">
-          <div className="flex items-center gap-1.5 font-semibold text-[#2563eb] mb-1">
+        <div className="rounded-[10px] border border-border-strong bg-primary-soft p-3 text-xs leading-relaxed text-foreground">
+          <div className="flex items-center gap-1.5 font-semibold text-primary-hover mb-1">
             <InfoCircle className="size-3.5" />
             <span>Разбор и цитата:</span>
           </div>
-          <div className="whitespace-pre-wrap text-slate-700">
+          <div className="whitespace-pre-wrap text-foreground">
             {item.explanation}
           </div>
         </div>

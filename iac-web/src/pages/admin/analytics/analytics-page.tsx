@@ -97,13 +97,13 @@ export function AnalyticsPage() {
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+          <p className="text-xs font-semibold text-primary normal-case">
             Аналитика
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
             Пульс платформы
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {overviewQuery.data
               ? `Обновлено ${new Date(overviewQuery.data.generatedAt).toLocaleTimeString('ru-RU')} · дни считаются по ${overviewQuery.data.timeZone}`
               : 'Регистрации, онлайн, активность и удержание.'}
@@ -112,7 +112,7 @@ export function AnalyticsPage() {
         <div className="flex items-center gap-2">
           <select
             aria-label="Период"
-            className="h-9 rounded-[10px] border border-[#deded9] bg-white px-3 text-sm"
+            className="h-9 rounded-[10px] border border-border bg-card px-3 text-sm"
             value={days}
             onChange={(event) =>
               setDays(Number(event.target.value) as AnalyticsDays)
@@ -146,14 +146,14 @@ export function AnalyticsPage() {
 
       {overviewQuery.isPending ? (
         <Panel>
-          <p className="p-8 text-center text-sm text-[#69696d]">
+          <p className="p-8 text-center text-sm text-muted-foreground">
             Считаем метрики…
           </p>
         </Panel>
       ) : overviewQuery.isError ? (
         <Panel>
           <div className="flex flex-col items-center p-8 text-center">
-            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-destructive" aria-hidden />
             <p className="mt-3 text-sm">
               {overviewQuery.error instanceof ApiError &&
               overviewQuery.error.status === 403
@@ -195,14 +195,14 @@ function Panel({
 }) {
   return (
     <Card
-      className={`gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none ${className ?? ''}`}
+      className={`gap-0 rounded-[10px] border-border py-0 shadow-none ${className ?? ''}`}
     >
       {title ? (
-        <CardHeader className="border-b border-[#ededeb] p-5">
+        <CardHeader className="border-b border-border p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               {icon ? (
-                <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
+                <span className="grid size-9 place-items-center rounded-[9px] bg-primary-soft text-primary">
                   {icon}
                 </span>
               ) : null}
@@ -227,13 +227,13 @@ function StatTile({
   detail?: string
 }) {
   return (
-    <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-5">
-      <p className="text-sm text-[#69696d]">{label}</p>
+    <div className="rounded-[10px] border border-border bg-card p-5">
+      <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-2 text-[28px] leading-none font-semibold tracking-[-0.03em]">
         {value}
       </p>
       {detail ? (
-        <p className="mt-2 text-xs leading-5 text-[#898781]">{detail}</p>
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">{detail}</p>
       ) : null}
     </div>
   )
@@ -248,15 +248,15 @@ function LivePanel({
 }) {
   const unavailable = isError || (realtime && !realtime.available)
   return (
-    <div className="grid gap-4 rounded-[16px] border border-[#e7e7e4] bg-white p-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+    <div className="grid gap-4 rounded-[10px] border border-border bg-card p-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <div className="flex flex-col justify-between gap-5">
-        <div className="flex items-center gap-2 text-sm text-[#69696d]">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span className="relative flex size-2.5">
             {!unavailable && (
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#0ca30c] opacity-60" />
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
             )}
             <span
-              className={`relative inline-flex size-2.5 rounded-full ${unavailable ? 'bg-[#c3c2b7]' : 'bg-[#0ca30c]'}`}
+              className={`relative inline-flex size-2.5 rounded-full ${unavailable ? 'bg-border-strong' : 'bg-success'}`}
             />
           </span>
           {unavailable
@@ -268,7 +268,9 @@ function LivePanel({
             <p className="text-[56px] leading-none font-semibold tracking-[-0.04em]">
               {realtime ? formatNumber(realtime.onlineVisitors) : '—'}
             </p>
-            <p className="mt-2 text-sm text-[#69696d]">посетителей онлайн</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              посетителей онлайн
+            </p>
           </div>
           <dl className="grid grid-cols-3 gap-6 text-sm">
             <LiveFigure label="вошли в аккаунт" value={realtime?.onlineUsers} />
@@ -283,8 +285,8 @@ function LivePanel({
           </dl>
         </div>
       </div>
-      <div className="rounded-[12px] bg-[#f7f7f5] p-4">
-        <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[#69696d] uppercase">
+      <div className="rounded-[10px] bg-background p-4">
+        <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground normal-case">
           <Eye className="size-4" aria-hidden />
           Где сейчас пользователи
         </p>
@@ -295,7 +297,7 @@ function LivePanel({
                 key={page.path}
                 className="flex items-center justify-between gap-3 text-sm"
               >
-                <span className="min-w-0 truncate font-mono text-xs text-[#111]">
+                <span className="min-w-0 truncate font-mono text-xs text-foreground">
                   {page.path}
                 </span>
                 <span className="font-semibold tabular-nums">
@@ -305,7 +307,7 @@ function LivePanel({
             ))}
           </ul>
         ) : (
-          <p className="mt-3 text-sm text-[#898781]">
+          <p className="mt-3 text-sm text-muted-foreground">
             Сейчас никто не открыл сайт.
           </p>
         )}
@@ -321,7 +323,7 @@ function LiveFigure({ label, value }: { label: string; value?: number }) {
       <dd className="text-xl font-semibold">
         {value === undefined ? '—' : formatNumber(value)}
       </dd>
-      <dd className="mt-1 text-xs text-[#898781]">{label}</dd>
+      <dd className="mt-1 text-xs text-muted-foreground">{label}</dd>
     </div>
   )
 }
@@ -453,12 +455,14 @@ function OverviewContent({
           icon={<Chart className="size-[18px]" aria-hidden />}
         >
           {overview.skills.length === 0 ? (
-            <p className="text-sm text-[#69696d]">Попыток за период нет.</p>
+            <p className="text-sm text-muted-foreground">
+              Попыток за период нет.
+            </p>
           ) : (
             <div className="-mx-5 -mb-5 overflow-x-auto">
               <table className="w-full min-w-[520px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#ededeb] text-xs text-[#69696d]">
+                  <tr className="border-b border-border text-xs text-muted-foreground">
                     {[
                       'Навык',
                       'Начато',
@@ -481,7 +485,7 @@ function OverviewContent({
                   {overview.skills.map((skill) => (
                     <tr
                       key={skill.skill}
-                      className="border-b border-[#f0f0ed] last:border-0"
+                      className="border-b border-muted last:border-0"
                     >
                       <td className="px-4 py-3 font-medium">
                         {skillLabels[skill.skill] ?? skill.skill}
@@ -491,7 +495,7 @@ function OverviewContent({
                       </td>
                       <td className="px-4 py-3">
                         {formatNumber(skill.submitted)}
-                        <span className="ml-1.5 text-xs text-[#898781]">
+                        <span className="ml-1.5 text-xs text-muted-foreground">
                           {percent(skill.submitted, skill.started)}
                         </span>
                       </td>
@@ -540,7 +544,7 @@ function OverviewContent({
           icon={<Global className="size-[18px]" aria-hidden />}
         >
           {overview.sources.length === 0 ? (
-            <p className="text-sm text-[#69696d]">
+            <p className="text-sm text-muted-foreground">
               Новых пользователей за период нет.
             </p>
           ) : (
@@ -575,7 +579,9 @@ function OverviewContent({
               }))}
             />
           ) : (
-            <p className="text-sm text-[#69696d]">Просмотров сегодня нет.</p>
+            <p className="text-sm text-muted-foreground">
+              Просмотров сегодня нет.
+            </p>
           )}
         </Panel>
         <ExportPanel />
@@ -587,7 +593,7 @@ function OverviewContent({
 function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
   if (cohorts.length === 0) {
     return (
-      <p className="text-sm text-[#69696d]">
+      <p className="text-sm text-muted-foreground">
         За последние 8 недель регистраций нет.
       </p>
     )
@@ -595,14 +601,14 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
   const weeks = cohorts[0].retained.length
   return (
     <div className="grid gap-3">
-      <p className="text-sm leading-6 text-[#69696d]">
+      <p className="text-sm leading-6 text-muted-foreground">
         Доля пользователей, вернувшихся на N-й неделе после регистрации. День
         регистрации не считается возвратом.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-separate border-spacing-[2px] text-sm tabular-nums">
           <thead>
-            <tr className="text-xs text-[#69696d]">
+            <tr className="text-xs text-muted-foreground">
               <th className="px-2 py-2 text-left font-medium">Неделя</th>
               <th className="px-2 py-2 text-right font-medium">Пользователи</th>
               {Array.from({ length: weeks }, (_, i) => (
@@ -638,7 +644,9 @@ function CohortTable({ cohorts }: { cohorts: AnalyticsOverview['cohorts'] }) {
                         className="rounded-[6px] px-2 py-2 text-center text-xs"
                         style={{
                           background,
-                          color: dark ? '#fff' : '#111',
+                          color: dark
+                            ? 'var(--primary-foreground)'
+                            : 'var(--foreground)',
                         }}
                         title={`${formatNumber(users)} из ${formatNumber(cohort.size)}`}
                       >
@@ -686,7 +694,7 @@ function ExportPanel() {
       action={
         <select
           aria-label="Период выгрузки"
-          className="h-8 rounded-[8px] border border-[#deded9] bg-white px-2 text-xs"
+          className="h-8 rounded-[8px] border border-border bg-card px-2 text-xs"
           value={days ?? ''}
           onChange={(event) =>
             setDays(
@@ -705,7 +713,7 @@ function ExportPanel() {
         </select>
       }
     >
-      <p className="text-sm leading-6 text-[#69696d]">
+      <p className="text-sm leading-6 text-muted-foreground">
         CSV напрямую из PostgreSQL (COPY) — готово для pandas, DuckDB,
         ClickHouse или BigQuery. Только идентификаторы и факты: без имён, email
         и телефонов.
@@ -726,7 +734,7 @@ function ExportPanel() {
         ))}
       </div>
       {error ? (
-        <p role="alert" className="mt-3 text-sm text-[#c92f2f]">
+        <p role="alert" className="mt-3 text-sm text-destructive">
           {error}
         </p>
       ) : null}

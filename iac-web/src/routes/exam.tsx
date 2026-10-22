@@ -23,7 +23,7 @@ export const Route = createFileRoute('/exam')({
   },
   head: () => ({
     meta: [
-      { title: 'IELTS test — Daiyndyq IELTS' },
+      { title: 'IELTS test — Yrys Academy' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),
@@ -39,7 +39,7 @@ function ExamLayout() {
       </DashboardShell>
     )
   return (
-    <main className="min-h-dvh bg-[#f7f7f5] text-[#111111]">
+    <main className="min-h-dvh bg-background text-foreground">
       <Outlet />
     </main>
   )

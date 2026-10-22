@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import type { AttemptReviewItem } from '../src/features/attempts/api'
+import type {
+  AttemptReviewItem,
+  WritingTaskFeedback,
+} from '../src/features/attempts/api'
 
 const criterion = { band: 7, feedback: 'Criterion feedback' }
 const base = {
@@ -59,10 +62,17 @@ const detail = (skill: string) => ({
             {
               taskId: 'task',
               position: 1,
+              band: 7,
+              criteria: {
+                taskResponse: criterion,
+                coherence: criterion,
+                lexicalResource: criterion,
+                grammar: criterion,
+              },
               feedback: 'Essay feedback',
               strengths: [],
               improvements: ['Writing suggestion'],
-            },
+            } satisfies WritingTaskFeedback,
           ],
         },
       }
@@ -84,6 +94,7 @@ const detail = (skill: string) => ({
           parts: [
             {
               partId: 'part',
+              transcript: '',
               feedback: 'Speech feedback',
               strengths: [],
               improvements: ['Speaking suggestion'],
@@ -705,22 +716,25 @@ test('submission immediately shows this test’s mistake cards', async ({
   ).toHaveCount(0)
 })
 
-test('Full Mock cards select the section; tabs stay in this exam after reload', async ({
+test('Full Mock cards switch inline review and retain the section after reload', async ({
   page,
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-  await page
-    .getByRole('link', { name: 'Reading: работа над ошибками', exact: true })
+  const sections = page.getByRole('group', { name: 'Секции Full Mock' })
+  await sections
+    .getByRole('button', { name: 'Выбрать Reading', exact: true })
     .click()
-  const tabs = page.getByRole('navigation', { name: 'Секции Full Mock' })
   await expect(
-    tabs.getByRole('link', { name: 'Reading', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
+    sections.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page).toHaveURL(/section=2/)
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Listening', exact: true }).click()
+  await sections
+    .getByRole('button', { name: 'Выбрать Listening', exact: true })
+    .click()
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
   ).toBeVisible()
@@ -729,17 +743,20 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   ).toHaveCount(0)
   await page.reload()
   await expect(
-    tabs.getByRole('link', { name: 'Listening', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
-  await tabs.getByRole('link', { name: 'Writing', exact: true }).click()
+    sections.getByRole('button', { name: 'Выбрать Listening', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await sections
+    .getByRole('button', { name: 'Выбрать Writing', exact: true })
+    .click()
   await expect(
     page.getByText('Writing suggestion', { exact: false }),
   ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Speaking', exact: true }).click()
+  await sections
+    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
+    .click()
   await expect(
     page.getByText('Speaking suggestion', { exact: false }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'К результату', exact: true }).click()
   await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
   ).toBeVisible()

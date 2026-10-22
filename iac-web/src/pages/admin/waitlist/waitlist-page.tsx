@@ -47,13 +47,13 @@ export function WaitlistPage() {
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+          <p className="text-xs font-semibold text-primary normal-case">
             Waitlist
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
             Заявки в waitlist
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {waitlistQuery.data
               ? `Всего заявок: ${waitlistQuery.data.total}`
               : 'Заявки с лендинга и реферальная статистика.'}
@@ -74,15 +74,15 @@ export function WaitlistPage() {
       </div>
 
       {waitlistQuery.isPending ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
-          <CardContent className="p-8 text-center text-sm text-[#69696d]">
+        <Card className="rounded-[10px] border-border shadow-none">
+          <CardContent className="p-8 text-center text-sm text-muted-foreground">
             Загружаем заявки…
           </CardContent>
         </Card>
       ) : waitlistQuery.isError ? (
-        <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+        <Card className="rounded-[10px] border-border shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-destructive" aria-hidden />
             <p className="mt-3 text-sm">
               {waitlistQuery.error instanceof ApiError &&
               waitlistQuery.error.status === 403
@@ -100,11 +100,11 @@ export function WaitlistPage() {
           </CardContent>
         </Card>
       ) : waitlistQuery.data.entries.length === 0 ? (
-        <Card className="rounded-[16px] border-dashed border-[#d8d8d3] bg-white shadow-none">
+        <Card className="rounded-[10px] border-dashed border-border-strong bg-card shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <DirectInbox className="size-8 text-[#9a9a9d]" aria-hidden />
+            <DirectInbox className="size-8 text-muted-foreground" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Заявок пока нет</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               Как только посетители начнут оставлять контакты, они появятся
               здесь вместе с реферальной статистикой.
             </p>
@@ -124,10 +124,10 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+          <CardHeader className="border-b border-border p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#eff6ff] text-[#3b82f6]">
+              <span className="grid size-9 place-items-center rounded-[9px] bg-primary-soft text-primary">
                 <People className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Топ приглашающих</CardTitle>
@@ -135,7 +135,7 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           </CardHeader>
           <CardContent className="p-5">
             {referrers.length === 0 ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-muted-foreground">
                 Пока никто никого не пригласил.
               </p>
             ) : (
@@ -145,13 +145,13 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
                     key={entry.id}
                     className="flex items-center gap-3 text-sm"
                   >
-                    <span className="w-5 text-xs font-semibold text-[#a1a1a6]">
+                    <span className="w-5 text-xs font-semibold text-muted-foreground">
                       {index + 1}
                     </span>
                     <span className="min-w-0 flex-1 truncate font-medium">
                       {displayName(entry)}
                     </span>
-                    <span className="text-xs text-[#808084]">
+                    <span className="text-xs text-muted-foreground">
                       {entry.referralCode}
                     </span>
                     <Badge variant="outline">
@@ -164,10 +164,10 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           </CardContent>
         </Card>
 
-        <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-          <CardHeader className="border-b border-[#ededeb] p-5">
+        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+          <CardHeader className="border-b border-border p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-[9px] bg-[#f4f4f1] text-[#69696d]">
+              <span className="grid size-9 place-items-center rounded-[9px] bg-muted text-muted-foreground">
                 <Tag className="size-[18px]" aria-hidden />
               </span>
               <CardTitle className="text-base">Внешние метки</CardTitle>
@@ -175,13 +175,13 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
           </CardHeader>
           <CardContent className="p-5">
             {tags.length === 0 ? (
-              <p className="text-sm text-[#69696d]">
+              <p className="text-sm text-muted-foreground">
                 Переходов по кодам, не принадлежащим пользователям waitlist,
                 нет.
               </p>
             ) : (
               <>
-                <p className="text-sm leading-6 text-[#69696d]">
+                <p className="text-sm leading-6 text-muted-foreground">
                   Коды «приглашён по», которые не совпадают ни с одним кодом из
                   waitlist — так помечены внешние источники трафика.
                 </p>
@@ -200,10 +200,10 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
         </Card>
       </div>
 
-      <div className="overflow-x-auto rounded-[16px] border border-[#e7e7e4] bg-white">
+      <div className="overflow-x-auto rounded-[10px] border border-border bg-card">
         <table className="w-full min-w-[1080px] text-left text-sm">
           <thead>
-            <tr className="border-b border-[#e7e7e4] text-xs uppercase tracking-wide text-[#69696d]">
+            <tr className="border-b border-border text-xs normal-case tracking-wide text-muted-foreground">
               <th className="px-4 py-3 font-medium">Имя</th>
               <th className="px-4 py-3 font-medium">Фамилия</th>
               <th className="px-4 py-3 font-medium">Email</th>
@@ -219,7 +219,7 @@ function WaitlistContent({ entries }: { entries: WaitlistEntry[] }) {
             {entries.map((entry) => (
               <tr
                 key={entry.id}
-                className="border-b border-[#f0f0ed] last:border-0"
+                className="border-b border-muted last:border-0"
               >
                 <td className="px-4 py-3">{entry.firstName ?? '—'}</td>
                 <td className="px-4 py-3">{entry.lastName ?? '—'}</td>

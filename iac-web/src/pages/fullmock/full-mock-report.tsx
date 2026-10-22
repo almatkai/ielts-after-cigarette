@@ -24,7 +24,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
     <GuestResultsAccess>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-baseline gap-3">
-          <span className="text-4xl font-semibold tracking-tight text-[#2563eb]">
+          <span className="font-display text-4xl font-semibold tracking-normal text-primary-hover">
             {session.overallBand?.toFixed(1) ?? '—'}
           </span>
           <h2 className="text-sm font-semibold">Итоговый IELTS band</h2>
@@ -44,7 +44,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
           return (
             <div
               key={section.position}
-              className={`relative min-w-0 rounded-2xl border bg-white ${active ? 'border-[#3b82f6] ring-1 ring-[#3b82f6]' : 'border-[#e7e7e4]'}`}
+              className={`relative min-w-0 rounded-xl border bg-card ${active ? 'border-primary ring-1 ring-primary' : 'border-border'}`}
             >
               <button
                 type="button"
@@ -60,15 +60,15 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
                     resetScroll: false,
                   })
                 }
-                className="grid w-full gap-3 rounded-2xl p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="grid w-full gap-3 rounded-xl p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <span className="text-base font-semibold">
-                  <span className="mr-2 text-[#69696d]">
+                  <span className="mr-2 text-muted-foreground">
                     0{section.position}
                   </span>
                   {skill}
                 </span>
-                <span className="text-sm text-[#69696d]">
+                <span className="text-sm text-muted-foreground">
                   {section.durationMinutes ??
                     (section.skill === 'listening'
                       ? 30
@@ -84,7 +84,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
                       ? 'Проверяется'
                       : 'Сдано'}
                 </Badge>
-                <span className="h-9 text-xl font-semibold text-[#2563eb]">
+                <span className="h-9 text-xl font-semibold text-primary-hover">
                   {locked && !ungraded
                     ? null
                     : (section.attempt.band?.toFixed(1) ?? '—')}
@@ -106,7 +106,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
           className="min-w-0"
         >
           {selected.attempt.status === 'ABANDONED' ? (
-            <p className="text-sm text-[#69696d]">
+            <p className="text-sm text-muted-foreground">
               Секция завершена без оценки.
             </p>
           ) : (

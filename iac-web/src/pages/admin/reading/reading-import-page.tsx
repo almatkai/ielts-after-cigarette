@@ -207,15 +207,15 @@ export function ReadingImportPage() {
           <Button
             type="button"
             variant="link"
-            className="h-auto p-0 text-[#69696d]"
+            className="h-auto p-0 text-muted-foreground"
             onClick={() => void navigate({ to: '/admin/reading/materials' })}
           >
             <ArrowLeft aria-hidden /> К библиотеке
           </Button>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-3 text-3xl font-semibold tracking-normal">
             Импорт IELTS Reading
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Основной формат — IELTS Reading Import Format v1. Сначала проверьте
             preview, затем создайте обычные draft-материалы в существующем
             конструкторе.
@@ -245,14 +245,14 @@ export function ReadingImportPage() {
       {message ? (
         <div
           role="alert"
-          className="rounded-[10px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          className="rounded-[10px] border border-destructive-soft bg-destructive-soft px-4 py-3 text-sm text-destructive"
         >
           {message}
         </div>
       ) : null}
 
-      <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-        <CardHeader className="border-b border-[#ededeb] p-5">
+      <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+        <CardHeader className="border-b border-border p-5">
           <CardTitle className="text-base">Исходный документ</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 p-5">
@@ -265,7 +265,7 @@ export function ReadingImportPage() {
                 onChange={(event) =>
                   setExamType(event.target.value as ReadingMaterial['examType'])
                 }
-                className="h-11 rounded-[9px] border border-[#deded9] bg-white px-3"
+                className="h-11 rounded-[9px] border border-border bg-card px-3"
               >
                 <option value="academic">Academic</option>
                 <option value="general">General Training</option>
@@ -281,7 +281,7 @@ export function ReadingImportPage() {
                     event.target.value as ReadingMaterial['difficulty'],
                   )
                 }
-                className="h-11 rounded-[9px] border border-[#deded9] bg-white px-3"
+                className="h-11 rounded-[9px] border border-border bg-card px-3"
               >
                 <option value="foundation">Foundation</option>
                 <option value="intermediate">Intermediate</option>
@@ -299,7 +299,7 @@ export function ReadingImportPage() {
             className="font-mono text-sm leading-6"
             placeholder="# IELTS_READING_IMPORT_V1&#10;title: ..."
           />
-          <p className="text-sm leading-6 text-[#69696d]">
+          <p className="text-sm leading-6 text-muted-foreground">
             Поддерживаются все типы Reading, банк слов через{' '}
             <code>options:</code>, групповой выбор через{' '}
             <code>MULTIPLE_SELECT</code>, изображения через <code>image:</code>{' '}
@@ -311,7 +311,7 @@ export function ReadingImportPage() {
               type="button"
               disabled={parseMutation.isPending}
               onClick={() => void parse()}
-              className="bg-[#3b82f6] hover:bg-[#2563eb]"
+              className="bg-primary hover:bg-primary-hover"
             >
               <DocumentUpload aria-hidden />
               {parseMutation.isPending ? 'Распознаём…' : 'Распознать'}
@@ -345,8 +345,8 @@ function ImportPreview({
 }) {
   const fatal = result.errors.length > 0
   return (
-    <Card className="gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none">
-      <CardHeader className="border-b border-[#ededeb] p-5">
+    <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
+      <CardHeader className="border-b border-border p-5">
         <div className="flex flex-wrap items-center gap-2">
           <CardTitle className="text-base">{result.title}</CardTitle>
           <Badge variant="outline">{result.formatVersion}</Badge>
@@ -359,7 +359,7 @@ function ImportPreview({
         {result.passages.map((passage) => (
           <div
             key={passage.number}
-            className="rounded-[12px] border border-[#e7e7e4] p-4"
+            className="rounded-[10px] border border-border p-4"
           >
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-semibold">
@@ -387,7 +387,7 @@ function ImportPreview({
           kind="warning"
         />
         <IssueList title="Информация" issues={result.info} kind="info" />
-        <div className="flex flex-wrap justify-end gap-2 border-t border-[#ededeb] pt-4">
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-4">
           <Button type="button" variant="outline" onClick={onBack}>
             Исправить документ
           </Button>
@@ -395,7 +395,7 @@ function ImportPreview({
             type="button"
             disabled={fatal || pending || result.passages.length === 0}
             onClick={onConfirm}
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
           >
             {pending
               ? 'Импортируем…'
@@ -428,7 +428,7 @@ function GroupPreview({
   const rule = group.questions[0]?.content.completionRule as
     { maxWords?: number; allowNumber?: boolean } | undefined
   return (
-    <div className="rounded-[10px] bg-[#f7f7f5] p-3 text-sm">
+    <div className="rounded-[10px] bg-background p-3 text-sm">
       <div className="flex flex-wrap items-center gap-2 font-semibold">
         <span>Group {index + 1}</span>
         {first !== null ? (
@@ -438,7 +438,7 @@ function GroupPreview({
         ) : null}
         <Badge variant="outline">{group.type.replaceAll('_', ' ')}</Badge>
       </div>
-      <div className="mt-2 grid gap-1 text-[#69696d] sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-2 grid gap-1 text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
         <span>✓ {group.questions.length} вопросов</span>
         <span>✓ {answers} ответов</span>
         <span>○ {explanations} explanations</span>
@@ -466,9 +466,9 @@ function IssueList({
 }) {
   if (issues.length === 0) return null
   const styles = {
-    error: 'border-red-200 bg-red-50',
-    warning: 'border-amber-200 bg-amber-50',
-    info: 'border-blue-200 bg-blue-50',
+    error: 'border-destructive-soft bg-destructive-soft',
+    warning: 'border-warning-bg bg-warning-bg',
+    info: 'border-border-strong bg-primary-soft',
   }
   const Icon = kind === 'info' ? InfoCircle : Warning2
   return (

@@ -137,10 +137,10 @@ export function ListeningImportPage() {
               <ArrowLeft aria-hidden /> К тестам
             </Link>
           </Button>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-3 text-3xl font-semibold tracking-normal">
             Импорт Listening v1
           </h1>
-          <p className="mt-2 text-sm text-[#69696d]">
+          <p className="mt-2 text-sm text-muted-foreground">
             Импорт создаёт draft. Аудио и изображения можно прикрепить в
             конструкторе.
           </p>
@@ -164,7 +164,7 @@ export function ListeningImportPage() {
         </div>
       </div>
       {message ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm">
+        <div className="rounded-lg border border-destructive-soft bg-destructive-soft p-3 text-sm">
           {message}
         </div>
       ) : null}
@@ -185,7 +185,7 @@ export function ListeningImportPage() {
           />
           <div className="flex justify-end">
             <Button
-              className="bg-[#3b82f6] hover:bg-[#2563eb]"
+              className="bg-primary hover:bg-primary-hover"
               onClick={() => void parse()}
               disabled={!source.trim() || parseMutation.isPending}
             >
@@ -232,7 +232,7 @@ function Preview({
             <h3 className="font-semibold">
               Part {part.position}: {part.title}
             </h3>
-            <p className="mt-1 text-xs text-[#69696d]">
+            <p className="mt-1 text-xs text-muted-foreground">
               {part.audioAssetId
                 ? '✓ audio attached'
                 : '○ audio добавляется после импорта'}
@@ -241,12 +241,12 @@ function Preview({
               {part.groups.map((group) => (
                 <div
                   key={group.position}
-                  className="rounded-lg bg-[#f7f7f5] p-3 text-sm"
+                  className="rounded-lg bg-background p-3 text-sm"
                 >
                   <strong>
                     Group {group.position} · {group.type.replaceAll('_', ' ')}
                   </strong>
-                  <p className="mt-1 text-[#69696d]">
+                  <p className="mt-1 text-muted-foreground">
                     ✓ {group.questions.length} questions · ✓{' '}
                     {
                       group.questions.filter(
@@ -267,7 +267,7 @@ function Preview({
         <Issues title="Информация" items={result.info} tone="blue" />
         <div className="flex justify-end">
           <Button
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
             disabled={result.errors.length > 0 || pending}
             onClick={onImport}
           >
@@ -289,9 +289,9 @@ function Issues({
 }) {
   if (!items.length) return null
   const classes = {
-    red: 'border-red-200 bg-red-50',
-    amber: 'border-amber-200 bg-amber-50',
-    blue: 'border-blue-200 bg-blue-50',
+    red: 'border-destructive-soft bg-destructive-soft',
+    amber: 'border-warning-bg bg-warning-bg',
+    blue: 'border-border-strong bg-primary-soft',
   }
   return (
     <div className={`rounded-lg border p-3 ${classes[tone]}`}>

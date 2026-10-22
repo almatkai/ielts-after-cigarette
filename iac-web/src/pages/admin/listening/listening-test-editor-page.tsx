@@ -136,7 +136,11 @@ function PartAudioPlayer({
     [url],
   )
   if (query.isPending) {
-    return <span className="text-xs text-slate-500">Загружаем аудиоплеер…</span>
+    return (
+      <span className="text-xs text-muted-foreground">
+        Загружаем аудиоплеер…
+      </span>
+    )
   }
   if (!url) return null
   return (
@@ -347,7 +351,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             </Link>
           </Button>
           <div className="mt-3 flex items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-3xl font-semibold tracking-normal">
               {editing ? 'Listening конструктор' : 'Новый Listening тест'}
             </h1>
             {query.data ? (
@@ -389,9 +393,9 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                   transcribeMutation.mutate()
                 }
               }}
-              className="border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 font-medium"
+              className="border-border-strong bg-primary-soft text-primary hover:bg-primary-soft hover:text-primary font-medium"
             >
-              <Magicpen aria-hidden className="size-4 text-purple-600 mr-1" />
+              <Magicpen aria-hidden className="size-4 text-primary mr-1" />
               {transcribeMutation.isPending
                 ? 'STT транскрибация…'
                 : 'AI STT Расшифровка'}
@@ -446,7 +450,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               publishMutation.isPending ||
               archiveMutation.isPending
             }
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
           >
             <Save2 aria-hidden /> Сохранить
           </Button>
@@ -463,7 +467,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
         />
       ) : null}
       {message ? (
-        <div className="rounded-lg border bg-white px-4 py-3 text-sm">
+        <div className="rounded-lg border bg-card px-4 py-3 text-sm">
           {message}
         </div>
       ) : null}
@@ -535,8 +539,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             <label
               className={
                 form.parts.length > 0
-                  ? 'cursor-pointer text-sm font-semibold text-[#1d4ed8]'
-                  : 'cursor-not-allowed text-sm font-semibold text-[#9b9b9f]'
+                  ? 'cursor-pointer text-sm font-semibold text-primary'
+                  : 'cursor-not-allowed text-sm font-semibold text-muted-foreground'
               }
             >
               Загрузить один файл для всех Parts
@@ -561,7 +565,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 }}
               />
             </label>
-            <span className="text-xs text-[#69696d]">
+            <span className="text-xs text-muted-foreground">
               {sharedAudioAssetId
                 ? `Общий audio asset: ${sharedAudioAssetId}`
                 : form.parts.length > 0
@@ -569,7 +573,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                   : 'Сначала импортируйте или добавьте Parts'}
             </span>
           </div>
-          <p className="mt-2 text-xs text-[#69696d]">
+          <p className="mt-2 text-xs text-muted-foreground">
             Один непрерывный файл будет воспроизводиться без перезапуска при
             переходе между вопросами и частями теста.
           </p>
@@ -604,7 +608,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             </Field>
             <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
               <ExportCurve className="size-5" aria-hidden />
-              <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
+              <label className="cursor-pointer text-sm font-semibold text-primary">
                 Загрузить аудио
                 <input
                   className="sr-only"
@@ -619,17 +623,17 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                   }}
                 />
               </label>
-              <span className="text-xs text-[#69696d]">
+              <span className="text-xs text-muted-foreground">
                 {part.audioAssetId
                   ? `asset ${part.audioAssetId}`
                   : 'аудио не прикреплено'}
               </span>
             </div>
             {part.audioAssetId ? (
-              <div className="rounded-lg border bg-slate-50 p-2.5">
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                  <span className="font-semibold flex items-center gap-1.5 text-slate-700">
-                    <VolumeHigh className="size-3.5 text-blue-600" />
+              <div className="rounded-lg border bg-card p-2.5">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                  <span className="font-semibold flex items-center gap-1.5 text-foreground">
+                    <VolumeHigh className="size-3.5 text-primary" />
                     Плеер предпросмотра аудио
                   </span>
                   <span>Part {partIndex + 1}</span>
@@ -644,15 +648,15 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             ) : null}
 
             {part.transcript ? (
-              <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 space-y-3">
+              <div className="rounded-xl border border-border-strong bg-primary-soft/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-primary normal-case">
                       Стенограмма аудио (AI STT Transcript)
                     </span>
                     <Badge
                       variant="outline"
-                      className="bg-white text-blue-700 border-blue-200 text-[11px]"
+                      className="bg-card text-primary border-border-strong text-[11px]"
                     >
                       {part.transcriptSegments?.length ?? 0} сегментов
                     </Badge>
@@ -661,29 +665,29 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
 
                 {part.transcriptSegments &&
                 part.transcriptSegments.length > 0 ? (
-                  <div className="max-h-60 overflow-y-auto space-y-1.5 rounded-lg border border-blue-100 bg-white p-3 text-xs">
+                  <div className="max-h-60 overflow-y-auto space-y-1.5 rounded-lg border border-border-strong bg-card p-3 text-xs">
                     {part.transcriptSegments.map((seg) => (
                       <div
                         key={seg.id}
-                        className="flex items-start gap-2 hover:bg-slate-50 p-1 rounded"
+                        className="flex items-start gap-2 hover:bg-card p-1 rounded"
                       >
                         <button
                           type="button"
                           onClick={() => handleSeek(partIndex, seg.start)}
-                          className="shrink-0 font-mono text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
+                          className="shrink-0 font-mono text-[11px] font-semibold text-primary hover:text-primary bg-primary-soft hover:bg-primary-soft px-1.5 py-0.5 rounded transition-colors"
                           title="Перемотать аудио на эту секунду"
                         >
                           ▶ {formatSeconds(seg.start)} -{' '}
                           {formatSeconds(seg.end)}
                         </button>
-                        <span className="text-slate-700 leading-relaxed">
+                        <span className="text-foreground leading-relaxed">
                           {seg.text}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap bg-white p-3 rounded-lg border border-blue-100 max-h-48 overflow-y-auto">
+                  <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap bg-card p-3 rounded-lg border border-border-strong max-h-48 overflow-y-auto">
                     {part.transcript}
                   </p>
                 )}
@@ -692,7 +696,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             {part.groups.map((group, groupIndex) => (
               <div
                 key={groupIndex}
-                className="grid gap-4 rounded-xl border bg-[#fafaf8] p-4"
+                className="grid gap-4 rounded-xl border bg-background p-4"
               >
                 <div className="flex flex-wrap items-end gap-3">
                   <Field label={`Group ${groupIndex + 1} — тип`}>
@@ -760,7 +764,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 </Field>
                 <div className="flex items-center gap-3 rounded-lg border p-3">
                   <Image className="size-5" aria-hidden />
-                  <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
+                  <label className="cursor-pointer text-sm font-semibold text-primary">
                     Загрузить карту/схему
                     <input
                       className="sr-only"
@@ -777,7 +781,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                       }}
                     />
                   </label>
-                  <span className="text-xs text-[#69696d]">
+                  <span className="text-xs text-muted-foreground">
                     {group.imageAssetId
                       ? `asset ${group.imageAssetId}`
                       : 'изображение не прикреплено'}
@@ -786,7 +790,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 {group.questions.map((question, questionIndex) => (
                   <div
                     key={questionIndex}
-                    className="grid gap-3 rounded-lg border bg-white p-3"
+                    className="grid gap-3 rounded-lg border bg-card p-3"
                   >
                     <div className="flex items-center justify-between">
                       <strong>Вопрос {question.number || '?'}</strong>
@@ -836,7 +840,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                     </div>
 
                     {/* Audio Timestamps & Hint/Quote Editor */}
-                    <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-blue-100 bg-blue-50/30 p-3">
+                    <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-border-strong bg-primary-soft/30 p-3">
                       <Field label="Таймкод начала ответа (сек)">
                         <div className="flex items-center gap-2">
                           <Input
@@ -873,7 +877,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           />
                           {typeof question.content.timestampStart ===
                             'number' && (
-                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                            <span className="text-xs font-mono text-muted-foreground shrink-0">
                               ({formatSeconds(question.content.timestampStart)})
                             </span>
                           )}
@@ -890,10 +894,10 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                                     question.content.timestampStart as number,
                                   )
                                 }
-                                className="h-9 px-2.5 text-xs text-blue-600 shrink-0 hover:bg-blue-50"
+                                className="h-9 px-2.5 text-xs text-primary shrink-0 hover:bg-primary-soft"
                                 title="Слушать с этой секунды"
                               >
-                                <Play className="size-3 mr-1 text-blue-600" />
+                                <Play className="size-3 mr-1 text-primary" />
                                 <span>Слушать</span>
                               </Button>
                             )}
@@ -934,7 +938,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           />
                           {typeof question.content.timestampEnd ===
                             'number' && (
-                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                            <span className="text-xs font-mono text-muted-foreground shrink-0">
                               ({formatSeconds(question.content.timestampEnd)})
                             </span>
                           )}

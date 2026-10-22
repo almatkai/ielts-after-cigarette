@@ -27,7 +27,7 @@ import {
 import { hydrateMistake, mistakeCountLabel } from '../model'
 
 const routeApi = getRouteApi('/_app/mistakes')
-const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
+const cardClassName = 'gap-0 rounded-[10px] border-border py-0 shadow-none'
 const materialTypeLabels: Record<AttemptMaterialType, string> = {
   reading: 'Reading',
   listening: 'Listening',
@@ -62,7 +62,7 @@ export function MistakesPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+          <h2 className="text-lg font-semibold tracking-[-0.025em] text-foreground">
             Банк ошибок
           </h2>
         </div>
@@ -84,14 +84,14 @@ export function MistakesPage() {
 
       <nav
         aria-label="Навык"
-        className="flex gap-1 overflow-x-auto rounded-[12px] bg-[#f0f0ed] p-1"
+        className="flex gap-1 overflow-x-auto rounded-[10px] bg-muted p-1"
       >
         {skills.map((value) => (
           <Button
             key={value}
             variant="ghost"
             aria-current={skill === value ? 'page' : undefined}
-            className={`min-w-0 flex-1 rounded-[9px] px-4 shadow-none ${skill === value ? 'bg-white text-[#111111] hover:bg-white' : 'text-[#69696d]'}`}
+            className={`min-w-0 flex-1 rounded-[9px] px-4 shadow-none ${skill === value ? 'bg-card text-foreground hover:bg-card' : 'text-muted-foreground'}`}
             onClick={() => void navigate({ search: { skill: value, page: 1 } })}
           >
             {materialTypeLabels[value]}
@@ -109,7 +109,7 @@ export function MistakesPage() {
         />
       ) : (
         <>
-          <div className="flex items-center justify-between gap-3 text-sm text-[#69696d]">
+          <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
             <p>
               {skill === 'reading' || skill === 'listening'
                 ? 'Попытки с ошибками'
@@ -131,7 +131,7 @@ export function MistakesPage() {
             ) : (
               <Card className={cardClassName}>
                 <CardContent className="grid gap-3 p-6">
-                  <p className="text-sm text-[#69696d]">
+                  <p className="text-sm text-muted-foreground">
                     На этой странице больше нет попыток.
                   </p>
                   <Button
@@ -148,17 +148,17 @@ export function MistakesPage() {
             )
           ) : (
             <Card className={`${cardClassName} overflow-hidden`}>
-              <CardContent className="divide-y divide-[#ededeb] p-0">
+              <CardContent className="divide-y divide-border p-0">
                 {listQuery.data.items.map((item) => (
                   <div
                     key={item.id}
                     className="flex flex-wrap items-center justify-between gap-3 px-3.5 py-3 sm:px-6 sm:py-4"
                   >
                     <div className="min-w-0 flex-1 basis-[180px]">
-                      <h3 className="break-words text-xs sm:text-sm font-semibold text-[#111111]">
+                      <h3 className="break-words text-xs sm:text-sm font-semibold text-foreground">
                         {item.testTitle || 'Без названия'}
                       </h3>
-                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#69696d]">
+                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
                         {dateFormatter.format(
                           new Date(item.submittedAt ?? item.startedAt),
                         )}
@@ -166,7 +166,7 @@ export function MistakesPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span
-                        className={`text-sm font-medium ${item.mistakeCount !== null ? 'text-rose-700' : 'text-[#1d4ed8]'}`}
+                        className={`text-sm font-medium ${item.mistakeCount !== null ? 'text-destructive' : 'text-primary'}`}
                       >
                         {item.mistakeCount !== null
                           ? mistakeCountLabel(item.mistakeCount)
@@ -212,7 +212,7 @@ export function MistakesPage() {
                 <ArrowLeft className="size-4" aria-hidden />
                 Назад
               </Button>
-              <p className="text-sm text-[#69696d]">Страница {page}</p>
+              <p className="text-sm text-muted-foreground">Страница {page}</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -266,7 +266,7 @@ function AttemptMistakes({
     <section className="grid gap-4">
       <Button
         variant="ghost"
-        className="w-fit gap-2 px-0 text-[#69696d] hover:bg-transparent hover:text-[#111111]"
+        className="w-fit gap-2 px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
         onClick={onBack}
       >
         <ArrowLeft className="size-4" aria-hidden />К списку попыток
@@ -276,7 +276,7 @@ function AttemptMistakes({
           <h3 className="break-words text-lg font-semibold tracking-[-0.02em]">
             {selected?.testTitle || 'Разбор попытки'}
           </h3>
-          <p className="mt-1 text-sm text-[#69696d]">
+          <p className="mt-1 text-sm text-muted-foreground">
             {materialTypeLabels[materialType]}
             {detail &&
             (materialType === 'reading' || materialType === 'listening')
@@ -314,7 +314,7 @@ function AttemptMistakes({
           {detailQuery.data.review.length === 0 &&
           !detailQuery.data.writingEvaluation &&
           !detailQuery.data.speakingEvaluation ? (
-            <p className="py-6 text-sm text-[#69696d]">
+            <p className="py-6 text-sm text-muted-foreground">
               В этой попытке нет ошибок для разбора.
             </p>
           ) : null}
@@ -345,7 +345,7 @@ function EmptyMistakesState({ skill }: { skill: AttemptMaterialType }) {
             ? `В ${materialTypeLabels[skill]} ошибок пока нет`
             : `Разборов ${materialTypeLabels[skill]} пока нет`}
         </p>
-        <p className="max-w-md text-sm leading-6 text-[#69696d]">
+        <p className="max-w-md text-sm leading-6 text-muted-foreground">
           {objective
             ? 'Здесь появятся завершённые попытки с неверными или пропущенными ответами.'
             : 'Здесь появятся оценки и обратная связь по завершённым попыткам.'}
@@ -411,15 +411,15 @@ function AIEvaluationCard({
 
   return (
     <Card className={cardClassName}>
-      <CardHeader className="border-b border-[#ededeb] p-5">
+      <CardHeader className="border-b border-border p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
-            <MessageQuestion className="size-4 text-[#3b82f6]" aria-hidden />
+            <MessageQuestion className="size-4 text-primary" aria-hidden />
             {materialTypeLabels[skill]} · Band{' '}
             {evaluation.overallBand.toFixed(1)}
           </CardTitle>
           {isSpeaking && !isPronunciationAvailable ? (
-            <span className="text-xs text-[#69696d]">
+            <span className="text-xs text-muted-foreground">
               Оценка по 3 критериям (произношение пока не определяется нашей
               системой)
             </span>
@@ -427,7 +427,7 @@ function AIEvaluationCard({
         </div>
       </CardHeader>
       <CardContent className="grid gap-4 p-5">
-        <p className="text-sm leading-6 text-[#4b5563]">{evaluation.summary}</p>
+        <p className="text-sm leading-6 text-primary">{evaluation.summary}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {criteria.map(({ label, criterion, unavailable, feedback }) =>
             criterion ? (
@@ -435,24 +435,24 @@ function AIEvaluationCard({
                 key={label}
                 className={`rounded-[10px] p-4 ${
                   unavailable
-                    ? 'border border-amber-200/80 bg-amber-50/20'
-                    : 'bg-[#fafaf8]'
+                    ? 'border border-warning-bg/80 bg-warning-bg/20'
+                    : 'bg-background'
                 }`}
               >
                 <p className="flex items-center justify-between gap-2 text-sm font-medium">
                   {label}
                   {unavailable ? (
-                    <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                    <span className="rounded-md border border-warning-bg bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg">
                       Пока не определяется
                     </span>
                   ) : (
-                    <span className="text-[#3b82f6]">
+                    <span className="text-primary">
                       {criterion.band.toFixed(1)}
                     </span>
                   )}
                 </p>
                 {feedback ? (
-                  <p className="mt-2 text-sm leading-6 text-[#69696d]">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {feedback}
                   </p>
                 ) : null}

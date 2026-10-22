@@ -109,7 +109,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
   return (
     <div
-      className="min-h-screen bg-[#f7f7f5] text-[#111111]"
+      className="min-h-screen bg-background text-foreground"
       onClickCapture={requireLogin}
     >
       <DashboardSidebar className="fixed inset-y-0 left-0 z-40 hidden lg:flex" />
@@ -118,7 +118,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-overlay"
             onClick={() => setNavigationIsOpen(false)}
             aria-label="Закрыть меню"
           />

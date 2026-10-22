@@ -49,7 +49,7 @@ export function UnfinishedTestBanner() {
 
   const renderDraftButton = (draft: AttemptListItem) => {
     const btnClassName =
-      'h-7 sm:h-8 shrink-0 rounded-[7px] sm:rounded-[8px] bg-[#3b82f6] px-2.5 sm:px-3 text-[11px] sm:text-xs font-semibold text-white shadow-none hover:bg-[#2563eb]'
+      'h-7 sm:h-8 shrink-0 rounded-[7px] sm:rounded-[8px] bg-primary px-2.5 sm:px-3 text-[11px] sm:text-xs font-semibold text-primary-foreground shadow-none hover:bg-primary-hover'
 
     // Section attempts of a Full Mock session must go back to the session —
     // the practice routes would start a different attempt.
@@ -78,9 +78,11 @@ export function UnfinishedTestBanner() {
   }
 
   return (
-    <Card className="gap-2 rounded-[14px] sm:rounded-[16px] border border-[#e7e7e4] bg-white p-3 sm:p-4 shadow-none">
-      <h3 className="text-[11px] sm:text-xs font-semibold text-[#808084]">Черновики</h3>
-      <div className="divide-y divide-[#ededeb]">
+    <Card className="gap-2 rounded-[10px] sm:rounded-[10px] border border-border bg-primary-soft p-3 sm:p-4 shadow-none">
+      <h3 className="text-[11px] sm:text-xs font-semibold text-muted-foreground">
+        Черновики
+      </h3>
+      <div className="divide-y divide-border">
         {inProgressAttempts.map((draft) => (
           <div
             key={draft.id}
@@ -90,20 +92,20 @@ export function UnfinishedTestBanner() {
               <div className="flex flex-wrap items-center gap-1.5">
                 <Badge
                   variant="outline"
-                  className="border-blue-200 bg-blue-50 px-1.5 py-0 text-[10px] font-medium text-blue-700"
+                  className="border-border-strong bg-primary-soft px-1.5 py-0 text-[10px] font-medium text-primary"
                 >
                   {skillLabels[draft.materialType]}
                 </Badge>
                 {draft.fullMockSessionId ? (
                   <Badge
                     variant="outline"
-                    className="border-violet-200 bg-violet-50 px-1.5 py-0 text-[10px] font-medium text-violet-700"
+                    className="border-border-strong bg-primary-soft px-1.5 py-0 text-[10px] font-medium text-primary"
                   >
                     Full Mock
                   </Badge>
                 ) : null}
               </div>
-              <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm font-semibold leading-snug text-[#111111]">
+              <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm font-semibold leading-snug text-foreground">
                 {draft.testTitle || 'Практический тест'}
               </p>
             </div>

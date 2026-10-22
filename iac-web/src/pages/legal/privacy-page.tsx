@@ -19,14 +19,14 @@ export function PrivacyPage() {
   return (
     <LegalShell
       title="Политика конфиденциальности"
-      subtitle="Настоящая Политика описывает, как платформа Daiyndyq IELTS собирает, использует, шифрует, хранит и защищает ваши персональные данные при использовании образовательного сервиса."
+      subtitle="Настоящая Политика описывает, как платформа Yrys Academy собирает, использует, шифрует, хранит и защищает ваши персональные данные при использовании образовательного сервиса."
       lastUpdated="5 октября 2026 г."
       version="1.1"
       toc={PRIVACY_TOC}
     >
-      <div className="space-y-10 text-sm leading-relaxed text-[#334155]">
+      <div className="space-y-10 text-sm leading-relaxed text-foreground">
         {/* Intro Highlight Box */}
-        <div className="rounded-[12px] border border-[#bfdbfe] bg-[#eff6ff] p-5 text-[#1e3a8a]">
+        <div className="rounded-[10px] border border-primary-soft bg-primary-soft p-5 text-primary">
           <p className="font-semibold">
             Краткое резюме наших принципов безопасности:
           </p>
@@ -66,7 +66,7 @@ export function PrivacyPage() {
 
         {/* Section 1 */}
         <section id="general" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             1. Общие положения
           </h2>
           <p>
@@ -74,8 +74,7 @@ export function PrivacyPage() {
             определяет порядок сбора, накопления, хранения, использования,
             распространения, обезличивания, блокирования и уничтожения
             персональных данных пользователей онлайн-платформы подготовки к
-            экзамену IELTS «Daiyndyq IELTS» (далее — «Сервис», «Платформа»,
-            «мы»).
+            экзамену IELTS «Yrys Academy» (далее — «Сервис», «Платформа», «мы»).
           </p>
           <p>
             1.2. Сервис соблюдает права и свободы граждан при обработке
@@ -96,32 +95,32 @@ export function PrivacyPage() {
 
         {/* Section 2 */}
         <section id="controller" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             2. Оператор персональных данных и контакты
           </h2>
           <p>
             2.1. Оператором базы персональных данных пользователей Сервиса
-            является проект «Daiyndyq IELTS» (г. Астана, Республика Казахстан).
+            является проект «Yrys Academy» (г. Астана, Республика Казахстан).
           </p>
           <p>
             2.2. Контактным каналом по всем вопросам обработки, изменения,
             выгрузки или отзыва согласия на обработку персональных данных
             является электронная почта:
           </p>
-          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4 text-xs sm:text-sm">
-            <p className="font-semibold text-[#0f172a]">
+          <div className="rounded-lg border border-border bg-background p-4 text-xs sm:text-sm">
+            <p className="font-semibold text-foreground">
               Служба заботы о пользователях и защиты данных:
             </p>
             <p className="mt-1">
               Email:{' '}
               <a
                 href="mailto:kairatovalmat2003@gmail.com"
-                className="font-medium text-[#2563eb] hover:underline"
+                className="font-medium text-primary-hover hover:underline"
               >
                 kairatovalmat2003@gmail.com
               </a>
             </p>
-            <p className="mt-0.5 text-[#64748b]">
+            <p className="mt-0.5 text-muted-foreground">
               Время ответа: до 2 рабочих дней.
             </p>
           </div>
@@ -129,7 +128,7 @@ export function PrivacyPage() {
 
         {/* Section 3 */}
         <section id="data-collected" className="scroll-mt-28 space-y-4">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             3. Категории собираемых персональных данных
           </h2>
           <p>
@@ -139,11 +138,11 @@ export function PrivacyPage() {
           </p>
 
           <div className="space-y-3">
-            <div className="rounded-[10px] border border-[#e2e8f0] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border p-4">
+              <h3 className="font-semibold text-foreground">
                 3.1. Данные авторизации Google (OAuth 2.0)
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569]">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 При входе через Google мы получаем уникальный Google ID (sub),
                 адрес электронной почты (email), а также имя и аватар профиля,
                 предоставляемые Google в соответствии с вашими настройками
@@ -151,11 +150,11 @@ export function PrivacyPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border p-4">
+              <h3 className="font-semibold text-foreground">
                 3.2. Профильные и контактные данные (защищенные шифрованием)
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569]">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 Имя пользователя, указанное при регистрации (для персонального
                 обращения в интерфейсе), а также контактный номер телефона
                 WhatsApp в международном формате (например, +7 700 123 45 67).
@@ -166,11 +165,11 @@ export function PrivacyPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border p-4">
+              <h3 className="font-semibold text-foreground">
                 3.3. Образовательные данные и материалы подготовки
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569]">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 Выбранный формат экзамена (Academic или General Training),
                 целевой балл IELTS и дата сдачи, история выполнения практических
                 заданий и полных симуляторов (Full Mock Exams), выбранные ответы
@@ -180,17 +179,17 @@ export function PrivacyPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border p-4">
+              <h3 className="font-semibold text-foreground">
                 3.4. Техническая и системная информация
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569]">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 IP-адрес пользователя, тип и версия браузера, операционная
                 система, язык интерфейса, метки времени запросов, сессионные
                 JWT-токены авторизации, а также технические события об ошибках
                 приложения, собираемые локально через собственную систему
-                мониторинга без передачи сторонним коммерческим
-                аналитическим компаниям.
+                мониторинга без передачи сторонним коммерческим аналитическим
+                компаниям.
               </p>
             </div>
           </div>
@@ -198,7 +197,7 @@ export function PrivacyPage() {
 
         {/* Section 4 */}
         <section id="purposes" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             4. Цели обработки персональных данных
           </h2>
           <p>
@@ -243,7 +242,7 @@ export function PrivacyPage() {
 
         {/* Section 5 */}
         <section id="ai-processing" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             5. Использование искусственного интеллекта и анализ ответов
           </h2>
           <p>
@@ -271,7 +270,7 @@ export function PrivacyPage() {
 
         {/* Section 6 */}
         <section id="legal-basis" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             6. Правовые основания обработки данных
           </h2>
           <p>
@@ -299,7 +298,7 @@ export function PrivacyPage() {
 
         {/* Section 7 */}
         <section id="third-parties" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             7. Передача данных третьим лицам и трансграничная передача
           </h2>
           <p>
@@ -346,7 +345,7 @@ export function PrivacyPage() {
 
         {/* Section 8 */}
         <section id="encryption-security" className="scroll-mt-28 space-y-4">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             8. Шифрование, хранение и безопасность персональных данных
           </h2>
           <p>
@@ -356,7 +355,7 @@ export function PrivacyPage() {
           </p>
 
           <div className="space-y-3">
-            <div className="rounded-[10px] border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-[#166534]">
+            <div className="rounded-[10px] border border-success-bg bg-success-bg p-4 text-success">
               <h3 className="font-semibold">
                 8.1. Криптографическое шифрование данных при хранении
                 (Encryption at Rest)
@@ -372,11 +371,11 @@ export function PrivacyPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] bg-[#f8fafc] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border bg-background p-4">
+              <h3 className="font-semibold text-foreground">
                 8.2. Безопасное хранение и изоляция ключей дешифрования
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569] leading-relaxed">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Ключ шифрования и дешифрования никогда не сохраняется в открытом
                 виде в исходном коде или репозитории приложения. Ключ хранится в
                 защищенном хранилище секретов CI/CD платформы (GitHub Actions
@@ -386,16 +385,16 @@ export function PrivacyPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] bg-[#f8fafc] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border bg-background p-4">
+              <h3 className="font-semibold text-foreground">
                 8.3. Динамическое дешифрование и строгий ролевой доступ
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-[#475569] leading-relaxed">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Бэкенд расшифровывает данные исключительно в оперативной памяти
                 (in-memory) «на лету» строго при обработке аутентифицированного
                 запроса. Расшифрованные данные доступны строго двум сторонам:
               </p>
-              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-xs sm:text-sm text-[#475569]">
+              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-xs sm:text-sm text-muted-foreground">
                 <li>
                   <strong>Самому пользователю:</strong> прошедшему успешную
                   аутентификацию в системе под своей учетной записью;
@@ -407,18 +406,18 @@ export function PrivacyPage() {
                   панель.
                 </li>
               </ul>
-              <p className="mt-1.5 text-xs text-[#64748b]">
+              <p className="mt-1.5 text-xs text-muted-foreground">
                 Никакой другой пользователь платформы или неавторизованное лицо
                 не имеет технической возможности получить доступ к чужим
                 персональным данным.
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#e2e8f0] p-4">
-              <h3 className="font-semibold text-[#0f172a]">
+            <div className="rounded-[10px] border border-border p-4">
+              <h3 className="font-semibold text-foreground">
                 8.4. Дополнительные меры защиты инфраструктуры
               </h3>
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-xs sm:text-sm text-[#475569]">
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-xs sm:text-sm text-muted-foreground">
                 <li>
                   Использование криптографических протоколов TLS/HTTPS для
                   шифрования всего сетевого трафика между браузером и сервером;
@@ -438,7 +437,7 @@ export function PrivacyPage() {
             </div>
           </div>
 
-          <p className="text-xs text-[#64748b]">
+          <p className="text-xs text-muted-foreground">
             8.5. Персональные данные хранятся в течение всего периода активности
             учетной записи пользователя в Сервисе либо до момента получения
             требования об их уничтожении от пользователя.
@@ -447,7 +446,7 @@ export function PrivacyPage() {
 
         {/* Section 9 */}
         <section id="user-rights" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             9. Права пользователя
           </h2>
           <p>
@@ -468,7 +467,7 @@ export function PrivacyPage() {
               момент, направив обращение на{' '}
               <a
                 href="mailto:kairatovalmat2003@gmail.com"
-                className="text-[#2563eb] hover:underline font-medium"
+                className="text-primary-hover hover:underline font-medium"
               >
                 kairatovalmat2003@gmail.com
               </a>
@@ -484,7 +483,7 @@ export function PrivacyPage() {
               судебном порядке.
             </li>
           </ul>
-          <p className="text-xs text-[#64748b]">
+          <p className="text-xs text-muted-foreground">
             Обратите внимание: при отзыве согласия или удалении персональных
             данных дальнейшее предоставление доступа к личному кабинету и
             истории результатов становится невозможным.
@@ -493,7 +492,7 @@ export function PrivacyPage() {
 
         {/* Section 10 */}
         <section id="cookies" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             10. Файлы cookie и технические данные
           </h2>
           <p>
@@ -527,7 +526,7 @@ export function PrivacyPage() {
 
         {/* Section 11 */}
         <section id="changes" className="scroll-mt-28 space-y-3">
-          <h2 className="text-xl font-bold text-[#0f172a]">
+          <h2 className="text-xl font-bold text-foreground">
             11. Изменение политики конфиденциальности
           </h2>
           <p>

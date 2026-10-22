@@ -67,14 +67,14 @@ export function ProviderStats({ revision }: { revision: number }) {
   return (
     <section
       aria-label="Статистика провайдеров"
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+      className="overflow-hidden rounded-xl border border-border bg-card"
     >
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 p-5">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border p-5">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-foreground">
             Скорость и надёжность
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
             Сравнивайте модели на одинаковых задачах. Успех означает корректный
             формат ответа, не оценку качества IELTS.
           </p>
@@ -82,7 +82,7 @@ export function ProviderStats({ revision }: { revision: number }) {
         <div className="flex flex-wrap items-center gap-2">
           <select
             aria-label="Период статистики"
-            className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm"
+            className="h-9 rounded-lg border border-border bg-card px-2 text-sm"
             value={days}
             onChange={(event) => setDays(Number(event.target.value))}
           >
@@ -92,7 +92,7 @@ export function ProviderStats({ revision }: { revision: number }) {
           </select>
           <select
             aria-label="Задача для статистики"
-            className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm"
+            className="h-9 rounded-lg border border-border bg-card px-2 text-sm"
             value={purpose}
             onChange={(event) => setPurpose(event.target.value)}
           >
@@ -114,19 +114,19 @@ export function ProviderStats({ revision }: { revision: number }) {
         </div>
       </header>
       {error && (
-        <p role="alert" className="p-5 text-sm text-red-700">
+        <p role="alert" className="p-5 text-sm text-destructive">
           {error}
         </p>
       )}
       {data?.migrationRequired ? (
-        <p className="p-5 text-sm text-slate-500">
+        <p className="p-5 text-sm text-muted-foreground">
           История запросов начнёт сохраняться после миграции 000032. Ключи,
           промпты и ответы в статистику не попадают.
         </p>
       ) : (
         <>
           {!busy && !models.length && (
-            <p className="p-5 text-sm text-slate-500">
+            <p className="p-5 text-sm text-muted-foreground">
               Пока нет измерений за этот период. Нажмите «Проверить» у
               провайдера или используйте Юки / проверку работы.
             </p>
@@ -134,7 +134,7 @@ export function ProviderStats({ revision }: { revision: number }) {
           {models.length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[920px] text-left text-sm">
-                <thead className="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
+                <thead className="border-b border-border bg-card text-xs text-muted-foreground">
                   <tr>
                     {[
                       'Провайдер / модель',
@@ -162,27 +162,27 @@ export function ProviderStats({ revision }: { revision: number }) {
                     return (
                       <tr
                         key={`${row.providerId}:${row.model}:${row.purpose}`}
-                        className="border-b border-slate-100 last:border-0"
+                        className="border-b border-border last:border-0"
                       >
                         <td className="max-w-64 px-4 py-4">
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-foreground">
                             {row.providerName}
                           </p>
-                          <p className="mt-1 break-all text-xs text-slate-500">
+                          <p className="mt-1 break-all text-xs text-muted-foreground">
                             {row.model}
                           </p>
                         </td>
                         <td className="px-4 py-4">{purposes[row.purpose]}</td>
                         <td className="px-4 py-4 tabular-nums">
                           {row.calls}
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-muted-foreground">
                             {row.successes < 5
                               ? 'Мало данных'
                               : `${row.failures} ошибок · ${row.timeouts} таймаутов`}
                           </p>
                         </td>
                         <td className="px-4 py-4 tabular-nums">{rate}</td>
-                        <td className="px-4 py-4 tabular-nums text-emerald-700">
+                        <td className="px-4 py-4 tabular-nums text-success">
                           {row.wins}
                         </td>
                         <td className="px-4 py-4 font-medium tabular-nums">
@@ -194,7 +194,7 @@ export function ProviderStats({ revision }: { revision: number }) {
                         <td className="px-4 py-4 tabular-nums">
                           {duration(row.firstTokenMs)}
                         </td>
-                        <td className="px-4 py-4 tabular-nums text-slate-500">
+                        <td className="px-4 py-4 tabular-nums text-muted-foreground">
                           {row.cancelled}
                         </td>
                       </tr>
@@ -204,7 +204,7 @@ export function ProviderStats({ revision }: { revision: number }) {
               </table>
             </div>
           )}
-          <p className="border-t border-slate-100 px-5 py-3 text-xs leading-5 text-slate-500">
+          <p className="border-t border-border px-5 py-3 text-xs leading-5 text-muted-foreground">
             p50 — медиана, p95 — задержка для 95% корректных ответов. Отменённые
             пользователем запросы не считаются ошибками и не входят в эти
             задержки. Первый токен измеряется для streaming; «Проверить»
@@ -212,13 +212,13 @@ export function ProviderStats({ revision }: { revision: number }) {
             отражают только успешные ответы, отдельно от ошибок и таймаутов.
           </p>
           {recent.length > 0 && (
-            <details className="border-t border-slate-100">
-              <summary className="cursor-pointer px-5 py-4 text-sm font-medium text-slate-800">
+            <details className="border-t border-border">
+              <summary className="cursor-pointer px-5 py-4 text-sm font-medium text-foreground">
                 Последние попытки ({recent.length})
               </summary>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-500">
+                  <thead className="bg-card text-muted-foreground">
                     <tr>
                       {[
                         'Время',
@@ -236,17 +236,17 @@ export function ProviderStats({ revision }: { revision: number }) {
                   </thead>
                   <tbody>
                     {recent.map((row) => (
-                      <tr key={row.id} className="border-b border-slate-100">
+                      <tr key={row.id} className="border-b border-border">
                         <td className="whitespace-nowrap px-4 py-3">
                           {new Date(row.startedAt).toLocaleString('ru-RU')}
                         </td>
                         <td className="max-w-56 px-4 py-3">
                           <p className="font-medium">{row.providerName}</p>
-                          <p className="mt-1 break-all text-slate-500">
+                          <p className="mt-1 break-all text-muted-foreground">
                             {row.model}
                           </p>
                           <p
-                            className="mt-1 break-all text-[10px] text-slate-400"
+                            className="mt-1 break-all text-[10px] text-muted-foreground"
                             title="ID гонки / запроса"
                           >
                             {row.runId}
@@ -260,17 +260,17 @@ export function ProviderStats({ revision }: { revision: number }) {
                           <span
                             className={
                               row.won
-                                ? 'text-emerald-700'
+                                ? 'text-success'
                                 : row.outcome === 'failure' ||
                                     row.outcome === 'timeout'
-                                  ? 'text-amber-700'
-                                  : 'text-slate-500'
+                                  ? 'text-warning-fg'
+                                  : 'text-muted-foreground'
                             }
                           >
                             {row.won ? 'Победитель' : outcomes[row.outcome]}
                           </span>
                           {row.code && (
-                            <p className="mt-1 text-slate-400">
+                            <p className="mt-1 text-muted-foreground">
                               {row.code}
                               {row.httpStatus
                                 ? ` · HTTP ${row.httpStatus}`

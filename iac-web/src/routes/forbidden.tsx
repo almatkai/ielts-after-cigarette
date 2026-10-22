@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 export const Route = createFileRoute('/forbidden')({
   head: () => ({
     meta: [
-      { title: 'Доступ запрещён — Daiyndyq IELTS' },
+      { title: 'Доступ запрещён — Yrys Academy' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),
@@ -16,19 +16,19 @@ export const Route = createFileRoute('/forbidden')({
 
 function ForbiddenPage() {
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f7f7f5] p-5">
-      <Card className="w-full max-w-md rounded-[16px] border-[#e7e7e4] shadow-none">
+    <main className="grid min-h-screen place-items-center bg-background p-5">
+      <Card className="w-full max-w-md rounded-[10px] border-border shadow-none">
         <CardContent className="flex flex-col items-center p-8 text-center">
-          <span className="grid size-12 place-items-center rounded-full bg-[#fff0f0] text-[#e23b3b]">
+          <span className="grid size-12 place-items-center rounded-full bg-destructive-soft text-destructive">
             <ShieldCross className="size-6" aria-hidden />
           </span>
-          <h1 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-5 text-2xl font-semibold tracking-normal">
             Недостаточно прав
           </h1>
-          <p className="mt-3 text-sm leading-6 text-[#69696d]">
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Этот раздел доступен редакторам и администраторам платформы.
           </p>
-          <Button asChild className="mt-6 bg-[#3b82f6] hover:bg-[#2563eb]">
+          <Button asChild className="mt-6 bg-primary hover:bg-primary-hover">
             <Link to="/">Вернуться в кабинет</Link>
           </Button>
         </CardContent>

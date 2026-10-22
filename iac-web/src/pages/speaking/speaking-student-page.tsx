@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import {
   ArrowLeft,
   Book,
@@ -192,9 +193,10 @@ export function SpeakingAttemptRunner({
           </Link>
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <BrandLogo variant="mark" />
           <div>
-            <h1 className="sr-only">{material.title}</h1>
-            <p className="mt-1 text-sm text-[#69696d]">
+            <h1 className="font-sans sr-only">{material.title}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               {material.examType === 'academic'
                 ? 'Academic'
                 : 'General Training'}
@@ -216,7 +218,7 @@ export function SpeakingAttemptRunner({
               size="sm"
               disabled={isExiting || session.isSubmitting}
               onClick={handleContinueLater}
-              className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+              className="gap-1.5 rounded-[10px] border-border text-xs font-semibold text-foreground hover:bg-card shadow-none"
             >
               {isExiting ? 'Сохраняем…' : 'Продолжить позже'}
             </Button>
@@ -226,7 +228,7 @@ export function SpeakingAttemptRunner({
       {session.exitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
           Не удалось сохранить черновик: {session.exitError}
         </p>
@@ -234,7 +236,7 @@ export function SpeakingAttemptRunner({
       {session.submitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
           Не удалось отправить Speaking: {session.submitError}
         </p>
@@ -253,7 +255,7 @@ export function SpeakingAttemptRunner({
             <button
               key={item.id}
               type="button"
-              className={`rounded-lg border px-3 py-2 text-left text-sm ${index === activeIndex ? 'border-[#3b82f6] bg-[#eff6ff]' : 'border-[#deded9]'} ${ready ? 'text-emerald-700' : 'text-[#69696d]'}`}
+              className={`rounded-lg border px-3 py-2 text-left text-sm ${index === activeIndex ? 'border-primary bg-primary-soft' : 'border-border'} ${ready ? 'text-success' : 'text-muted-foreground'}`}
               onClick={() => setActiveIndex(index)}
             >
               <span className="block font-semibold">Part {item.position}</span>
@@ -413,11 +415,11 @@ function SpeakingPartRunner({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Microphone2 className="size-5 text-[#3b82f6]" aria-hidden />
+              <Microphone2 className="size-5 text-primary" aria-hidden />
               Part {part.position}: {part.title}
             </CardTitle>
             {part.instructions ? (
-              <p className="mt-2 text-sm leading-6 text-[#69696d]">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {part.instructions}
               </p>
             ) : null}
@@ -434,7 +436,7 @@ function SpeakingPartRunner({
       <CardContent className="grid gap-5">
         <PartPrompt part={part} />
         {recordingError ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]">
+          <p className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-sm text-destructive">
             {recordingError}
           </p>
         ) : null}
@@ -446,7 +448,7 @@ function SpeakingPartRunner({
             </Button>
           ) : null}
           {phase === 'preparing' ? (
-            <p className="flex items-center gap-2 text-sm text-[#69696d]">
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
               Подготовьте идеи: запись начнётся только после нажатия «Начать
               ответ».
             </p>
@@ -469,10 +471,10 @@ function SpeakingPartRunner({
             </Button>
           ) : null}
           {phase === 'uploading' || recorder.isUploading ? (
-            <p className="text-sm text-[#69696d]">Сохраняем запись…</p>
+            <p className="text-sm text-muted-foreground">Сохраняем запись…</p>
           ) : null}
           {(phase === 'finished' || hasRecording) && !recorder.isUploading ? (
-            <p className="flex items-center gap-2 text-sm text-emerald-700">
+            <p className="flex items-center gap-2 text-sm text-success">
               <TickCircle className="size-4" aria-hidden />
               Запись сохранена.
             </p>
@@ -493,7 +495,7 @@ function SpeakingPartRunner({
             className="resize-y text-base leading-7"
             placeholder="Можно напечатать ответ вручную или наговорить голосом — аудио расшифруется автоматически."
           />
-          <p className="text-xs text-[#808084]">
+          <p className="text-xs text-muted-foreground">
             Наша система пока не может определить произношение (Pronunciation).
             Оценка будет сформирована по беглости, словарному запасу и
             грамматической точности.
@@ -550,7 +552,7 @@ function SpeakingPartRunner({
 function PartPrompt({ part }: { part: SpeakingPart }) {
   if (part.type === 'part2') {
     return (
-      <div className="rounded-xl bg-[#f7f7f5] p-5 text-sm leading-6">
+      <div className="rounded-xl bg-background p-5 text-sm leading-6">
         <p className="font-semibold">{part.title}</p>
         <ul className="mt-3 list-disc space-y-1 pl-5">
           {part.cueCard.map((prompt) => (
@@ -561,11 +563,11 @@ function PartPrompt({ part }: { part: SpeakingPart }) {
     )
   }
   return (
-    <div className="rounded-xl bg-[#f7f7f5] p-5 text-sm leading-6">
+    <div className="rounded-xl bg-background p-5 text-sm leading-6">
       <ol className="grid gap-3">
         {part.questions.map((question) => (
           <li key={question.id}>
-            <span className="mr-2 font-semibold text-[#3b82f6]">
+            <span className="mr-2 font-semibold text-primary">
               {question.position}.
             </span>
             {question.prompt}
@@ -607,10 +609,10 @@ export function SpeakingAttemptResult({
       />
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           Работа над ошибками
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{material.title}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{material.title}</p>
       </div>
 
       {detailQuery.isError ? (
@@ -702,11 +704,11 @@ function SpeakingEvaluationView({
       />
 
       {evaluation.summary ? (
-        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
+          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
             Резюме экзаменатора
           </p>
-          <p className="text-sm leading-relaxed text-slate-700">
+          <p className="text-sm leading-relaxed text-foreground">
             {evaluation.summary}
           </p>
         </Card>
@@ -716,26 +718,26 @@ function SpeakingEvaluationView({
         {criteriaFeedback.map(([label, criterion, unavailable]) => (
           <Card
             key={label}
-            className={`rounded-[16px] border bg-white shadow-xs ${
+            className={`rounded-[10px] border bg-card shadow-none ${
               unavailable
-                ? 'border-amber-200/80 bg-amber-50/20'
-                : 'border-[#e7e7e4]'
+                ? 'border-warning-bg/80 bg-warning-bg/20'
+                : 'border-border'
             }`}
           >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <h2 className="font-semibold text-foreground">{label}</h2>
                 {unavailable ? (
-                  <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
+                  <span className="rounded-md bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg border border-warning-bg">
                     Пока не определяется
                   </span>
                 ) : (
-                  <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
+                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-sm font-bold text-primary">
                     {criterion.band.toFixed(1)}
                   </span>
                 )}
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {criterion.feedback ||
                   (unavailable
                     ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.'
@@ -753,8 +755,8 @@ function SpeakingEvaluationView({
           <CardContent className="grid gap-4 text-sm leading-6">
             <p>{part.feedback}</p>
             {part.transcript ? (
-              <div className="rounded-xl bg-[#f7f7f5] p-4">
-                <p className="mb-1 text-xs font-semibold text-[#69696d]">
+              <div className="rounded-xl bg-background p-4">
+                <p className="mb-1 text-xs font-semibold text-muted-foreground">
                   РАСШИФРОВКА
                 </p>
                 {part.transcript}
@@ -765,7 +767,7 @@ function SpeakingEvaluationView({
           </CardContent>
         </Card>
       ))}
-      <p className="flex items-center gap-2 text-xs text-[#808084]">
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <Book className="size-4" aria-hidden />
         Оценка носит учебный характер; фактический результат IELTS определяет
         экзаменатор.
@@ -779,7 +781,7 @@ function FeedbackList({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
       <p className="font-semibold">{title}</p>
-      <ul className="mt-1 list-disc pl-5 text-[#69696d]">
+      <ul className="mt-1 list-disc pl-5 text-muted-foreground">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}

@@ -45,7 +45,7 @@ export const Route = createFileRoute('/login')({
   },
   head: () => ({
     meta: [
-      { title: 'Войти в Daiyndyq IELTS — подготовка к IELTS' },
+      { title: 'Войти — Yrys Academy' },
       {
         name: 'description',
         content: 'Вход в личный кабинет платформы подготовки к IELTS.',
@@ -76,7 +76,7 @@ function LoginPage() {
     <AuthShell>
       {returning ? (
         <p
-          className="px-6 py-8 text-center text-sm text-[#475569]"
+          className="px-6 py-8 text-center text-sm text-muted-foreground"
           role="status"
         >
           Завершаем вход через Google…

@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import {
   Book,
   Category,
@@ -125,16 +126,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5] text-[#111111]">
-      <header className="border-b border-[#e7e7e4] bg-white">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex min-h-16 max-w-[1280px] items-center justify-between gap-4 px-5 sm:px-7">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#111111] text-white">
-              <ShieldTick className="size-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">IAC Admin</p>
-              <p className="truncate text-xs text-[#808084]">
+            <BrandLogo />
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-sm font-semibold">
+                Yrys Academy Admin
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
                 {auth.user?.displayName} ·{' '}
                 {auth.user?.role === 'EDITOR' ? 'Сотрудник' : auth.user?.role}
               </p>
@@ -189,7 +190,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <section key={group.id} aria-labelledby={`admin-nav-${group.id}`}>
                 <h2
                   id={`admin-nav-${group.id}`}
-                  className="mb-2 px-4 text-xs font-medium text-[#808084]"
+                  className="mb-2 px-4 text-xs font-medium text-muted-foreground"
                 >
                   {group.label}
                 </h2>
@@ -207,12 +208,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                           }
                           activeProps={{
                             className:
-                              'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                              'bg-primary-soft font-semibold text-primary',
                           }}
                           inactiveProps={{
-                            className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                            className: 'text-muted-foreground hover:bg-muted',
                           }}
-                          className="flex min-h-10 items-center gap-3 rounded-[10px] px-4 py-2 text-sm no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
+                          className="flex min-h-10 items-center gap-3 rounded-[10px] px-4 py-2 text-sm no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                           <Icon className="size-[18px] shrink-0" aria-hidden />
                           {label}

@@ -48,13 +48,13 @@ export function WritingMaterialsPage() {
     <div className="grid gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-[0.08em] text-[#3b82f6] uppercase">
+          <p className="text-xs font-semibold text-primary normal-case">
             Writing
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
             Библиотека материалов
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#69696d]">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             По два задания: Academic Task 1 с визуалом или General letter, и
             общий Task 2.
           </p>
@@ -65,7 +65,7 @@ export function WritingMaterialsPage() {
               <DocumentUpload aria-hidden /> Импорт JSON
             </Link>
           </Button>
-          <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+          <Button asChild className="bg-primary hover:bg-primary-hover">
             <Link to="/admin/writing/materials/new">
               <DocumentForward aria-hidden /> Создать вручную
             </Link>
@@ -74,14 +74,14 @@ export function WritingMaterialsPage() {
       </div>
       {materialsQuery.isPending ? (
         <Card className="shadow-none">
-          <CardContent className="p-8 text-center text-sm text-[#69696d]">
+          <CardContent className="p-8 text-center text-sm text-muted-foreground">
             Загружаем материалы…
           </CardContent>
         </Card>
       ) : materialsQuery.isError ? (
         <Card className="shadow-none">
           <CardContent className="flex flex-col items-center p-8 text-center">
-            <Warning2 className="size-6 text-[#e23b3b]" aria-hidden />
+            <Warning2 className="size-6 text-destructive" aria-hidden />
             <p className="mt-3 text-sm">Не удалось загрузить библиотеку.</p>
             <Button
               type="button"
@@ -96,9 +96,9 @@ export function WritingMaterialsPage() {
       ) : materialsQuery.data.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="flex flex-col items-center p-10 text-center">
-            <Edit2 className="size-8 text-[#9a9a9d]" aria-hidden />
+            <Edit2 className="size-8 text-muted-foreground" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">Материалов пока нет</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#69696d]">
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               Создайте первый набор из Task 1 и Task 2, затем опубликуйте его
               для студентов.
             </p>
@@ -116,14 +116,14 @@ export function WritingMaterialsPage() {
                     <Badge
                       className={
                         material.status === 'PUBLISHED'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-[#f4f4f1] text-[#69696d]'
+                          ? 'bg-success-bg text-success'
+                          : 'bg-muted text-muted-foreground'
                       }
                     >
                       {material.status}
                     </Badge>
                     {material.hasUnpublishedChanges ? (
-                      <span className="text-xs text-amber-700">
+                      <span className="text-xs text-warning-fg">
                         Есть неопубликованные изменения
                       </span>
                     ) : null}
@@ -131,7 +131,7 @@ export function WritingMaterialsPage() {
                   <h2 className="mt-3 truncate text-base font-semibold">
                     {material.title}
                   </h2>
-                  <p className="mt-1 truncate text-xs text-[#808084]">
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
                     /{material.slug} · версия {material.currentVersionNumber}
                   </p>
                 </div>

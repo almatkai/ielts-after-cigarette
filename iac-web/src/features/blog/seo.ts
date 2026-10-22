@@ -1,7 +1,7 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestUrl } from '@tanstack/react-start/server'
 
-export const BLOG_SITE_NAME = 'Daiyndyq IELTS'
+export const BLOG_SITE_NAME = 'Yrys Academy'
 export const BLOG_TITLE = `Блог ${BLOG_SITE_NAME}`
 export const BLOG_DESCRIPTION =
   'Стратегии, разборы и личный опыт подготовки к IELTS от авторов с подтверждённым баллом 7.5+.'

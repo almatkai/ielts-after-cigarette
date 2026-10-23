@@ -748,3 +748,24 @@ for (const language of ['kk', 'en']) {
     }
   }
 }
+
+for (const key of ['Enter', 'Space']) {
+  test(`Yuki: ${key} dismisses the hint without opening chat`, async ({
+    page,
+  }) => {
+    await fixtures(page)
+    await page.goto('./practice')
+    const dismiss = page.getByRole('button', {
+      name: 'Скрыть подсказку',
+      exact: true,
+    })
+    await dismiss.focus()
+    await dismiss.press(key)
+    await expect(page.getByTestId('yuki-hint')).toHaveCount(0)
+    await expect(page.locator('#ai-assistant-widget')).toHaveCount(0)
+    await expect(fox(page)).toBeVisible()
+    expect(
+      await page.evaluate(() => localStorage.getItem('iac_show_mascot')),
+    ).not.toBe('false')
+  })
+}

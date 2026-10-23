@@ -345,6 +345,7 @@ for (const theme of ['light', 'dark'] as const) {
       import {ReadingReviewSplitRunner} from '/app/src/pages/reading/reading-review-split-runner.tsx';
       import {PreviewEvidenceText} from '/app/src/features/admin/preview-answer.tsx';
       import {Badge} from '/app/src/components/ui/badge.tsx';
+      import {LanguageProvider} from '/app/src/lib/i18n.tsx';
       import {QueryClient,QueryClientProvider} from '/app/node_modules/.vite/deps/@tanstack_react-query.js';
       const {m,a}=window.reviewFixture;
       const host=document.createElement('div');host.id='review-component-fixture';host.style.cssText='position:absolute;inset:0;z-index:1000;background:var(--background)';document.body.append(host);
@@ -354,7 +355,7 @@ for (const theme of ['light', 'dark'] as const) {
         React.createElement('article',{className:'blog-article'},React.createElement('mark',null,'Blog highlighted evidence')),
         React.createElement(Badge,{variant:'destructive'},'Destructive status'))});
       const router=createRouter({routeTree:route,history:createMemoryHistory({initialEntries:['/']})});
-      ReactDOM.createRoot(host).render(React.createElement(QueryClientProvider,{client:new QueryClient()},React.createElement(RouterProvider,{router}))); 
+      ReactDOM.createRoot(host).render(React.createElement(LanguageProvider,null,React.createElement(QueryClientProvider,{client:new QueryClient()},React.createElement(RouterProvider,{router}))));
     `,
     })
     const evidence = page
@@ -476,3 +477,30 @@ for (const theme of ['light', 'dark'] as const) {
       )
   })
 }
+
+test('profile reuses the translated Yuki settings wording in RU, KK and EN', async ({
+  page,
+}) => {
+  await fixtures(page)
+  for (const [locale, label, description] of [
+    [
+      'ru',
+      'Показывать подсказку Юки',
+      'Управление подсказкой помощника в интерфейсе.',
+    ],
+    ['kk', 'Юки кеңесін көрсету', 'Интерфейстегі көмекшінің кеңесін басқару.'],
+    ['en', 'Show Yuki prompt', 'Manage assistant tips in the interface.'],
+  ]) {
+    await page.goto('./profile')
+    await page.evaluate(
+      (value) => localStorage.setItem('daiyndyq-language', value),
+      locale,
+    )
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('lang', locale)
+    await expect(
+      page.getByRole('switch', { name: label, exact: true }),
+    ).toBeVisible()
+    await expect(page.getByText(description, { exact: true })).toBeVisible()
+  }
+})

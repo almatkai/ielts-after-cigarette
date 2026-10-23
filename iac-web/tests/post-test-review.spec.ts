@@ -383,7 +383,7 @@ for (const skill of ['reading', 'listening']) {
       page.getByText(`${skill}: right question`, { exact: true }),
     ).toHaveCount(0)
     await expect(
-      page.getByRole('navigation', { name: 'Секции Full Mock' }),
+      page.getByRole('navigation', { name: 'Full Mock sections' }),
     ).toHaveCount(0)
     await expect(
       page.getByText(`${skill}-correct`, { exact: true }),
@@ -701,10 +701,8 @@ test('submission immediately shows this test’s mistake cards', async ({
 }) => {
   await fixtures(page, { fresh: true })
   await page.goto('./exam/listening/material')
-  await page
-    .getByRole('button', { name: 'Завершить тест', exact: true })
-    .click()
-  await page.getByRole('button', { name: 'Завершить', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish test', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish', exact: true }).click()
   await expect(
     page.getByRole('heading', { name: 'Работа над ошибками', exact: true }),
   ).toBeVisible()
@@ -712,7 +710,7 @@ test('submission immediately shows this test’s mistake cards', async ({
     page.getByRole('button', { name: 'Разобрать ошибку 1', exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toHaveCount(0)
 })
 
@@ -721,17 +719,35 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
+<<<<<<< HEAD
   await page
     .getByRole('link', { name: 'Reading: работа над ошибками', exact: true })
+=======
+  const cards = page.getByRole('group', { name: 'Full Mock sections' })
+  await cards
+    .getByRole('button', { name: 'Show Reading review', exact: true })
+>>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
     .click()
   const tabs = page.getByRole('navigation', { name: 'Секции Full Mock' })
   await expect(
+<<<<<<< HEAD
     tabs.getByRole('link', { name: 'Reading', exact: true }),
   ).toHaveAttribute('aria-current', 'page')
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
   await tabs.getByRole('link', { name: 'Listening', exact: true }).click()
+=======
+    cards.getByRole('button', { name: 'Show Reading review', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page).toHaveURL(/\/mock-session\?section=2$/)
+  await expect(
+    page.getByText('reading: wrong question', { exact: true }),
+  ).toBeVisible()
+  await cards
+    .getByRole('button', { name: 'Show Listening review', exact: true })
+    .click()
+>>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
   ).toBeVisible()
@@ -740,6 +756,7 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   ).toHaveCount(0)
   await page.reload()
   await expect(
+<<<<<<< HEAD
     tabs.getByRole('link', { name: 'Listening', exact: true }),
   ).toHaveAttribute('aria-current', 'page')
   await tabs.getByRole('link', { name: 'Writing', exact: true }).click()
@@ -751,6 +768,25 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
     page.getByText('Speaking suggestion', { exact: false }),
   ).toBeVisible()
   await page.getByRole('link', { name: 'К результату', exact: true }).click()
+=======
+    cards.getByRole('button', { name: 'Show Listening review', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await cards
+    .getByRole('button', { name: 'Show Writing review', exact: true })
+    .click()
+  await expect(
+    page.getByText('Writing suggestion', { exact: false }),
+  ).toBeVisible()
+  await cards
+    .getByRole('button', { name: 'Show Speaking review', exact: true })
+    .click()
+  await expect(
+    page.getByText('Speaking suggestion', { exact: false }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
+  ).toHaveCount(0)
+>>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
   await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
   ).toBeVisible()
@@ -806,7 +842,7 @@ test('empty attempts and pending AI have correct states', async ({ page }) => {
   await page.goto('./attempts/writing-attempt?session=mock-session')
   await expect(page.getByText('Проверяется', { exact: true })).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toBeVisible()
 })
 

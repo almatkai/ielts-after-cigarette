@@ -135,7 +135,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <BrandLogo />
             <div className="hidden min-w-0 sm:block">
               <p className="truncate text-sm font-semibold">
-                {t('Администрирование — Yrys Academy')}
+                {t('Администрирование')}
               </p>
               <p className="truncate text-xs text-muted-foreground">
                 {auth.user?.displayName} ·{' '}

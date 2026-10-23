@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'public'
 BRAND = OUT / 'brand'
 BRAND.mkdir(exist_ok=True)
-TEAL = '#0B5563'
+BRAND_BLUE = '#3C82F6'
 PAPER = '#F6F7F5'
 
 
@@ -46,8 +46,8 @@ for name, source in [('horizontal', horizontal), ('stacked', stacked), ('mark', 
 
 
 def tile(size, rounded=True):
-    result = Image.new('RGBA', (size, size), TEAL)
-    # Full bleed teal for opaque Apple and maskable icons. Corners are drawn by OS.
+    result = Image.new('RGBA', (size, size), BRAND_BLUE)
+    # Full bleed blue for opaque Apple and maskable icons. Corners are drawn by OS.
     emblem = white(mark)
     emblem.thumbnail((round(size * .64), round(size * .64)), Image.Resampling.LANCZOS)
     result.alpha_composite(emblem, ((size-emblem.width)//2, (size-emblem.height)//2))
@@ -88,6 +88,6 @@ for lang, caption in [('ru','Подготовка к IELTS онлайн'), ('kk'
 # BASE_URL is /app/ in vite.config.ts; preserve the application's deployment scope.
 (OUT / 'manifest.webmanifest').write_text(json.dumps({
     'name':'Yrys Academy','short_name':'Yrys','start_url':'/app/','scope':'/app/',
-    'display':'standalone','background_color':PAPER,'theme_color':TEAL,
+    'display':'standalone','background_color':PAPER,'theme_color':BRAND_BLUE,
     'icons':[{'src':f'icon-{size}.png','sizes':f'{size}x{size}','type':'image/png'} for size in [192,512]] + [{'src':'icon-maskable-512.png','sizes':'512x512','type':'image/png','purpose':'maskable'}]
 }, indent=2)+'\n')

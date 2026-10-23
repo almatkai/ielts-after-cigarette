@@ -12,7 +12,7 @@ python3 -m venv .brand-venv
 
 Pillow, fontTools and Brotli are pinned in `requirements.txt`. Golos outlines for OG text come from the installed fontsource package. `public/brand/` includes native PNG/lossless WebP and display PNGs at 1×/2×. White variants replace RGB with white while preserving the source alpha exactly. Source images are outside `public/` and do not ship in the client bundle.
 
-Icons use a white mark on Teal. Apple and maskable icons are opaque; their corners are masked by the OS. The webmanifest preserves the Vite `/app/` scope. OG files have the supplied stacked artwork, real Golos text and the existing domain; the KK image is provided for integration, while this application currently has no `/kk/` routes.
+Icons use a white mark on the requested blue `#3C82F6`. Apple and maskable icons are opaque; their corners are masked by the OS. The webmanifest preserves the Vite `/app/` scope. OG files have the supplied stacked artwork, real Golos text and the existing domain; the KK image is provided for integration, while this application currently has no `/kk/` routes.
 
 For browser evidence, run:
 

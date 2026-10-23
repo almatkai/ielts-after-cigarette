@@ -67,10 +67,12 @@
   --card-foreground: var(--foreground);
   --popover: #ffffff;
   --popover-foreground: var(--foreground);
-  --primary: #0b5563;
-  --primary-hover: #08434e;
+  --primary: #3c82f6;
+  --primary-text: #245fc4;
+  --primary-fill: #2563eb;
+  --primary-hover: #1d4ed8;
   --primary-foreground: #ffffff;
-  --primary-soft: #e3eef0;
+  --primary-soft: #eff6ff;
   --secondary: var(--muted);
   --secondary-foreground: var(--foreground);
   --muted: #eef0ee;
@@ -109,10 +111,12 @@
   --border: #2e3337;
   --border-strong: #505a60;
   --muted-foreground: #9aa19f;
-  --primary: #6cc0cf;
-  --primary-hover: #8ad0dc;
+  --primary: #3c82f6;
+  --primary-text: #8fbaff;
+  --primary-fill: #3c82f6;
+  --primary-hover: #73a6fa;
   --primary-foreground: #121416;
-  --primary-soft: #173a40;
+  --primary-soft: #172b49;
   --highlight: #fef08a;
   --highlight-foreground: #17191c;
   --destructive: #f0645a;
@@ -338,7 +342,7 @@ svg path[stroke-width]:not([stroke]) {
 }
 
 .blog-editor .tiptap a {
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -377,7 +381,7 @@ svg path[stroke-width]:not([stroke]) {
 }
 
 .blog-article a {
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -614,7 +618,7 @@ svg path[stroke-width]:not([stroke]) {
 }
 
 .assistant-shell {
-  --assistant-reserve: 104px;
+  --assistant-reserve: 120px;
 }
 .assistant-shell[data-assistant='compact'] {
   --assistant-reserve: 72px;
@@ -624,12 +628,12 @@ svg path[stroke-width]:not([stroke]) {
 }
 @media (min-width: 640px) {
   .assistant-shell {
-    --assistant-reserve: 136px;
+    --assistant-reserve: 152px;
   }
 }
 @media (min-width: 1024px) {
   .assistant-shell {
-    --assistant-reserve: 160px;
+    --assistant-reserve: 168px;
   }
 }
 .assistant-paused [class*='animate-fox-'] {
@@ -652,5 +656,31 @@ svg path[stroke-width]:not([stroke]) {
   .animate-fox-ear {
     animation: none;
     will-change: auto;
+  }
+}
+
+/* Preserve the original Yuki messenger independently of the Yrys theme. */
+.assistant-chat-original {
+  --foreground: #1e293b;
+  --card: #ffffff;
+  --muted: #eef2f6;
+  --muted-foreground: #64748b;
+  --primary: #3c82f6;
+  --primary-text: #245fc4;
+  --primary-fill: #2563eb;
+  --primary-foreground: #ffffff;
+}
+
+.assistant-shell:has([data-testid='yuki-hint']) main {
+  padding-bottom: calc(var(--assistant-reserve) + 140px);
+}
+
+/* Blue is the accent; text and solid controls use readable tonal variants. */
+@layer utilities {
+  .text-primary {
+    color: var(--primary-text);
+  }
+  .bg-primary {
+    background-color: var(--primary-fill);
   }
 }

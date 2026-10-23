@@ -22,7 +22,9 @@ def trim(image):
 
 
 stacked_source = Image.open(ROOT / 'brand/source/yrys-logo-stacked.png').convert('RGBA')
-horizontal = trim(Image.open(ROOT / 'brand/source/yrys-logo-horizontal.png').convert('RGBA'))
+# Approved visible-body ROI; excludes the isolated alpha=1 dot at y=49.
+# Keep the supplied source byte-identical and all other trim rules unchanged.
+horizontal = Image.open(ROOT / 'brand/source/yrys-logo-horizontal.png').convert('RGBA').crop((144, 70, 1831, 611))
 stacked = trim(stacked_source)
 # First connected band of nonempty alpha rows is the complete emblem; no tracing.
 mark = trim(stacked_source.crop((0, 8, stacked_source.width, 720)))

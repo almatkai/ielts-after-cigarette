@@ -413,7 +413,7 @@ export function ProfilePage() {
             <CardHeader className="p-5">
               <CardTitle className="text-base">{t('Помощник Юки')}</CardTitle>
               <CardDescription>
-                {t('Управление подсказкой помощника в интерфейсе.')}
+                {t('Управление отображением питомца Юки в интерфейсе.')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -423,7 +423,7 @@ export function ProfilePage() {
                     htmlFor="profile-mascot-toggle"
                     className="leading-5 text-foreground cursor-pointer"
                   >
-                    {t('Показывать подсказку Юки')}
+                    {t('Показывать питомца (Юки)')}
                   </Label>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {t('Если скрыть, останется маленькая кнопка чата.')}
@@ -433,7 +433,7 @@ export function ProfilePage() {
                   id="profile-mascot-toggle"
                   checked={isMascotVisible}
                   onCheckedChange={setMascotVisible}
-                  aria-label={t('Показывать подсказку Юки')}
+                  aria-label={t('Показывать питомца (Юки)')}
                   className="mt-0.5 data-[state=checked]:bg-primary"
                 />
               </div>

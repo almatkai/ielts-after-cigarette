@@ -1,6 +1,14 @@
 import { Link } from '@tanstack/react-router'
+import { useSyncExternalStore } from 'react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/lib/i18n'
+import { useThemePreference } from '@/features/theme/theme'
+
+function subscribeSystemTheme(listener: () => void) {
+  const media = window.matchMedia('(prefers-color-scheme: dark)')
+  media.addEventListener('change', listener)
+  return () => media.removeEventListener('change', listener)
+}
 
 type BrandLogoProps = {
   variant?: 'horizontal' | 'stacked' | 'mark'
@@ -19,6 +27,16 @@ export function BrandLogo({
   decorative = false,
 }: BrandLogoProps) {
   const { t } = useLanguage()
+  const { preference } = useThemePreference()
+  const systemIsDark = useSyncExternalStore(
+    subscribeSystemTheme,
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches,
+    () => false,
+  )
+  const suffix =
+    preference === 'dark' || (preference === 'system' && systemIsDark)
+      ? '-white'
+      : ''
   const dimensions = {
     horizontal: [1690, 539],
     stacked: [1142, 1316],
@@ -33,22 +51,14 @@ export function BrandLogo({
             : 'brand-responsive-horizontal'),
       )}
     >
-      {['', '-white'].map((suffix) => (
-        <img
-          key={suffix}
-          src={`${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@2x.png`}
-          srcSet={`${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@1x.png 1x, ${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@2x.png 2x`}
-          width={dimensions[kind][0]}
-          height={dimensions[kind][1]}
-          alt={linked || decorative ? '' : 'Yrys Academy'}
-          className={cn(
-            'brand-logo',
-            `brand-logo-${kind}`,
-            suffix ? 'brand-logo-dark' : 'brand-logo-light',
-            className,
-          )}
-        />
-      ))}
+      <img
+        src={`${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@2x.png`}
+        srcSet={`${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@1x.png 1x, ${import.meta.env.BASE_URL}brand/yrys-${kind}${suffix}@2x.png 2x`}
+        width={dimensions[kind][0]}
+        height={dimensions[kind][1]}
+        alt={linked || decorative ? '' : 'Yrys Academy'}
+        className={cn('brand-logo', `brand-logo-${kind}`, className)}
+      />
     </span>
   )
   const logo = (

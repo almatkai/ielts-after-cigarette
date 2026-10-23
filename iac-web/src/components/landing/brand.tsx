@@ -36,7 +36,7 @@ export function BrandLogo({
       ? '-white'
       : ''
   const dimensions = {
-    horizontal: [1690, 539],
+    horizontal: [1687, 541],
     stacked: [1142, 1316],
     mark: [821, 712],
   }

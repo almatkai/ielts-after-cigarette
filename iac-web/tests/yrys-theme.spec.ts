@@ -493,7 +493,12 @@ for (const locale of ['ru', 'kk', 'en'] as const) {
           )
           if (title) await expect(page).toHaveTitle(title)
           await stable(page)
-          await expect(page.locator('img[src*="fox"]')).toHaveCount(0)
+          // The restored assistant is the only permitted fox surface.
+          await expect(
+            page.locator(
+              ':is(img[src*="fox"], img[src*="yuki-avatar"], [data-part="body"]):not([data-testid="yuki-widget"] *, #ai-assistant-widget *)',
+            ),
+          ).toHaveCount(0)
           if (name === 'overview') {
             await expect(
               page.locator('meta[property="og:image"]'),

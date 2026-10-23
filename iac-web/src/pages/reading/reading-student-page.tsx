@@ -455,7 +455,7 @@ function ReadingTestRunner({
         )}
 
         {/* Правая часть шапки: Сохранение, Таймер, Кнопка Завершить */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2.5 sm:gap-3">
           {!preview ? <SaveIndicator state={session.saveState} /> : null}
           {timerEnabled ? (
             <TimeBadge seconds={secondsLeft} label="Time remaining" />

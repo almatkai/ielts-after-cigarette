@@ -256,9 +256,11 @@ for (const theme of ['light', 'dark'] as const) {
     await capture(page, `assistant-sent-code-${theme}`)
     await page.goto('./profile')
     await expect(
-      page.getByRole('switch', { name: 'Показывать подсказку Юки' }),
+      page.getByRole('switch', { name: 'Показывать питомца (Юки)' }),
     ).toBeVisible()
-    await expect(page.getByText(/лисёнка|питомца/)).toHaveCount(0)
+    await expect(
+      page.getByRole('switch', { name: 'Показывать питомца (Юки)' }),
+    ).toBeChecked()
     await capture(page, `profile-${theme}`)
     const criterion = { band: 7, feedback: 'Criterion feedback' }
     await page.route('**/api/v1/attempts/band-result', (route) =>

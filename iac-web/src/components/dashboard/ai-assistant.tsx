@@ -499,8 +499,15 @@ export function AiAssistantChatWindow({
       >
         <div className="flex items-center gap-2.5">
           <div className="relative size-10 shrink-0 rounded-full border-2 border-card bg-primary-soft shadow-none ring-1 ring-primary flex items-center justify-center">
-            <span aria-hidden="true" className="font-semibold text-primary">
-              Ю
+            <span className="size-full overflow-hidden rounded-full">
+              <img
+                src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
+                alt=""
+                aria-hidden="true"
+                width={40}
+                height={40}
+                className="size-full object-cover"
+              />
             </span>
             <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-card bg-success ring-1 ring-success/40" />
           </div>
@@ -523,7 +530,7 @@ export function AiAssistantChatWindow({
               type="button"
               onClick={handleReset}
               title="Очистить диалог"
-              className="p-1.5 rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
               aria-label="Очистить диалог"
             >
               <Refresh className="size-4" />
@@ -534,7 +541,7 @@ export function AiAssistantChatWindow({
             type="button"
             onClick={onClose}
             title="Закрыть чат"
-            className="p-1.5 rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+            className="min-h-11 min-w-11 flex items-center justify-center rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
             aria-label="Закрыть чат"
           >
             <CloseCircle className="size-5" />
@@ -555,13 +562,15 @@ export function AiAssistantChatWindow({
               )}
             >
               {msg.sender === 'fox' ? (
-                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft/60 p-0.5 flex items-center justify-center">
-                  <span
+                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft flex items-center justify-center">
+                  <img
+                    src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
+                    alt=""
                     aria-hidden="true"
-                    className="font-semibold text-primary"
-                  >
-                    Ю
-                  </span>
+                    width={24}
+                    height={24}
+                    className="size-full object-cover"
+                  />
                 </div>
               ) : null}
 
@@ -598,10 +607,15 @@ export function AiAssistantChatWindow({
 
         {isTyping ? (
           <div className="flex items-end gap-2">
-            <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft/60 p-0.5 flex items-center justify-center">
-              <span aria-hidden="true" className="font-semibold text-primary">
-                Ю
-              </span>
+            <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft flex items-center justify-center">
+              <img
+                src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
+                alt=""
+                aria-hidden="true"
+                width={24}
+                height={24}
+                className="size-full object-cover"
+              />
             </div>
             <div className="rounded-xl rounded-bl-xs bg-card border border-border/80 px-3.5 py-2.5 shadow-none flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />

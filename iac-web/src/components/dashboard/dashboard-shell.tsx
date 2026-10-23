@@ -7,6 +7,7 @@ import { DashboardSidebar } from './dashboard-sidebar'
 import { AiAssistantFloatingWidget } from './ai-assistant-widget'
 import { LoginDialog } from '@/components/auth/login-dialog'
 import type { MouseEvent } from 'react'
+import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import { useAuth } from '@/features/auth/auth-store'
 
 const accountDestinations = [
@@ -32,6 +33,7 @@ type DashboardShellProps = {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { user } = useAuth()
+  const { isVisible: mascotIsVisible } = useMascotVisibility()
   const router = useRouter()
   const [loginIsOpen, setLoginIsOpen] = useState(false)
   const [loginDestination, setLoginDestination] = useState<AccountDestination>()
@@ -109,7 +111,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
   return (
     <div
-      className="min-h-screen bg-background text-foreground"
+      className={`min-h-screen bg-background text-foreground${user ? ' assistant-shell' : ''}`}
+      data-assistant={mascotIsVisible ? 'fox' : 'compact'}
       onClickCapture={requireLogin}
     >
       <DashboardSidebar className="fixed inset-y-0 left-0 z-40 hidden lg:flex" />
@@ -140,7 +143,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <main className="min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] p-3 sm:p-7 lg:p-9 min-w-0 max-w-full overflow-x-clip">
           {children}
         </main>
-        {user ? <AiAssistantFloatingWidget /> : null}
+        {user ? <AiAssistantFloatingWidget hidden={navigationIsOpen} /> : null}
       </div>
       <LoginDialog
         open={loginIsOpen}

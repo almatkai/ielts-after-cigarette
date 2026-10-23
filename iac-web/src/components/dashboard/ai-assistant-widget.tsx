@@ -191,6 +191,7 @@ export function AiAssistantFloatingWidget({
               tabIndex={0}
               onClick={() => openChat()}
               onKeyDown={(e) => {
+                if (e.target !== e.currentTarget) return
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
                   openChat()

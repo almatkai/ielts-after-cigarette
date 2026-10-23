@@ -409,7 +409,8 @@ export function ReadingReviewSplitRunner({
                 onClick={() => setActiveQuestionIndex(index)}
                 className={cn(
                   'flex size-8 shrink-0 items-center justify-center rounded-[8px] text-xs font-bold transition-all select-none',
-                  isCurrent && 'ring-2 ring-primary ring-offset-1 scale-105',
+                  isCurrent &&
+                    'ring-2 ring-primary ring-offset-1 ring-offset-card scale-105',
                   isCorrect
                     ? 'bg-success-bg text-success border border-success'
                     : isAnswered
@@ -657,7 +658,7 @@ function HighlightedPassageText({
             {before}
             <span
               ref={quoteRef}
-              className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1"
+              className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1 ring-offset-card"
             >
               {matchText}
             </span>
@@ -697,7 +698,7 @@ function HighlightedPassageText({
       {before}
       <span
         ref={quoteRef}
-        className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1"
+        className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1 ring-offset-card"
       >
         {matchText}
       </span>

@@ -50,7 +50,7 @@ export function DashboardHeader({
             <p className="hidden text-[10px] font-semibold text-muted-foreground normal-case lg:block">
               Рабочее пространство
             </p>
-            <h1 className="truncate text-sm sm:text-base font-semibold tracking-normal text-foreground">
+            <h1 className="font-sans truncate text-sm sm:text-base font-semibold tracking-normal text-foreground">
               {pageTitle}
             </h1>
           </div>

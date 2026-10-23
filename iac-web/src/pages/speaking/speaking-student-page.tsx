@@ -203,7 +203,7 @@ export function SpeakingAttemptRunner({
               {' · '}Part {activeIndex + 1} of {material.parts.length}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-3">
             {sectionDeadlineAt ? (
               <TimeBadge
                 seconds={secondsLeft}
@@ -509,7 +509,7 @@ function SpeakingPartRunner({
           ) : (
             <span />
           )}
-          <div className="flex items-center gap-2.5">
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2.5">
             {onContinueLater ? (
               <Button
                 type="button"

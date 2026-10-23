@@ -63,7 +63,7 @@ export function LegalShell({
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 ">
+      <header className="sticky top-0 z-40 border-b border-border bg-background ">
         <div className="container-shell flex h-18 items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <BrandLogo />

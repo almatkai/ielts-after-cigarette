@@ -188,7 +188,7 @@ function AccountOverviewPage() {
                     {metric.label}
                   </p>
                   <p
-                    className={`mt-0.5 sm:mt-1 text-lg sm:text-2xl leading-none font-semibold tracking-normal ${metric.label === 'Целевой балл' ? 'inline-block rounded-sm bg-gold px-2 py-1 text-gold-foreground' : 'text-foreground'}`}
+                    className={`mt-0.5 sm:mt-1 tabular-nums text-lg sm:text-2xl leading-none font-semibold tracking-normal ${metric.label === 'Целевой балл' ? 'inline-block rounded-sm bg-gold px-2 py-1 text-gold-foreground' : 'text-foreground'}`}
                     style={{
                       fontFamily:
                         metric.label === 'Дата экзамена'

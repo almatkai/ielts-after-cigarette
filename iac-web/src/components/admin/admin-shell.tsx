@@ -132,9 +132,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex min-w-0 items-center gap-3">
             <BrandLogo />
             <div className="hidden min-w-0 sm:block">
-              <p className="truncate text-sm font-semibold">
-                Yrys Academy Admin
-              </p>
+              <p className="truncate text-sm font-semibold">Admin</p>
               <p className="truncate text-xs text-muted-foreground">
                 {auth.user?.displayName} ·{' '}
                 {auth.user?.role === 'EDITOR' ? 'Сотрудник' : auth.user?.role}

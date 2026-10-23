@@ -83,6 +83,8 @@
   --success-bg: #e7f3ec;
   --warning-fg: #8a5a00;
   --warning-bg: #fff4d6;
+  --highlight: #fef08a;
+  --highlight-foreground: #17191c;
   --gold: #f2b705;
   --gold-foreground: #17191c;
   --border: #dde1e0;
@@ -110,6 +112,8 @@
   --primary-hover: #8ad0dc;
   --primary-foreground: #121416;
   --primary-soft: #173a40;
+  --highlight: #fef08a;
+  --highlight-foreground: #17191c;
   --destructive: #f0645a;
   --destructive-soft: #412420;
   --success: #4cc38a;
@@ -164,10 +168,6 @@ a {
     font-weight: 600;
     letter-spacing: 0;
   }
-}
-/* Questions and source texts keep the examination typography. */
-.exam-content h1 {
-  font-family: var(--font-sans);
 }
 .container-shell {
   width: min(100% - 40px, 1240px);
@@ -228,33 +228,35 @@ a {
   border-radius: 4px;
   background: var(--border);
 }
-.brand-logo {
-  display: block;
-  object-fit: contain;
-  height: 32px;
-  width: auto;
-}
-.brand-logo-dark {
-  display: none;
-}
-.dark .brand-logo-light {
-  display: none;
-}
-.dark .brand-logo-dark {
-  display: block;
-}
-.brand-logo-stacked {
-  height: 88px;
-}
-.brand-logo-mark {
-  height: 24px;
-}
-@media (max-width: 639px) {
-  .container-shell {
-    width: min(100% - 32px, 1240px);
+@layer components {
+  .brand-logo {
+    display: block;
+    object-fit: contain;
+    height: 32px;
+    width: auto;
   }
-  .brand-logo-horizontal {
-    height: 28px;
+  .brand-logo-dark {
+    display: none;
+  }
+  .dark .brand-logo-light {
+    display: none;
+  }
+  .dark .brand-logo-dark {
+    display: block;
+  }
+  .brand-logo-stacked {
+    height: 88px;
+  }
+  .brand-logo-mark {
+    height: 24px;
+  }
+  @media (max-width: 639px) {
+    .container-shell {
+      width: min(100% - 32px, 1240px);
+    }
+    .brand-logo-horizontal {
+      height: 28px;
+    }
   }
 }
 @media (max-width: 359px) {

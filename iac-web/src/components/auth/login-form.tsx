@@ -233,7 +233,7 @@ function GoogleSignInCard({
           </p>
         ) : null}
       </CardContent>
-      <CardFooter className="justify-center border-t border-muted px-6 py-4 text-center text-xs leading-5 text-muted-foreground sm:px-8">
+      <CardFooter className="justify-center border-t border-border px-6 py-4 text-center text-xs leading-5 text-muted-foreground sm:px-8">
         <p>
           Входя в систему, вы соглашаетесь с{' '}
           <Link

@@ -87,7 +87,7 @@ export function MarkdownContent({
         blocks.push(
           <pre
             key={`code-${i}`}
-            className="my-2 rounded-xl bg-foreground p-2.5 text-[11px] text-muted-foreground overflow-x-auto font-mono"
+            className="my-2 rounded-xl bg-muted p-2.5 text-[11px] text-foreground overflow-x-auto font-mono"
           >
             <code>{codeBuffer.join('\n')}</code>
           </pre>,
@@ -169,7 +169,7 @@ export function MarkdownContent({
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="bg-muted rounded-md px-4 py-3 border-primary bg-primary-soft/50 pl-2.5 py-1 my-1.5 rounded-r text-[11px] text-foreground italic"
+          className="my-1.5 rounded-md bg-muted px-4 py-3 text-[11px] text-foreground"
         >
           {formatInline(trimmed.replace(/^>\s+/, ''))}
         </blockquote>,
@@ -189,7 +189,7 @@ export function MarkdownContent({
     blocks.push(
       <pre
         key="code-dangling"
-        className="my-2 rounded-xl bg-foreground p-2.5 text-[11px] text-muted-foreground overflow-x-auto font-mono"
+        className="my-2 rounded-xl bg-muted p-2.5 text-[11px] text-foreground overflow-x-auto font-mono"
       >
         <code>{codeBuffer.join('\n')}</code>
       </pre>,

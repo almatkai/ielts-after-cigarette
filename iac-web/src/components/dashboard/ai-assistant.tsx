@@ -1,5 +1,6 @@
 import {
   ArrowLeft2,
+  Maximize4,
   ArrowRight2,
   CloseCircle,
   Refresh,
@@ -473,9 +474,7 @@ export function AiAssistantChatWindow({
         title="Потяните для изменения размера (дважды кликните для переключения)"
         aria-label="Изменить размер окна"
       >
-        <span aria-hidden="true" className="text-icon text-xs">
-          ⤢
-        </span>
+        <Maximize4 aria-hidden="true" className="size-3 text-icon" />
       </div>
 
       {/* Top Edge Resize Strip */}
@@ -499,7 +498,7 @@ export function AiAssistantChatWindow({
         className="flex items-center justify-between border-b border-border bg-card px-4 py-3 select-none"
       >
         <div className="flex items-center gap-2.5">
-          <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-card bg-primary-soft shadow-none ring-1 ring-primary flex items-center justify-center">
+          <div className="relative size-10 shrink-0 rounded-full border-2 border-card bg-primary-soft shadow-none ring-1 ring-primary flex items-center justify-center">
             <span aria-hidden="true" className="font-semibold text-primary">
               Ю
             </span>
@@ -513,7 +512,6 @@ export function AiAssistantChatWindow({
               </span>
             </div>
             <p className="text-[11px] font-medium text-success flex items-center gap-1">
-              <span className="inline-block size-1.5 rounded-full bg-success animate-pulse" />
               Онлайн наставник
             </p>
           </div>
@@ -588,7 +586,7 @@ export function AiAssistantChatWindow({
                   className={cn(
                     'mt-1 text-[9px] font-medium text-right select-none',
                     msg.sender === 'user'
-                      ? 'text-primary'
+                      ? 'text-primary-foreground'
                       : 'text-muted-foreground',
                   )}
                 >

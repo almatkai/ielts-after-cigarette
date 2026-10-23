@@ -1342,7 +1342,7 @@ function ListeningTranscriptRender({
         <span>{broadBeforeQuote}</span>
         <span
           ref={quoteMarkerRef}
-          className="transition-all duration-300 rounded px-1.5 py-0.5 bg-success-bg text-success font-bold shadow-none ring-2 ring-success ring-offset-1"
+          className="transition-all duration-300 rounded px-1.5 py-0.5 bg-success-bg text-success font-bold shadow-none ring-2 ring-success ring-offset-1 ring-offset-card"
         >
           {matchedText}
         </span>
@@ -1429,7 +1429,7 @@ function PassageBodyRender({
         className={cn(
           'transition-all duration-300 rounded px-1',
           highlight
-            ? 'bg-warning-bg/90 text-warning-fg font-semibold shadow-none ring-2 ring-warning-fg ring-offset-1'
+            ? 'bg-warning-bg/90 text-warning-fg font-semibold shadow-none ring-2 ring-warning-fg ring-offset-1 ring-offset-card'
             : 'hover:bg-muted',
         )}
       >

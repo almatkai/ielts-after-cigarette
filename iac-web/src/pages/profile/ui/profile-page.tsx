@@ -408,9 +408,9 @@ export function ProfilePage() {
 
           <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
             <CardHeader className="p-5">
-              <CardTitle className="text-base">Персонаж-помощник</CardTitle>
+              <CardTitle className="text-base">Помощник Юки</CardTitle>
               <CardDescription>
-                Отображение лисёнка Юки на экране.
+                Управление подсказкой помощника в интерфейсе.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -420,7 +420,7 @@ export function ProfilePage() {
                     htmlFor="profile-mascot-toggle"
                     className="leading-5 text-foreground cursor-pointer"
                   >
-                    Показывать питомца (Юки)
+                    Показывать подсказку Юки
                   </Label>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     Если скрыть, останется маленькая кнопка чата.
@@ -430,7 +430,7 @@ export function ProfilePage() {
                   id="profile-mascot-toggle"
                   checked={isMascotVisible}
                   onCheckedChange={setMascotVisible}
-                  aria-label="Показывать питомца"
+                  aria-label="Показывать подсказку Юки"
                   className="mt-0.5 data-[state=checked]:bg-primary"
                 />
               </div>

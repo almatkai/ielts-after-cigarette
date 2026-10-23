@@ -383,7 +383,7 @@ for (const skill of ['reading', 'listening']) {
       page.getByText(`${skill}: right question`, { exact: true }),
     ).toHaveCount(0)
     await expect(
-      page.getByRole('navigation', { name: 'Секции Full Mock' }),
+      page.getByRole('navigation', { name: 'Full Mock sections' }),
     ).toHaveCount(0)
     await expect(
       page.getByText(`${skill}-correct`, { exact: true }),
@@ -701,10 +701,8 @@ test('submission immediately shows this test’s mistake cards', async ({
 }) => {
   await fixtures(page, { fresh: true })
   await page.goto('./exam/listening/material')
-  await page
-    .getByRole('button', { name: 'Завершить тест', exact: true })
-    .click()
-  await page.getByRole('button', { name: 'Завершить', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish test', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish', exact: true }).click()
   await expect(
     page.getByRole('heading', { name: 'Работа над ошибками', exact: true }),
   ).toBeVisible()
@@ -712,7 +710,7 @@ test('submission immediately shows this test’s mistake cards', async ({
     page.getByRole('button', { name: 'Разобрать ошибку 1', exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toHaveCount(0)
 })
 
@@ -721,19 +719,19 @@ test('Full Mock cards select inline review and retain the section after reload',
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-  const cards = page.getByRole('group', { name: 'Секции Full Mock' })
+  const cards = page.getByRole('group', { name: 'Full Mock sections' })
   await cards
-    .getByRole('button', { name: 'Выбрать Reading', exact: true })
+    .getByRole('button', { name: 'Show Reading review', exact: true })
     .click()
   await expect(
-    cards.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+    cards.getByRole('button', { name: 'Show Reading review', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await expect(page).toHaveURL(/\/mock-session\?section=2$/)
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
   await cards
-    .getByRole('button', { name: 'Выбрать Listening', exact: true })
+    .getByRole('button', { name: 'Show Listening review', exact: true })
     .click()
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
@@ -743,22 +741,22 @@ test('Full Mock cards select inline review and retain the section after reload',
   ).toHaveCount(0)
   await page.reload()
   await expect(
-    cards.getByRole('button', { name: 'Выбрать Listening', exact: true }),
+    cards.getByRole('button', { name: 'Show Listening review', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await cards
-    .getByRole('button', { name: 'Выбрать Writing', exact: true })
+    .getByRole('button', { name: 'Show Writing review', exact: true })
     .click()
   await expect(
     page.getByText('Writing suggestion', { exact: false }),
   ).toBeVisible()
   await cards
-    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
+    .getByRole('button', { name: 'Show Speaking review', exact: true })
     .click()
   await expect(
     page.getByText('Speaking suggestion', { exact: false }),
   ).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toHaveCount(0)
   await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
@@ -815,7 +813,7 @@ test('empty attempts and pending AI have correct states', async ({ page }) => {
   await page.goto('./attempts/writing-attempt?session=mock-session')
   await expect(page.getByText('Проверяется', { exact: true })).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Секции Full Mock' }),
+    page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toBeVisible()
 })
 

@@ -144,7 +144,7 @@ for (const initiallyProcessing of [false, true]) {
     })
     await auth(page)
     await page.goto('./exam/full-mock-sessions/session')
-    await expect(page.getByText('Итоговый IELTS band')).toBeVisible()
+    await expect(page.getByText('Overall IELTS band')).toBeVisible()
     const initial = reads
     if (initiallyProcessing) {
       await page.clock.runFor(10_100)

@@ -1,6 +1,6 @@
 # Yrys Academy artwork
 
-`source/` contains the two supplied PNGs unchanged. The 1142×1377 file is the stacked logo; the 2000×667 file is horizontal. Transparent bounds are cropped; the mark is the first nonempty band of the stacked source (rows 8–719). No paths, lettering or spacing are redrawn.
+`source/` contains the two supplied PNGs unchanged. The 1142×1377 file is the stacked logo; the 2000×667 file is horizontal. The horizontal visible-body ROI is `(144, 70, 1831, 611)` (1687×541), excluding an isolated alpha=1 dot at y=49; the supplied source stays byte-identical. Other transparent bounds are cropped; the mark is the first nonempty band of the stacked source (rows 8–719). No paths, lettering or spacing are redrawn.
 
 Build from `iac-web` after `pnpm install`:
 

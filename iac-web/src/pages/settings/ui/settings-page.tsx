@@ -455,7 +455,7 @@ export function SettingsPage() {
             {t('Помощник Юки')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            {t('Управление подсказкой помощника в интерфейсе.')}
+            {t('Управление отображением питомца Юки в интерфейсе.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-5 sm:p-6">
@@ -465,11 +465,11 @@ export function SettingsPage() {
                 htmlFor="mascot-toggle"
                 className="text-sm font-medium text-foreground cursor-pointer"
               >
-                {t('Показывать подсказку Юки')}
+                {t('Показывать питомца (Юки)')}
               </Label>
               <p className="text-xs leading-5 text-muted-foreground">
                 {t(
-                  'Отображать подсказку помощника в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
+                  'Отображать анимированного лисёнка в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
                 )}
               </p>
             </div>

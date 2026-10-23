@@ -148,10 +148,10 @@ export function AiAssistantFloatingWidget({
 
   return (
     <>
-      {chatWasOpened && !hidden ? (
+      {chatWasOpened ? (
         <Suspense
           fallback={
-            chatIsOpen ? (
+            chatIsOpen && !hidden ? (
               <div
                 className="fixed bottom-4 right-4 z-40 rounded-xl border border-border bg-card p-5 shadow-popover"
                 role="status"
@@ -169,7 +169,10 @@ export function AiAssistantFloatingWidget({
             ) : null
           }
         >
-          <AiAssistantChatWindow isOpen={chatIsOpen} onClose={closeChat} />
+          <AiAssistantChatWindow
+            isOpen={chatIsOpen && !hidden}
+            onClose={closeChat}
+          />
         </Suspense>
       ) : null}
       {!chatIsOpen && !hidden ? (

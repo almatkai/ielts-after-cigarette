@@ -1,3 +1,5 @@
+import { createServer } from 'node:http'
+import type { ServerResponse } from 'node:http'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
@@ -384,6 +386,172 @@ for (const theme of ['light', 'dark']) {
     })
   }
 }
+
+test('Yuki: mobile drawer hides the pending lazy chat fallback', async ({
+  page,
+}) => {
+  let release!: () => void
+  const loading = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  await fixtures(page)
+  await page.setViewportSize({ width: 360, height: 740 })
+  await page.route('**/ai-assistant.tsx*', async (route) => {
+    await loading
+    await route.continue()
+  })
+  try {
+    await page.goto('./practice')
+    await fox(page).click()
+    await expect(page.getByRole('status')).toContainText('Загружаем чат Юки')
+    await page
+      .getByRole('button', { name: 'Открыть меню', exact: true })
+      .click()
+    await expect(page.locator('#dashboard-mobile-navigation')).toBeVisible()
+    await expect(page.getByRole('status')).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('status')).toContainText('Загружаем чат Юки')
+    release()
+    await expect(chat(page).locator('input')).toBeFocused()
+  } finally {
+    release()
+  }
+})
+
+test('Yuki: mobile drawer preserves an unsent chat draft', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 })
+  await fixtures(page)
+  await page.goto('./practice')
+  await fox(page).click()
+  const input = chat(page).locator('input')
+  const draft = 'Keep this unsent IELTS question'
+  await input.fill(draft)
+  await page.getByRole('button', { name: 'Открыть меню', exact: true }).click()
+  await expect(page.locator('#dashboard-mobile-navigation')).toBeVisible()
+  // The window must stay mounted, but not paint or intercept the drawer.
+  await expect(chat(page)).toHaveCSS('opacity', '0')
+  await expect(chat(page)).toHaveCSS('pointer-events', 'none')
+  await expect(page.getByTestId('yuki-widget')).toHaveCount(0)
+  await page.keyboard.press('Escape')
+  await expect(input).toBeFocused()
+  await expect(input).toHaveValue(draft)
+  await expect(chat(page)).toHaveCSS('opacity', '1')
+})
+
+test('Yuki: mobile drawer preserves the same in-flight stream without abort or re-request', async ({
+  page,
+}, testInfo) => {
+  // A gated real HTTP response: route.fulfill would buffer all SSE chunks and
+  // could not prove that the request survives while the drawer is open.
+  let response: ServerResponse | undefined
+  let requests = 0
+  let aborted = 0
+  const frame = (event: object) => `data: ${JSON.stringify(event)}\n\n`
+  const server = createServer((request, reply) => {
+    if (request.method === 'OPTIONS') {
+      reply.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      })
+      reply.end()
+      return
+    }
+    requests += 1
+    response = reply
+    request.resume()
+    reply.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-cache',
+    })
+    reply.once('close', () => {
+      if (!reply.writableEnded) aborted += 1
+    })
+    reply.write(frame({ type: 'reset' }))
+    reply.write(frame({ type: 'delta', text: 'First streamed chunk' }))
+  })
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing SSE port')
+  const failedRequests: string[] = []
+  page.on('requestfailed', (request) => {
+    if (request.url().includes('/assistant/chat/stream'))
+      failedRequests.push(request.failure()?.errorText ?? 'failed')
+  })
+  try {
+    await page.setViewportSize({ width: 360, height: 740 })
+    await fixtures(page)
+    await page.route('**/assistant/chat/stream', (route) =>
+      route.continue({
+        url: `http://127.0.0.1:${address.port}/api/v1/assistant/chat/stream`,
+      }),
+    )
+    await page.goto('./practice')
+    await fox(page).click()
+    const input = chat(page).locator('input')
+    await input.fill('Stream a mocked IELTS answer')
+    await input.press('Enter')
+    const answer = chat(page).getByText('First streamed chunk', { exact: true })
+    await expect(answer).toBeVisible()
+    // Also preserve the next draft while a previous answer is streaming.
+    await input.fill('My next unsent question')
+    await page.screenshot({ path: testInfo.outputPath('drawer-before.png') })
+    await page
+      .getByRole('button', { name: 'Открыть меню', exact: true })
+      .click()
+    await expect(page.locator('#dashboard-mobile-navigation')).toBeVisible()
+    await expect(chat(page)).toHaveCSS('opacity', '0')
+    await expect(chat(page)).toHaveCSS('pointer-events', 'none')
+    await page.screenshot({ path: testInfo.outputPath('drawer-open.png') })
+    response!.write(
+      frame({ type: 'delta', text: ' and continued behind drawer' }),
+    )
+    await expect(
+      chat(page).getByText('First streamed chunk and continued behind drawer', {
+        exact: true,
+      }),
+    ).toHaveCount(1)
+    await page.keyboard.press('Escape')
+    await expect(input).toBeFocused()
+    await expect(input).toHaveValue('My next unsent question')
+    await expect(
+      chat(page).getByRole('button', { name: 'Отправить', exact: true }),
+    ).toBeDisabled()
+    expect(requests).toBe(1)
+    expect(aborted).toBe(0)
+    expect(failedRequests).toEqual([])
+    const content = 'First streamed chunk and continued behind drawer: complete'
+    response!.end(
+      frame({
+        type: 'done',
+        response: { message: { role: 'assistant', content } },
+      }),
+    )
+    await expect(chat(page).getByText(content, { exact: true })).toBeVisible()
+    await expect(
+      chat(page).getByRole('button', { name: 'Отправить', exact: true }),
+    ).toBeEnabled()
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          sessionStorage.getItem('iac_yuki_chat_messages_v1'),
+        ),
+      )
+      .toContain(content)
+    expect(requests).toBe(1)
+    expect(aborted).toBe(0)
+    // The parser cancels its reader after `done`; Chromium may then report
+    // ERR_ABORTED for that completed request, so assert failures before `done`.
+    await page.screenshot({ path: testInfo.outputPath('drawer-after.png') })
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve())),
+    )
+  }
+})
 
 test('Yuki: mobile introduction appears once per session without hiding the fox', async ({
   page,

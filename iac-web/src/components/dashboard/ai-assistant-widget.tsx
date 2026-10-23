@@ -179,7 +179,7 @@ export function AiAssistantFloatingWidget({
         <div
           data-testid="yuki-widget"
           className={cn(
-            'pointer-events-none fixed bottom-4 right-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end gap-3 sm:bottom-6 sm:right-6',
+            'pointer-events-none fixed bottom-4 right-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end sm:bottom-6 sm:right-6',
             !pageVisible && 'assistant-paused',
             className,
           )}
@@ -187,33 +187,53 @@ export function AiAssistantFloatingWidget({
           {isVisible && !bubbleDismissed ? (
             <div
               data-testid="yuki-hint"
-              className="pointer-events-auto relative w-60 rounded-xl border border-border bg-card p-4 text-foreground shadow-popover"
+              role="button"
+              tabIndex={0}
+              onClick={() => openChat()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  openChat()
+                }
+              }}
+              className="group/bubble pointer-events-auto relative mb-2 cursor-pointer max-w-[240px] sm:max-w-[280px] rounded-[16px] bg-white/95 p-3.5 shadow-[0_12px_32px_rgba(29,39,61,0.16)] border border-blue-100/90 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-300 hover:shadow-[0_16px_40px_rgba(37,99,235,0.22)] animate-speech-bubble outline-none after:absolute after:-bottom-2.5 after:right-8 sm:after:right-12 after:size-0 after:border-x-8 after:border-x-transparent after:border-t-10 after:border-t-white after:filter after:drop-shadow-[0_2px_1px_rgba(29,39,61,0.06)]"
+              aria-label={t('Открыть чат с Юки')}
             >
-              <p className="pr-7 text-sm leading-relaxed">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded-full bg-blue-50 px-1.5 py-0.2 text-[9px] font-bold text-[#2563eb]">
+                    IELTS AI
+                  </span>
+                </div>
+                <span aria-hidden="true" className="size-5" />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    dismissBubble()
+                  }}
+                  className={cn(
+                    'absolute -right-0.5 -top-0.5 flex size-11 items-center justify-center text-[#94a3b8] hover:text-[#0f172a] rounded-full hover:bg-slate-100 transition-colors cursor-pointer',
+                    focusRing,
+                  )}
+                  title={t('Скрыть подсказку')}
+                  aria-label={t('Скрыть подсказку')}
+                >
+                  <CloseCircle className="size-4" variant="Outline" />
+                </button>
+              </div>
+
+              <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-[#334155]">
                 {t('Привет! Меня зовут')} <strong>{t('Юки')}</strong>{' '}
                 {t('— я твой наставник по IELTS.')}
               </p>
-              <button
-                type="button"
-                onClick={openChat}
-                className={cn(
-                  'mt-2 min-h-11 rounded-md text-sm font-semibold text-primary underline underline-offset-4',
-                  focusRing,
-                )}
-              >
-                {t('Открыть чат')}
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  'absolute right-1 top-1 flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted',
-                  focusRing,
-                )}
-                aria-label={t('Скрыть подсказку')}
-                onClick={dismissBubble}
-              >
-                <CloseCircle className="size-5" />
-              </button>
+
+              <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb]">
+                <span>{t('Открыть чат')}</span>
+                <span className="text-xs transition-transform duration-200 group-hover/bubble:translate-x-1">
+                  →
+                </span>
+              </div>
             </div>
           ) : null}
           {isVisible ? (
@@ -225,7 +245,7 @@ export function AiAssistantFloatingWidget({
                 aria-label={t('Открыть чат с Юки')}
                 data-testid="yuki-fox"
                 className={cn(
-                  'block size-20 rounded-xl sm:size-28 lg:size-[136px]',
+                  'block size-24 rounded-2xl sm:size-32 lg:size-36',
                   focusRing,
                 )}
               >
@@ -264,11 +284,22 @@ export function AiAssistantFloatingWidget({
               )}
               data-testid="yuki-compact"
               className={cn(
-                'pointer-events-auto flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-popover transition-colors hover:bg-primary-hover',
+                'pointer-events-auto group relative flex size-12 sm:size-13 items-center justify-center rounded-full bg-gradient-to-tr from-[#3C82F6] to-[#3C82F6] text-white shadow-[0_8px_24px_rgba(37,99,235,0.35)] hover:shadow-[0_12px_28px_rgba(37,99,235,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer',
                 focusRing,
               )}
             >
-              <Messages1 className="size-6" variant="Bold" />
+              <Messages1
+                className="size-6 transition-transform group-hover:scale-110"
+                variant="Bold"
+              />
+              <span className="absolute -top-1 -right-1 flex size-5.5 items-center justify-center rounded-full bg-white shadow-xs border border-blue-100 overflow-hidden">
+                <img
+                  src={`${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`}
+                  alt=""
+                  aria-hidden="true"
+                  className="size-full object-contain p-0.5"
+                />
+              </span>
             </button>
           )}
         </div>

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { createServer } from 'node:http'
 import type { ServerResponse } from 'node:http'
 import { expect, test } from '@playwright/test'
@@ -222,6 +223,27 @@ test('Yuki: original cached avatar loads; animated fox tracks fine pointer and p
     'animation-name',
     'foxFloat',
   )
+  // Every original path, circle and gradient stop, including blue sparkle/glow.
+  const artwork = await fox(page)
+    .locator('path, circle, stop')
+    .evaluateAll((nodes) =>
+      nodes.map((node) => [
+        node.tagName,
+        Object.fromEntries(
+          Array.from(node.attributes)
+            .map((attribute) => [
+              attribute.name,
+              attribute.name === 'fill' && attribute.value.startsWith('url(')
+                ? 'url(#original-glow)'
+                : attribute.value,
+            ])
+            .sort(([a], [b]) => a.localeCompare(b)),
+        ),
+      ]),
+    )
+  expect(
+    createHash('sha256').update(JSON.stringify(artwork)).digest('hex'),
+  ).toBe('7a088152990d92c2ec624c35f5b020856c24ec8b8e1a1f42987d17971b879fef')
   const bounds = await fox(page).boundingBox()
   await page.mouse.move(bounds!.x - 50, bounds!.y - 30)
   await expect
@@ -253,7 +275,7 @@ test('Yuki: original cached avatar loads; animated fox tracks fine pointer and p
   )
   await fox(page).click()
   await expect(chat(page).locator('input')).toBeFocused()
-  const avatars = chat(page).locator('img[src*="yuki-avatar.svg"]')
+  const avatars = chat(page).locator('img[src*="thoughtful_arctic_fox.webp"]')
   await expect(avatars).toHaveCount(2)
   for (const avatar of await avatars.all()) {
     expect(
@@ -264,16 +286,19 @@ test('Yuki: original cached avatar loads; animated fox tracks fine pointer and p
           image.naturalWidth > 0,
       ),
     ).toBe(true)
-    await expect(avatar).toHaveAttribute('alt', '')
+    await expect(avatar).toHaveCSS('object-fit', 'contain')
     expect(
       await avatar.evaluate((image) => image.getBoundingClientRect().width),
-    ).toBeGreaterThanOrEqual(22)
+    ).toBeGreaterThanOrEqual(18)
   }
-  const asset = await page.request.get('/app/yuki-avatar.svg')
+  const asset = await page.request.get('/app/thoughtful_arctic_fox.webp')
   expect(asset.ok()).toBe(true)
-  expect(await asset.text()).toContain('viewBox="265 300 860 860"')
-  expect(await asset.text()).not.toMatch(/magic-spark|magicGlow|animate-fox/)
-  await expect(chat(page).locator('.bg-success')).toHaveCount(1)
+  expect(
+    createHash('sha256')
+      .update(await asset.body())
+      .digest('hex'),
+  ).toBe('071261a9b75ca8e69a98c8f54987e3ee5ca7be23063015e8832923a97101bcfe')
+  await expect(chat(page).locator('.bg-emerald-500.ring-1')).toHaveCount(1)
   await chat(page)
     .getByRole('button', { name: 'Закрыть чат', exact: true })
     .click()
@@ -339,7 +364,7 @@ for (const theme of ['light', 'dark']) {
         await expect(fox(page)).toBeVisible()
         expect(
           await fox(page).evaluate((el) => el.getBoundingClientRect().width),
-        ).toBe(width < 640 ? 80 : width < 1024 ? 112 : 136)
+        ).toBe(width < 640 ? 96 : width < 1024 ? 128 : 144)
         const action = page
           .locator(
             'main button:visible:not([disabled]), main a:visible, main [role="switch"]:visible',
@@ -354,7 +379,7 @@ for (const theme of ['light', 'dark']) {
           await page
             .locator('main')
             .evaluate((el) => parseFloat(getComputedStyle(el).paddingBottom)),
-        ).toBeGreaterThanOrEqual(width < 640 ? 104 : width < 1024 ? 136 : 160)
+        ).toBeGreaterThanOrEqual(width < 640 ? 120 : width < 1024 ? 152 : 168)
       }
       await fox(page).focus()
       for (const target of [
@@ -379,7 +404,7 @@ for (const theme of ['light', 'dark']) {
       await fox(page).click()
       await expect(chat(page).locator('input')).toBeFocused()
       await expect(
-        chat(page).locator('img[src*="yuki-avatar.svg"]').first(),
+        chat(page).locator('img[src*="thoughtful_arctic_fox.webp"]').first(),
       ).toBeVisible()
       await page.keyboard.press('Escape')
       await expect(fox(page)).toBeFocused()
@@ -567,3 +592,74 @@ test('Yuki: mobile introduction appears once per session without hiding the fox'
     await page.evaluate(() => localStorage.getItem('iac_show_mascot')),
   ).toBeNull()
 })
+
+for (const width of [360, 1440]) {
+  for (const theme of ['light', 'dark']) {
+    test(`Yuki exact reference: blue compact button and original chat ${width} ${theme}`, async ({
+      page,
+    }, testInfo) => {
+      await fixtures(page)
+      await page.setViewportSize({ width, height: width === 360 ? 844 : 1000 })
+      await page.addInitScript((mode) => {
+        localStorage.setItem('iac_show_mascot', 'false')
+        localStorage.setItem('yrys-theme', mode)
+      }, theme)
+      await page.goto('./practice')
+      const compact = page.getByTestId('yuki-compact')
+      expect(
+        await compact.evaluate(
+          (el) =>
+            parseFloat(getComputedStyle(el).borderRadius) >= el.clientWidth / 2,
+        ),
+      ).toBe(true)
+      await expect(compact).toHaveCSS('color', 'rgb(255, 255, 255)')
+      await expect(compact).toHaveCSS('background-image', /gradient/)
+      expect(await compact.getAttribute('class')).toContain('from-[#3C82F6]')
+      await expect(compact.locator('img')).toHaveCSS('object-fit', 'contain')
+      await expect
+        .poll(() =>
+          compact
+            .locator('img')
+            .evaluate((img) => (img as HTMLImageElement).naturalWidth),
+        )
+        .toBeGreaterThan(0)
+      await page.screenshot({
+        path: testInfo.outputPath('compact.png'),
+        animations: 'disabled',
+      })
+      await compact.click()
+      await expect(chat(page).locator('input')).toBeFocused()
+      await expect(
+        chat(page).getByText('IELTS AI', { exact: true }),
+      ).toBeVisible()
+      await expect(chat(page).locator('.assistant-message').first()).toHaveCSS(
+        'border-top-left-radius',
+        '16px',
+      )
+      await expect(chat(page).locator('.assistant-message').first()).toHaveCSS(
+        'background-color',
+        'rgb(255, 255, 255)',
+      )
+      await page.screenshot({
+        path: testInfo.outputPath('chat.png'),
+        animations: 'disabled',
+      })
+      await page.keyboard.press('Escape')
+      await page.evaluate(() => {
+        localStorage.setItem('iac_show_mascot', 'true')
+        window.dispatchEvent(
+          new StorageEvent('storage', {
+            key: 'iac_show_mascot',
+            newValue: 'true',
+            storageArea: localStorage,
+          }),
+        )
+      })
+      await expect(fox(page)).toBeVisible()
+      await page.screenshot({
+        path: testInfo.outputPath('floating.png'),
+        animations: 'disabled',
+      })
+    })
+  }
+}

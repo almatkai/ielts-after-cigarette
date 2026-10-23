@@ -1,6 +1,5 @@
 import {
   ArrowLeft2,
-  Maximize4,
   ArrowRight2,
   CloseCircle,
   Refresh,
@@ -10,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { MarkdownContent } from './markdown-content'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { getErrorMessage } from '@/lib/api/client'
 import { streamAssistantChat } from '@/features/assistant/stream'
@@ -43,7 +43,7 @@ function getInitialMessages(): Message[] {
     {
       id: 'welcome',
       sender: 'fox',
-      text: 'Привет! Меня зовут Юки — я твой наставник по IELTS. Могу подсказать структуру эссе, разобрать критерии Band Descriptors, объяснить логику вопросов в Reading и дать советы по таймингу. Что тебя интересует?',
+      text: 'Привет! Меня зовут Юки 🦊 — я твой наставник по IELTS. Могу подсказать структуру эссе, разобрать критерии Band Descriptors, объяснить логику вопросов в Reading и дать советы по таймингу. Что тебя интересует?',
       time: 'сейчас',
     },
   ]
@@ -58,6 +58,7 @@ export function AiAssistantChatWindow({
   isOpen,
   onClose,
 }: AiAssistantChatWindowProps) {
+  const foxSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -454,10 +455,10 @@ export function AiAssistantChatWindow({
         maxHeight: 'calc(100vh - 36px)',
       }}
       className={cn(
-        'fixed z-50 flex flex-col overflow-hidden origin-bottom-right',
+        'assistant-chat-original text-slate-800 fixed z-50 flex flex-col overflow-hidden origin-bottom-right',
         'bottom-4 right-4 sm:bottom-6 sm:right-6',
-        'rounded-xl bg-card  border border-border/90',
-        'shadow-popover',
+        'rounded-[24px] bg-white/95 backdrop-blur-xl border border-slate-200/90',
+        'shadow-[0_24px_60px_-15px_rgba(15,23,42,0.28),0_0_0_1px_rgba(226,232,240,0.6)]',
         isResizing
           ? 'transition-none select-none'
           : 'transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)',
@@ -471,67 +472,70 @@ export function AiAssistantChatWindow({
         onPointerDown={(e) => handleResizeStart(e, 'top-left')}
         onDoubleClick={toggleExpand}
         className="absolute top-0 left-0 size-8 z-30 flex items-center justify-center cursor-nwse-resize group/corner select-none touch-none"
-        title="Потяните для изменения размера (дважды кликните для переключения)"
-        aria-label="Изменить размер окна"
+        title={
+          'Потяните для изменения размера (дважды кликните для переключения)'
+        }
+        aria-label={'Изменить размер окна'}
       >
-        <Maximize4 aria-hidden="true" className="size-3 text-icon" />
+        <div className="absolute top-2 left-2 size-3.5 rounded-tl-lg border-t-2 border-l-2 border-slate-300/90 group-hover/corner:border-blue-500 group-hover/corner:scale-110 group-active/corner:border-blue-600 transition-all flex items-start justify-start p-0.5">
+          <div className="size-1 rounded-full bg-slate-300/90 group-hover/corner:bg-blue-500 transition-colors" />
+        </div>
       </div>
 
       {/* Top Edge Resize Strip */}
       <div
         onPointerDown={(e) => handleResizeStart(e, 'top')}
-        className="absolute top-0 left-8 right-4 h-2 z-20 cursor-ns-resize select-none touch-none hover:bg-primary/20 transition-colors"
-        title="Потяните для изменения высоты"
+        className="absolute top-0 left-8 right-4 h-2 z-20 cursor-ns-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
+        title={'Потяните для изменения высоты'}
       />
 
       {/* Left Edge Resize Strip */}
       <div
         onPointerDown={(e) => handleResizeStart(e, 'left')}
-        className="absolute top-8 left-0 bottom-4 w-2 z-20 cursor-ew-resize select-none touch-none hover:bg-primary/20 transition-colors"
-        title="Потяните для изменения ширины"
+        className="absolute top-8 left-0 bottom-4 w-2 z-20 cursor-ew-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
+        title={'Потяните для изменения ширины'}
       />
 
       {/* Modern Messenger Header */}
       <div
         onDoubleClick={toggleExpand}
-        title="Дважды кликните, чтобы увеличить или уменьшить окно"
-        className="flex items-center justify-between border-b border-border bg-card px-4 py-3 select-none"
+        title={'Дважды кликните, чтобы увеличить или уменьшить окно'}
+        className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 px-4 py-3 select-none"
       >
         <div className="flex items-center gap-2.5">
-          <div className="relative size-10 shrink-0 rounded-full border-2 border-card bg-primary-soft shadow-none ring-1 ring-primary flex items-center justify-center">
-            <span className="size-full overflow-hidden rounded-full">
-              <img
-                src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
-                alt=""
-                aria-hidden="true"
-                width={40}
-                height={40}
-                className="size-full object-cover"
-              />
-            </span>
-            <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-card bg-success ring-1 ring-success/40" />
+          <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-white bg-blue-50 shadow-xs ring-1 ring-blue-100 flex items-center justify-center">
+            <img
+              src={foxSrc}
+              alt={'Юки'}
+              className="size-full object-contain p-0.5"
+            />
+            <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-white bg-emerald-500 ring-1 ring-emerald-400/40" />
           </div>
 
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-foreground tracking-tight">
-                Юки
+              <span className="text-sm font-bold text-slate-900 tracking-tight">
+                {'Юки'}
               </span>
+              <Badge className="rounded-full border-none bg-blue-50 text-blue-700 px-1.5 py-0 text-[10px] font-bold">
+                IELTS AI
+              </Badge>
             </div>
-            <p className="text-[11px] font-medium text-success flex items-center gap-1">
-              Онлайн наставник
+            <p className="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
+              <span className="inline-block size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {'Онлайн наставник'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 text-muted-foreground">
+        <div className="flex items-center gap-1 text-slate-400">
           {messages.length > 1 ? (
             <button
               type="button"
               onClick={handleReset}
-              title="Очистить диалог"
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
-              aria-label="Очистить диалог"
+              title={'Очистить диалог'}
+              className="min-h-11 min-w-11 flex items-center justify-center p-1.5 rounded-[18px] hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
+              aria-label={'Очистить диалог'}
             >
               <Refresh className="size-4" />
             </button>
@@ -540,9 +544,9 @@ export function AiAssistantChatWindow({
           <button
             type="button"
             onClick={onClose}
-            title="Закрыть чат"
-            className="min-h-11 min-w-11 flex items-center justify-center rounded-xl hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
-            aria-label="Закрыть чат"
+            title={'Закрыть чат'}
+            className="min-h-11 min-w-11 flex items-center justify-center p-1.5 rounded-[18px] hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
+            aria-label={'Закрыть чат'}
           >
             <CloseCircle className="size-5" />
           </button>
@@ -550,7 +554,7 @@ export function AiAssistantChatWindow({
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-card text-foreground">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-gradient-to-b from-slate-50/40 via-white to-slate-50/20 text-slate-800">
         {messages
           .filter((msg) => msg.text.trim())
           .map((msg) => (
@@ -562,26 +566,27 @@ export function AiAssistantChatWindow({
               )}
             >
               {msg.sender === 'fox' ? (
-                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft flex items-center justify-center">
+                <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
                   <img
-                    src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
-                    alt=""
-                    aria-hidden="true"
-                    width={24}
-                    height={24}
-                    className="size-full object-cover"
+                    src={foxSrc}
+                    alt={'Юки'}
+                    className="size-full object-contain"
                   />
                 </div>
               ) : null}
 
               <div
+                style={{
+                  backgroundColor:
+                    msg.sender === 'user' ? '#2563eb' : undefined,
+                }}
                 className={cn(
-                  'max-w-[85%] rounded-xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-none',
+                  'assistant-message max-w-[85%] rounded-[16px] p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
                   msg.sender === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-xs'
+                    ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
                     : msg.isError
-                      ? 'bg-destructive-soft border border-destructive-soft text-destructive rounded-bl-xs'
-                      : 'bg-muted text-foreground rounded-bl-xs',
+                      ? 'bg-red-50 border border-red-200 text-red-700 rounded-bl-xs'
+                      : 'bg-white border border-slate-200/80 text-slate-800 rounded-bl-xs',
                 )}
               >
                 {/* Message body with Markdown support */}
@@ -594,9 +599,7 @@ export function AiAssistantChatWindow({
                 <div
                   className={cn(
                     'mt-1 text-[9px] font-medium text-right select-none',
-                    msg.sender === 'user'
-                      ? 'text-primary-foreground'
-                      : 'text-muted-foreground',
+                    msg.sender === 'user' ? 'text-white' : 'text-slate-500',
                   )}
                 >
                   {msg.time}
@@ -607,22 +610,19 @@ export function AiAssistantChatWindow({
 
         {isTyping ? (
           <div className="flex items-end gap-2">
-            <div className="size-6 shrink-0 overflow-hidden rounded-full border border-border-strong bg-primary-soft flex items-center justify-center">
+            <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
               <img
-                src={`${import.meta.env.BASE_URL}yuki-avatar.svg`}
-                alt=""
-                aria-hidden="true"
-                width={24}
-                height={24}
-                className="size-full object-cover"
+                src={foxSrc}
+                alt={'Юки'}
+                className="size-full object-contain"
               />
             </div>
-            <div className="rounded-xl rounded-bl-xs bg-card border border-border/80 px-3.5 py-2.5 shadow-none flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
-              <span className="size-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
-              <span className="size-1.5 rounded-full bg-primary animate-bounce" />
-              <span className="text-[11px] text-muted-foreground ml-1.5 font-medium">
-                Юки думает...
+            <div className="rounded-[16px] rounded-bl-xs bg-white border border-slate-200/80 px-3.5 py-2.5 shadow-2xs flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:-0.3s]" />
+              <span className="size-1.5 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
+              <span className="size-1.5 rounded-full bg-blue-600 animate-bounce" />
+              <span className="text-[11px] text-slate-400 ml-1.5 font-medium">
+                {'Юки думает...'}
               </span>
             </div>
           </div>
@@ -632,14 +632,14 @@ export function AiAssistantChatWindow({
       </div>
 
       {/* Quick Prompts Carousel Bar */}
-      <div className="relative border-t border-border/90 bg-card/80  px-2 py-2 select-none group/carousel">
+      <div className="relative border-t border-slate-100/90 bg-slate-50/80 backdrop-blur-sm px-2 py-2 select-none group/carousel">
         {/* Left Scroll Arrow */}
         {canScrollLeft ? (
           <button
             type="button"
             onClick={() => scrollPrompts('left')}
-            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 size-6 rounded-full bg-card shadow-none border border-border/90 flex items-center justify-center text-muted-foreground hover:text-primary  active:scale-95 transition-all cursor-pointer"
-            aria-label="Прокрутить темы влево"
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 size-11 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            aria-label={'Прокрутить темы влево'}
           >
             <ArrowLeft2 className="size-3.5" />
           </button>
@@ -666,7 +666,7 @@ export function AiAssistantChatWindow({
                 if (hasDragged.current) return
                 handleSend(prompt)
               }}
-              className="rounded-sm border border-border/90 bg-card hover:border-border-strong hover:bg-primary-soft/80 hover:text-primary text-[11px] font-medium text-muted-foreground px-2.5 py-1 transition-all whitespace-nowrap cursor-pointer shadow-none shrink-0 select-none active:scale-95"
+              className="rounded-full border border-slate-200/90 bg-white hover:border-blue-300 hover:bg-blue-50/80 hover:text-blue-600 text-[11px] font-medium text-slate-600 px-2.5 py-1 transition-all whitespace-nowrap cursor-pointer shadow-2xs shrink-0 select-none active:scale-95"
             >
               {prompt}
             </button>
@@ -678,8 +678,8 @@ export function AiAssistantChatWindow({
           <button
             type="button"
             onClick={() => scrollPrompts('right')}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 size-6 rounded-full bg-card shadow-none border border-border/90 flex items-center justify-center text-muted-foreground hover:text-primary  active:scale-95 transition-all cursor-pointer"
-            aria-label="Прокрутить темы вправо"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 size-11 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            aria-label={'Прокрутить темы вправо'}
           >
             <ArrowRight2 className="size-3.5" />
           </button>
@@ -692,25 +692,25 @@ export function AiAssistantChatWindow({
           e.preventDefault()
           handleSend()
         }}
-        className="p-3 border-t border-border bg-card  flex items-center gap-2"
+        className="p-3 border-t border-slate-100 bg-white/95 backdrop-blur-md flex items-center gap-2"
       >
         <input
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Спроси Юки о подготовке к IELTS..."
-          className="flex-1 bg-card/90 border border-border/90 rounded-xl px-3.5 py-2 text-xs sm:text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
+          placeholder={'Спроси Юки о подготовке к IELTS...'}
+          className="min-w-0 min-h-11 flex-1 bg-slate-50/90 border border-slate-200/90 rounded-[16px] px-3.5 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
         />
         <button
           type="submit"
           disabled={!input.trim() || isTyping}
           className={cn(
-            'size-9 rounded-xl flex items-center justify-center transition-all shrink-0',
+            'size-11 rounded-[18px] flex items-center justify-center transition-all shrink-0',
             input.trim() && !isTyping
-              ? 'bg-primary text-primary-foreground shadow-none shadow-primary/25 hover:bg-primary-hover  active:scale-95 cursor-pointer'
-              : 'bg-muted text-muted-foreground cursor-not-allowed',
+              ? 'bg-[#3C82F6] text-white shadow-md shadow-blue-500/25 hover:bg-blue-700 hover:scale-105 active:scale-95 cursor-pointer'
+              : 'bg-slate-100 text-slate-400 cursor-not-allowed',
           )}
-          aria-label="Отправить"
+          aria-label={'Отправить'}
         >
           <Send2 className="size-4" />
         </button>

@@ -237,9 +237,7 @@ for (const theme of ['light', 'dark'] as const) {
         await screenshot(page, `${name}-${width}-${theme}`)
       }
       await page.goto('./practice')
-      await page
-        .getByRole('button', { name: 'Открыть чат с Юки', exact: true })
-        .click()
+      await page.getByTestId('yuki-fox').click()
       await expect(
         page.getByPlaceholder('Спроси Юки о подготовке к IELTS...'),
       ).toBeVisible()
@@ -254,6 +252,9 @@ for (const theme of ['light', 'dark'] as const) {
         'muted-foreground',
         'card',
         'primary',
+        'primary-text',
+        'primary-fill',
+        'primary-foreground',
         'primary-soft',
         'gold',
         'gold-foreground',
@@ -281,8 +282,9 @@ for (const theme of ['light', 'dark'] as const) {
       const pairs = [
         ['foreground', 'background'],
         ['muted-foreground', 'card'],
-        ['primary', 'card'],
-        ['primary', 'primary-soft'],
+        ['primary-text', 'card'],
+        ['primary-text', 'primary-soft'],
+        ['primary-foreground', 'primary-fill'],
         ['gold-foreground', 'gold'],
         ['destructive', 'card'],
         ['success', 'card'],
@@ -299,6 +301,27 @@ for (const theme of ['light', 'dark'] as const) {
         }
       })
     })
+    const palette = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement)
+      const probe = document.createElement('span')
+      probe.className = 'bg-primary text-primary'
+      document.body.append(probe)
+      const resolved = getComputedStyle(probe)
+      const result = {
+        accent: style.getPropertyValue('--primary').trim(),
+        text: resolved.color,
+        fill: resolved.backgroundColor,
+      }
+      probe.remove()
+      return result
+    })
+    expect(palette.accent.toLowerCase()).toBe('#3c82f6')
+    expect(palette.text).toBe(
+      theme === 'light' ? 'rgb(36, 95, 196)' : 'rgb(143, 186, 255)',
+    )
+    expect(palette.fill).toBe(
+      theme === 'light' ? 'rgb(37, 99, 235)' : 'rgb(60, 130, 246)',
+    )
     for (const pair of contrast)
       expect(pair.ratio, `${pair.fg}/${pair.bg}`).toBeGreaterThanOrEqual(4.5)
     if (process.env.YRYS_REVIEW_DIR)

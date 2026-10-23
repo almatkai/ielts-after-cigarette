@@ -177,9 +177,15 @@ async function contrast(locator: Locator) {
       node = node.parentElement
     }
     const luminance = (color: string) => {
-      const channels = color.match(/[\d.]+/g)!.map(Number)
-      if (channels.length === 4 && channels[3] !== 1)
-        throw new Error(`Nonopaque background: ${color}`)
+      // Canvas resolves CSS Color 4 (oklch/oklab) to the same sRGB pixels
+      // the browser paints, so the restored blue palette is measured accurately.
+      const canvas = document.createElement('canvas')
+      canvas.width = canvas.height = 1
+      const context = canvas.getContext('2d')!
+      context.fillStyle = color
+      context.fillRect(0, 0, 1, 1)
+      const channels = Array.from(context.getImageData(0, 0, 1, 1).data)
+      if (channels[3] !== 255) throw new Error(`Nonopaque background: ${color}`)
       return channels
         .slice(0, 3)
         .map((v) => v / 255)
@@ -245,14 +251,16 @@ for (const theme of ['light', 'dark'] as const) {
     const widget = page.locator('#ai-assistant-widget')
     await widget.locator('input').fill('Help with IELTS')
     await widget.getByRole('button', { name: 'Отправить', exact: true }).click()
-    const time = widget.locator('.bg-primary > .text-right')
+    const time = widget.locator(
+      '.assistant-message:has(> .whitespace-pre-wrap) > .text-right',
+    )
     const results = {
       timestamp: await contrast(time),
       code: await contrast(widget.locator('pre')),
     }
     await expect(time).toHaveText(/\d{1,2}:\d{2}/)
     await expect(widget.locator('blockquote')).toHaveCSS('font-style', 'normal')
-    await expect(widget.locator('.bg-success')).toHaveCount(1)
+    await expect(widget.locator('.bg-emerald-500.ring-1')).toHaveCount(1)
     await capture(page, `assistant-sent-code-${theme}`)
     await page.goto('./profile')
     await expect(
@@ -320,7 +328,7 @@ for (const theme of ['light', 'dark'] as const) {
       .filter({ hasText: /^2$/ })
     await expect(answered).toHaveCSS(
       'background-color',
-      theme === 'dark' ? 'rgb(23, 58, 64)' : 'rgb(227, 238, 240)',
+      theme === 'dark' ? 'rgb(23, 43, 73)' : 'rgb(239, 246, 255)',
     )
     await expect(current).toHaveCSS(
       'background-color',

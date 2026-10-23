@@ -11,17 +11,17 @@ export function ModelParagraphCard({
   if (!modelParagraph) return null
 
   return (
-    <div className="rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/30 to-white p-5 shadow-xs">
+    <div className="rounded-xl border border-border-strong/80 bg-primary-soft p-5 shadow-none">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs text-xs font-bold">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-none text-xs font-bold">
             ★
           </span>
           <div>
-            <h4 className="text-sm font-bold text-slate-900">
+            <h4 className="text-sm font-bold text-foreground">
               {'Model paragraph aiming at Band 8'}
             </h4>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               An example using precise vocabulary and varied sentence structures
             </p>
           </div>
@@ -31,14 +31,14 @@ export function ModelParagraphCard({
           variant="ghost"
           size="sm"
           onClick={() => setIsOpen(!isOpen)}
-          className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+          className="text-xs text-primary hover:text-primary hover:bg-primary-soft"
         >
           {isOpen ? 'Hide' : 'Show'}
         </Button>
       </div>
 
       {isOpen && (
-        <div className="mt-3.5 rounded-xl border border-blue-200 bg-white/95 p-4 font-serif text-sm sm:text-base leading-relaxed text-slate-800 shadow-2xs">
+        <div className="mt-3.5 rounded-xl border border-border-strong bg-card p-4 font-sans text-sm sm:text-base leading-relaxed text-foreground shadow-none">
           <p className="italic">“{modelParagraph}”</p>
         </div>
       )}

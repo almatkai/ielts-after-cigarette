@@ -17,7 +17,7 @@ export function GuestConversionContent({
 }) {
   if (!conversion) {
     return (
-      <p className="text-sm text-[#69696d]">
+      <p className="text-sm text-muted-foreground">
         Гостевая воронка пока недоступна. Обновите API для расчёта конверсии.
       </p>
     )
@@ -53,12 +53,12 @@ export function GuestConversionContent({
   return (
     <section aria-label="Конверсия гостевого Full Mock" className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <p className="max-w-2xl text-sm leading-6 text-[#69696d]">
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
           Сколько гостей дошли до регистрации после полного мока. Вход в
           существующий аккаунт не считается регистрацией.
         </p>
         <div className="sm:text-right">
-          <p className="text-sm text-[#69696d]">Гость → новый аккаунт</p>
+          <p className="text-sm text-muted-foreground">Гость → новый аккаунт</p>
           <p className="mt-1 text-[28px] leading-none font-semibold tracking-[-0.03em] tabular-nums">
             {conversionRate(conversion.registered, conversion.guests)}
           </p>
@@ -66,7 +66,7 @@ export function GuestConversionContent({
       </div>
 
       {conversion.guests === 0 ? (
-        <p className="rounded-[10px] bg-[#f7f7f5] p-4 text-sm text-[#69696d]">
+        <p className="rounded-[10px] bg-background p-4 text-sm text-muted-foreground">
           За выбранный период новых гостевых профилей нет. Воронка появится,
           когда посетители откроют гостевой доступ к Full Mock.
         </p>
@@ -80,7 +80,7 @@ export function GuestConversionContent({
               {formatNumber(stage.value)}
             </p>
             <div
-              className="h-1.5 overflow-hidden rounded-full bg-[#f0efec]"
+              className="h-1.5 overflow-hidden rounded-full bg-muted"
               aria-hidden
             >
               <div
@@ -91,14 +91,16 @@ export function GuestConversionContent({
                 }}
               />
             </div>
-            <p className="text-xs leading-5 text-[#69696d]">{stage.detail}</p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {stage.detail}
+            </p>
           </li>
         ))}
       </ol>
 
-      <div className="grid gap-3 border-t border-[#ededeb] pt-5">
+      <div className="grid gap-3 border-t border-border pt-5">
         <h3 className="text-sm font-medium">По дню первого гостевого входа</h3>
-        <p className="text-xs leading-5 text-[#69696d]">
+        <p className="text-xs leading-5 text-muted-foreground">
           В каждой точке — одна группа гостей, пришедших в этот день, и их
           дальнейшие шаги на момент обновления. Регистрация учитывается, если
           завершённый мок сохранён в новый аккаунт. У свежих групп ещё было
@@ -112,7 +114,7 @@ export function GuestConversionContent({
           }))}
         />
       </div>
-      <p className="text-xs leading-5 text-[#898781]">
+      <p className="text-xs leading-5 text-muted-foreground">
         Гости определяются по cookie браузера, а не как уникальные люди.
         Повторные моки одного гостя не увеличивают воронку. Другой браузер или
         удаление cookie создают нового гостя.

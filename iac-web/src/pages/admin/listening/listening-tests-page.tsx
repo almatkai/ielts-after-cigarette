@@ -50,13 +50,13 @@ export function ListeningTestsPage() {
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#3b82f6]">
+          <p className="text-xs font-semibold normal-case text-primary">
             Listening
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
             {t('Listening тесты')}
           </h1>
-          <p className="mt-2 text-sm text-[#69696d]">
+          <p className="mt-2 text-sm text-muted-foreground">
             {t('Аудио, части теста и группы вопросов.')}
           </p>
         </div>
@@ -66,7 +66,7 @@ export function ListeningTestsPage() {
               <DocumentUpload aria-hidden /> {t('Импортировать')}
             </Link>
           </Button>
-          <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+          <Button asChild className="bg-primary hover:bg-primary-hover">
             <Link to="/admin/listening/tests/new">
               <Add aria-hidden /> {t('Создать вручную')}
             </Link>
@@ -77,7 +77,7 @@ export function ListeningTestsPage() {
       {query.data?.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="grid place-items-center gap-3 p-16 text-center">
-            <Headphone className="size-8 text-[#999]" aria-hidden />
+            <Headphone className="size-8 text-muted-foreground" aria-hidden />
             <p className="font-semibold">{t('Listening тестов пока нет')}</p>
           </CardContent>
         </Card>
@@ -92,11 +92,11 @@ export function ListeningTestsPage() {
                   <Badge variant="outline">{test.status}</Badge>
                 </div>
                 {test.hasUnpublishedChanges ? (
-                  <p className="mt-1 text-xs text-amber-700">
+                  <p className="mt-1 text-xs text-warning-fg">
                     {t('Есть неопубликованные изменения')}
                   </p>
                 ) : null}
-                <p className="mt-1 text-sm text-[#69696d]">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {test.examType} · {test.durationMinutes} {t('минут')} ·
                   version {test.currentVersionNumber}
                 </p>

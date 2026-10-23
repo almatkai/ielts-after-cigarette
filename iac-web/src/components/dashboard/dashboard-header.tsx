@@ -6,7 +6,7 @@ import {
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 
-import { Brand } from '@/components/landing/brand'
+import { BrandLogo } from '@/components/landing/brand'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-store'
 import { useLanguage } from '@/lib/i18n'
@@ -30,29 +30,29 @@ export function DashboardHeader({
   const accountName = user?.displayName.trim() || t('Аккаунт')
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center border-b border-[#eeeeeb] bg-white/80 px-3 sm:px-6 lg:px-8 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center border-b border-border bg-card px-3 sm:px-6 lg:px-8 ">
       <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onOpenNavigation}
-          className="shrink-0 rounded-[9px] text-[#69696d] lg:hidden"
+          className="shrink-0 rounded-[9px] text-muted-foreground lg:hidden"
           aria-label={t('Открыть меню')}
           aria-controls="dashboard-mobile-navigation"
         >
           <HambergerMenu aria-hidden />
         </Button>
         <div className="shrink-0 lg:hidden">
-          <Brand to="/" />
+          <BrandLogo to="/" />
         </div>
-        <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
+        <span className="hidden h-7 w-px bg-border sm:block lg:hidden" />
         {pageTitle ? (
           <div className="min-w-0 flex-1">
-            <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
+            <p className="hidden text-[10px] font-semibold text-muted-foreground normal-case lg:block">
               {t('Рабочее пространство')}
             </p>
-            <h1 className="truncate text-sm sm:text-base font-semibold tracking-[-0.025em] text-[#111111]">
+            <h1 className="font-sans truncate text-sm sm:text-base font-semibold tracking-normal text-foreground">
               {pageTitle}
             </h1>
           </div>
@@ -68,7 +68,7 @@ export function DashboardHeader({
               type="button"
               variant="ghost"
               size="icon"
-              className="rounded-[9px] text-[#69696d] data-[state=open]:bg-[#f4f4f1] data-[state=open]:text-[#111111]"
+              className="rounded-[9px] text-muted-foreground data-[state=open]:bg-muted data-[state=open]:text-foreground"
               aria-label={t('Открыть уведомления')}
             >
               <Notification aria-hidden />
@@ -79,39 +79,39 @@ export function DashboardHeader({
             sideOffset={10}
             className="w-[calc(100vw-32px)] max-w-[360px] overflow-hidden p-0"
           >
-            <div className="border-b border-[#ededeb] px-5 py-4">
-              <h2 className="text-sm font-semibold tracking-[-0.015em] text-[#111111]">
+            <div className="border-b border-border px-5 py-4">
+              <h2 className="text-sm font-semibold tracking-[-0.015em] text-foreground">
                 {t('Уведомления')}
               </h2>
             </div>
             <div className="flex flex-col items-center px-5 py-10 text-center">
-              <span className="grid size-11 place-items-center rounded-full bg-[#f4f4f1] text-[#8b8b8e]">
+              <span className="grid size-11 place-items-center rounded-full bg-muted text-muted-foreground">
                 <NotificationBing
                   className="size-5"
                   strokeWidth={1.8}
                   aria-hidden
                 />
               </span>
-              <p className="mt-4 text-sm font-semibold text-[#111111]">
+              <p className="mt-4 text-sm font-semibold text-foreground">
                 {t('Пока нет уведомлений')}
               </p>
-              <p className="mt-1 max-w-[240px] text-xs leading-5 text-[#808084]">
+              <p className="mt-1 max-w-[240px] text-xs leading-5 text-muted-foreground">
                 {t('Новые сообщения и напоминания появятся здесь.')}
               </p>
             </div>
           </PopoverContent>
         </Popover>
-        <span className="mx-1 hidden h-7 w-px bg-[#eeeeeb] sm:block" />
+        <span className="mx-1 hidden h-7 w-px bg-border sm:block" />
         <Button
           asChild
           variant="ghost"
-          className="h-9 sm:h-11 gap-1.5 sm:gap-2 rounded-[10px] px-2 text-[#111111] sm:px-3"
+          className="h-9 sm:h-11 gap-1.5 sm:gap-2 rounded-[10px] px-2 text-foreground sm:px-3"
         >
           <Link
             to={user ? '/profile' : '/login'}
             aria-label={user ? t('Открыть профиль') : t('Войти в аккаунт')}
           >
-            <span className="grid size-8 place-items-center rounded-full bg-[#f4f4f1] text-[#69696d]">
+            <span className="grid size-8 place-items-center rounded-full bg-muted text-muted-foreground">
               <User className="size-[17px]" strokeWidth={1.8} aria-hidden />
             </span>
             <span className="hidden text-sm font-semibold sm:inline">

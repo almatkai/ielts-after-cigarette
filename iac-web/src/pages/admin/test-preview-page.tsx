@@ -55,14 +55,14 @@ function TestPreviewPage<T>({
   })
 
   return (
-    <main className="min-h-dvh bg-[#f7f7f5] text-slate-900">
-      <header className="border-b border-blue-200 bg-blue-50 px-4 py-3 sm:px-6">
+    <main className="min-h-dvh bg-background text-foreground">
+      <header className="border-b border-border-strong bg-primary-soft px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-[1780px] flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold">
               {t('Предпросмотр')} {skill} · {t('Без сохранения попытки')}
             </h1>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-muted-foreground">
               {version === 'draft'
                 ? t('Текущая сохранённая версия')
                 : t('Опубликованная версия — её видят пользователи')}
@@ -70,7 +70,7 @@ function TestPreviewPage<T>({
                 ? ` · ${t('Версия')} ${query.data.versionNumber} · revision ${query.data.revision}`
                 : ''}
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-muted-foreground">
               {t(
                 'Пробные ответы не сохраняются. Попытка и статистика не создаются.',
               )}
@@ -127,7 +127,7 @@ function TestPreviewPage<T>({
           <h2 className="font-semibold">
             {t('Не удалось открыть предпросмотр')}
           </h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             {t(getErrorMessage(query.error))}
           </p>
           <Button

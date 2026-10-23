@@ -15,7 +15,7 @@ export const Route = createFileRoute('/admin_/preview')({
   },
   head: () => ({
     meta: [
-      { title: tr('Предпросмотр теста — IAC') },
+      { title: tr('Предпросмотр теста — Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

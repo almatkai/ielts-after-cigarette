@@ -132,7 +132,7 @@ function UserProfile({ user }: { user: UserDetail }) {
         <div className="flex min-w-0 items-center gap-3">
           <UserAvatar user={user} />
           <div className="min-w-0">
-            <h1 className="break-words text-2xl font-semibold tracking-[-0.035em]">
+            <h1 className="break-words text-2xl font-semibold tracking-normal">
               {user.displayName}
             </h1>
             <p className="mt-1 break-all text-sm text-muted-foreground">
@@ -141,12 +141,12 @@ function UserProfile({ user }: { user: UserDetail }) {
           </div>
         </div>
         <span
-          className={`rounded-full px-3 py-1 text-xs ${user.blocked ? 'bg-red-50 text-destructive' : 'bg-[#eff6ff] text-[#2563eb]'}`}
+          className={`rounded-full px-3 py-1 text-xs ${user.blocked ? 'bg-destructive-soft text-destructive' : 'bg-primary-soft text-primary-hover'}`}
         >
           {user.blocked ? t('Заблокирован') : t(roles[user.role])}
         </span>
       </div>
-      <div className="grid grid-cols-3 divide-x divide-[#e7e7e4] rounded-xl border border-[#e7e7e4] bg-white">
+      <div className="grid grid-cols-3 divide-x divide-border rounded-xl border border-border bg-card">
         <Metric value={String(user.completedTests)} label={t('Завершено')} />
         <Metric value={String(user.unfinishedTests)} label={t('В процессе')} />
         <Metric
@@ -156,7 +156,7 @@ function UserProfile({ user }: { user: UserDetail }) {
       </div>
       <nav
         aria-label={t('Данные пользователя')}
-        className="flex gap-6 border-b border-[#e7e7e4]"
+        className="flex gap-6 border-b border-border"
       >
         {(
           [
@@ -186,7 +186,7 @@ function UserProfile({ user }: { user: UserDetail }) {
               setNotice('')
               save.mutate()
             }}
-            className="grid gap-5 rounded-xl border border-[#e7e7e4] bg-white p-5"
+            className="grid gap-5 rounded-xl border border-border bg-card p-5"
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t('Имя')} id="displayName">
@@ -211,7 +211,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                       role: e.target.value as UserUpdate['role'],
                     })
                   }
-                  className="h-9 w-full rounded-md border border-[#e7e7e4] bg-white px-3 text-sm"
+                  className="h-9 w-full rounded-md border border-border bg-card px-3 text-sm"
                 >
                   {Object.entries(roles).map(([value, label]) => (
                     <option value={value} key={value}>
@@ -241,7 +241,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 />
               </Field>
             </div>
-            <fieldset className="grid gap-3 border-t border-[#e7e7e4] pt-4">
+            <fieldset className="grid gap-3 border-t border-border pt-4">
               <legend className="px-1 text-sm font-medium">
                 {t('Доступы')}
               </legend>
@@ -311,7 +311,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 onChange={(e) =>
                   setForm({ ...form, blocked: e.target.checked })
                 }
-                className="size-4 accent-[#3b82f6]"
+                className="size-4 accent-primary"
               />
               {t('Заблокировать аккаунт')}
             </label>
@@ -320,7 +320,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 {save.isPending ? t('Сохранение…') : t('Сохранить')}
               </Button>
               {notice && (
-                <span role="status" className="text-sm text-[#16845b]">
+                <span role="status" className="text-sm text-success">
                   {t(notice)}
                 </span>
               )}
@@ -330,7 +330,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 </p>
               )}
             </div>
-            <dl className="grid gap-x-5 gap-y-4 border-t border-[#e7e7e4] pt-5 text-sm grid-cols-2">
+            <dl className="grid gap-x-5 gap-y-4 border-t border-border pt-5 text-sm grid-cols-2">
               <Info
                 label={t('Регистрация')}
                 value={date(user.createdAt, true)}
@@ -377,14 +377,14 @@ function UserProfile({ user }: { user: UserDetail }) {
             </dl>
           </form>
           <div className="grid gap-5">
-            <div className="rounded-xl border border-[#e7e7e4] bg-white p-4">
+            <div className="rounded-xl border border-border bg-card p-4">
               <h2 className="mb-3 text-sm font-semibold">{t('Доступ')}</h2>
               <div className="grid gap-2">
                 <Button
                   variant="outline"
                   disabled={self || busy}
                   onClick={() => open('password')}
-                  className="justify-start border-[#deded9]"
+                  className="justify-start border-border"
                 >
                   <Lock1 aria-hidden />
                   {t('Сменить пароль')}
@@ -393,7 +393,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                   variant="outline"
                   disabled={self || busy}
                   onClick={() => open('sessions')}
-                  className="justify-start border-[#deded9]"
+                  className="justify-start border-border"
                 >
                   <Logout aria-hidden />
                   {t('Завершить сессии')}
@@ -402,14 +402,14 @@ function UserProfile({ user }: { user: UserDetail }) {
                   variant="ghost"
                   disabled={self || busy}
                   onClick={() => open('delete')}
-                  className="justify-start text-destructive hover:bg-red-50 hover:text-destructive"
+                  className="justify-start text-destructive hover:bg-destructive-soft hover:text-destructive"
                 >
                   <Trash aria-hidden />
                   {t('Удалить аккаунт')}
                 </Button>
               </div>
             </div>
-            <div className="rounded-xl border border-[#e7e7e4] bg-white p-4">
+            <div className="rounded-xl border border-border bg-card p-4">
               <h2 className="mb-4 text-sm font-semibold">{t('Навыки')}</h2>
               <div className="grid gap-4">
                 {user.skills.map((skill) => (
@@ -444,7 +444,7 @@ function UserProfile({ user }: { user: UserDetail }) {
       {tab === 'tests' && <UserTests id={user.id} />}
       {tab === 'activity' && (
         <div className="grid gap-5">
-          <dl className="flex flex-wrap gap-8 rounded-xl border border-[#e7e7e4] bg-white p-5 text-sm">
+          <dl className="flex flex-wrap gap-8 rounded-xl border border-border bg-card p-5 text-sm">
             <Info
               label={t('Последняя активность')}
               value={date(user.lastActiveAt, true)}
@@ -454,13 +454,13 @@ function UserProfile({ user }: { user: UserDetail }) {
               value={String(user.activityDays.length)}
             />
           </dl>
-          <div className="rounded-xl border border-[#e7e7e4] bg-white p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h2 className="mb-4 text-sm font-semibold">{t('Дни занятий')}</h2>
             <div className="flex flex-wrap gap-2">
               {user.activityDays.map((day) => (
                 <span
                   key={day}
-                  className="rounded-md bg-[#f4f4f1] px-2.5 py-1.5 text-xs"
+                  className="rounded-md bg-muted px-2.5 py-1.5 text-xs"
                 >
                   {date(day)}
                 </span>
@@ -472,12 +472,12 @@ function UserProfile({ user }: { user: UserDetail }) {
               )}
             </div>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-[#e7e7e4] bg-white">
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full min-w-[600px] text-left text-sm">
               <caption className="px-5 pt-5 pb-3 text-left font-semibold">
                 {t('Последние входы')}
               </caption>
-              <thead className="border-b border-[#e7e7e4] text-xs text-muted-foreground">
+              <thead className="border-b border-border text-xs text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3 font-medium">{t('Дата')}</th>
                   <th className="px-5 py-3 font-medium">{t('Устройство')}</th>
@@ -487,10 +487,7 @@ function UserProfile({ user }: { user: UserDetail }) {
               </thead>
               <tbody>
                 {user.sessions.map((session, i) => (
-                  <tr
-                    key={i}
-                    className="border-b border-[#eeeeeb] last:border-0"
-                  >
+                  <tr key={i} className="border-b border-border last:border-0">
                     <td className="px-5 py-4 text-xs">
                       {date(session.createdAt, true)}
                     </td>
@@ -595,7 +592,7 @@ function UserProfile({ user }: { user: UserDetail }) {
               <Button
                 type="button"
                 variant="outline"
-                className="border-[#deded9]"
+                className="border-border"
                 disabled={action.isPending}
                 onClick={() => setDialog(null)}
               >
@@ -672,7 +669,7 @@ function AccessCheckbox({
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 size-4 accent-[#3b82f6]"
+        className="mt-0.5 size-4 accent-primary"
       />
       <span>
         <span className="block font-medium">{title}</span>
@@ -712,9 +709,9 @@ function UserTests({ id }: { id: string }) {
           retry={() => void query.refetch()}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[#e7e7e4] bg-white">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full min-w-[620px] text-left text-sm">
-            <thead className="border-b border-[#e7e7e4] bg-[#fafaf8] text-xs text-muted-foreground">
+            <thead className="border-b border-border bg-background text-xs text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-medium">{t('Тест')}</th>
                 <th className="px-4 py-3 font-medium">{t('Статус')}</th>
@@ -736,7 +733,7 @@ function UserTests({ id }: { id: string }) {
                 query.data.items.map((attempt) => (
                   <tr
                     key={attempt.id}
-                    className="border-b border-[#eeeeeb] last:border-0"
+                    className="border-b border-border last:border-0"
                   >
                     <td className="px-5 py-4">
                       <p className="mb-1 text-xs capitalize text-primary">
@@ -751,7 +748,7 @@ function UserTests({ id }: { id: string }) {
                       </button>
                     </td>
                     <td
-                      className={`px-4 py-4 text-xs ${attempt.status === 'SUBMITTED' ? 'text-[#16845b]' : 'text-muted-foreground'}`}
+                      className={`px-4 py-4 text-xs ${attempt.status === 'SUBMITTED' ? 'text-success' : 'text-muted-foreground'}`}
                     >
                       {t(statusText[attempt.status] ?? attempt.status)}
                     </td>
@@ -816,7 +813,7 @@ function UserTests({ id }: { id: string }) {
               {detail.data.answers.map((answer, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-[#e7e7e4] p-4"
+                  className="rounded-lg border border-border p-4"
                 >
                   <h3 className="mb-2 text-sm font-semibold">
                     {t('Ответ')} {index + 1}

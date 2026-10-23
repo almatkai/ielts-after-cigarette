@@ -8,7 +8,7 @@ export const Route = createFileRoute('/waitlist-admin')({
   },
   head: () => ({
     meta: [
-      { title: tr('Waitlist — администрирование IAC') },
+      { title: tr('Waitlist — администрирование Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

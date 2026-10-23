@@ -35,7 +35,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        'fixed inset-0 z-[70] bg-black/30 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0',
+        'fixed inset-0 z-[70] bg-overlay data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0',
         className,
       )}
       {...props}
@@ -53,7 +53,7 @@ function AlertDialogContent({
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-[80] grid w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-[16px] border border-[#e7e7e4] bg-white p-6 text-[#111111] shadow-[0_24px_80px_rgba(17,17,17,0.16)] outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:p-7',
+          'fixed top-1/2 left-1/2 z-[80] grid w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-[10px] border border-border bg-card p-6 text-foreground shadow-popover outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:p-7',
           className,
         )}
         {...props}
@@ -114,7 +114,7 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn('text-sm leading-6 text-[#69696d]', className)}
+      className={cn('text-sm leading-6 text-muted-foreground', className)}
       {...props}
     />
   )

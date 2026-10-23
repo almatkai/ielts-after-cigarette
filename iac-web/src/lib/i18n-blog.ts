@@ -2,17 +2,17 @@ import type { TranslationMap } from './i18n-types'
 
 export const blogTranslations: TranslationMap = {
   // components/blog/blog-shell.tsx
-  'Daiyndyq IELTS — главная': {
-    kk: 'Daiyndyq IELTS — басты бет',
-    en: 'Daiyndyq IELTS — home',
+  'Yrys Academy — главная': {
+    kk: 'Yrys Academy — басты бет',
+    en: 'Yrys Academy — home',
   },
   'Разделы блога': { kk: 'Блог бөлімдері', en: 'Blog sections' },
   Статьи: { kk: 'Мақалалар', en: 'Articles' },
   Авторам: { kk: 'Авторларға', en: 'For writers' },
   'О платформе': { kk: 'Платформа туралы', en: 'About the platform' },
-  '© 2026 Daiyndyq IELTS · Подготовка к IELTS': {
-    kk: '© 2026 Daiyndyq IELTS · IELTS-ке дайындық',
-    en: '© 2026 Daiyndyq IELTS · IELTS preparation',
+  '© 2026 Yrys Academy · Подготовка к IELTS': {
+    kk: '© 2026 Yrys Academy · IELTS-ке дайындық',
+    en: '© 2026 Yrys Academy · IELTS preparation',
   },
   'Ссылки в подвале': {
     kk: 'Төменгі жолдағы сілтемелер',

@@ -24,7 +24,7 @@ export function downloadTextFile(
 
 /**
  * Lowercases a possibly-missing question-group type. API payloads are not
- * guaranteed to carry `type`, and IELTS material types are uppercase
+ * guaranteed to carry `type`, and IELTS material types are normal-case
  * (SENTENCE_COMPLETION), so callers must match case-insensitively.
  */
 function groupTypeOf(value: unknown): string {

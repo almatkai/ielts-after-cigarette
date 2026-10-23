@@ -48,6 +48,46 @@ export function tr(source: string): string {
 }
 
 const baseTranslations: TranslationMap = {
+  'Блог Yrys Academy': { kk: 'Yrys Academy блогы', en: 'Yrys Academy blog' },
+  'Блог Yrys Academy: стратегии и опыт подготовки к IELTS': {
+    kk: 'Yrys Academy блогы: IELTS-ке дайындық стратегиялары мен тәжірибесі',
+    en: 'Yrys Academy blog: IELTS preparation strategies and experience',
+  },
+  'Стать автором блога — Yrys Academy': {
+    kk: 'Блог авторы болу — Yrys Academy',
+    en: 'Become a blog author — Yrys Academy',
+  },
+  'Статья не найдена — Блог Yrys Academy': {
+    kk: 'Мақала табылмады — Yrys Academy блогы',
+    en: 'Article not found — Yrys Academy blog',
+  },
+  'Тема оформления': { kk: 'Безендіру тақырыбы', en: 'Appearance theme' },
+  Системная: { kk: 'Жүйелік', en: 'System' },
+  Светлая: { kk: 'Ашық', en: 'Light' },
+  Тёмная: { kk: 'Күңгірт', en: 'Dark' },
+  'Помощник Юки': { kk: 'Юки көмекшісі', en: 'Yuki assistant' },
+  'Управление подсказкой помощника в интерфейсе.': {
+    kk: 'Интерфейстегі көмекшінің кеңесін басқару.',
+    en: 'Manage assistant tips in the interface.',
+  },
+  'Показывать подсказку Юки': {
+    kk: 'Юки кеңесін көрсету',
+    en: 'Show Yuki prompt',
+  },
+  'Отображать подсказку помощника в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.':
+    {
+      kk: 'Экранның оң жақ төменгі бұрышында көмекшінің кеңесін көрсету. Өшірілсе, чатқа жылдам өтуге арналған шағын батырма қалады.',
+      en: 'Display the assistant prompt in the bottom right corner of the screen. If disabled, a compact chat shortcut button remains.',
+    },
+  'Yrys Academy — к обзору': {
+    kk: 'Yrys Academy — шолуға',
+    en: 'Yrys Academy — overview',
+  },
+  'Заданий выполнено': { kk: 'Орындалған тапсырмалар', en: 'Tasks completed' },
+  'IELTS test — Yrys Academy': {
+    kk: 'IELTS тесті — Yrys Academy',
+    en: 'IELTS test — Yrys Academy',
+  },
   Язык: { kk: 'Тіл', en: 'Language' },
   Обучение: { kk: 'Оқу', en: 'Study' },
   Обзор: { kk: 'Шолу', en: 'Overview' },
@@ -1464,9 +1504,9 @@ const baseTranslations: TranslationMap = {
     kk: 'Жеке деректерді өңдеу бойынша кез келген сұрақ бойынша жазыңыз:',
     en: 'For any personal-data questions, write to',
   },
-  '© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.': {
-    kk: '© 2026 Daiyndyq IELTS. Барлық құқықтар қорғалған. Астана, Қазақстан.',
-    en: '© 2026 Daiyndyq IELTS. All rights reserved. Astana, Kazakhstan.',
+  '© 2026 Yrys Academy. Все права защищены. Астана, Казахстан.': {
+    kk: '© 2026 Yrys Academy. Барлық құқықтар қорғалған. Астана, Қазақстан.',
+    en: '© 2026 Yrys Academy. All rights reserved. Astana, Kazakhstan.',
   },
   Вход: { kk: 'Кіру', en: 'Sign in' },
   'Выберите дату экзамена': {
@@ -1479,15 +1519,15 @@ const baseTranslations: TranslationMap = {
   'Быстро:': { kk: 'Жылдам:', en: 'Quick:' },
   'Предыдущий месяц': { kk: 'Алдыңғы ай', en: 'Previous month' },
   'Следующий месяц': { kk: 'Келесі ай', en: 'Next month' },
-  'Настоящая Политика описывает, как платформа Daiyndyq IELTS собирает, использует, шифрует, хранит и защищает ваши персональные данные при использовании образовательного сервиса.':
+  'Настоящая Политика описывает, как платформа Yrys Academy собирает, использует, шифрует, хранит и защищает ваши персональные данные при использовании образовательного сервиса.':
     {
-      kk: 'Осы Саясат Daiyndyq IELTS платформасының білім беру қызметін пайдаланған кезде жеке деректеріңізді қалай жинайтынын, пайдаланатынын, шифрлайтынын, сақтайтынын және қорғайтынын сипаттайды.',
-      en: 'This Policy explains how the Daiyndyq IELTS platform collects, uses, encrypts, stores, and protects your personal data when you use the learning service.',
+      kk: 'Осы Саясат Yrys Academy платформасының білім беру қызметін пайдаланған кезде жеке деректеріңізді қалай жинайтынын, пайдаланатынын, шифрлайтынын, сақтайтынын және қорғайтынын сипаттайды.',
+      en: 'This Policy explains how the Yrys Academy platform collects, uses, encrypts, stores, and protects your personal data when you use the learning service.',
     },
-  'Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Daiyndyq IELTS».':
+  'Пользовательское соглашение, регулирующее порядок и правила использования образовательной платформы подготовки к IELTS «Yrys Academy».':
     {
-      kk: 'IELTS-ке дайындықтың білім беру платформасы «Daiyndyq IELTS»-ты пайдалану тәртібі мен ережелерін реттейтін пайдаланушы келісімшарты.',
-      en: 'The user agreement governing use of the Daiyndyq IELTS preparation platform.',
+      kk: 'IELTS-ке дайындықтың білім беру платформасы «Yrys Academy»-ні пайдалану тәртібі мен ережелерін реттейтін пайдаланушы келісімшарты.',
+      en: 'The user agreement governing use of the Yrys Academy preparation platform.',
     },
   '5 октября 2026 г.': { kk: '2026 ж. 5 қазан', en: '5 October 2026' },
   '1. Общие положения': { kk: '1. Жалпы ережелер', en: '1. General terms' },
@@ -1574,57 +1614,57 @@ const baseTranslations: TranslationMap = {
     kk: 'Дағды мен тапсырма форматын таңдау',
     en: 'Choose a skill and task format',
   },
-  'AI-провайдеры — Daiyndyq IELTS': {
-    kk: 'AI-провайдерлер — Daiyndyq IELTS',
-    en: 'AI providers — Daiyndyq IELTS',
+  'AI-провайдеры — Yrys Academy': {
+    kk: 'AI-провайдерлер — Yrys Academy',
+    en: 'AI providers — Yrys Academy',
   },
-  'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза': {
-    kk: 'Daiyndyq IELTS — бірінші ретте 7.0-ден жоғары IELTS тапсырыңыз',
-    en: 'Daiyndyq IELTS — score above 7.0 on your first IELTS',
+  'Yrys Academy — подготовка к IELTS онлайн': {
+    kk: 'Yrys Academy — IELTS-ке онлайн дайындық',
+    en: 'Yrys Academy — online IELTS preparation',
   },
-  'Waitlist — администрирование IAC': {
-    kk: 'Waitlist — IAC әкімшілігі',
-    en: 'Waitlist — IAC admin',
+  'Waitlist — администрирование Yrys Academy': {
+    kk: 'Waitlist — Yrys Academy әкімшілігі',
+    en: 'Waitlist — Yrys Academy admin',
   },
-  'Администрирование — IAC': {
-    kk: 'Әкімшілік — IAC',
-    en: 'Administration — IAC',
+  'Администрирование — Yrys Academy': {
+    kk: 'Әкімшілік — Yrys Academy',
+    en: 'Administration — Yrys Academy',
   },
-  'Аналитика — Daiyndyq IELTS': {
-    kk: 'Аналитика — Daiyndyq IELTS',
-    en: 'Analytics — Daiyndyq IELTS',
+  'Аналитика — Yrys Academy': {
+    kk: 'Аналитика — Yrys Academy',
+    en: 'Analytics — Yrys Academy',
   },
-  'Войти в Daiyndyq IELTS — подготовка к IELTS': {
-    kk: 'Daiyndyq IELTS-ке кіру — IELTS дайындығы',
-    en: 'Sign in to Daiyndyq IELTS — IELTS preparation',
+  'Войти — Yrys Academy': {
+    kk: 'Кіру — Yrys Academy',
+    en: 'Sign in — Yrys Academy',
   },
-  'Доступ запрещён — Daiyndyq IELTS': {
-    kk: 'Кіруге тыйым салынған — Daiyndyq IELTS',
-    en: 'Access denied — Daiyndyq IELTS',
+  'Доступ запрещён — Yrys Academy': {
+    kk: 'Кіруге тыйым салынған — Yrys Academy',
+    en: 'Access denied — Yrys Academy',
   },
-  'Панель управления — Daiyndyq IELTS': {
-    kk: 'Басқару панелі — Daiyndyq IELTS',
-    en: 'Dashboard — Daiyndyq IELTS',
+  'Панель управления — Yrys Academy': {
+    kk: 'Басқару панелі — Yrys Academy',
+    en: 'Dashboard — Yrys Academy',
   },
-  'Политика конфиденциальности — Daiyndyq IELTS': {
-    kk: 'Құпиялылық саясаты — Daiyndyq IELTS',
-    en: 'Privacy Policy — Daiyndyq IELTS',
+  'Политика конфиденциальности — Yrys Academy': {
+    kk: 'Құпиялылық саясаты — Yrys Academy',
+    en: 'Privacy Policy — Yrys Academy',
   },
-  'Практика — Daiyndyq IELTS': {
-    kk: 'Практика — Daiyndyq IELTS',
-    en: 'Practice — Daiyndyq IELTS',
+  'Практика — Yrys Academy': {
+    kk: 'Практика — Yrys Academy',
+    en: 'Practice — Yrys Academy',
   },
-  'Предпросмотр теста — IAC': {
-    kk: 'Тест алдын ала қарау — IAC',
-    en: 'Test preview — IAC',
+  'Предпросмотр теста — Yrys Academy': {
+    kk: 'Тест алдын ала қарау — Yrys Academy',
+    en: 'Test preview — Yrys Academy',
   },
-  'Профиль — Daiyndyq IELTS': {
-    kk: 'Профиль — Daiyndyq IELTS',
-    en: 'Profile — Daiyndyq IELTS',
+  'Профиль — Yrys Academy': {
+    kk: 'Профиль — Yrys Academy',
+    en: 'Profile — Yrys Academy',
   },
-  'Условия использования — Daiyndyq IELTS': {
-    kk: 'Пайдалану шарттары — Daiyndyq IELTS',
-    en: 'Terms of Use — Daiyndyq IELTS',
+  'Условия использования — Yrys Academy': {
+    kk: 'Пайдалану шарттары — Yrys Academy',
+    en: 'Terms of Use — Yrys Academy',
   },
 }
 
@@ -1639,6 +1679,27 @@ const translations: TranslationMap = {
   ...legalPrivacyTranslations,
   ...legalTermsTranslations,
   ...reviewTranslations,
+}
+
+/** Route head functions can still hold a title from the previous device locale. */
+export function localizePageTitle(title: string, language: Language): string {
+  const entry = Object.entries(translations).find(
+    ([source, values]) =>
+      source === title || values?.kk === title || values?.en === title,
+  )
+  if (entry)
+    return language === 'ru' ? entry[0] : (entry[1]?.[language] ?? entry[0])
+  // Preserve authored article titles; only the branded suffix is interface copy.
+  const blog =
+    translations['Блог Yrys Academy']?.[language] ?? 'Блог Yrys Academy'
+  const paginated = title.match(/^Блог Yrys Academy — страница (\d+)$/)
+  if (paginated)
+    return language === 'en'
+      ? `${blog} — page ${paginated[1]}`
+      : language === 'kk'
+        ? `${blog} — ${paginated[1]}-бет`
+        : title
+  return title.replace(/ — Блог Yrys Academy$/, ` — ${blog}`)
 }
 
 type LanguageContextValue = {

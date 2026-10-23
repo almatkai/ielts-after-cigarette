@@ -23,7 +23,7 @@ const skillLabels: Record<SkillId, string> = {
 }
 
 const cardClassName =
-  'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none min-w-0 max-w-full overflow-hidden'
+  'gap-0 rounded-[10px] border-border py-0 shadow-none min-w-0 max-w-full overflow-hidden'
 
 export function ProgressPage() {
   const { language, t } = useLanguage()
@@ -84,13 +84,13 @@ export function ProgressPage() {
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
       <div>
-        <h2 className="text-base sm:text-lg font-semibold tracking-[-0.025em] text-[#111111]">
+        <h2 className="text-base sm:text-lg font-semibold tracking-[-0.025em] text-foreground">
           {t('Отслеживайте свою динамику')}
         </h2>
       </div>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
+        <CardHeader className="border-b border-border p-3.5 sm:p-5">
           <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
             {t('Уровень по навыкам')}
           </CardTitle>
@@ -99,19 +99,19 @@ export function ProgressPage() {
           {dashboard.skillProgress.map((progress) => (
             <div
               key={progress.skill}
-              className="min-w-0 rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-[#fafaf8] p-3 sm:p-4"
+              className="min-w-0 rounded-[10px] sm:rounded-[10px] border border-border bg-background p-3 sm:p-4"
             >
               <div className="flex items-center justify-between gap-2 sm:gap-3">
-                <p className="truncate text-xs sm:text-sm font-semibold text-[#111111]">
+                <p className="truncate text-xs sm:text-sm font-semibold text-foreground">
                   {skillLabels[progress.skill]}
                 </p>
-                <span className="shrink-0 text-xs sm:text-sm font-semibold text-[#3b82f6]">
+                <span className="shrink-0 text-xs sm:text-sm font-semibold text-primary">
                   {progress.estimatedBand === null
                     ? '—'
                     : progress.estimatedBand.toFixed(1)}
                 </span>
               </div>
-              <p className="mt-1 sm:mt-2 truncate text-[11px] sm:text-xs leading-4 sm:leading-5 text-[#808084]">
+              <p className="mt-1 sm:mt-2 truncate text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
                 {progress.completedTasks === 0
                   ? t('Нет выполненных заданий')
                   : language === 'en'
@@ -126,7 +126,7 @@ export function ProgressPage() {
       </Card>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-3.5 sm:p-5">
+        <CardHeader className="border-b border-border p-3.5 sm:p-5">
           <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
             {t('История попыток')}
           </CardTitle>
@@ -143,11 +143,11 @@ export function ProgressPage() {
               }}
             />
           ) : attempts.length === 0 ? (
-            <div className="rounded-[12px] border border-dashed border-[#deded9] bg-[#fafaf8] px-4 py-8 text-center">
-              <p className="text-sm font-semibold text-[#111111]">
+            <div className="rounded-[10px] border border-dashed border-border bg-background px-4 py-8 text-center">
+              <p className="text-sm font-semibold text-foreground">
                 {t('Попыток пока нет')}
               </p>
-              <p className="mt-1 text-xs leading-5 text-[#808084]">
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {t('Пройдите первый тест в разделе Listening или Reading.')}
               </p>
               <div className="mt-4 flex justify-center gap-3">
@@ -188,15 +188,15 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
   const submitted = item.status === 'SUBMITTED'
   const processing = item.status === 'PROCESSING'
   return (
-    <div className="flex flex-col gap-2 rounded-[10px] sm:rounded-[12px] border border-[#ededeb] bg-white p-3 sm:p-4 min-w-0 w-full sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+    <div className="flex flex-col gap-2 rounded-[10px] sm:rounded-[10px] border border-border bg-card p-3 sm:p-4 min-w-0 w-full sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <div className="min-w-0 flex-1">
         <p
-          className="truncate text-xs sm:text-sm font-semibold text-[#111111]"
+          className="truncate text-xs sm:text-sm font-semibold text-foreground"
           title={item.testTitle}
         >
           {item.testTitle}
         </p>
-        <p className="mt-0.5 sm:mt-1 truncate text-[11px] sm:text-xs text-[#808084]">
+        <p className="mt-0.5 sm:mt-1 truncate text-[11px] sm:text-xs text-muted-foreground">
           {skillLabel(item.materialType)} ·{' '}
           {formatDateTime(item.submittedAt ?? item.startedAt)}
           {submitted
@@ -208,7 +208,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       </div>
       <div className="flex items-center justify-between gap-3 shrink-0 sm:justify-end">
         {processing ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3b82f6]">
+          <span className="inline-flex items-center gap-1.5 rounded-sm bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
             <svg
               className="size-3 animate-spin"
               viewBox="0 0 24 24"
@@ -232,12 +232,12 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
           </span>
         ) : null}
         {submitted ? (
-          <p className="text-sm text-[#69696d]">
-            <span className="font-semibold text-[#111111]">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">
               {item.score ?? '—'}/{item.maxScore ?? '—'}
             </span>
             {' · band '}
-            <span className="font-semibold text-[#3b82f6]">
+            <span className="font-semibold text-primary">
               {item.band !== null ? item.band.toFixed(1) : '—'}
             </span>
           </p>

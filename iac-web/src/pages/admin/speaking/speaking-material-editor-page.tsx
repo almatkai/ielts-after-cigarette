@@ -36,7 +36,7 @@ import type {
 import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 
-const fieldClassName = 'border-[#deded9] bg-white shadow-none'
+const fieldClassName = 'border-border bg-card shadow-none'
 
 const emptyForm: SpeakingMaterialInput = {
   slug: '',
@@ -183,11 +183,15 @@ export function SpeakingMaterialEditorPage({
     archiveMutation.isPending
 
   if (materialQuery.isPending && editing)
-    return <p className="text-sm text-[#69696d]">{t('Загружаем материал…')}</p>
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t('Загружаем материал…')}
+      </p>
+    )
   if (materialQuery.isError)
     return (
       <Card className="shadow-none">
-        <CardContent className="p-6 text-center text-sm text-[#e23b3b]">
+        <CardContent className="p-6 text-center text-sm text-destructive">
           {t('Не удалось загрузить материал.')}
         </CardContent>
       </Card>
@@ -204,14 +208,18 @@ export function SpeakingMaterialEditorPage({
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
+          >
             <Link to="/admin/speaking/materials">
               <ArrowLeft aria-hidden />
               {t('К библиотеке')}
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+            <h1 className="text-3xl font-semibold tracking-normal">
               {editing ? t('Редактор Speaking') : t('Новый Speaking-материал')}
             </h1>
             {material ? (
@@ -219,7 +227,7 @@ export function SpeakingMaterialEditorPage({
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
+            <p className="mt-2 text-xs text-muted-foreground">
               {t('Версия')} {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
@@ -285,7 +293,7 @@ export function SpeakingMaterialEditorPage({
           role="status"
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
         >
-          <TickCircle className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-success" aria-hidden />
           {message}
         </p>
       ) : null}
@@ -294,7 +302,7 @@ export function SpeakingMaterialEditorPage({
       archiveMutation.isError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-sm text-destructive"
         >
           {getErrorMessage(
             saveMutation.error ??

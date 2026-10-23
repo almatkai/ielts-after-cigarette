@@ -33,22 +33,24 @@ export function InlineWritingAnnotation({
           type="button"
           aria-label={`${feedbackLabel}: ${text}`}
           aria-pressed={selected}
-          className={`inline text-left font-serif text-base sm:text-lg cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
+          className={`inline text-left font-sans text-base sm:text-lg cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
             isError
-              ? `underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-950 hover:bg-red-100/90 ${
-                  selected ? 'bg-red-100 ring-2 ring-red-400' : 'bg-red-50/80'
-                }`
-              : `underline decoration-wavy decoration-amber-500 decoration-2 underline-offset-4 text-amber-950 hover:bg-amber-100/90 ${
+              ? `underline decoration-wavy decoration-destructive decoration-2 underline-offset-4 text-destructive hover:bg-destructive-soft/90 ${
                   selected
-                    ? 'bg-amber-100 ring-2 ring-amber-400'
-                    : 'bg-amber-50/80'
+                    ? 'bg-destructive-soft ring-2 ring-destructive'
+                    : 'bg-destructive-soft/80'
+                }`
+              : `underline decoration-wavy decoration-warning-fg decoration-2 underline-offset-4 text-warning-fg hover:bg-warning-bg/90 ${
+                  selected
+                    ? 'bg-warning-bg ring-2 ring-warning-fg'
+                    : 'bg-warning-bg/80'
                 }`
           }`}
         >
           <span>{text}</span>
           <sup
-            className={`ml-1 inline-flex items-center justify-center font-sans font-bold text-[10px] size-4 rounded-full text-white align-top select-none shadow-xs ${
-              isError ? 'bg-red-500' : 'bg-amber-500'
+            className={`ml-1 inline-flex items-center justify-center font-sans font-bold text-[10px] size-4 rounded-full text-primary-foreground align-top select-none shadow-none ${
+              isError ? 'bg-destructive' : 'bg-warning-fg'
             }`}
           >
             {annotation.id}
@@ -65,23 +67,23 @@ export function InlineWritingAnnotation({
         <div className="mb-2 flex items-center justify-between gap-3">
           <p
             className={`text-xs font-semibold ${
-              isError ? 'text-red-700' : 'text-amber-700'
+              isError ? 'text-destructive' : 'text-warning-fg'
             }`}
           >
             {feedbackLabel}
           </p>
           <PopoverPrimitive.Close
             aria-label={closeLabel}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md text-lg text-slate-500 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-lg text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             <span aria-hidden>×</span>
           </PopoverPrimitive.Close>
         </div>
-        <p className="font-serif text-base font-semibold leading-snug text-emerald-700 whitespace-pre-wrap">
+        <p className="font-sans text-base font-semibold leading-snug text-success whitespace-pre-wrap">
           {annotation.replacement}
         </p>
         {annotation.explanationRu && (
-          <p className="mt-2 text-slate-700 leading-relaxed">
+          <p className="mt-2 text-foreground leading-relaxed">
             {annotation.explanationRu}
           </p>
         )}

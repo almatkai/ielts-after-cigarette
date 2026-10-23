@@ -257,35 +257,35 @@ test('Reading preview reuses the exam, answers locally, shows every passage and 
     path: testInfo.outputPath('reading-preview.png'),
     fullPage: true,
   })
-  await expect(
-    page.getByRole('button', { name: 'Завершить тест' }),
-  ).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Finish test' })).toHaveCount(0)
   await expect(
     page.getByRole('button', { name: 'Включить таймер' }),
   ).toBeVisible()
   const option = page.locator('label').filter({ hasText: 'First option' })
   await option.click()
-  await expect(option).toHaveClass(/border-blue-600/)
+  await expect(option).toHaveClass(/border-primary/)
   await page.getByRole('button', { name: 'Сбросить ответы' }).click()
   await expect(
     page.locator('label').filter({ hasText: 'First option' }),
-  ).not.toHaveClass(/border-blue-600/)
+  ).not.toHaveClass(/border-primary/)
   await page
-    .getByRole('button', { name: /Раздел 2/ })
+    .getByRole('button', { name: /Passage 2/ })
     .first()
     .click()
   await expect(
-    page.getByText('This passage has no questions yet.'),
+    page.getByText('This passage has no questions yet.', { exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByText('В этом разделе ещё нет вопросов. Добавьте их в редакторе.'),
+    page.getByText(
+      'This passage has no questions yet. Add them in the editor.',
+    ),
   ).toBeVisible()
   await page
-    .getByRole('button', { name: /Раздел 3/ })
+    .getByRole('button', { name: /Passage 3/ })
     .first()
     .click()
-  await page.getByPlaceholder('Введите ваш ответ здесь…').fill('local answer')
-  await expect(page.getByPlaceholder('Введите ваш ответ здесь…')).toHaveValue(
+  await page.getByPlaceholder('Enter your answer here…').fill('local answer')
+  await expect(page.getByPlaceholder('Enter your answer here…')).toHaveValue(
     'local answer',
   )
   await page.getByRole('button', { name: 'Включить таймер' }).click()
@@ -313,22 +313,20 @@ test('Listening preview loads draft media, takes local answers and opens empty p
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('admin/preview/listening/listening-id')
   await expect(page.locator('audio')).toBeVisible()
-  await expect(page.getByAltText('Схема задания Listening')).toBeVisible()
-  await page.getByPlaceholder('Ваш ответ').fill('local listening answer')
-  await expect(page.getByPlaceholder('Ваш ответ')).toHaveValue(
+  await expect(page.getByAltText('Listening question diagram')).toBeVisible()
+  await page.getByPlaceholder('Your answer').fill('local listening answer')
+  await expect(page.getByPlaceholder('Your answer')).toHaveValue(
     'local listening answer',
   )
   await page.getByRole('button', { name: 'Part 2', exact: true }).click()
   await expect(
-    page.getByText('Аудио ещё не прикреплено.').first(),
+    page.getByText('No audio has been added yet.').first(),
   ).toBeVisible()
   await page.getByRole('button', { name: 'Part 3', exact: true }).click()
   await expect(
-    page.getByText('В этой части ещё нет вопросов. Добавьте их в редакторе.'),
+    page.getByText('This part has no questions yet. Add them in the editor.'),
   ).toBeVisible()
-  await expect(
-    page.getByRole('button', { name: 'Завершить тест' }),
-  ).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Finish test' })).toHaveCount(0)
   expectNoAttempts(requests)
   expect(errors).toEqual([])
 })
@@ -433,8 +431,8 @@ for (const skill of ['reading', 'listening']) {
     await expect(
       page.getByText(
         skill === 'reading'
-          ? 'Текст раздела ещё не добавлен. Вернитесь в редактор.'
-          : 'В тесте ещё нет частей. Добавьте их в редакторе.',
+          ? 'This passage has no text yet. Return to the editor.'
+          : 'This test has no parts yet. Add them in the editor.',
       ),
     ).toBeVisible()
     expectNoAttempts(requests)
@@ -499,11 +497,11 @@ test('Reading preview remains usable on a phone', async ({
   await page.goto('admin/preview/reading/reading-id')
   await expect(page.getByText('It’s the current saved passage.')).toBeVisible()
   await page
-    .getByRole('button', { name: /Раздел 3/ })
+    .getByRole('button', { name: /Passage 3/ })
     .first()
     .click()
-  await page.getByPlaceholder('Введите ваш ответ здесь…').fill('mobile answer')
-  await expect(page.getByPlaceholder('Введите ваш ответ здесь…')).toHaveValue(
+  await page.getByPlaceholder('Enter your answer here…').fill('mobile answer')
+  await expect(page.getByPlaceholder('Enter your answer here…')).toHaveValue(
     'mobile answer',
   )
   await page
@@ -544,7 +542,7 @@ test('Reading reveals the answer and evidence, hides it, resets it and uses the 
   )
   await expect(
     page.locator('label').filter({ hasText: 'First option' }),
-  ).not.toHaveClass(/border-blue-600/)
+  ).not.toHaveClass(/border-primary/)
   await page.screenshot({
     path: testInfo.outputPath('reading-answer-revealed.png'),
     fullPage: true,
@@ -592,7 +590,7 @@ test('Listening reveals the stored answer and explanation and highlights transcr
   await expect(page.getByTestId('answer-evidence')).toHaveText(
     'The answer is secret.',
   )
-  await expect(page.getByPlaceholder('Ваш ответ')).toHaveValue('')
+  await expect(page.getByPlaceholder('Your answer')).toHaveValue('')
   await page.getByRole('button', { name: 'Скрыть ответ и объяснение' }).click()
   await expect(panel).toHaveCount(0)
   await expect(page.getByTestId('answer-evidence')).toHaveCount(0)
@@ -820,7 +818,7 @@ test('every Listening question type offers the stored answer and explanation', a
         .getByText(`Explanation for ${type}`, { exact: true }),
     ).toBeVisible()
     if (index < types.length - 1)
-      await page.getByRole('button', { name: 'Далее', exact: true }).click()
+      await page.getByRole('button', { name: 'Next', exact: true }).click()
   }
   expectNoAttempts(requests)
 })
@@ -920,7 +918,7 @@ for (const preview of [true, false]) {
     await expect(first).toBeFocused()
     await expect(second).toBeVisible()
     await expect(second).not.toBeFocused()
-    await expect(page.getByPlaceholder('Ваш ответ')).toHaveCount(0)
+    await expect(page.getByPlaceholder('Your answer')).toHaveCount(0)
     await expect(
       page.getByText('note completion', { exact: true }),
     ).toHaveCount(0)
@@ -933,16 +931,16 @@ for (const preview of [true, false]) {
     await first.fill('umbrella')
     await expect(first).toHaveValue('umbrella')
     await expect(first).toHaveCSS('border-bottom-width', '1px')
-    await page.getByRole('button', { name: 'Далее', exact: true }).click()
+    await page.getByRole('button', { name: 'Next', exact: true }).click()
     await expect(first).toHaveValue('umbrella')
     await second.fill('tower')
     await expect(second).toBeFocused()
     await expect(
-      page.getByText('Вопрос 2 из 2', { exact: false }),
+      page.getByText('Question 2 of 2', { exact: false }),
     ).toBeVisible()
     await first.focus()
     await expect(
-      page.getByText('Вопрос 1 из 2', { exact: false }),
+      page.getByText('Question 1 of 2', { exact: false }),
     ).toBeVisible()
     await first.fill('')
     await expect(first).toHaveCSS('border-bottom-width', '1px')
@@ -1012,7 +1010,7 @@ test('Listening completion without context renders prompt gaps inline', async ({
   await expect(first.locator('..')).toContainText('Build an')
   await first.fill('engine')
   await expect(first).toHaveValue('engine')
-  await page.getByRole('button', { name: 'Далее', exact: true }).click()
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
   const second = page.getByRole('textbox', {
     name: 'Ответ на вопрос 2',
     exact: true,
@@ -1021,7 +1019,7 @@ test('Listening completion without context renders prompt gaps inline', async ({
   await expect(second.locator('..')).toContainText('Create a short')
   await second.fill('film')
   await expect(second).toHaveValue('film')
-  await page.getByRole('button', { name: 'Назад', exact: true }).click()
+  await page.getByRole('button', { name: 'Back', exact: true }).click()
   await expect(first).toHaveValue('engine')
 })
 
@@ -1180,7 +1178,7 @@ for (const skill of ['reading', 'listening']) {
     })
     await page.goto(`exam/${skill}/${skill}-id`)
     const input = page.getByPlaceholder(
-      skill === 'reading' ? 'Введите ваш ответ здесь…' : 'Ваш ответ',
+      skill === 'reading' ? 'Enter your answer here…' : 'Your answer',
     )
     await input.fill('student answer')
     // Autosave intentionally waits for 15 seconds of inactivity.

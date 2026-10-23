@@ -234,14 +234,14 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   await expect(page.getByRole('checkbox')).toHaveCount(0)
   await start.click()
   await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
-  await expect(page.getByText('Итоговый IELTS band')).toBeVisible()
+  await expect(page.getByText('Overall IELTS band')).toBeVisible()
   expect(starts).toEqual([
     { examType: 'academic', turnstileToken: '', acceptedTerms: true },
   ])
   await expect(
     page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
   ).toHaveCount(4)
-  await page.getByRole('button', { name: 'Выбрать Writing' }).click()
+  await page.getByRole('button', { name: 'Show Writing review' }).click()
   await expect(page.getByText(/3 из 10 разборов/)).toBeVisible()
   await page
     .getByRole('button', { name: 'Разобрать рекомендацию 1', exact: true })
@@ -256,7 +256,7 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
     page.getByText('Без аккаунта доступны 30% ошибок', { exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByRole('button', { name: 'Выбрать Writing' }),
+    page.getByRole('button', { name: 'Show Writing review' }),
   ).toHaveAttribute('aria-pressed', 'true')
   await page.goto('./try')
   await expect(
@@ -385,7 +385,7 @@ test('login logo opens the app overview even when guest trials are disabled', as
 }) => {
   const { privateReads, starts } = await guestAPI(page, false, false)
   await page.goto('./login')
-  const brand = page.getByRole('link', { name: 'Daiyndyq IELTS — к обзору' })
+  const brand = page.getByRole('link', { name: 'Yrys Academy — к обзору' })
   await expect(brand).toHaveAttribute('href', '/app/')
   await brand.click()
   await expect(page).toHaveURL(/\/app\/$/)
@@ -767,7 +767,7 @@ for (const registration of [false, true]) {
       page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
     ).toHaveCount(0)
     expect(claims).toEqual(['Bearer account-token'])
-    await page.getByRole('button', { name: 'Выбрать Reading' }).click()
+    await page.getByRole('button', { name: 'Show Reading review' }).click()
     await expect(
       page.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
     ).toHaveCount(10)
@@ -786,7 +786,7 @@ for (const registration of [false, true]) {
     ).toBeVisible()
     await page.reload()
     await expect(
-      page.getByRole('button', { name: 'Выбрать Reading' }),
+      page.getByRole('button', { name: 'Show Reading review' }),
     ).toHaveAttribute('aria-pressed', 'true')
     await expect(
       page.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
@@ -987,9 +987,9 @@ for (const mobile of [false, true]) {
       .click()
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
     await expect(
-      page.getByRole('link', { name: 'Продолжить', exact: true }),
+      page.getByRole('link', { name: 'Resume section', exact: true }),
     ).toBeVisible()
-    await expect(page.getByText('Закрыто', { exact: true })).toHaveCount(3)
+    await expect(page.getByText('Locked', { exact: true })).toHaveCount(3)
     expect(starts).toEqual([
       {
         examType: 'academic',
@@ -1002,7 +1002,7 @@ for (const mobile of [false, true]) {
     ).toHaveCount(0)
     await page.reload()
     await expect(
-      page.getByRole('link', { name: 'Продолжить', exact: true }),
+      page.getByRole('link', { name: 'Resume section', exact: true }),
     ).toBeVisible()
     await page.goto('./')
     await page
@@ -1053,7 +1053,7 @@ test('guest can retake a mock completed without a grade', async ({ page }) => {
     }),
   )
   await page.goto('./exam/full-mock-sessions/guest-mock')
-  await expect(page.getByText('Без оценки', { exact: true })).toHaveCount(4)
+  await expect(page.getByText('Not graded', { exact: true })).toHaveCount(4)
   await page
     .getByRole('button', { name: 'Пересдать тест', exact: true })
     .click()
@@ -1188,9 +1188,9 @@ for (const mobile of [false, true]) {
     if (mobile) await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('./exam/full-mock-sessions/guest-mock')
     await expect(
-      page.getByRole('button', { name: 'Завершить и показать отчёт' }),
+      page.getByRole('button', { name: 'Finish and show the report' }),
     ).toBeVisible()
-    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    await expect(page.getByText('Overall IELTS band')).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: /Разобрать ошибку/ }),
     ).toHaveCount(0)
@@ -1198,22 +1198,26 @@ for (const mobile of [false, true]) {
       page.getByRole('button', { name: 'Завершить досрочно' }),
     ).toHaveCount(0)
     await page
-      .getByRole('button', { name: 'Завершить и показать отчёт' })
+      .getByRole('button', { name: 'Finish and show the report' })
       .click()
-    await expect(page.getByRole('button', { name: /^Выбрать / })).toHaveCount(4)
     await expect(
-      page.getByRole('button', { name: 'Выбрать Listening' }),
+      page.getByRole('button', {
+        name: /^Show (Listening|Reading|Writing|Speaking) review$/,
+      }),
+    ).toHaveCount(4)
+    await expect(
+      page.getByRole('button', { name: 'Show Listening review' }),
     ).toHaveAttribute('aria-pressed', 'true')
-    await page.getByRole('button', { name: 'Выбрать Reading' }).click()
+    await page.getByRole('button', { name: 'Show Reading review' }).click()
     await expect(page).toHaveURL(/\/guest-mock\?section=2$/)
     await expect(
-      page.getByRole('button', { name: 'Выбрать Reading' }),
+      page.getByRole('button', { name: 'Show Reading review' }),
     ).toHaveAttribute('aria-pressed', 'true')
     await expect(
-      page.getByRole('button', { name: 'Выбрать Listening' }),
+      page.getByRole('button', { name: 'Show Listening review' }),
     ).toHaveAttribute('aria-pressed', 'false')
     const review = page.getByRole('region', {
-      name: 'Работа над ошибками reading',
+      name: 'reading review',
     })
     await expect(
       review.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
@@ -1264,15 +1268,15 @@ for (const mobile of [false, true]) {
     })
     await page.reload()
     await expect(
-      page.getByRole('button', { name: 'Выбрать Reading' }),
+      page.getByRole('button', { name: 'Show Reading review' }),
     ).toHaveAttribute('aria-pressed', 'true')
     await expect(
       review.getByRole('button', { name: /^Разобрать ошибку \d+$/ }),
     ).toHaveCount(3)
-    await page.getByRole('button', { name: 'Выбрать Writing' }).click()
+    await page.getByRole('button', { name: 'Show Writing review' }).click()
     await expect(
       page
-        .getByRole('region', { name: 'Работа над ошибками writing' })
+        .getByRole('region', { name: 'writing review' })
         .getByTestId('guest-improvement-1'),
     ).toBeVisible()
   })

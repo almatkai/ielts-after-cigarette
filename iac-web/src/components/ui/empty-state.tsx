@@ -18,7 +18,7 @@ export function EmptyState({
   title = 'Для выбранного формата экзамена пока нет опубликованных тестов.',
   description,
   icon: Icon,
-  imageSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`,
+  imageSrc = null,
   action,
   className,
 }: EmptyStateProps) {
@@ -26,7 +26,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex min-h-[380px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#e2e8f0] bg-white px-6 py-12 text-center transition-colors sm:min-h-[440px] sm:py-16',
+        'flex min-h-[380px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card px-6 py-12 text-center transition-colors sm:min-h-[440px] sm:py-16',
         className,
       )}
     >
@@ -42,16 +42,16 @@ export function EmptyState({
             />
           </div>
         ) : Icon ? (
-          <div className="mb-4 flex size-12 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50 text-slate-400">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-xl border border-border/80 bg-card text-muted-foreground">
             <Icon className="size-5 stroke-[1.75]" aria-hidden="true" />
           </div>
         ) : null}
 
-        <p className="text-base font-semibold tracking-tight text-[#0f172a] sm:text-lg">
+        <p className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
           {t(title)}
         </p>
         {description ? (
-          <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#64748b] sm:text-sm">
+          <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-muted-foreground sm:text-sm">
             {t(description)}
           </p>
         ) : null}

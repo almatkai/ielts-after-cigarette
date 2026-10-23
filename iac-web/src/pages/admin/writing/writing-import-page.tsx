@@ -71,16 +71,20 @@ export function WritingImportPage() {
   return (
     <div className="grid max-w-4xl gap-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+        <Button
+          asChild
+          variant="link"
+          className="h-auto p-0 text-muted-foreground"
+        >
           <Link to="/admin/writing/materials">
             <ArrowLeft aria-hidden />
             {t('К библиотеке')}
           </Link>
         </Button>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+        <h1 className="mt-3 text-3xl font-semibold tracking-normal">
           {t('Импорт Writing')}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[#69696d]">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {t('Вставьте JSON-массив материалов или объект')}{' '}
           <code>{'{"materials":[...]}'}</code>.{' '}
           {t(
@@ -116,7 +120,7 @@ export function WritingImportPage() {
             {parseMutation.isPending ? t('Проверяем…') : t('Проверить импорт')}
           </Button>
           {parseMutation.isError ? (
-            <p className="text-sm text-[#e23b3b]">
+            <p className="text-sm text-destructive">
               {getErrorMessage(parseMutation.error)}
             </p>
           ) : null}
@@ -129,7 +133,7 @@ export function WritingImportPage() {
           </CardHeader>
           <CardContent className="grid gap-4">
             {result.errors.length > 0 ? (
-              <ul className="list-disc pl-5 text-sm text-[#e23b3b]">
+              <ul className="list-disc pl-5 text-sm text-destructive">
                 {result.errors.map((error) => (
                   <li key={`${error.item}-${error.message}`}>
                     {error.item ? `${t('Материал')} ${error.item}: ` : ''}
@@ -138,7 +142,7 @@ export function WritingImportPage() {
                 ))}
               </ul>
             ) : (
-              <p className="flex items-center gap-2 text-sm text-emerald-700">
+              <p className="flex items-center gap-2 text-sm text-success">
                 <TickCircle className="size-4" aria-hidden />
                 {t('Готово к импорту: {count} материалов.').replace(
                   '{count}',
@@ -156,14 +160,12 @@ export function WritingImportPage() {
                 : t('Подтвердить импорт')}
             </Button>
             {importMutation.isError ? (
-              <p className="text-sm text-[#e23b3b]">
+              <p className="text-sm text-destructive">
                 {getErrorMessage(importMutation.error)}
               </p>
             ) : null}
             {importMutation.isSuccess ? (
-              <p className="text-sm text-emerald-700">
-                {t('Импорт завершён.')}
-              </p>
+              <p className="text-sm text-success">{t('Импорт завершён.')}</p>
             ) : null}
           </CardContent>
         </Card>

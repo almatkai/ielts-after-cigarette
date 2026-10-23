@@ -55,6 +55,7 @@ for (const width of [1440, 390]) {
           node.getAnimations().map((animation) => animation.finished),
         ),
       )
+      await page.evaluate(() => document.fonts.ready)
       const bounds = await card.boundingBox()
       expect(bounds).not.toBeNull()
       await page.mouse.move(
@@ -99,7 +100,7 @@ for (const width of [1440, 390]) {
         `${title} must not lose hover at its bottom edge`,
       ).toBe(true)
       // Non-geometric hover feedback is retained, rather than removing hover.
-      await expect(card).toHaveCSS('border-color', 'rgb(215, 215, 210)')
+      await expect(card).toHaveCSS('border-color', 'rgb(198, 204, 203)')
     }
   })
 }

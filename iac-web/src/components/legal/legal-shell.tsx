@@ -2,7 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { ArrowLeft, Printer } from 'iconsax-react'
 import * as React from 'react'
 
-import { Brand } from '@/components/landing/brand'
+import { BrandLogo } from '@/components/landing/brand'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -63,12 +63,12 @@ export function LegalShell({
   const isTerms = currentPath.includes('/terms')
 
   return (
-    <div className="min-h-screen bg-[#fafaf8] text-[#111111]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-[#e7e7e4] bg-[#fafaf8]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-background ">
         <div className="container-shell flex h-18 items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <Brand />
+            <BrandLogo />
             <nav
               className="hidden items-center gap-1 sm:flex"
               aria-label={t('Юридические документы')}
@@ -78,8 +78,8 @@ export function LegalShell({
                 className={cn(
                   'rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors',
                   isPrivacy
-                    ? 'bg-[#eef4ff] text-[#1d4ed8]'
-                    : 'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+                    ? 'bg-primary-soft text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {t('Политика конфиденциальности')}
@@ -89,8 +89,8 @@ export function LegalShell({
                 className={cn(
                   'rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors',
                   isTerms
-                    ? 'bg-[#eef4ff] text-[#1d4ed8]'
-                    : 'text-[#69696d] hover:bg-[#f4f4f1] hover:text-[#111111]',
+                    ? 'bg-primary-soft text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {t('Условия использования')}
@@ -103,7 +103,7 @@ export function LegalShell({
               variant="outline"
               size="sm"
               onClick={handlePrint}
-              className="hidden h-9 items-center gap-1.5 rounded-[9px] border-[#deded9] bg-white px-3 text-xs font-medium text-[#475569] hover:bg-[#f4f4f1] hover:text-[#111111] md:inline-flex"
+              className="hidden h-9 items-center gap-1.5 rounded-[9px] border-border bg-card px-3 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground md:inline-flex"
               title={t('Распечатать документ')}
             >
               <Printer size={15} aria-hidden />
@@ -112,7 +112,7 @@ export function LegalShell({
             <Button
               asChild
               size="sm"
-              className="h-9 rounded-[9px] bg-[#3b82f6] px-3.5 text-xs font-semibold text-white hover:bg-[#2563eb]"
+              className="h-9 rounded-[9px] bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover"
             >
               <Link to="/login">{t('Войти в кабинет')}</Link>
             </Button>
@@ -121,43 +121,43 @@ export function LegalShell({
       </header>
 
       {/* Hero Section */}
-      <section className="border-b border-[#e7e7e4] bg-white py-10 sm:py-14">
+      <section className="border-b border-border bg-card py-10 sm:py-14">
         <div className="container-shell">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#69696d] transition-colors hover:text-[#3b82f6]"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
             >
               <ArrowLeft size={14} aria-hidden />
               <span>{t('Назад ко входу')}</span>
             </Link>
-            <span className="text-[#deded9]">•</span>
+            <span className="text-border">•</span>
 
             <Badge
               variant="outline"
-              className="border-[#e7e7e4] text-[11px] font-normal text-[#69696d]"
+              className="border-border text-[11px] font-normal text-muted-foreground"
             >
               {t('Редакция')} {version}
             </Badge>
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight text-[#0f172a] sm:text-4xl lg:text-5xl">
+          <h1 className="text-3xl font-bold tracking-normal text-foreground sm:text-4xl lg:text-5xl">
             {t(title)}
           </h1>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed text-[#475569] sm:text-lg">
+          <p className="mt-3 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             {t(subtitle)}
           </p>
 
-          <div className="mt-5 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-[#69696d]">
+          <div className="mt-5 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-muted-foreground">
             <div>
               {t('Последнее обновление:')}
-              <span className="font-medium text-[#475569]">
+              <span className="font-medium text-muted-foreground">
                 {t(lastUpdated)}
               </span>
             </div>
             <div>
               {t('Юрисдикция:')}
-              <span className="font-medium text-[#475569]">
+              <span className="font-medium text-muted-foreground">
                 {t('Республика Казахстан')}
               </span>
             </div>
@@ -165,7 +165,7 @@ export function LegalShell({
               {t('Контакты:')}
               <a
                 href="mailto:kairatovalmat2003@gmail.com"
-                className="font-medium text-[#3b82f6] hover:underline"
+                className="font-medium text-primary hover:underline"
               >
                 kairatovalmat2003@gmail.com
               </a>
@@ -173,14 +173,14 @@ export function LegalShell({
           </div>
 
           {/* Mobile subnavigation tabs */}
-          <div className="mt-6 flex gap-2 border-t border-[#f1f5f9] pt-4 sm:hidden">
+          <div className="mt-6 flex gap-2 border-t border-muted pt-4 sm:hidden">
             <Link
               to="/privacy"
               className={cn(
                 'flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-colors',
                 isPrivacy
-                  ? 'bg-[#3b82f6] text-white'
-                  : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-border',
               )}
             >
               {t('Политика конфиденциальности')}
@@ -190,8 +190,8 @@ export function LegalShell({
               className={cn(
                 'flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-colors',
                 isTerms
-                  ? 'bg-[#3b82f6] text-white'
-                  : 'bg-[#f4f4f1] text-[#475569] hover:bg-[#e2e8f0]',
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-border',
               )}
             >
               {t('Условия использования')}
@@ -205,8 +205,8 @@ export function LegalShell({
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Sidebar / Table of Contents (Desktop) */}
           <aside className="hidden lg:col-span-4 lg:block">
-            <div className="sticky top-26 rounded-[14px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-              <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#94a3b8]">
+            <div className="sticky top-26 rounded-[10px] border border-border bg-card p-5 shadow-none">
+              <h2 className="mb-3 text-xs font-bold normal-case text-muted-foreground">
                 {t('Содержание документа')}
               </h2>
               <nav className="flex flex-col space-y-1">
@@ -219,8 +219,8 @@ export function LegalShell({
                       className={cn(
                         'block rounded-md px-2.5 py-1.5 text-xs transition-colors',
                         isActive
-                          ? 'bg-[#eef4ff] font-semibold text-[#1d4ed8]'
-                          : 'text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]',
+                          ? 'bg-primary-soft font-semibold text-primary'
+                          : 'text-muted-foreground hover:bg-background hover:text-foreground',
                       )}
                     >
                       {t(item.title)}
@@ -229,8 +229,8 @@ export function LegalShell({
                 })}
               </nav>
 
-              <div className="mt-6 border-t border-[#f1f5f9] pt-4 text-xs text-[#64748b]">
-                <p className="mb-2 font-medium text-[#0f172a]">
+              <div className="mt-6 border-t border-muted pt-4 text-xs text-muted-foreground">
+                <p className="mb-2 font-medium text-foreground">
                   {t('Возникли вопросы?')}
                 </p>
                 <p className="leading-relaxed">
@@ -239,7 +239,7 @@ export function LegalShell({
                   )}{' '}
                   <a
                     href="mailto:kairatovalmat2003@gmail.com"
-                    className="text-[#3b82f6] hover:underline"
+                    className="text-primary hover:underline"
                   >
                     kairatovalmat2003@gmail.com
                   </a>
@@ -250,7 +250,7 @@ export function LegalShell({
 
           {/* Document Content */}
           <article className="lg:col-span-8">
-            <div className="rounded-[16px] border border-[#e7e7e4] bg-white p-6 shadow-xs sm:p-10">
+            <div className="rounded-[10px] border border-border bg-card p-6 shadow-none sm:p-10">
               {children}
             </div>
           </article>
@@ -258,35 +258,35 @@ export function LegalShell({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#e7e7e4] bg-white py-8 text-sm text-[#64748b]">
+      <footer className="border-t border-border bg-card py-8 text-sm text-muted-foreground">
         <div className="container-shell flex flex-col items-center justify-between gap-4 sm:flex-row">
           <p>
-            {t('© 2026 Daiyndyq IELTS. Все права защищены. Астана, Казахстан.')}
+            {t('© 2026 Yrys Academy. Все права защищены. Астана, Казахстан.')}
           </p>
           <div className="flex items-center gap-5 text-xs">
             <Link
               to="/privacy"
               className={cn(
-                'transition-colors hover:text-[#0f172a]',
-                isPrivacy && 'font-semibold text-[#3b82f6]',
+                'transition-colors hover:text-foreground',
+                isPrivacy && 'font-semibold text-primary',
               )}
             >
               {t('Политика конфиденциальности')}
             </Link>
-            <span className="text-[#cbd5e1]">•</span>
+            <span className="text-border-strong">•</span>
             <Link
               to="/terms"
               className={cn(
-                'transition-colors hover:text-[#0f172a]',
-                isTerms && 'font-semibold text-[#3b82f6]',
+                'transition-colors hover:text-foreground',
+                isTerms && 'font-semibold text-primary',
               )}
             >
               {t('Условия использования')}
             </Link>
-            <span className="text-[#cbd5e1]">•</span>
+            <span className="text-border-strong">•</span>
             <Link
               to="/login"
-              className="transition-colors hover:text-[#0f172a]"
+              className="transition-colors hover:text-foreground"
             >
               {t('Вход')}
             </Link>

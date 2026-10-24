@@ -1282,7 +1282,44 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
   test(`${skill} direct attempt URL cannot expose a locked full mock review`, async ({
     page,
   }) => {
-    await guestAPI(page, true)
+    const { privateReads } = await guestAPI(page, true)
+    await page.route('**/api/v1/full-mock-sessions/guest-mock', (route) =>
+      route.fulfill({
+        json: {
+          id: 'guest-mock',
+          status: 'IN_PROGRESS',
+          currentSection: 4,
+          mockTest: { title: 'Полный пробный IELTS', examType: 'academic' },
+          overallBand: null,
+          sections: ['listening', 'reading', 'writing', 'speaking'].map(
+            (name, index) => ({
+              position: index + 1,
+              skill: name,
+              attempt: {
+                id: `${name}-guest`,
+                materialType: name,
+                status: name === 'speaking' ? 'PROCESSING' : 'SUBMITTED',
+                band: null,
+              },
+            }),
+          ),
+        },
+      }),
+    )
+    await page.addInitScript(() => {
+      const leaks: string[] = []
+      Object.assign(window, { lockedReviewLeaks: leaks })
+      new MutationObserver(() => {
+        for (const text of [
+          'PRIVATE_',
+          'Секция завершена',
+          'Продолжить Full Mock',
+        ]) {
+          if (document.querySelector('body')?.innerText.includes(text))
+            leaks.push(text)
+        }
+      }).observe(document, { childList: true, subtree: true })
+    })
     await page.route(`**/api/v1/attempts/${skill}-guest`, (route) =>
       route.fulfill({
         json: {
@@ -1308,16 +1345,21 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
       }),
     )
     await page.goto(`./attempts/${skill}-guest`)
+    await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
     await expect(
-      page.getByRole('heading', { name: 'Секция завершена' }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole('link', { name: 'Продолжить Full Mock' }),
-    ).toBeVisible()
+      page.getByRole('button', { name: 'Завершить и показать отчёт' }),
+    ).toBeEnabled()
+    await expect(page.getByText('Сдано', { exact: true })).toHaveCount(3)
+    await expect(page.getByText('Проверяется', { exact: true })).toBeVisible()
     await expect(page.getByText(/PRIVATE_/)).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: /Разобрать ошибку/ }),
     ).toHaveCount(0)
+    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    expect(
+      await page.evaluate(() => Reflect.get(window, 'lockedReviewLeaks')),
+    ).toEqual([])
+    expect(privateReads.filter((path) => path.endsWith('/advance'))).toEqual([])
   })
 }
 

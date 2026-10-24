@@ -411,7 +411,8 @@ for (const skill of ['reading', 'listening']) {
     await expect(card.getByText('Ошибка', { exact: true })).toHaveCount(0)
     await page.reload()
     await expect(card.getByText('Разобрано', { exact: true })).toBeVisible()
-    await expect(page.getByText('Band 6.0', { exact: false })).toBeVisible()
+    await expect(page.getByText('Band 6.0', { exact: false })).toHaveCount(0)
+    await expect(page.getByText('Результат:', { exact: false })).toBeVisible()
     await page.goto(
       `./attempts/${skill === 'reading' ? 'listening' : 'reading'}-attempt?session=mock-session`,
     )
@@ -714,24 +715,29 @@ test('submission immediately shows this test’s mistake cards', async ({
   ).toHaveCount(0)
 })
 
-test('Full Mock cards select inline review and retain the section after reload', async ({
+test('Full Mock cards select the section and preserve selection in this exam after reload', async ({
   page,
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-  const cards = page.getByRole('group', { name: 'Full Mock sections' })
-  await cards
-    .getByRole('button', { name: 'Show Reading review', exact: true })
+  const sections = page.getByRole('group', { name: 'Секции Full Mock' })
+  await expect(page.getByText('Итоговый IELTS band', { exact: true })).toHaveCount(0)
+  await expect(
+    sections.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+  ).toContainText('1/2')
+  await expect(sections.getByText('Разбор готов', { exact: true })).toHaveCount(2)
+  await sections
+    .getByRole('button', { name: 'Выбрать Reading', exact: true })
     .click()
   await expect(
-    cards.getByRole('button', { name: 'Show Reading review', exact: true }),
+    sections.getByRole('button', { name: 'Выбрать Reading', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
-  await expect(page).toHaveURL(/\/mock-session\?section=2$/)
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
-  await cards
-    .getByRole('button', { name: 'Show Listening review', exact: true })
+  await expect(page).toHaveURL(/mock-session\?section=2$/)
+  await sections
+    .getByRole('button', { name: 'Выбрать Listening', exact: true })
     .click()
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
@@ -741,26 +747,27 @@ test('Full Mock cards select inline review and retain the section after reload',
   ).toHaveCount(0)
   await page.reload()
   await expect(
-    cards.getByRole('button', { name: 'Show Listening review', exact: true }),
+    sections.getByRole('button', { name: 'Выбрать Listening', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
-  await cards
-    .getByRole('button', { name: 'Show Writing review', exact: true })
+  await expect(
+    page.getByText('listening: wrong question', { exact: true }),
+  ).toBeVisible()
+  await sections
+    .getByRole('button', { name: 'Выбрать Writing', exact: true })
     .click()
   await expect(
     page.getByText('Writing suggestion', { exact: false }),
   ).toBeVisible()
-  await cards
-    .getByRole('button', { name: 'Show Speaking review', exact: true })
+  await sections
+    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
     .click()
   await expect(
     page.getByText('Speaking suggestion', { exact: false }),
   ).toBeVisible()
   await expect(
-    page.getByRole('navigation', { name: 'Full Mock sections' }),
-  ).toHaveCount(0)
-  await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
   ).toBeVisible()
+  await expect(page).toHaveURL(/mock-session\?section=4$/)
 })
 
 test('a partial multiple-select answer stays incorrect', async ({ page }) => {

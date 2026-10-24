@@ -30,15 +30,19 @@ import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-re
 import { useAuth } from '@/features/auth/auth-store'
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { GuestAttemptReview } from './guest-attempt-review'
+import { ReviewAcknowledgement } from '@/features/study-plan/review-acknowledgement'
+import { AttemptLearningBridge } from '@/features/study-plan/attempt-learning-bridge'
 
 export { formatDateTime } from '@/lib/date'
 
 export function AttemptReviewPage({
   attemptId,
   embedded = false,
+  studyReview,
 }: {
   attemptId: string
   embedded?: boolean
+  studyReview?: string
 }) {
   const { t } = useLanguage()
   const { user } = useAuth()
@@ -108,7 +112,15 @@ export function AttemptReviewPage({
           material={material}
           title={material?.title}
           showHeading={!embedded}
+          showBand={false}
         />
+        <AttemptLearningBridge attemptId={attempt.id} />
+        {studyReview && material ? (
+          <ReviewAcknowledgement
+            assignmentId={studyReview}
+            attemptId={attemptId}
+          />
+        ) : null}
       </div>
     )
   }
@@ -118,14 +130,14 @@ export function AttemptReviewPage({
       <div>
         {!embedded ? (
           <>
-            <Button asChild variant="link" className="h-auto p-0">
+            <Button asChild variant="ghost" className="min-h-11 -ml-3">
               <Link to="/progress">
                 <ArrowLeft aria-hidden />
                 {t('К прогрессу')}
               </Link>
             </Button>
-            <h1 className="text-[28px] sm:text-[36px] mt-3 font-semibold tracking-normal">
-              {t('Работа над ошибками')}
+            <h1 className="mt-3 text-xl font-semibold tracking-[-0.025em] sm:text-2xl">
+              Разбор: {skillLabel(attempt.materialType)}
             </h1>
           </>
         ) : null}
@@ -145,6 +157,7 @@ export function AttemptReviewPage({
       ) : aiEvaluation ? (
         <>
           <AIEvaluationReview attempt={attempt} evaluation={aiEvaluation} />
+          <AttemptLearningBridge attemptId={attempt.id} />
           {attempt.materialType === 'speaking' &&
           (attempt.recordings?.length ?? 0) > 0 ? (
             <SpeakingRecordings
@@ -154,8 +167,14 @@ export function AttemptReviewPage({
           ) : null}
         </>
       ) : (
-        <p className="text-sm text-muted-foreground">{t('Нет ошибок')}</p>
+        <p className="text-sm text-muted-foreground">Разбор пока недоступен</p>
       )}
+      {studyReview && attempt.status === 'SUBMITTED' && !isObjectiveAttempt ? (
+        <ReviewAcknowledgement
+          assignmentId={studyReview}
+          attemptId={attemptId}
+        />
+      ) : null}
     </div>
   )
 }
@@ -349,6 +368,7 @@ function AIEvaluationReview({
   return (
     <>
       <AttemptPerformanceReport
+        showBand={false}
         band={evaluation.overallBand}
         bandNote={bandNote}
         criteria={criteriaList}
@@ -384,11 +404,7 @@ function AIEvaluationReview({
                   <span className="rounded-md bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg border border-warning-bg">
                     {t('Пока не определяется')}
                   </span>
-                ) : (
-                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-sm font-bold text-primary">
-                    {criterion.band.toFixed(1)}
-                  </span>
-                )}
+                ) : null}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {criterion.feedback ||

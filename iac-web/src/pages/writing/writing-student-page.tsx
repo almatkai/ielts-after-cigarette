@@ -470,7 +470,7 @@ export function WritingAttemptResult({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
         skill="writing"
         fullMockSessionId={fullMockSessionId}

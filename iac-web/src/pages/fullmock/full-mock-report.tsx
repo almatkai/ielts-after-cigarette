@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+import { attemptKeys, getAttempt } from '@/features/attempts/api'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   GuestLockedBand,
@@ -24,11 +26,15 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
   return (
     <GuestResultsAccess>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-baseline gap-3">
-          <span className="font-display text-4xl font-semibold tracking-normal text-primary-hover">
-            {session.overallBand?.toFixed(1) ?? '—'}
-          </span>
-          <h2 className="text-sm font-semibold">Overall IELTS band</h2>
+        <div className="grid gap-2">
+          <h2 className="text-lg font-semibold">
+            Результаты пробного экзамена
+          </h2>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            Общий ориентировочный балл пока не рассчитан: шкала и автоматические
+            оценки не подтверждены. Используйте результаты заданий и разбор для
+            следующей практики.
+          </p>
         </div>
         <FullMockRetake sessionId={session.id} />
       </div>
@@ -86,10 +92,16 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
                       ? 'Assessing'
                       : 'Submitted'}
                 </Badge>
-                <span className="h-9 text-xl font-semibold text-primary-hover">
-                  {locked && !ungraded
-                    ? null
-                    : (section.attempt.band?.toFixed(1) ?? '—')}
+                <span className="min-h-9 text-sm font-semibold text-primary">
+                  {locked && !ungraded ? null : section.attempt.status !==
+                    'SUBMITTED' ? (
+                    '—'
+                  ) : section.skill === 'reading' ||
+                    section.skill === 'listening' ? (
+                    `${section.attempt.score ?? '—'}/${section.attempt.maxScore ?? '—'}`
+                  ) : (
+                    <SubjectiveReviewStatus attemptId={section.attempt.id} />
+                  )}
                 </span>
               </button>
               {locked && !ungraded ? (
@@ -122,4 +134,18 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
       ) : null}
     </GuestResultsAccess>
   )
+}
+
+function SubjectiveReviewStatus({ attemptId }: { attemptId: string }) {
+  const query = useQuery({
+    queryKey: attemptKeys.detail(attemptId),
+    queryFn: ({ signal }) => getAttempt(attemptId, signal),
+  })
+  if (query.isPending) return <>Загружаем разбор…</>
+  if (
+    query.isError ||
+    !(query.data.writingEvaluation || query.data.speakingEvaluation)
+  )
+    return <>Разбор пока недоступен</>
+  return <>Разбор готов</>
 }

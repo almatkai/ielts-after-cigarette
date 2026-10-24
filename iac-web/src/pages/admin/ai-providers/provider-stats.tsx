@@ -1,3 +1,4 @@
+import { Disclosure } from '@/components/ui/disclosure'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { getAIStats } from '@/features/ai-providers/api'
@@ -217,10 +218,10 @@ export function ProviderStats({ revision }: { revision: number }) {
             )}
           </p>
           {recent.length > 0 && (
-            <details className="border-t border-border">
-              <summary className="cursor-pointer px-5 py-4 text-sm font-medium text-foreground">
-                {t('Последние попытки')} ({recent.length})
-              </summary>
+            <Disclosure
+              className="border-t border-border"
+              title={<>{t('Последние попытки')} ({recent.length})</>}
+            >
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">
                   <thead className="bg-card text-muted-foreground">
@@ -295,7 +296,7 @@ export function ProviderStats({ revision }: { revision: number }) {
                   </tbody>
                 </table>
               </div>
-            </details>
+            </Disclosure>
           )}
         </>
       )}

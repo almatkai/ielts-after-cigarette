@@ -1,8 +1,10 @@
-import { Book } from 'iconsax-react'
-import { Card } from '@/components/ui/card'
 import { AttemptPerformanceReport } from './attempt-ui'
 import { WritingTaskReview } from './writing-task-review'
 import type { AttemptDetail, WritingEvaluation } from './api'
+import {
+  AttemptLearningBridge,
+  useAttemptLearning,
+} from '@/features/study-plan/attempt-learning-bridge'
 
 export function WritingReview({
   attempt,
@@ -15,6 +17,7 @@ export function WritingReview({
   totalQuestions?: number
   evaluation: WritingEvaluation
 }) {
+  const learning = useAttemptLearning(attempt.id)
   const criteriaList = [
     {
       label: 'Task Achievement / Response',
@@ -25,31 +28,18 @@ export function WritingReview({
       label: 'Lexical Resource',
       band: evaluation.criteria.lexicalResource.band,
     },
-    { label: 'Grammar Accuracy', band: evaluation.criteria.grammar.band },
+    {
+      label: 'Grammatical Range & Accuracy',
+      band: evaluation.criteria.grammar.band,
+    },
   ] as const
 
   return (
     <div className="space-y-6">
-      <AttemptPerformanceReport
-        band={evaluation.overallBand}
-        bandNote={'Score based on the 4 IELTS Writing criteria'}
-        criteria={criteriaList}
-        totalQuestions={totalQuestions}
-        startedAt={attempt.startedAt}
-        submittedAt={attempt.submittedAt}
-        durationMinutes={durationMinutes}
-        paceUnit={'essay'}
-      />
-
       {evaluation.summary ? (
-        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
-          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
-            {'Assessment summary'}
-          </p>
-          <p className="text-sm leading-relaxed text-foreground">
-            {evaluation.summary}
-          </p>
-        </Card>
+        <p className="text-sm leading-5 text-muted-foreground">
+          {evaluation.summary}
+        </p>
       ) : null}
 
       {[...evaluation.tasks]
@@ -67,16 +57,46 @@ export function WritingReview({
               key={task.taskId}
               task={task}
               taskAnswerText={candidateText}
+              learningAction={
+                <AttemptLearningBridge
+                  attemptId={attempt.id}
+                  taskId={task.taskId}
+                  taskLabel={`Task ${task.position}`}
+                />
+              }
+              showModelAnswer={learning.correctedTaskIds.includes(task.taskId)}
+              modelAnswerAvailability={
+                learning.isPending
+                  ? 'loading'
+                  : learning.isError
+                    ? 'unavailable'
+                    : !learning.data.readOnly &&
+                        learning.cycles.some(
+                          (cycle) =>
+                            cycle.section === 'writing' &&
+                            cycle.source.questionId === task.taskId &&
+                            !cycle.skippedAt,
+                        )
+                      ? 'correction-required'
+                      : 'no-cycle'
+              }
             />
           )
         })}
 
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Book className="size-4" aria-hidden />
-        {
-          'This score is for practice only; your official IELTS result is determined by an examiner.'
+      <AttemptPerformanceReport
+        showBand={false}
+        band={evaluation.overallBand}
+        bandNote={
+          'Комментарии сгруппированы по четырём критериям Writing. Факты Task 1 нужно сверять с исходным графиком.'
         }
-      </p>
+        criteria={criteriaList}
+        totalQuestions={totalQuestions}
+        startedAt={attempt.startedAt}
+        submittedAt={attempt.submittedAt}
+        durationMinutes={durationMinutes}
+        paceUnit={'эссе'}
+      />
     </div>
   )
 }

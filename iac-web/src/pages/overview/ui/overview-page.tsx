@@ -1,11 +1,7 @@
 import {
   ArrowRight,
   Calendar,
-  CalendarTick,
-  Chart,
-  ClipboardTick,
   DirectRight,
-  Speedometer,
   User,
   Warning2,
   Weight,
@@ -17,19 +13,13 @@ import { useAuth } from '@/features/auth/auth-store'
 import { GuestTrialCard } from '@/components/auth/guest-trial-card'
 import { PracticePage } from '@/pages/practice/ui/practice-page'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getDashboard, queryKeys } from '@/features/ielts/api'
 import { GoalDialog } from '@/features/ielts/goal-form'
 import { useLanguage } from '@/lib/i18n'
 import { UnfinishedTestBanner } from './unfinished-test-banner'
 
-import type { SkillId } from '@/features/ielts/api'
+import { StudyProgress, TodayPlanSummary } from '@/features/study-plan/summary'
 
 const quickActions = [
   {
@@ -41,7 +31,7 @@ const quickActions = [
   {
     label: 'Разобрать ошибки',
     description: 'Вернуться к сложным заданиям',
-    to: '/mistakes',
+    to: '/plan/learning',
     icon: Warning2,
   },
   {
@@ -54,13 +44,6 @@ const quickActions = [
 
 const cardClassName =
   'group gap-0 rounded-[10px] sm:rounded-[10px] border-border py-0 shadow-none transition-all hover:border-border-strong'
-
-const skillLabels: Record<SkillId, string> = {
-  listening: 'Listening',
-  reading: 'Reading',
-  writing: 'Writing',
-  speaking: 'Speaking',
-}
 
 function formatExamDate(value: string | null) {
   if (!value) return '—'
@@ -124,19 +107,7 @@ function AccountOverviewPage() {
   const dashboard = dashboardQuery.data
   const overviewMetrics = [
     {
-      label: t('Текущий уровень'),
-      value:
-        dashboard.profile.currentBand === null
-          ? '—'
-          : dashboard.profile.currentBand.toFixed(1),
-      hint:
-        dashboard.profile.currentBand === null
-          ? t('Появится после диагностики')
-          : t('Расчётный IELTS Band'),
-      icon: Speedometer,
-    },
-    {
-      label: t('Целевой балл'),
+      label: 'Целевой балл',
       value:
         dashboard.profile.targetBand === null
           ? '—'
@@ -157,11 +128,6 @@ function AccountOverviewPage() {
       icon: Calendar,
     },
   ] as const
-  const recommendedTarget =
-    dashboard.recommendedAction.target === '/profile' ||
-    dashboard.recommendedAction.target === '/dashboard/profile'
-      ? '/profile'
-      : '/practice'
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
@@ -169,8 +135,8 @@ function AccountOverviewPage() {
         {t('Обзор')}
       </h1>
       <section
-        className="grid min-w-0 gap-2.5 sm:gap-4 sm:grid-cols-3"
-        aria-label={t('Основные показатели')}
+        className="grid min-w-0 gap-2.5 sm:gap-4 sm:grid-cols-2"
+        aria-label="Основные показатели"
       >
         {overviewMetrics.map((metric) => {
           const Icon = metric.icon
@@ -215,160 +181,16 @@ function AccountOverviewPage() {
 
       <div className="grid min-w-0 items-start gap-3.5 sm:gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid min-w-0 gap-3.5 sm:gap-5 [&>*]:min-w-0">
-          <Card className={cardClassName}>
-            <CardContent className="relative overflow-hidden p-3.5 sm:p-8">
-              <div className="relative max-w-[620px]">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {t('Рекомендуемый шаг')}
-                </p>
-                <h2 className="mt-2.5 sm:mt-5 text-base sm:text-[clamp(1.65rem,3vw,2.35rem)] leading-snug sm:leading-[1.08] font-semibold tracking-tight sm:tracking-[-0.045em] text-foreground">
-                  {t(dashboard.recommendedAction.title)}
-                </h2>
-                <p className="mt-1.5 sm:mt-3 max-w-[560px] text-xs sm:text-[15px] leading-5 sm:leading-6 text-muted-foreground">
-                  {t(dashboard.recommendedAction.description)}
-                </p>
-                <div className="mt-3.5 sm:mt-6 flex flex-col gap-2 sm:flex-row">
-                  <Button
-                    asChild
-                    className="h-9 sm:h-11 rounded-[9px] bg-primary px-4 sm:px-5 text-xs sm:text-sm shadow-none hover:bg-primary-hover"
-                  >
-                    <Link to={recommendedTarget}>
-                      {t('Перейти к следующему шагу')}
-                      <ArrowRight aria-hidden />
-                    </Link>
-                  </Button>
-                  <GoalDialog>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-9 sm:h-11 rounded-[9px] border-border bg-card px-4 sm:px-5 text-xs sm:text-sm shadow-none"
-                    >
-                      {t('Настроить цель')}
-                    </Button>
-                  </GoalDialog>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className={cardClassName}>
-            <CardHeader className="border-b border-border p-3.5 sm:p-6">
-              <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
-                  <Chart
-                    className="size-4 sm:size-[18px] transition-colors"
-                    aria-hidden
-                  />
-                </span>
-                <div className="min-w-0">
-                  <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    {t('Прогресс по навыкам')}
-                  </CardTitle>
-                  <CardDescription className="mt-0.5 sm:mt-1 text-xs sm:text-sm leading-4 sm:leading-5">
-                    {t(
-                      'Общая картина по Listening, Reading, Writing и Speaking.',
-                    )}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-2.5 sm:gap-3 p-3.5 sm:grid-cols-2 sm:p-6">
-              {dashboard.skillProgress.map((progress) => (
-                <div
-                  key={progress.skill}
-                  className="rounded-[10px] sm:rounded-[10px] border border-border bg-background p-3 sm:p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs sm:text-sm font-semibold text-foreground">
-                      {skillLabels[progress.skill]}
-                    </p>
-                    <span className="text-xs sm:text-sm font-semibold text-primary">
-                      {progress.estimatedBand === null
-                        ? '—'
-                        : progress.estimatedBand.toFixed(1)}
-                    </span>
-                  </div>
-                  <p className="mt-1 sm:mt-2 text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
-                    {progress.completedTasks === 0
-                      ? t('Нет выполненных заданий')
-                      : language === 'en'
-                        ? `${progress.completedTasks} tasks · ${progress.accuracyPercent ?? 0}% accuracy`
-                        : language === 'kk'
-                          ? `${progress.completedTasks} тапсырма · дәлдігі ${progress.accuracyPercent ?? 0}%`
-                          : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
-                  </p>
-                </div>
-              ))}
-              <Button
-                asChild
-                variant="outline"
-                className="h-9 sm:h-10 rounded-[9px] border-border bg-card px-4 text-xs sm:text-sm shadow-none sm:col-span-2"
-              >
-                <Link to="/progress">{t('Открыть прогресс')}</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <TodayPlanSummary />
+          <StudyProgress />
+          <GoalDialog>
+            <Button variant="outline" className="min-h-11 justify-self-start">
+              Настроить цель
+            </Button>
+          </GoalDialog>
         </div>
 
         <aside className="grid min-w-0 gap-3.5 sm:gap-5 [&>*]:min-w-0">
-          <Card className={cardClassName}>
-            <CardHeader className="border-b border-border p-3.5 sm:p-5">
-              <div className="flex items-start gap-3">
-                <span className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-[8px] sm:rounded-[9px] bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary-soft group-hover:text-primary ">
-                  <CalendarTick
-                    className="size-4 sm:size-[18px] transition-colors"
-                    aria-hidden
-                  />
-                </span>
-                <div className="min-w-0">
-                  <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-                    {t('План на сегодня')}
-                  </CardTitle>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-3.5 sm:p-5">
-              {dashboard.todayPlan.length === 0 ? (
-                <div className="rounded-[10px] sm:rounded-[10px] border border-dashed border-border bg-background px-3.5 py-5 sm:px-4 sm:py-6 text-center">
-                  <ClipboardTick
-                    className="mx-auto size-4 sm:size-5 text-muted-foreground"
-                    strokeWidth={1.8}
-                    aria-hidden
-                  />
-                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-foreground">
-                    {t('Заданий пока нет')}
-                  </p>
-                  <p className="mt-1 text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
-                    {t('Добавьте первое занятие в план.')}
-                  </p>
-                </div>
-              ) : (
-                <ul className="grid gap-2 sm:gap-3">
-                  {dashboard.todayPlan.map((item) => (
-                    <li
-                      key={item.id}
-                      className="rounded-[9px] sm:rounded-[10px] border border-border p-2.5 sm:p-3"
-                    >
-                      <p className="text-xs sm:text-sm font-semibold text-foreground">
-                        {t(item.title)}
-                      </p>
-                      <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">
-                        {skillLabels[item.skill]} · {item.durationMinutes} мин.
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <Button
-                asChild
-                variant="outline"
-                className="mt-3 sm:mt-4 h-9 sm:h-10 w-full rounded-[9px] border-border bg-card text-xs sm:text-sm shadow-none"
-              >
-                <Link to="/plan">{t('Настроить план')}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
           <Card className={cardClassName}>
             <CardHeader className="border-b border-border p-3.5 sm:p-5">
               <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">

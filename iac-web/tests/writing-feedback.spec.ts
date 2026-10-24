@@ -1,5 +1,18 @@
 import { expect, test } from '@playwright/test'
+import { cycleFixture, learningFixture } from './fixtures/learning'
 import type { Page } from '@playwright/test'
+
+const observations = new WeakMap<
+  Page,
+  { unexpected: string[]; errors: string[] }
+>()
+test.afterEach(({ page }) => {
+  const seen = observations.get(page)
+  if (seen) {
+    expect(seen.unexpected).toEqual([])
+    expect(seen.errors).toEqual([])
+  }
+})
 
 type ReviewScreen = 'exam' | 'history' | 'bank' | 'fullmock'
 
@@ -7,6 +20,11 @@ async function openWritingReview(
   page: Page,
   screen: ReviewScreen = 'exam',
   inline = true,
+  correctedTask?: 'task-one' | 'task-two',
+  options: {
+    learning?: 'cycle' | 'no-cycle' | 'network-error'
+    readOnly?: boolean
+  } = {},
 ) {
   const criterion = { band: 7, feedback: 'Clear, accurate sentences.' }
   const criteria = {
@@ -57,6 +75,7 @@ async function openWritingReview(
           position: 1,
           band: 7,
           criteria,
+          modelParagraph: 'The chart shows an overall rise in visitor numbers.',
           feedback: 'Комментарий к первому заданию',
           strengths: [],
           improvements: [],
@@ -110,6 +129,40 @@ async function openWritingReview(
       },
     ],
   }
+  const seen = { unexpected: [] as string[], errors: [] as string[] }
+  observations.set(page, seen)
+  page.on('pageerror', (error) => seen.errors.push(error.message))
+  const learning = learningFixture()
+  learning.readOnly = options.readOnly ?? false
+  learning.cycles = []
+  learning.drills = []
+  learning.profiles = []
+  if (options.learning !== 'no-cycle') {
+    const cycle = cycleFixture('task-two-cycle', 'writing')
+    cycle.source.attemptId = attempt.id
+    cycle.source.questionId = 'task-two'
+    cycle.source.prompt = 'Discuss studying abroad.'
+    cycle.source.originalAnswer = 'Many people study abroad.'
+    learning.cycles.push(cycle)
+  }
+  if (correctedTask) {
+    const cycle =
+      learning.cycles.find(
+        (item) => item.source.questionId === correctedTask,
+      ) ?? cycleFixture('corrected-task-cycle', 'writing')
+    cycle.source.attemptId = attempt.id
+    cycle.source.questionId = correctedTask
+    cycle.correction = {
+      text: 'Studying abroad broadens perspectives through daily contact with different customs.',
+      explanation: 'I linked the claim to a mechanism.',
+      assisted: false,
+      savedAt: '2026-10-24T10:00:00Z',
+      verdict: 'unverified',
+      feedback: 'Saved, not assessed.',
+    }
+    cycle.status = 'correction-saved'
+    if (!learning.cycles.includes(cycle)) learning.cycles.push(cycle)
+  }
   await page.route('**/api/v1/**', (route) => {
     const path = new URL(route.request().url()).pathname
     if (path.endsWith('/auth/refresh')) {
@@ -128,6 +181,33 @@ async function openWritingReview(
         },
       })
     }
+    if (path.endsWith('/study-plan/learning')) {
+      if (options.learning === 'network-error')
+        return route.abort('connectionfailed')
+      return route.fulfill({ json: learning })
+    }
+    if (path === '/api/v1/guest/session')
+      return route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } })
+    if (path === '/api/v1/analytics/ping') return route.fulfill({ status: 204 })
+    if (path === '/api/v1/dashboard')
+      return route.fulfill({
+        json: {
+          profile: { currentBand: null, targetBand: null, examDate: null },
+          todayPlan: [],
+          skillProgress: [],
+          recommendedAction: {
+            title: 'Practice',
+            description: '',
+            target: '/practice',
+          },
+          unreadNotifications: 0,
+        },
+      })
+    if (
+      path === '/api/v1/attempts' ||
+      path === '/api/v1/full-mock-sessions/active'
+    )
+      return route.fulfill({ json: { items: [] } })
     if (path.endsWith('/writing/materials/material/attempts')) {
       return route.fulfill({ json: { attempt, material } })
     }
@@ -182,7 +262,11 @@ async function openWritingReview(
     if (path.endsWith('/attempts/11111111-1111-4111-8111-111111111111')) {
       return route.fulfill({ json: attempt })
     }
-    return route.fulfill({ json: { items: [] } })
+    seen.unexpected.push(`${route.request().method()} ${path}`)
+    return route.fulfill({
+      status: 501,
+      json: { code: 'UNEXPECTED_FIXTURE_REQUEST' },
+    })
   })
   const urls: Record<ReviewScreen, string> = {
     exam: './exam/writing/material',
@@ -195,6 +279,13 @@ async function openWritingReview(
   await expect(
     page.getByRole('region', { name: 'Writing Task 2' }),
   ).toBeVisible({ timeout: 15_000 })
+  await expect(
+    page.getByRole('region', { name: 'Ограничения учебного разбора' }),
+  ).toBeVisible()
+  await expect(page.getByText('IELTS Band Score', { exact: true })).toHaveCount(
+    0,
+  )
+  await expect(page.getByText('7.0', { exact: true })).toHaveCount(0)
 }
 
 test('each task opens inline feedback and keeps its detailed card', async ({
@@ -264,6 +355,48 @@ test('each task opens inline feedback and keeps its detailed card', async ({
   expect(errors).toEqual([])
 })
 
+test('writing comparison pairs the answer and example on desktop and stacks them on mobile', async ({
+  page,
+}) => {
+  await openWritingReview(page, 'exam', true, 'task-one')
+  const task = page.getByRole('region', { name: 'Writing Task 1', exact: true })
+  await expect(task.getByRole('table')).toBeVisible()
+  const model = task.getByRole('region', {
+    name: 'Пример абзаца для сравнения',
+    exact: true,
+  })
+  const answer = task.getByText('Текст вашего эссе с замечаниями', {
+    exact: true,
+  })
+  for (const width of [1280, 360]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await expect(model).toBeVisible()
+    const answerBox = await answer.boundingBox()
+    const modelBox = await model.boundingBox()
+    expect(answerBox).not.toBeNull()
+    expect(modelBox).not.toBeNull()
+    if (width === 1280) {
+      expect(modelBox!.x).toBeGreaterThan(answerBox!.x + answerBox!.width)
+    } else {
+      expect(modelBox!.y).toBeGreaterThan(answerBox!.y + answerBox!.height)
+    }
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width)
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.screenshot({
+      path: `artifact/redesign-qa/feedback/writing-${width}.png`,
+      fullPage: true,
+    })
+  }
+  const toggle = model.getByRole('button', { name: 'Скрыть', exact: true })
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  await toggle.click()
+  await expect(
+    model.getByRole('button', { name: 'Показать', exact: true }),
+  ).toHaveAttribute('aria-expanded', 'false')
+})
+
 test('writing feedback fits a narrow screen', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 })
   await openWritingReview(page)
@@ -293,7 +426,7 @@ test('writing feedback fits a narrow screen', async ({ page }) => {
 })
 
 for (const screen of ['history', 'bank', 'fullmock'] as const) {
-  test(`${screen}: original essay, inline feedback and rewrite survive the review route`, async ({
+  test(`${screen}: original essay and feedback remain while model answer waits for own correction`, async ({
     page,
   }) => {
     await openWritingReview(page, screen)
@@ -315,6 +448,11 @@ for (const screen of ['history', 'bank', 'fullmock'] as const) {
         'Many people believe that studying abroad broadens their perspective.',
         { exact: false },
       ),
+    ).toHaveCount(0)
+    await expect(
+      taskTwo.getByText('Сначала сохраните собственное исправление', {
+        exact: false,
+      }),
     ).toBeVisible()
     await expect(
       page.getByText('See the separate Task 1 and Task 2 feedback.'),
@@ -322,10 +460,44 @@ for (const screen of ['history', 'bank', 'fullmock'] as const) {
   })
 }
 
+for (const correctedTask of ['task-one', 'task-two'] as const) {
+  test(`a persisted correction of ${correctedTask} unlocks only that task's model paragraph`, async ({
+    page,
+  }) => {
+    await openWritingReview(page, 'history', true, correctedTask)
+    const taskOneModel = page
+      .getByRole('region', { name: 'Writing Task 1' })
+      .getByText('The chart shows an overall rise in visitor numbers.', {
+        exact: false,
+      })
+    if (correctedTask === 'task-one') await expect(taskOneModel).toBeVisible()
+    else await expect(taskOneModel).toHaveCount(0)
+    const task = page.getByRole('region', { name: 'Writing Task 2' })
+    const model = task.getByText(
+      'Many people believe that studying abroad broadens their perspective.',
+      { exact: false },
+    )
+    if (correctedTask === 'task-two') {
+      await expect(model).toBeVisible()
+      await page.reload()
+      await expect(model).toBeVisible()
+    } else {
+      await expect(model).toHaveCount(0)
+      await expect(
+        task.getByText('Сначала сохраните собственное исправление', {
+          exact: false,
+        }),
+      ).toBeVisible()
+    }
+  })
+}
+
 test('a saved evaluation without inline annotations still displays the essay honestly', async ({
   page,
 }) => {
-  await openWritingReview(page, 'history', false)
+  await openWritingReview(page, 'history', false, undefined, {
+    learning: 'no-cycle',
+  })
   await expect(
     page.getByText('The visitors has increased.', { exact: true }),
   ).toBeVisible()
@@ -341,4 +513,72 @@ test('a saved evaluation without inline annotations still displays the essay hon
     ),
   ).toHaveCount(2)
   await expect(page.locator('[id^="annotation-card-"]')).toHaveCount(0)
+})
+
+test('a task without an actionable cycle explains unavailability instead of asking for a nonexistent correction', async ({
+  page,
+}) => {
+  await openWritingReview(page, 'history', false, undefined, {
+    learning: 'no-cycle',
+  })
+  const task = page.getByRole('region', { name: 'Writing Task 2' })
+  await expect(
+    task.getByText('Для этого задания нет доступного учебного цикла правки.', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
+    task.getByText('Сначала сохраните', { exact: false }),
+  ).toHaveCount(0)
+  await expect(
+    task.getByText(
+      'Many people believe that studying abroad broadens their perspective.',
+      { exact: false },
+    ),
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole('link', { name: /Исправить эту ошибку/ }),
+  ).toHaveCount(0)
+})
+
+test('learning network failure keeps model paragraph hidden with an honest unavailable message', async ({
+  page,
+}) => {
+  await openWritingReview(page, 'history', false, undefined, {
+    learning: 'network-error',
+  })
+  const task = page.getByRole('region', { name: 'Writing Task 2' })
+  await expect(
+    task.getByText('Учебные циклы сейчас недоступны.', { exact: false }),
+  ).toBeVisible()
+  await expect(
+    task.getByText('Сначала сохраните', { exact: false }),
+  ).toHaveCount(0)
+  await expect(
+    task.getByText(
+      'Many people believe that studying abroad broadens their perspective.',
+      { exact: false },
+    ),
+  ).toHaveCount(0)
+})
+
+test('read-only learning does not ask the learner to save a new correction', async ({
+  page,
+}) => {
+  await openWritingReview(page, 'history', true, undefined, { readOnly: true })
+  const task = page.getByRole('region', { name: 'Writing Task 2' })
+  await expect(
+    task.getByText('Для этого задания нет доступного учебного цикла правки.', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
+    task.getByText('Сначала сохраните', { exact: false }),
+  ).toHaveCount(0)
+  await expect(
+    task.getByText(
+      'Many people believe that studying abroad broadens their perspective.',
+      { exact: false },
+    ),
+  ).toHaveCount(0)
 })

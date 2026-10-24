@@ -1,4 +1,4 @@
-import { useRouter, useRouterState } from '@tanstack/react-router'
+import { useRouter, useRouterState, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 
 import { DashboardHeader } from './dashboard-header'
@@ -92,6 +92,15 @@ export function DashboardShell({ children }: DashboardShellProps) {
     select: (state) => state.location.pathname,
   })
   const pageTitle = getDashboardPageTitle(pathname)
+  const studyReview = useSearch({
+    strict: false,
+    select: (search) => search.studyReview,
+  })
+  const appPath = pathname.replace(/^\/app(?=\/|$)/, '').replace(/\/$/, '')
+  const isPlanPage = appPath === '/plan' || appPath.startsWith('/plan/learning')
+  const isProgressPage = appPath === '/progress'
+  const isStudyReview =
+    /^\/attempts\/[^/]+$/.test(appPath) && Boolean(studyReview)
 
   useEffect(() => {
     if (!navigationIsOpen) return
@@ -144,7 +153,16 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <main className="min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] p-3 sm:p-7 lg:p-9 min-w-0 max-w-full overflow-x-clip">
           {children}
         </main>
-        {user ? <AiAssistantFloatingWidget hidden={navigationIsOpen} /> : null}
+        {user ? (
+          // Keep the widget mounted to preserve chat state on other routes.
+          // Planning and its review acknowledgement must stay clear of overlays.
+          <div
+            hidden={isPlanPage || isStudyReview}
+            className={isProgressPage ? 'px-3 pb-6 sm:px-7 lg:px-9' : undefined}
+          >
+            <AiAssistantFloatingWidget compact={isProgressPage} hidden={navigationIsOpen} />
+          </div>
+        ) : null}
       </div>
       <LoginDialog
         open={loginIsOpen}

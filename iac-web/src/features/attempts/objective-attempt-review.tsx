@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import { Card, CardContent } from '@/components/ui/card'
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
 import { AttemptResultHeader, ErrorState, LoadingState } from './attempt-ui'
 import { MistakeRetryDialog } from './mistake-retry-dialog'
@@ -19,11 +18,13 @@ export function ObjectiveAttemptReview({
   material,
   title,
   showHeading = true,
+  showBand = false,
 }: {
   attempt: AttemptDetail
   material?: ReviewMaterial | null
   title?: string
   showHeading?: boolean
+  showBand?: boolean
 }) {
   const { t, language } = useLanguage()
   const [selected, setSelected] = useState<AttemptReviewItem | null>(null)
@@ -51,15 +52,17 @@ export function ObjectiveAttemptReview({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           {title ? (
-            <h2 className="break-words text-lg font-semibold tracking-[-0.02em]">
-              {title}
-            </h2>
+            <h2 className="break-words text-base font-semibold">{title}</h2>
           ) : null}
           <p className="mt-1 text-sm text-muted-foreground">
             {skill} · {mistakeCountLabel(mistakes.length, language)}
           </p>
         </div>
-        {attempt.band !== null ? (
+        {!showBand ? (
+          <p className="shrink-0 text-sm text-muted-foreground">
+            Результат: {attempt.score ?? '—'}/{attempt.maxScore ?? '—'}
+          </p>
+        ) : attempt.band !== null ? (
           <p className="shrink-0 text-sm font-semibold text-primary">
             Band {attempt.band.toFixed(1)}
             <span className="ml-3 font-normal text-muted-foreground">
@@ -69,8 +72,29 @@ export function ObjectiveAttemptReview({
         ) : null}
       </div>
       {mistakes.length ? (
-        <Card className="gap-0 rounded-[10px] border-border py-0 shadow-none">
-          <CardContent className="grid gap-3 p-4 sm:p-5">
+        <section aria-label="Ошибки в ответах" className="min-w-0">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold">Разбор ответов</h2>
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {mistakes.length}/{review.length} ошибок
+            </span>
+          </div>
+          <div
+            className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-label="Доля ошибок"
+            aria-valuenow={mistakes.length}
+            aria-valuemin={0}
+            aria-valuemax={review.length}
+          >
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{
+                width: `${review.length ? (mistakes.length / review.length) * 100 : 0}%`,
+              }}
+            />
+          </div>
+          <div className="grid gap-3">
             {mistakes.map((item) => (
               <div
                 key={item.questionId}
@@ -88,8 +112,8 @@ export function ObjectiveAttemptReview({
                 />
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       ) : (
         <p className="py-6 text-sm text-muted-foreground">{t('Нет ошибок')}</p>
       )}

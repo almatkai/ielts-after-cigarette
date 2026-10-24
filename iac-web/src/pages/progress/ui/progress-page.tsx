@@ -1,5 +1,4 @@
 import { ArrowRight } from 'iconsax-react'
-import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 
@@ -8,29 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
 import { useAttemptHistory } from '@/features/attempts/use-attempt-history'
 import type { AttemptListItem } from '@/features/attempts/api'
-import { getDashboard, queryKeys } from '@/features/ielts/api'
-import type { SkillId } from '@/features/ielts/api'
+import { StudyProgress } from '@/features/study-plan/summary'
 import { getErrorMessage } from '@/lib/api/client'
 
 import { formatDateTime } from '@/lib/date'
 import { useLanguage } from '@/lib/i18n'
 
-const skillLabels: Record<SkillId, string> = {
-  listening: 'Listening',
-  reading: 'Reading',
-  writing: 'Writing',
-  speaking: 'Speaking',
-}
-
 const cardClassName =
-  'gap-0 rounded-[10px] border-border py-0 shadow-none min-w-0 max-w-full overflow-hidden'
+  'gap-0 rounded-[16px] border-border py-0 shadow-none min-w-0 max-w-full overflow-hidden'
 
 export function ProgressPage() {
-  const { language, t } = useLanguage()
-  const dashboardQuery = useQuery({
-    queryKey: queryKeys.dashboard,
-    queryFn: ({ signal }) => getDashboard(signal),
-  })
   const attemptsQuery = useAttemptHistory()
   const moreRef = useRef<HTMLDivElement>(null)
   const { hasNextPage, isFetchingNextPage, fetchNextPage } = attemptsQuery
@@ -59,23 +45,8 @@ export function ProgressPage() {
     isFetchingNextPage,
     fetchNextPage,
     attemptsQuery.isFetchNextPageError,
-    dashboardQuery.isPending,
   ])
 
-  if (dashboardQuery.isPending) {
-    return <LoadingState label={t('Загружаем прогресс…')} />
-  }
-  if (dashboardQuery.isError) {
-    return (
-      <ErrorState
-        title={t('Не удалось загрузить прогресс')}
-        message={t(getErrorMessage(dashboardQuery.error))}
-        onRetry={() => void dashboardQuery.refetch()}
-      />
-    )
-  }
-
-  const dashboard = dashboardQuery.data
   const attemptsPending = attemptsQuery.isPending
   const attemptsError = attemptsQuery.isFetchNextPageError
     ? null
@@ -84,46 +55,12 @@ export function ProgressPage() {
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
       <div>
-        <h2 className="text-base sm:text-lg font-semibold tracking-[-0.025em] text-foreground">
-          {t('Отслеживайте свою динамику')}
+        <h2 className="text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
+          Прогресс
         </h2>
       </div>
 
-      <Card className={cardClassName}>
-        <CardHeader className="border-b border-border p-3.5 sm:p-5">
-          <CardTitle className="text-sm sm:text-base tracking-[-0.02em]">
-            {t('Уровень по навыкам')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-2.5 sm:gap-3 p-3 sm:p-5 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
-          {dashboard.skillProgress.map((progress) => (
-            <div
-              key={progress.skill}
-              className="min-w-0 rounded-[10px] sm:rounded-[10px] border border-border bg-background p-3 sm:p-4"
-            >
-              <div className="flex items-center justify-between gap-2 sm:gap-3">
-                <p className="truncate text-xs sm:text-sm font-semibold text-foreground">
-                  {skillLabels[progress.skill]}
-                </p>
-                <span className="shrink-0 text-xs sm:text-sm font-semibold text-primary">
-                  {progress.estimatedBand === null
-                    ? '—'
-                    : progress.estimatedBand.toFixed(1)}
-                </span>
-              </div>
-              <p className="mt-1 sm:mt-2 truncate text-[11px] sm:text-xs leading-4 sm:leading-5 text-muted-foreground">
-                {progress.completedTasks === 0
-                  ? t('Нет выполненных заданий')
-                  : language === 'en'
-                    ? `${progress.completedTasks} tasks · ${progress.accuracyPercent ?? 0}% accuracy`
-                    : language === 'kk'
-                      ? `${progress.completedTasks} тапсырма · дәлдігі ${progress.accuracyPercent ?? 0}%`
-                      : `${progress.completedTasks} заданий · точность ${progress.accuracyPercent ?? 0}%`}
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <StudyProgress activity />
 
       <Card className={cardClassName}>
         <CardHeader className="border-b border-border p-3.5 sm:p-5">
@@ -143,9 +80,9 @@ export function ProgressPage() {
               }}
             />
           ) : attempts.length === 0 ? (
-            <div className="rounded-[10px] border border-dashed border-border bg-background px-4 py-8 text-center">
+            <div className="px-2 py-4 text-center">
               <p className="text-sm font-semibold text-foreground">
-                {t('Попыток пока нет')}
+                Попыток пока нет
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {t('Пройдите первый тест в разделе Listening или Reading.')}
@@ -179,6 +116,9 @@ export function ProgressPage() {
           ) : null}
         </CardContent>
       </Card>
+      <p className="text-xs leading-5 text-muted-foreground">
+        Это учебные результаты, не IELTS band.
+      </p>
     </div>
   )
 }
@@ -208,7 +148,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
       </div>
       <div className="flex items-center justify-between gap-3 shrink-0 sm:justify-end">
         {processing ? (
-          <span className="inline-flex items-center gap-1.5 rounded-sm bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
             <svg
               className="size-3 animate-spin"
               viewBox="0 0 24 24"
@@ -234,11 +174,10 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
         {submitted ? (
           <p className="text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">
-              {item.score ?? '—'}/{item.maxScore ?? '—'}
-            </span>
-            {' · band '}
-            <span className="font-semibold text-primary">
-              {item.band !== null ? item.band.toFixed(1) : '—'}
+              {item.materialType === 'reading' ||
+              item.materialType === 'listening'
+                ? `${item.score ?? '—'}/${item.maxScore ?? '—'}`
+                : 'Разбор готов'}
             </span>
           </p>
         ) : null}
@@ -247,7 +186,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             asChild
             variant="outline"
             size="sm"
-            className="shadow-none shrink-0"
+            className="min-h-11 shadow-none shrink-0"
           >
             <Link to="/attempts/$attemptId" params={{ attemptId: item.id }}>
               {processing ? t('Статус') : t('Разбор')}
@@ -259,7 +198,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             asChild
             variant="outline"
             size="sm"
-            className="shadow-none shrink-0"
+            className="min-h-11 shadow-none shrink-0"
           >
             <Link
               to="/exam/listening/$testId"
@@ -274,7 +213,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             asChild
             variant="outline"
             size="sm"
-            className="shadow-none shrink-0"
+            className="min-h-11 shadow-none shrink-0"
           >
             <Link
               to="/exam/reading/$materialId"
@@ -289,7 +228,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             asChild
             variant="outline"
             size="sm"
-            className="shadow-none shrink-0"
+            className="min-h-11 shadow-none shrink-0"
           >
             <Link
               to="/exam/writing/$materialId"
@@ -304,7 +243,7 @@ function AttemptRow({ item }: { item: AttemptListItem }) {
             asChild
             variant="outline"
             size="sm"
-            className="shadow-none shrink-0"
+            className="min-h-11 shadow-none shrink-0"
           >
             <Link
               to="/exam/speaking/$materialId"

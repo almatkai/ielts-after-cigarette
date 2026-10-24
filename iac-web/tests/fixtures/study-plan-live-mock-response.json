@@ -1,0 +1,1213 @@
+{
+  "today": "2026-10-24",
+  "timezone": "Asia/Almaty",
+  "settings": {
+    "dailyMinutes": 60,
+    "studyDays": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "weeklyMockEnabled": true
+  },
+  "goal": {
+    "targetBand": 7,
+    "examDate": null,
+    "examType": "academic"
+  },
+  "plan": {
+    "id": "e1cfdbf3-ae5a-4aec-add8-a3ac4f13036a",
+    "revision": 4,
+    "startDate": "2026-10-18",
+    "endDate": "2026-11-16",
+    "days": [
+      {
+        "date": "2026-10-18",
+        "dayIndex": 1,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "83323715-1d1e-4f53-ab7a-a3268b5120f2",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — University Campus Library Orientation",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 10,
+            "status": "MISSED",
+            "materialId": "245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-19",
+        "dayIndex": 2,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "ae10e984-0a13-4d5a-8ee8-6689ba389f17",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 11,
+            "status": "MISSED",
+            "materialId": "1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-20",
+        "dayIndex": 3,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "c328f93f-c4f4-4d50-8e88-b84ac2fe6644",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Secrets of Deep-Sea Bioluminescence",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "MISSED",
+            "materialId": "3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-21",
+        "dayIndex": 4,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "24a88eb1-5c01-45c5-8f62-06f19037763b",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 60,
+            "status": "MISSED",
+            "materialId": "336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-22",
+        "dayIndex": 5,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "4c65b21d-197a-4223-9125-554b28bb00a9",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — Botanical Garden Volunteering Briefing",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 10,
+            "status": "MISSED",
+            "materialId": "a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-23",
+        "dayIndex": 6,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "7a16883e-53fd-41a7-ad9b-db66c543ef19",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 11,
+            "status": "MISSED",
+            "materialId": "cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-24",
+        "dayIndex": 7,
+        "week": 1,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": false,
+        "assignments": [
+          {
+            "id": "2ac8a61b-4224-4696-ab37-ebf906971c47",
+            "kind": "CHECKPOINT",
+            "skill": "reading",
+            "title": "SMOKE full section component The Urban Heat Island Effect and Green Roofs",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Недельная проверка на новом материале; только учебный результат, а не официальный балл IELTS. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "507d8482-b26c-47cc-92ee-a08368e7b015",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/507d8482-b26c-47cc-92ee-a08368e7b015",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-25",
+        "dayIndex": 8,
+        "week": 2,
+        "budgetMinutes": 165,
+        "plannedMinutes": 0,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "146b24fe-a2a9-4b38-a578-dead6dad0515",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — University Campus Library Orientation",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 10,
+            "status": "SKIPPED",
+            "materialId": "245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "skipReason": "superseded_by_optional_mock",
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-26",
+        "dayIndex": 9,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "9226a3c9-74e7-469f-a9df-3d72de7e2627",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-27",
+        "dayIndex": 10,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "a97a460d-6ada-4ec8-bde3-8b3192f4acd4",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-28",
+        "dayIndex": 11,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 10,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "a797270d-f56a-47c6-b7ba-6eae89eeb9e2",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — Botanical Garden Volunteering Briefing",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 10,
+            "status": "PLANNED",
+            "materialId": "a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-29",
+        "dayIndex": 12,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "faed7a52-cf24-4966-9e10-d093aaecf88e",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-30",
+        "dayIndex": 13,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "dd3e2016-aaf6-4072-b00d-648dc3567730",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Secrets of Deep-Sea Bioluminescence",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-10-31",
+        "dayIndex": 14,
+        "week": 2,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "c5919b40-67cf-4e87-ad5b-bafa5d0e5b7b",
+            "kind": "CHECKPOINT",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Недельная проверка на новом материале; только учебный результат, а не официальный балл IELTS",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-01",
+        "dayIndex": 15,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 10,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "1dae8a9b-c541-4cff-80af-12c396f52c7c",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — University Campus Library Orientation",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 10,
+            "status": "PLANNED",
+            "materialId": "245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-02",
+        "dayIndex": 16,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "36811c1e-8e91-4a62-92ea-1de312896587",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-03",
+        "dayIndex": 17,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "1761a09f-079c-4550-bf78-af17c23bd974",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Urban Heat Island Effect and Green Roofs",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "507d8482-b26c-47cc-92ee-a08368e7b015",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/507d8482-b26c-47cc-92ee-a08368e7b015",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-04",
+        "dayIndex": 18,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "43d82756-da98-4733-b03c-257e37d921db",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-05",
+        "dayIndex": 19,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 10,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "1b8a10e4-c25e-45b7-a77d-1e941a655a5a",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — Botanical Garden Volunteering Briefing",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 10,
+            "status": "PLANNED",
+            "materialId": "a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-06",
+        "dayIndex": 20,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "54ceb117-1dff-4b8a-891f-0044b7daa696",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-07",
+        "dayIndex": 21,
+        "week": 3,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "5d92da8e-5686-44ac-85c7-53fabeadea72",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Secrets of Deep-Sea Bioluminescence",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-08",
+        "dayIndex": 22,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "18dac41a-504d-4363-be36-ab308cf71409",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-09",
+        "dayIndex": 23,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 10,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "0a3e1877-5a78-4cc7-94b7-4a077011d734",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — University Campus Library Orientation",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 10,
+            "status": "PLANNED",
+            "materialId": "245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/245dcbc9-632a-45ac-a83c-c23117aea9a4",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-10",
+        "dayIndex": 24,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "597e0a54-3c8a-4915-9b2d-4247e3fb1f2c",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/1819c477-30c9-4c94-a089-9857ae9e3e05",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-11",
+        "dayIndex": 25,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "52c7505d-7c0c-45f5-aa31-bb273c4af037",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Urban Heat Island Effect and Green Roofs",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "507d8482-b26c-47cc-92ee-a08368e7b015",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/507d8482-b26c-47cc-92ee-a08368e7b015",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-12",
+        "dayIndex": 26,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "aeb44275-89e5-4c82-8bf7-380b8ab21515",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/336bcfe1-896f-46eb-9716-d21ea79acfee",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-13",
+        "dayIndex": 27,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 10,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "3dd0c7a1-8d9c-4c3b-b7c1-862bcf33ce30",
+            "kind": "PRACTICE",
+            "skill": "listening",
+            "title": "Practice — Botanical Garden Volunteering Briefing",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 10,
+            "status": "PLANNED",
+            "materialId": "a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/listening/a506950a-5c0a-4ed0-b2a1-6706a465dc66",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-14",
+        "dayIndex": 28,
+        "week": 4,
+        "budgetMinutes": 60,
+        "plannedMinutes": 11,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "61055818-1cca-47a4-b1ec-dc8c82891156",
+            "kind": "PRACTICE",
+            "skill": "speaking",
+            "title": "Synthetic smoke speaking 1",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 11,
+            "status": "PLANNED",
+            "materialId": "cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/speaking/cbf85bb4-a85d-4c95-9394-374dca5a98c3",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-15",
+        "dayIndex": 29,
+        "week": 5,
+        "budgetMinutes": 60,
+        "plannedMinutes": 20,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "3e5cc6de-2a89-429f-9b94-7eebb769bdc2",
+            "kind": "PRACTICE",
+            "skill": "reading",
+            "title": "SMOKE full section component The Secrets of Deep-Sea Bioluminescence",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня. Отдельный текст; на задания без таймера выделяется 20 минут практики",
+            "durationMinutes": 20,
+            "status": "PLANNED",
+            "materialId": "3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/reading/3a14412e-a9a0-4e5d-adbb-abdfb89519da",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      },
+      {
+        "date": "2026-11-16",
+        "dayIndex": 30,
+        "week": 5,
+        "budgetMinutes": 60,
+        "plannedMinutes": 60,
+        "isRest": false,
+        "preliminary": true,
+        "assignments": [
+          {
+            "id": "bc245fb4-0a6a-4395-a3c7-c9b5d1d72768",
+            "kind": "PRACTICE",
+            "skill": "writing",
+            "title": "Synthetic smoke writing 0",
+            "reason": "Практика по разделу: завершенных работ по этому разделу пока нет. Повторная практика с интервалом от 7 дней; не используется для независимой оценки текущего уровня",
+            "durationMinutes": 60,
+            "status": "PLANNED",
+            "materialId": "f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "attemptId": null,
+            "sourceAttemptId": null,
+            "target": "/exam/writing/f7ffe599-5899-4495-9c6b-31d37497cd48",
+            "skipReason": null,
+            "completedAt": null
+          }
+        ]
+      }
+    ],
+    "weeks": [
+      {
+        "week": 1,
+        "startDate": "2026-10-18",
+        "endDate": "2026-10-24",
+        "goal": "Начальная практика и сбор результатов. Пока нет завершенных работ: Listening, Reading, Writing, Speaking. Данных о неверных ответах для выбора узких навыков пока нет. Будущие результаты не предполагаются; задания зависят от доступного банка",
+        "preliminary": false,
+        "mockOffer": {
+          "status": "SCHEDULED",
+          "durationMinutes": 165,
+          "scheduledDate": "2026-10-25",
+          "windowMinutes": 165,
+          "target": "/full-mocks"
+        }
+      },
+      {
+        "week": 2,
+        "startDate": "2026-10-25",
+        "endDate": "2026-10-31",
+        "goal": "Практика и исправление по разборам. Пока нет завершенных работ: Listening, Reading, Writing, Speaking. Данных о неверных ответах для выбора узких навыков пока нет. Будущие результаты не предполагаются; задания зависят от доступного банка",
+        "preliminary": true,
+        "mockOffer": {
+          "status": "AVAILABLE",
+          "durationMinutes": 165,
+          "scheduledDate": null,
+          "windowMinutes": null,
+          "target": "/full-mocks"
+        }
+      },
+      {
+        "week": 3,
+        "startDate": "2026-11-01",
+        "endDate": "2026-11-07",
+        "goal": "Отложенная практика на доступных материалах. Пока нет завершенных работ: Listening, Reading, Writing, Speaking. Данных о неверных ответах для выбора узких навыков пока нет. Будущие результаты не предполагаются; задания зависят от доступного банка",
+        "preliminary": true,
+        "mockOffer": {
+          "status": "AVAILABLE",
+          "durationMinutes": 165,
+          "scheduledDate": null,
+          "windowMinutes": null,
+          "target": "/full-mocks"
+        }
+      },
+      {
+        "week": 4,
+        "startDate": "2026-11-08",
+        "endDate": "2026-11-14",
+        "goal": "Недельная проверка и повторение. Пока нет завершенных работ: Listening, Reading, Writing, Speaking. Данных о неверных ответах для выбора узких навыков пока нет. Будущие результаты не предполагаются; задания зависят от доступного банка",
+        "preliminary": true,
+        "mockOffer": {
+          "status": "AVAILABLE",
+          "durationMinutes": 165,
+          "scheduledDate": null,
+          "windowMinutes": null,
+          "target": "/full-mocks"
+        }
+      },
+      {
+        "week": 5,
+        "startDate": "2026-11-15",
+        "endDate": "2026-11-16",
+        "goal": "Итоги 30 дней и выбор следующего шага. Пока нет завершенных работ: Listening, Reading, Writing, Speaking. Данных о неверных ответах для выбора узких навыков пока нет. Будущие результаты не предполагаются; задания зависят от доступного банка",
+        "preliminary": true,
+        "mockOffer": {
+          "status": "DISABLED",
+          "durationMinutes": 165,
+          "scheduledDate": null,
+          "windowMinutes": null,
+          "target": "/full-mocks"
+        }
+      }
+    ],
+    "changes": [
+      {
+        "type": "DAY_RECONCILED",
+        "description": "Неначатые прошлые задания отмечены пропущенными; время не переносится",
+        "date": "2026-10-24"
+      },
+      {
+        "type": "MOCK_DECLINED",
+        "description": "Отказ от Full Mock; без штрафа и накопленного долга",
+        "date": "2026-10-24"
+      },
+      {
+        "type": "MOCK_SCHEDULED",
+        "description": "Full Mock запланирован на 2026-10-25: выделено окно 165 мин, обычные задания отменены без долга. Запустите экзамен отдельно в разделе Full Mock",
+        "date": "2026-10-24"
+      }
+    ],
+    "returnAfterPause": false
+  },
+  "recommendations": [],
+  "evidence": [
+    {
+      "skill": "listening",
+      "band": null,
+      "practiceBand": null,
+      "status": "NO_EVIDENCE",
+      "attemptId": null,
+      "assessedAt": null,
+      "sampleCount": 0,
+      "score": null,
+      "maxScore": null,
+      "source": "none",
+      "limitations": [
+        "Недостаточно данных для пересчета в балл; ориентировочный балл недоступен"
+      ]
+    },
+    {
+      "skill": "reading",
+      "band": null,
+      "practiceBand": null,
+      "status": "NO_EVIDENCE",
+      "attemptId": null,
+      "assessedAt": null,
+      "sampleCount": 0,
+      "score": null,
+      "maxScore": null,
+      "source": "none",
+      "limitations": [
+        "Недостаточно данных для пересчета в балл; ориентировочный балл недоступен"
+      ]
+    },
+    {
+      "skill": "writing",
+      "band": null,
+      "practiceBand": null,
+      "status": "NO_EVIDENCE",
+      "attemptId": null,
+      "assessedAt": null,
+      "sampleCount": 0,
+      "score": null,
+      "maxScore": null,
+      "source": "none",
+      "limitations": [
+        "Недостаточно данных для пересчета в балл; ориентировочный балл недоступен"
+      ]
+    },
+    {
+      "skill": "speaking",
+      "band": null,
+      "practiceBand": null,
+      "status": "NO_EVIDENCE",
+      "attemptId": null,
+      "assessedAt": null,
+      "sampleCount": 0,
+      "score": null,
+      "maxScore": null,
+      "source": "none",
+      "limitations": [
+        "Недостаточно данных для пересчета в балл; ориентировочный балл недоступен"
+      ]
+    }
+  ],
+  "overallBand": null,
+  "progress": [
+    {
+      "date": "2026-10-18",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-19",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-20",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-21",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-22",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-23",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-24",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-25",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 0,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-26",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-27",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-28",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 10,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-29",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-30",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-10-31",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-01",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 10,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-02",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-03",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-04",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-05",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 10,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-06",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-07",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-08",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-09",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 10,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-10",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-11",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-12",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-13",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 10,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-14",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 11,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-15",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 20,
+      "activeMinutes": null
+    },
+    {
+      "date": "2026-11-16",
+      "completedAttempts": 0,
+      "reviewedAssignments": 0,
+      "skippedAssignments": 0,
+      "plannedMinutes": 60,
+      "activeMinutes": null
+    }
+  ],
+  "limitations": [
+    "Только учебный результат практики: шкала пересчета не подтверждена; итоговый ориентировочный балл IELTS недоступен",
+    "Фактическое время занятий недоступно; запланированное время не означает активность. Для Reading без таймера выделяется 20 минут практики",
+    "Для Writing/Speaking дата отправки может отражать завершение оценивания, а не точный день сдачи",
+    "Просмотр разбора фиксирует ознакомление, а не освоение; повторная практика и версии заданий не дают независимой оценки",
+    "Планирование Full Mock на неделю не бронирует материалы и не создает сессию. Запустите экзамен отдельно в разделе Full Mock"
+  ]
+}

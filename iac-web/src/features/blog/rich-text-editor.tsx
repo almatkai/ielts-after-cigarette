@@ -19,6 +19,7 @@ import {
 import { useCallback, useRef, useState } from 'react'
 
 import { blogMediaUrl, uploadBlogMedia } from '@/features/blog/api'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 import type { Editor } from '@tiptap/react'
@@ -96,30 +97,37 @@ export function BlogRichTextEditor({
   onChange,
   disabled = false,
 }: BlogRichTextEditorProps) {
+  const { t, language } = useLanguage()
   const uploadInputRef = useRef<HTMLInputElement | null>(null)
   const [uploading, setUploading] = useState(0)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: { levels: [2, 3] },
-        link: { openOnClick: false, autolink: true },
-      }),
-      Image.configure({ allowBase64: false }),
-      Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      Placeholder.configure({
-        placeholder:
-          'Напишите статью: делитесь опытом подготовки, стратегиями и разборами заданий…',
-      }),
-    ],
-    content,
-    editable: !disabled,
-    onUpdate: ({ editor: current }) => {
-      onChange(current.getHTML())
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          heading: { levels: [2, 3] },
+          link: { openOnClick: false, autolink: true },
+        }),
+        Image.configure({ allowBase64: false }),
+        Highlight,
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        Placeholder.configure({
+          placeholder: t(
+            'Напишите статью: делитесь опытом подготовки, стратегиями и разборами заданий…',
+          ),
+        }),
+      ],
+      content,
+      editable: !disabled,
+      onUpdate: ({ editor: current }) => {
+        onChange(current.getHTML())
+      },
     },
-  })
+    // Recreate the editor when the language changes so the placeholder is
+    // localised; the content prop always holds the current HTML.
+    [language],
+  )
 
   const handleFiles = useCallback(
     async (files: FileList | null) => {
@@ -136,17 +144,19 @@ export function BlogRichTextEditor({
             .setImage({ src: blogMediaUrl(media.id) })
             .run()
         } catch {
-          setUploadError(`Не удалось загрузить «${file.name}».`)
+          setUploadError(
+            t('Не удалось загрузить «{name}».').replace('{name}', file.name),
+          )
         } finally {
           setUploading((count) => count - 1)
         }
       }
     },
-    [editor],
+    [editor, t],
   )
 
   return (
-    <div className="rounded-[12px] border border-[#e7e7e4] bg-white">
+    <div className="rounded-[10px] border border-border bg-card">
       <Toolbar
         editor={editor}
         disabled={disabled}
@@ -166,11 +176,11 @@ export function BlogRichTextEditor({
       {uploading > 0 || uploadError ? (
         <p
           className={cn(
-            'border-b border-[#ededeb] px-4 py-2 text-xs',
-            uploadError ? 'text-[#c92f2f]' : 'text-[#69696d]',
+            'border-b border-border px-4 py-2 text-xs',
+            uploadError ? 'text-destructive' : 'text-muted-foreground',
           )}
         >
-          {uploadError ?? 'Сжимаем и загружаем изображение…'}
+          {uploadError ?? t('Сжимаем и загружаем изображение…')}
         </p>
       ) : null}
       <EditorContent
@@ -202,16 +212,17 @@ function Toolbar({
   disabled: boolean
   onPickImage: () => void
 }) {
+  const { t } = useLanguage()
   // useEditor does not re-render on selection changes, so toolbar state is
   // read through a selector that updates on every transaction.
   const state = useEditorState({
     editor,
     selector: ({ editor: current }) => ({
-      block: (current.isActive('heading', { level: 2 })
+      block: current.isActive('heading', { level: 2 })
         ? 'h2'
         : current.isActive('heading', { level: 3 })
           ? 'h3'
-          : 'paragraph'),
+          : 'paragraph',
       bold: current.isActive('bold'),
       italic: current.isActive('italic'),
       underline: current.isActive('underline'),
@@ -242,7 +253,7 @@ function Toolbar({
 
   const editLink = () => {
     const previous = editor.getAttributes('link').href as string | undefined
-    const url = window.prompt('Адрес ссылки', previous ?? 'https://')
+    const url = window.prompt(t('Адрес ссылки'), previous ?? 'https://')
     if (url === null) return
     if (url.trim() === '') {
       chain().extendMarkRange('link').unsetLink().run()
@@ -254,80 +265,80 @@ function Toolbar({
   return (
     <div
       role="toolbar"
-      aria-label="Форматирование текста"
-      className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-[12px] border-b border-[#ededeb] bg-white/95 px-2 py-1.5 backdrop-blur"
+      aria-label={t('Форматирование текста')}
+      className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-[10px] border-b border-border bg-card px-2 py-1.5 "
     >
       <ToolButton
-        label="Отменить (Ctrl+Z)"
+        label={t('Отменить (Ctrl+Z)')}
         icon={UndoIcon}
         disabled={disabled || !state.canUndo}
         onClick={() => chain().undo().run()}
       />
       <ToolButton
-        label="Повторить (Ctrl+Shift+Z)"
+        label={t('Повторить (Ctrl+Shift+Z)')}
         icon={RedoIcon}
         disabled={disabled || !state.canRedo}
         onClick={() => chain().redo().run()}
       />
       <Divider />
       <select
-        aria-label="Стиль абзаца"
+        aria-label={t('Стиль абзаца')}
         value={state.block}
         disabled={disabled}
         onChange={(event) => setBlock(event.target.value as BlockType)}
-        className="h-8 rounded-[8px] bg-transparent px-1.5 text-sm font-medium text-[#111111] outline-none hover:bg-[#f4f4f1]"
+        className="h-8 rounded-[8px] bg-transparent px-1.5 text-sm font-medium text-foreground outline-none hover:bg-muted"
       >
         {blockTypes.map((type) => (
           <option key={type.value} value={type.value}>
-            {type.label}
+            {t(type.label)}
           </option>
         ))}
       </select>
       <Divider />
       <ToolButton
-        label="Жирный (Ctrl+B)"
+        label={t('Жирный (Ctrl+B)')}
         icon={TextBold}
         active={state.bold}
         disabled={disabled}
         onClick={() => chain().toggleBold().run()}
       />
       <ToolButton
-        label="Курсив (Ctrl+I)"
+        label={t('Курсив (Ctrl+I)')}
         icon={TextItalic}
         active={state.italic}
         disabled={disabled}
         onClick={() => chain().toggleItalic().run()}
       />
       <ToolButton
-        label="Подчёркнутый (Ctrl+U)"
+        label={t('Подчёркнутый (Ctrl+U)')}
         icon={TextUnderline}
         active={state.underline}
         disabled={disabled}
         onClick={() => chain().toggleUnderline().run()}
       />
       <ToolButton
-        label="Зачёркнутый"
+        label={t('Зачёркнутый')}
         icon={StrikeIcon}
         active={state.strike}
         disabled={disabled}
         onClick={() => chain().toggleStrike().run()}
       />
       <ToolButton
-        label="Выделить маркером"
+        label={t('Выделить маркером')}
         icon={HighlightIcon}
         active={state.highlight}
         disabled={disabled}
         onClick={() => chain().toggleHighlight().run()}
       />
       <ToolButton
-        label="Код в строке"
+        label={t('Код в строке')}
         icon={Code}
         active={state.code}
         disabled={disabled}
         onClick={() => chain().toggleCode().run()}
       />
       <ToolButton
-        label="Ссылка"
+        label={t('Ссылка')}
         icon={Link1}
         active={state.link}
         disabled={disabled}
@@ -335,56 +346,56 @@ function Toolbar({
       />
       <Divider />
       <ToolButton
-        label="Маркированный список"
+        label={t('Маркированный список')}
         icon={BulletListIcon}
         active={state.bulletList}
         disabled={disabled}
         onClick={() => chain().toggleBulletList().run()}
       />
       <ToolButton
-        label="Нумерованный список"
+        label={t('Нумерованный список')}
         icon={OrderedListIcon}
         active={state.orderedList}
         disabled={disabled}
         onClick={() => chain().toggleOrderedList().run()}
       />
       <ToolButton
-        label="Цитата"
+        label={t('Цитата')}
         icon={QuoteUp}
         active={state.blockquote}
         disabled={disabled}
         onClick={() => chain().toggleBlockquote().run()}
       />
       <ToolButton
-        label="Блок кода или примера"
+        label={t('Блок кода или примера')}
         icon={CodeBlockIcon}
         active={state.codeBlock}
         disabled={disabled}
         onClick={() => chain().toggleCodeBlock().run()}
       />
       <ToolButton
-        label="Разделитель"
+        label={t('Разделитель')}
         icon={DividerIcon}
         disabled={disabled}
         onClick={() => chain().setHorizontalRule().run()}
       />
       <Divider />
       <ToolButton
-        label="По левому краю"
+        label={t('По левому краю')}
         icon={TextalignLeft}
         active={!state.alignCenter && !state.alignRight}
         disabled={disabled}
         onClick={() => chain().unsetTextAlign().run()}
       />
       <ToolButton
-        label="По центру"
+        label={t('По центру')}
         icon={TextalignCenter}
         active={state.alignCenter}
         disabled={disabled}
         onClick={() => chain().setTextAlign('center').run()}
       />
       <ToolButton
-        label="По правому краю"
+        label={t('По правому краю')}
         icon={TextalignRight}
         active={state.alignRight}
         disabled={disabled}
@@ -392,7 +403,7 @@ function Toolbar({
       />
       <Divider />
       <ToolButton
-        label="Изображение (или перетащите и вставьте из буфера)"
+        label={t('Изображение (или перетащите и вставьте из буфера)')}
         icon={Gallery}
         disabled={disabled}
         onClick={onPickImage}
@@ -425,8 +436,8 @@ function ToolButton({
       aria-pressed={active}
       title={label}
       className={cn(
-        'grid size-8 place-items-center rounded-[8px] text-[#525256] transition-colors hover:bg-[#f4f4f1] hover:text-[#111111] disabled:pointer-events-none disabled:opacity-35',
-        active && 'bg-[#eff6ff] text-[#1d4ed8] hover:bg-[#e3eefe]',
+        'grid size-8 place-items-center rounded-[8px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-35',
+        active && 'bg-primary-soft text-primary hover:bg-primary-soft',
       )}
     >
       <Icon className="size-[18px]" />
@@ -435,5 +446,5 @@ function ToolButton({
 }
 
 function Divider() {
-  return <span className="mx-0.5 h-5 w-px bg-[#e7e7e4]" aria-hidden />
+  return <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
 }

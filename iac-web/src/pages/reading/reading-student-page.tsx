@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import { ObjectiveAttemptResult } from '@/features/attempts/objective-attempt-review'
 import { ArrowLeft, TickCircle } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
@@ -48,6 +49,7 @@ import {
   PreviewAnswer,
   PreviewEvidenceText,
 } from '@/features/admin/preview-answer'
+import { tr } from '@/lib/i18n'
 
 const tfngValues = ['TRUE', 'FALSE', 'NOT_GIVEN'] as const
 const ynngValues = ['YES', 'NO', 'NOT_GIVEN'] as const
@@ -62,8 +64,8 @@ export function ReadingStudentPage({
   return (
     <ExamAttemptShell<PublicReadingMaterial>
       skillBadge="IELTS Reading"
-      loadingLabel="Готовим материал…"
-      loadingDescription="Загружаем текст задания, формируем группы вопросов и настраиваем форму для ответов."
+      loadingLabel={'Preparing your test…'}
+      loadingDescription="Loading the passage, organising the questions, and preparing your answer sheet."
       queryKey={attemptStartQueryKey('reading', materialId)}
       startAttemptFn={(signal) => startReadingAttempt(materialId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
@@ -318,7 +320,7 @@ function ReadingTestRunner({
   if (session.loadError) {
     return (
       <ErrorState
-        title="Не удалось восстановить ответы"
+        title={'Could not restore your answers'}
         message={session.loadError}
         onRetry={session.retryLoad}
       />
@@ -328,8 +330,8 @@ function ReadingTestRunner({
     return (
       <ExamLoadingScreen
         badge="IELTS Reading"
-        label="Готовим чтение…"
-        description="Загружаем пассажи, формируем группы вопросов и восстанавливаем сохранённые ответы…"
+        label={'Preparing Reading…'}
+        description="Loading passages and questions, and restoring your saved answers…"
       />
     )
   }
@@ -365,13 +367,14 @@ function ReadingTestRunner({
       )}
     >
       {/* ВЕРХНЯЯ ШАПКА */}
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-xs shrink-0">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-none shrink-0">
         <div className="flex items-center gap-3">
+          <BrandLogo variant="mark" />
           <Button
             asChild
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
+            className="h-8 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
           >
             {preview ? (
               <Link
@@ -379,7 +382,7 @@ function ReadingTestRunner({
                 params={{ materialId: material.id }}
               >
                 <ArrowLeft className="size-4" aria-hidden />
-                <span>К редактору</span>
+                <span>{'Back to editor'}</span>
               </Link>
             ) : fullMockSessionId ? (
               <Link
@@ -387,17 +390,17 @@ function ReadingTestRunner({
                 params={{ sessionId: fullMockSessionId }}
               >
                 <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К Full Mock</span>
+                <span className="hidden sm:inline">{'Back to Full Mock'}</span>
               </Link>
             ) : (
               <Link to="/reading">
                 <ArrowLeft className="size-4" aria-hidden />
-                <span className="hidden sm:inline">К Reading</span>
+                <span className="hidden sm:inline">{'Back to Reading'}</span>
               </Link>
             )}
           </Button>
           <div className="hidden md:block">
-            <h1 className="text-sm font-semibold text-slate-900 truncate max-w-[240px] lg:max-w-[360px]">
+            <h1 className="font-sans text-sm font-semibold text-foreground truncate max-w-[240px] lg:max-w-[360px]">
               {material.title}
             </h1>
           </div>
@@ -405,7 +408,7 @@ function ReadingTestRunner({
 
         {/* Вкладки Разделов (Passages) по центру */}
         {passages.length > 1 && (
-          <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
+          <div className="flex items-center gap-1 rounded-[10px] border border-border bg-card p-1">
             {passages.map((passage, passageIndex) => {
               const isCurrentPassage = currentPassageIndex === passageIndex
               const pQuestions = questions.filter(
@@ -425,20 +428,22 @@ function ReadingTestRunner({
                   className={cn(
                     'flex items-center gap-2 rounded-[8px] px-3 py-1.5 text-xs font-semibold transition-all select-none',
                     isCurrentPassage
-                      ? 'bg-[#3b82f6] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                   )}
                 >
-                  <span>Раздел {passageIndex + 1}</span>
+                  <span>
+                    {'Passage'} {passageIndex + 1}
+                  </span>
                   <span
                     className={cn(
                       'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
                       isCurrentPassage
-                        ? 'bg-white/25 text-white'
+                        ? 'bg-primary-hover text-primary-foreground'
                         : pAnswered === pQuestions.length &&
                             pQuestions.length > 0
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-slate-100 text-slate-600',
+                          ? 'bg-success-bg text-success'
+                          : 'bg-muted text-muted-foreground',
                     )}
                   >
                     {pAnswered}/{pQuestions.length}
@@ -450,10 +455,10 @@ function ReadingTestRunner({
         )}
 
         {/* Правая часть шапки: Сохранение, Таймер, Кнопка Завершить */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2.5 sm:gap-3">
           {!preview ? <SaveIndicator state={session.saveState} /> : null}
           {timerEnabled ? (
-            <TimeBadge seconds={secondsLeft} label="Осталось" />
+            <TimeBadge seconds={secondsLeft} label="Time remaining" />
           ) : null}
           {!preview ? (
             <Button
@@ -462,9 +467,9 @@ function ReadingTestRunner({
               size="sm"
               disabled={session.isSavingAndExiting || session.isSubmitting}
               onClick={handleContinueLater}
-              className="rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+              className="rounded-[10px] border-border text-xs font-semibold text-foreground hover:bg-card shadow-none"
             >
-              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+              {session.isSavingAndExiting ? 'Saving…' : 'Continue later'}
             </Button>
           ) : null}
           {!preview ? (
@@ -473,24 +478,24 @@ function ReadingTestRunner({
                 <Button
                   size="sm"
                   disabled={session.isSubmitting}
-                  className="bg-[#3b82f6] text-white hover:bg-blue-600 shadow-xs"
+                  className="bg-primary text-primary-foreground hover:bg-primary shadow-none"
                 >
-                  {session.isSubmitting ? 'Отправляем…' : 'Завершить тест'}
+                  {session.isSubmitting ? 'Submitting…' : 'Finish test'}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Завершить попытку?</AlertDialogTitle>
+                  <AlertDialogTitle>{'Finish this attempt?'}</AlertDialogTitle>
                   <AlertDialogDescription>
                     {answeredCount < totalQuestions
-                      ? `Вы ответили на ${answeredCount} из ${totalQuestions} вопросов. Неотвеченные вопросы будут засчитаны как неверные.`
-                      : 'Все вопросы отвечены. Вы уверены, что хотите завершить тест и перейти к результатам?'}
+                      ? `You answered ${answeredCount} of ${totalQuestions} questions. Unanswered questions will be marked incorrect.`
+                      : 'All questions are answered. Finish the test and view your results?'}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Продолжить тест</AlertDialogCancel>
+                  <AlertDialogCancel>{'Continue test'}</AlertDialogCancel>
                   <AlertDialogAction onClick={session.submit}>
-                    Завершить
+                    {'Finish'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -502,48 +507,48 @@ function ReadingTestRunner({
       {session.exitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-xs text-destructive shrink-0"
         >
-          Не удалось сохранить черновик: {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
 
       {session.submitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-[#e23b3b] shrink-0"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-xs text-destructive shrink-0"
         >
-          Не удалось отправить тест: {session.submitError}
+          {'Could not submit test:'} {tr(session.submitError)}
         </p>
       ) : null}
 
       {/* Основная рабочая зона — сплит на 2 колонки на desktop */}
       <div className="grid flex-1 min-h-0 gap-3 lg:grid-cols-2 overflow-hidden">
         {/* ЛЕВАЯ КОЛОНКА: Текст отрывка (Reading Passage) */}
-        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[10px] border border-border bg-card shadow-none">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-card shrink-0">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
+              <span className="rounded-sm bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary border border-primary-soft shrink-0">
                 {passages.length > 1
-                  ? `Раздел ${currentPassageIndex + 1}`
-                  : 'Текст'}
+                  ? `${'Passage'} ${currentPassageIndex + 1}`
+                  : 'Passage'}
               </span>
-              <h2 className="text-sm font-semibold text-slate-900 truncate">
+              <h2 className="text-sm font-semibold text-foreground truncate">
                 {currentPassage.title}
               </h2>
             </div>
             {/* Контролы размера текста */}
-            <div className="flex items-center gap-1 rounded-[8px] p-0.5 border border-[#e7e7e4] bg-white shrink-0">
+            <div className="flex items-center gap-1 rounded-[8px] p-0.5 border border-border bg-card shrink-0">
               <button
                 type="button"
                 onClick={() => setPassageFontSize('sm')}
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'sm'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Уменьшить шрифт"
+                title={'Decrease text size'}
               >
                 A-
               </button>
@@ -553,10 +558,10 @@ function ReadingTestRunner({
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'md'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Стандартный шрифт"
+                title={'Default text size'}
               >
                 A
               </button>
@@ -566,20 +571,20 @@ function ReadingTestRunner({
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'lg'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Увеличить шрифт"
+                title={'Increase text size'}
               >
                 A+
               </button>
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 select-text bg-white">
+          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 select-text bg-card">
             <div
               className={cn(
-                'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+                'whitespace-pre-wrap font-sans text-foreground space-y-4',
                 passageFontSize === 'sm' && 'text-[14px] leading-[1.65]',
                 passageFontSize === 'md' && 'text-[15.5px] leading-[1.8]',
                 passageFontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
@@ -591,52 +596,48 @@ function ReadingTestRunner({
                   quote={revealedQuote}
                 />
               ) : (
-                'Текст раздела ещё не добавлен. Вернитесь в редактор.'
+                'This passage has no text yet. Return to the editor.'
               )}
             </div>
           </div>
         </Card>
 
         {/* ПРАВАЯ КОЛОНКА: Вопросы и ответы */}
-        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-          <div className="border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[10px] border border-border bg-card shadow-none">
+          <div className="border-b border-border px-5 py-3.5 bg-card shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
+                <span className="rounded-sm bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary border border-primary-soft">
                   {passages.length > 1
-                    ? `Раздел ${currentPassageIndex + 1}`
-                    : 'Вопросы'}
+                    ? `${'Passage'} ${currentPassageIndex + 1}`
+                    : 'Questions'}
                 </span>
-                <span className="text-xs text-slate-500 font-medium">
-                  {currentPassage.questionGroups.length}{' '}
-                  {currentPassage.questionGroups.length === 1
-                    ? 'группа'
-                    : 'групп'}{' '}
-                  вопросов
+                <span className="text-xs text-muted-foreground font-medium">
+                  `${currentPassage.questionGroups.length} question groups`
                 </span>
               </div>
-              <span className="text-xs font-semibold text-slate-500">
-                Вопрос {currentNumber} из {totalQuestions}
+              <span className="text-xs font-semibold text-muted-foreground">
+                {'Question'} {currentNumber} {'of'} {totalQuestions}
               </span>
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 bg-white space-y-7">
+          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 bg-card space-y-7">
             {currentPassage.questionGroups.every(
               (group) => group.questions.length === 0,
             ) ? (
-              <p role="status" className="text-sm text-amber-700">
-                В этом разделе ещё нет вопросов. Добавьте их в редакторе.
+              <p role="status" className="text-sm text-warning-fg">
+                {'This passage has no questions yet. Add them in the editor.'}
               </p>
             ) : null}
             {currentPassage.questionGroups.map((group) => (
               <div key={group.id ?? group.position} className="space-y-3.5">
-                <div className="border-b border-[#ededeb] pb-2.5">
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 border border-slate-200">
+                <div className="border-b border-border pb-2.5">
+                  <span className="rounded-sm bg-muted px-2.5 py-0.5 text-[11px] font-bold normal-case text-foreground border border-border">
                     {group.type.replaceAll('_', ' ')}
                   </span>
                   {group.instructions ? (
-                    <p className="mt-2 text-xs leading-relaxed text-[#69696d]">
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                       {group.instructions}
                     </p>
                   ) : null}
@@ -671,24 +672,24 @@ function ReadingTestRunner({
           </div>
 
           {/* Навигация внизу правой колонки */}
-          <div className="flex items-center justify-between border-t border-[#ededeb] px-5 py-3 bg-white shrink-0">
+          <div className="flex items-center justify-between border-t border-border px-5 py-3 bg-card shrink-0">
             <Button
               type="button"
               variant="outline"
               size="sm"
               disabled={!currentQuestion || activeQuestionIndex === 0}
               onClick={() => setActiveQuestionIndex((index) => index - 1)}
-              className="gap-1.5 rounded-[10px] text-xs font-medium border-[#e7e7e4] bg-white hover:bg-slate-50"
+              className="gap-1.5 rounded-[10px] text-xs font-medium border-border bg-card hover:bg-card"
             >
-              ← Назад
+              ← {'Back'}
             </Button>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#69696d] font-medium">
-                Вопрос {currentNumber} из {totalQuestions}
+              <span className="text-xs text-muted-foreground font-medium">
+                {'Question'} {currentNumber} {'of'} {totalQuestions}
               </span>
               {passages.length > 1 && (
-                <span className="text-xs text-slate-400">
-                  · Раздел {currentPassageIndex + 1}
+                <span className="text-xs text-muted-foreground">
+                  · {'Passage'} {currentPassageIndex + 1}
                 </span>
               )}
             </div>
@@ -699,20 +700,20 @@ function ReadingTestRunner({
                 !currentQuestion || activeQuestionIndex === questions.length - 1
               }
               onClick={() => setActiveQuestionIndex((index) => index + 1)}
-              className="gap-1.5 rounded-[10px] bg-[#3b82f6] text-white hover:bg-blue-600 text-xs font-medium shadow-xs"
+              className="gap-1.5 rounded-[10px] bg-primary text-primary-foreground hover:bg-primary text-xs font-medium shadow-none"
             >
-              Далее →
+              {'Next'} →
             </Button>
           </div>
         </Card>
       </div>
 
       {/* НИЖНИЙ НАВИГАТОР ПО ВОПРОСАМ (Question Palette) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2 sm:px-4 shadow-xs shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-3.5 py-2 sm:px-4 shadow-none shrink-0">
         <div className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto py-0.5 max-w-full">
           {/* Переключение разделов внизу (если больше 1 раздела) */}
           {passages.length > 1 && (
-            <div className="flex items-center gap-1 border-r border-[#ededeb] pr-2.5 sm:pr-3 shrink-0">
+            <div className="flex items-center gap-1 border-r border-border pr-2.5 sm:pr-3 shrink-0">
               {passages.map((passage, pIdx) => {
                 const isCurrentPassage = currentPassageIndex === pIdx
                 const pQuestions = questions.filter(
@@ -732,21 +733,23 @@ function ReadingTestRunner({
                     className={cn(
                       'flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-xs font-semibold transition-all shrink-0 select-none',
                       isCurrentPassage
-                        ? 'bg-[#3b82f6] text-white shadow-xs'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                        ? 'bg-primary text-primary-foreground shadow-none'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
-                    title={`Раздел ${pIdx + 1}: ${pAnswered}/${pQuestions.length} отвечено`}
+                    title={`${'Passage'} ${pIdx + 1}: ${pAnswered}/${pQuestions.length} ${'answered'}`}
                   >
-                    <span>Раздел {pIdx + 1}</span>
+                    <span>
+                      {'Passage'} {pIdx + 1}
+                    </span>
                     <span
                       className={cn(
                         'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
                         isCurrentPassage
-                          ? 'bg-white/25 text-white'
+                          ? 'bg-primary-hover text-primary-foreground'
                           : pAnswered === pQuestions.length &&
                               pQuestions.length > 0
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-slate-100 text-slate-600',
+                            ? 'bg-success-bg text-success'
+                            : 'bg-muted text-muted-foreground',
                       )}
                     >
                       {pAnswered}/{pQuestions.length}
@@ -775,12 +778,12 @@ function ReadingTestRunner({
                   className={cn(
                     'flex size-7 shrink-0 items-center justify-center rounded-[7px] border text-xs font-semibold transition-all select-none',
                     isCurrent
-                      ? 'border-[#3b82f6] bg-[#3b82f6] text-white shadow-xs scale-105'
+                      ? 'border-foreground bg-foreground text-background shadow-none scale-105'
                       : answered
-                        ? 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                        : 'border-[#e7e7e4] bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
+                        ? 'border-border-strong bg-primary-soft text-primary hover:bg-primary-soft'
+                        : 'border-border-strong bg-card text-muted-foreground hover:border-border-strong hover:bg-muted',
                   )}
-                  title={`Вопрос ${label}${answered ? ' (отвечен)' : ''}`}
+                  title={`${'Question'} ${label}${answered ? ` (${'answered'})` : ''}`}
                 >
                   {label}
                 </button>
@@ -790,23 +793,22 @@ function ReadingTestRunner({
         </div>
 
         {/* Счётчик ответов */}
-        <div className="flex items-center gap-3 shrink-0 text-xs text-slate-600 font-medium">
+        <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground font-medium">
           {passages.length > 1 && (
-            <span className="text-slate-500 hidden sm:inline">
-              В разделе:{' '}
-              <strong className="text-slate-800">
+            <span className="text-muted-foreground hidden sm:inline">
+              {'Passage:'}{' '}
+              <strong className="text-foreground">
                 {activePassageAnsweredCount}
               </strong>{' '}
-              из {activePassageQuestions.length}
-              <span className="mx-2 text-slate-300">|</span>
+              {'of'} {activePassageQuestions.length}
+              <span className="mx-2 text-muted-foreground">|</span>
             </span>
           )}
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-blue-600" />
-            Всего: <strong className="text-slate-800">
-              {answeredCount}
-            </strong>{' '}
-            из {totalQuestions}
+            <span className="size-2 rounded-full bg-primary" />
+            {'Total:'}{' '}
+            <strong className="text-foreground">{answeredCount}</strong> {'of'}{' '}
+            {totalQuestions}
           </span>
         </div>
       </div>
@@ -873,7 +875,7 @@ function GroupContexts({ group }: { group: PublicReadingGroup }) {
       {contexts.map((context) => (
         <div
           key={context}
-          className="whitespace-pre-wrap rounded-[12px] border border-[#e7e7e4] bg-[#fafaf8] p-4 text-sm leading-relaxed text-slate-800"
+          className="whitespace-pre-wrap rounded-[10px] border border-border bg-background p-4 text-sm leading-relaxed text-foreground"
         >
           {context
             .replaceAll('{{answer}}', '_____')
@@ -923,10 +925,10 @@ function StudentGroup({
                   onSelectQuestion(question.id)
               }}
               className={cn(
-                'rounded-[14px] border p-4 sm:p-5 transition-all duration-150 cursor-pointer bg-white',
+                'rounded-[10px] border p-4 sm:p-5 transition-all duration-150 cursor-pointer bg-card',
                 isCurrent
-                  ? 'border-[#3b82f6] ring-2 ring-[#3b82f6]/20 shadow-xs'
-                  : 'border-[#e7e7e4] hover:border-slate-300 hover:shadow-xs',
+                  ? 'border-primary ring-2 ring-primary/20 shadow-none'
+                  : 'border-border hover:border-border-strong hover:shadow-none',
               )}
             >
               <CleanStudentQuestion
@@ -984,7 +986,7 @@ function CleanStudentQuestion({
 
   const prompt = (
     <p className="font-medium">
-      <span className="mr-2 text-[#3b82f6]">
+      <span className="mr-2 text-primary">
         {questionNumberLabel(question)}.
       </span>
       {question.prompt.replace('{{answer}}', '_____')}
@@ -1007,8 +1009,8 @@ function CleanStudentQuestion({
                 className={cn(
                   'flex cursor-pointer items-center justify-between rounded-xl border p-3.5 text-sm font-medium transition-all select-none',
                   isSelected
-                    ? 'border-blue-600 bg-blue-50/60 text-blue-900 shadow-xs ring-1 ring-blue-500/20'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/50',
+                    ? 'border-primary bg-primary-soft/60 text-primary shadow-none ring-1 ring-primary/20'
+                    : 'border-border bg-card text-foreground hover:border-border-strong hover:bg-card/50',
                 )}
               >
                 <span>{variant.replaceAll('_', ' ')}</span>
@@ -1016,12 +1018,12 @@ function CleanStudentQuestion({
                   className={cn(
                     'size-4 rounded-full border flex items-center justify-center transition-colors',
                     isSelected
-                      ? 'border-blue-600 bg-blue-600'
-                      : 'border-slate-300 bg-white',
+                      ? 'border-primary bg-primary'
+                      : 'border-border-strong bg-card',
                   )}
                 >
                   {isSelected ? (
-                    <div className="size-1.5 rounded-full bg-white" />
+                    <div className="size-1.5 rounded-full bg-card" />
                   ) : null}
                 </div>
               </label>
@@ -1054,8 +1056,8 @@ function CleanStudentQuestion({
       <div className="space-y-4">
         {prompt}
         {isMulti ? (
-          <p className="text-xs font-medium text-slate-500">
-            Выберите до {limit} вариантов:
+          <p className="text-xs font-medium text-muted-foreground">
+            `Choose up to ${limit} options:`
           </p>
         ) : null}
         <div className="grid gap-2.5 pt-1">
@@ -1079,8 +1081,8 @@ function CleanStudentQuestion({
                 className={cn(
                   'flex cursor-pointer items-center justify-between rounded-xl border p-3.5 text-sm transition-all select-none',
                   isSelected
-                    ? 'border-blue-600 bg-blue-50/60 text-blue-950 font-medium shadow-xs ring-1 ring-blue-500/20'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/50',
+                    ? 'border-primary bg-primary-soft/60 text-primary font-medium shadow-none ring-1 ring-primary/20'
+                    : 'border-border bg-card text-foreground hover:border-border-strong hover:bg-card/50',
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -1088,8 +1090,8 @@ function CleanStudentQuestion({
                     className={cn(
                       'flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors',
                       isSelected
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 text-slate-600',
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground',
                     )}
                   >
                     {option.id}
@@ -1100,12 +1102,15 @@ function CleanStudentQuestion({
                   className={cn(
                     'size-4 shrink-0 rounded-full border flex items-center justify-center transition-colors',
                     isSelected
-                      ? 'border-blue-600 bg-blue-600 text-white'
-                      : 'border-slate-300 bg-white',
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border-strong bg-card',
                   )}
                 >
                   {isSelected ? (
-                    <TickCircle className="size-3.5 text-white" aria-hidden />
+                    <TickCircle
+                      className="size-3.5 text-primary-foreground"
+                      aria-hidden
+                    />
                   ) : null}
                 </div>
               </label>
@@ -1129,13 +1134,13 @@ function CleanStudentQuestion({
               onAnswer(questionId, { value: event.target.value })
             }
           }}
-          placeholder="Введите ваш ответ здесь…"
-          className="h-11 rounded-xl border-slate-200 bg-white px-4 text-base focus-visible:border-blue-500 focus-visible:ring-blue-500/20"
+          placeholder={'Enter your answer here…'}
+          className="h-11 rounded-xl border-border bg-card px-4 text-base focus-visible:border-primary focus-visible:ring-ring"
         />
-        <p className="mt-1.5 text-xs text-slate-400">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           {preview
-            ? 'Пробный ответ хранится только на этой странице'
-            : 'Ответ автоматически сохраняется по мере ввода'}
+            ? 'Practice answers are only saved on this page'
+            : 'Your answer is saved automatically as you type'}
         </p>
       </div>
     </div>

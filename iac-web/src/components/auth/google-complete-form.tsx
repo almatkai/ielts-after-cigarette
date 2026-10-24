@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/features/auth/auth-store'
 import type { GoogleRegistrationRequired } from '@/features/auth/google-auth'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import { AuthInput } from './auth-input'
 import { getFieldError } from './auth-input-utils'
@@ -50,6 +51,7 @@ export function GoogleCompleteForm({
   onSuccess,
 }: GoogleCompleteFormProps) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const { completeGoogleRegistration } = useAuth()
   const [submissionError, setSubmissionError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
@@ -113,12 +115,12 @@ export function GoogleCompleteForm({
   return (
     <>
       <CardHeader className="gap-0 px-6 pt-8 text-center sm:px-8 sm:pt-9">
-        <CardTitle className="text-3xl tracking-[-0.04em] text-[#0f172a]">
-          Давайте создадим вам аккаунт
+        <CardTitle className="text-3xl tracking-[-0.04em] text-foreground">
+          {t('Давайте создадим вам аккаунт')}
         </CardTitle>
-        <CardDescription className="mt-2 text-[#475569]">
-          Вход через Google выполнен: {pending.profile.email}. Заполните данные
-          ниже, чтобы завершить регистрацию.
+        <CardDescription className="mt-2 text-muted-foreground">
+          {t('Вход через Google выполнен:')} {pending.profile.email}.{' '}
+          {t('Заполните данные ниже, чтобы завершить регистрацию.')}
         </CardDescription>
       </CardHeader>
 
@@ -141,9 +143,9 @@ export function GoogleCompleteForm({
             {(field) => (
               <AuthInput
                 id={field.name}
-                label="Имя"
+                label={t('Имя')}
                 autoComplete="name"
-                placeholder="Как к вам обращаться"
+                placeholder={t('Как к вам обращаться')}
                 value={field.state.value}
                 onChange={(value) => {
                   field.handleChange(value)
@@ -167,7 +169,7 @@ export function GoogleCompleteForm({
             {(field) => (
               <AuthInput
                 id={field.name}
-                label="Номер WhatsApp"
+                label={t('Номер WhatsApp')}
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
@@ -198,7 +200,7 @@ export function GoogleCompleteForm({
                 getFieldError(field.state.meta.errors)
               return (
                 <div className="mb-5">
-                  <div className="flex min-h-11 items-start gap-3 text-sm leading-6 text-[#475569]">
+                  <div className="flex min-h-11 items-start gap-3 text-sm leading-6 text-muted-foreground">
                     <input
                       id="acceptedTerms"
                       type="checkbox"
@@ -207,32 +209,32 @@ export function GoogleCompleteForm({
                         field.handleChange(event.target.checked)
                         clearFieldError('acceptedTerms')
                       }}
-                      className="mt-1 size-4 shrink-0 cursor-pointer rounded border-[#cbd5e1] accent-[#3b82f6]"
+                      className="mt-1 size-4 shrink-0 cursor-pointer rounded border-border-strong accent-primary"
                       aria-invalid={Boolean(termsError)}
                     />
                     <span>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
-                        Принимаю{' '}
+                        {t('Принимаю')}{' '}
                       </label>
                       <Link
                         to="/terms"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+                        className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
                       >
-                        условия использования
+                        {t('условия использования')}
                       </Link>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
                         {' '}
-                        и{' '}
+                        {t('и')}{' '}
                       </label>
                       <Link
                         to="/privacy"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-[#2563eb] underline decoration-[#93c5fd] underline-offset-2 transition-colors hover:text-[#1d4ed8] hover:decoration-[#1d4ed8]"
+                        className="font-medium text-primary-hover underline decoration-primary-soft underline-offset-2 transition-colors hover:text-primary hover:decoration-primary"
                       >
-                        политику конфиденциальности
+                        {t('политику конфиденциальности')}
                       </Link>
                       <label htmlFor="acceptedTerms" className="cursor-pointer">
                         .
@@ -240,8 +242,8 @@ export function GoogleCompleteForm({
                     </span>
                   </div>
                   {termsError ? (
-                    <p className="mt-1 text-xs text-[#dc2626]" role="alert">
-                      {termsError}
+                    <p className="mt-1 text-xs text-destructive" role="alert">
+                      {t(termsError)}
                     </p>
                   ) : null}
                 </div>
@@ -257,26 +259,26 @@ export function GoogleCompleteForm({
                 type="submit"
                 size="lg"
                 disabled={!canSubmit || isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-[#3b82f6] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {isSubmitting ? 'Создаём аккаунт…' : 'Создать аккаунт'}
+                {isSubmitting ? t('Создаём аккаунт…') : t('Создать аккаунт')}
               </Button>
             )}
           </form.Subscribe>
 
           {submissionError ? (
             <div className="mt-4 text-center">
-              <p className="text-sm leading-6 text-[#dc2626]" role="alert">
-                {submissionError}
+              <p className="text-sm leading-6 text-destructive" role="alert">
+                {t(submissionError)}
               </p>
               {sessionExpired ? (
                 <Button
                   type="button"
                   variant="link"
                   onClick={onBack}
-                  className="mt-1 inline-block h-auto p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
+                  className="mt-1 inline-block h-auto p-0 text-sm font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-primary"
                 >
-                  Вернуться ко входу
+                  {t('Вернуться ко входу')}
                 </Button>
               ) : null}
             </div>
@@ -285,15 +287,15 @@ export function GoogleCompleteForm({
       </CardContent>
 
       <CardFooter className="justify-center px-6 pt-7 pb-8 sm:px-8">
-        <p className="text-center text-sm text-[#475569]">
-          Уже есть аккаунт?{' '}
+        <p className="text-center text-sm text-muted-foreground">
+          {t('Уже есть аккаунт?')}{' '}
           <Button
             type="button"
             variant="link"
             onClick={onBack}
-            className="h-auto min-h-11 p-0 text-sm font-semibold text-[#0f172a] underline decoration-[#cbd5e1] underline-offset-4 hover:decoration-[#3b82f6]"
+            className="h-auto min-h-11 p-0 text-sm font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-primary"
           >
-            Вернуться ко входу
+            {t('Вернуться ко входу')}
           </Button>
         </p>
       </CardFooter>

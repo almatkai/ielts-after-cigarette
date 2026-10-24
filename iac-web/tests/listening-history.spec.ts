@@ -181,7 +181,7 @@ test('retake bypasses cached result and updates the library and sidebar after su
     return route.fulfill({ json: { items: [] } })
   })
   await page.goto('./exam/listening/test-one')
-  await page.getByRole('link', { name: 'К списку тестов', exact: true }).click()
+  await page.getByRole('link', { name: 'Back to tests', exact: true }).click()
   await expect(
     page.locator('main').getByText('Band 7.5', { exact: true }),
   ).toBeVisible()
@@ -189,12 +189,14 @@ test('retake bypasses cached result and updates the library and sidebar after su
   retaking = true
   await page.getByRole('link', { name: 'Новая попытка', exact: true }).click()
   await expect(
-    page.getByRole('button', { name: 'Завершить тест', exact: true }),
+    page.getByRole('button', { name: 'Finish test', exact: true }),
   ).toBeVisible()
   // Dev StrictMode can abort/restart the mount's start request.
   expect(starts).toBeGreaterThan(initialStarts)
   expect(starts).toBeLessThanOrEqual(initialStarts + 2)
-  await page.getByRole('link', { name: 'К Listening', exact: true }).focus()
+  await page
+    .getByRole('link', { name: 'Back to Listening', exact: true })
+    .focus()
   await page.keyboard.press('Enter')
   await expect(
     page.getByRole('link', { name: 'Продолжить попытку', exact: true }),
@@ -205,11 +207,9 @@ test('retake bypasses cached result and updates the library and sidebar after su
   await page
     .getByRole('link', { name: 'Продолжить попытку', exact: true })
     .click()
-  await page
-    .getByRole('button', { name: 'Завершить тест', exact: true })
-    .click()
-  await page.getByRole('button', { name: 'Завершить', exact: true }).click()
-  await page.getByRole('link', { name: 'К списку тестов', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish test', exact: true }).click()
+  await page.getByRole('button', { name: 'Finish', exact: true }).click()
+  await page.getByRole('link', { name: 'Back to tests', exact: true }).click()
   await expect(
     page.locator('main').getByText('Band 8.0', { exact: true }),
   ).toBeVisible()

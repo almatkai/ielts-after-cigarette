@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/waitlist-admin')({
   ssr: false,
@@ -7,7 +8,7 @@ export const Route = createFileRoute('/waitlist-admin')({
   },
   head: () => ({
     meta: [
-      { title: 'Waitlist — администрирование IAC' },
+      { title: tr('Waitlist — администрирование Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

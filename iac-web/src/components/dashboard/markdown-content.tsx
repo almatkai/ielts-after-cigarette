@@ -15,20 +15,20 @@ function formatInline(text: string): React.ReactNode[] {
       parts.push(
         <code
           key={match.index}
-          className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-blue-700 font-semibold"
+          className="rounded bg-muted px-1 py-0.5 font-mono text-[11px] text-primary font-semibold"
         >
           {token.slice(1, -1)}
         </code>,
       )
     } else if (token.startsWith('**') && token.endsWith('**')) {
       parts.push(
-        <strong key={match.index} className="font-bold text-slate-900">
+        <strong key={match.index} className="font-bold text-foreground">
           {token.slice(2, -2)}
         </strong>,
       )
     } else if (token.startsWith('*') && token.endsWith('*')) {
       parts.push(
-        <em key={match.index} className="italic text-slate-800">
+        <em key={match.index} className="italic text-foreground">
           {token.slice(1, -1)}
         </em>,
       )
@@ -87,7 +87,7 @@ export function MarkdownContent({
         blocks.push(
           <pre
             key={`code-${i}`}
-            className="my-2 rounded-xl bg-slate-900 p-2.5 text-[11px] text-slate-100 overflow-x-auto font-mono"
+            className="my-2 rounded-xl bg-muted p-2.5 text-[11px] text-foreground overflow-x-auto font-mono"
           >
             <code>{codeBuffer.join('\n')}</code>
           </pre>,
@@ -133,7 +133,7 @@ export function MarkdownContent({
       blocks.push(
         <h5
           key={`h4-${i}`}
-          className="font-bold text-xs text-slate-900 mt-2 mb-1"
+          className="font-bold text-xs text-foreground mt-2 mb-1"
         >
           {formatInline(trimmed.replace(/^####\s+/, ''))}
         </h5>,
@@ -142,7 +142,7 @@ export function MarkdownContent({
       blocks.push(
         <h4
           key={`h3-${i}`}
-          className="font-bold text-[13px] text-slate-900 mt-2 mb-1"
+          className="font-bold text-[13px] text-foreground mt-2 mb-1"
         >
           {formatInline(trimmed.replace(/^###\s+/, ''))}
         </h4>,
@@ -151,7 +151,7 @@ export function MarkdownContent({
       blocks.push(
         <h3
           key={`h2-${i}`}
-          className="font-bold text-sm text-slate-900 mt-2.5 mb-1 text-blue-900"
+          className="font-bold text-sm text-foreground mt-2.5 mb-1 text-primary"
         >
           {formatInline(trimmed.replace(/^##\s+/, ''))}
         </h3>,
@@ -160,7 +160,7 @@ export function MarkdownContent({
       blocks.push(
         <h2
           key={`h1-${i}`}
-          className="font-bold text-base text-slate-900 mt-3 mb-1.5 text-blue-950"
+          className="font-bold text-base text-foreground mt-3 mb-1.5 text-primary"
         >
           {formatInline(trimmed.replace(/^#\s+/, ''))}
         </h2>,
@@ -169,7 +169,7 @@ export function MarkdownContent({
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="border-l-3 border-blue-400 bg-blue-50/50 pl-2.5 py-1 my-1.5 rounded-r text-[11px] text-slate-700 italic"
+          className="my-1.5 rounded-md bg-muted px-4 py-3 text-[11px] text-foreground"
         >
           {formatInline(trimmed.replace(/^>\s+/, ''))}
         </blockquote>,
@@ -189,7 +189,7 @@ export function MarkdownContent({
     blocks.push(
       <pre
         key="code-dangling"
-        className="my-2 rounded-xl bg-slate-900 p-2.5 text-[11px] text-slate-100 overflow-x-auto font-mono"
+        className="my-2 rounded-xl bg-muted p-2.5 text-[11px] text-foreground overflow-x-auto font-mono"
       >
         <code>{codeBuffer.join('\n')}</code>
       </pre>,

@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import { ObjectiveAttemptResult } from '@/features/attempts/objective-attempt-review'
 import { ArrowLeft, Clock } from 'iconsax-react'
 import { useQueries, useQuery } from '@tanstack/react-query'
@@ -45,6 +46,7 @@ import {
   completionQuestionNumbers,
   ListeningCompletionText,
 } from './listening-completion-text'
+import { tr } from '@/lib/i18n'
 
 const TIMER_DANGER_SECONDS = 300
 
@@ -58,8 +60,8 @@ export function ListeningStudentPage({
   return (
     <ExamAttemptShell<PublicListeningTest>
       skillBadge="IELTS Listening"
-      loadingLabel="Готовим аудирование…"
-      loadingDescription="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера."
+      loadingLabel={'Preparing Listening…'}
+      loadingDescription="Loading the audio, organising the questions, and checking the player."
       queryKey={attemptStartQueryKey('listening', testId)}
       startAttemptFn={(signal) => startListeningAttempt(testId, signal)}
       renderRunner={({ attempt, material, onSubmitted }) => (
@@ -264,7 +266,7 @@ function ListeningTestRunner({
   if (session.loadError) {
     return (
       <ErrorState
-        title="Не удалось восстановить ответы"
+        title={'Could not restore your answers'}
         message={session.loadError}
         onRetry={session.retryLoad}
       />
@@ -274,8 +276,8 @@ function ListeningTestRunner({
     return (
       <ExamLoadingScreen
         badge="IELTS Listening"
-        label="Готовим аудирование…"
-        description="Загружаем аудиотрек, формируем секции вопросов и проверяем готовность плеера…"
+        label={'Preparing Listening…'}
+        description="Loading audio, organising the questions, and checking the player…"
       />
     )
   }
@@ -300,16 +302,19 @@ function ListeningTestRunner({
               to="/admin/listening/tests/$testId"
               params={{ testId: test.id }}
             >
-              <ArrowLeft aria-hidden />К редактору
+              <ArrowLeft aria-hidden />
+              {'Back to editor'}
             </Link>
           ) : (
             <Link to="/listening">
-              <ArrowLeft aria-hidden />К Listening
+              <ArrowLeft aria-hidden />
+              {'Back to Listening'}
             </Link>
           )}
         </Button>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="sr-only">{test.title}</h1>
+          <BrandLogo variant="mark" />
+          <h1 className="font-sans sr-only">{test.title}</h1>
           <div className="flex items-center gap-3">
             {!preview ? <SaveIndicator state={session.saveState} /> : null}
             {timerEnabled ? (
@@ -318,7 +323,7 @@ function ListeningTestRunner({
                 danger={
                   deadline !== null && secondsLeft <= TIMER_DANGER_SECONDS
                 }
-                label="Оставшееся время"
+                label={'Time remaining'}
               />
             ) : null}
           </div>
@@ -329,40 +334,40 @@ function ListeningTestRunner({
               size="sm"
               disabled={session.isSavingAndExiting || session.isSubmitting}
               onClick={handleContinueLater}
-              className="gap-1.5 rounded-[10px] border-[#e7e7e4] text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
+              className="gap-1.5 rounded-[10px] border-border text-xs font-semibold text-foreground hover:bg-card shadow-none"
             >
-              {session.isSavingAndExiting ? 'Сохраняем…' : 'Продолжить позже'}
+              {session.isSavingAndExiting ? 'Saving…' : 'Continue later'}
             </Button>
           ) : null}
         </div>
         <p className="sr-only">
           <Clock className="size-4" aria-hidden />
-          {test.durationMinutes} минут ·{' '}
+          {test.durationMinutes} {'minutes'} ·{' '}
           {preview
-            ? 'пробные ответы не сохраняются'
-            : 'ответы сохраняются автоматически'}
+            ? 'practice answers are not saved'
+            : 'answers are saved automatically'}
         </p>
       </div>
       {session.exitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
-          Не удалось сохранить черновик: {session.exitError}
+          {'Could not save draft:'} {tr(session.exitError)}
         </p>
       ) : null}
       {session.submitError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-4 text-sm text-destructive"
         >
-          Не удалось отправить тест: {session.submitError}
+          {'Could not submit test:'} {tr(session.submitError)}
         </p>
       ) : null}
       {sharedAudioAssetId ? (
         <Card className="shrink-0 shadow-none">
           <CardContent className="pt-4">
-            <p className="text-sm font-semibold">Аудио полного теста</p>
+            <p className="text-sm font-semibold">{'Full test audio'}</p>
             <ProtectedAudio assetId={sharedAudioAssetId} />
           </CardContent>
         </Card>
@@ -370,12 +375,12 @@ function ListeningTestRunner({
       {test.parts.length === 0 ? (
         <p
           role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+          className="rounded-xl border border-warning-bg bg-warning-bg p-4 text-sm text-warning-fg"
         >
-          В тесте ещё нет частей. Добавьте их в редакторе.
+          {'This test has no parts yet. Add them in the editor.'}
         </p>
       ) : null}
-      <nav aria-label="Части Listening" className="flex flex-wrap gap-2">
+      <nav aria-label={'Listening parts'} className="flex flex-wrap gap-2">
         {test.parts.map((part, index) => (
           <Button
             key={part.position}
@@ -407,15 +412,15 @@ function ListeningTestRunner({
             {!sharedAudioAssetId && part.audioAssetId ? (
               <ProtectedAudio assetId={part.audioAssetId} />
             ) : !sharedAudioAssetId ? (
-              <p className="text-sm text-amber-700">
-                Аудио ещё не прикреплено.
+              <p className="text-sm text-warning-fg">
+                {'No audio has been added yet.'}
               </p>
             ) : null}
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto">
             {part.groups.every((group) => group.questions.length === 0) ? (
-              <p role="status" className="text-sm text-amber-700">
-                В этой части ещё нет вопросов. Добавьте их в редакторе.
+              <p role="status" className="text-sm text-warning-fg">
+                {'This part has no questions yet. Add them in the editor.'}
               </p>
             ) : null}
             {part.groups.map((group) => (
@@ -450,17 +455,17 @@ function ListeningTestRunner({
           </CardContent>
         </Card>
       ))}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white p-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-border bg-card p-3">
         <Button
           type="button"
           variant="outline"
           disabled={!currentQuestion || activeQuestionIndex === 0}
           onClick={() => setActiveQuestionIndex((index) => index - 1)}
         >
-          Назад
+          {'Back'}
         </Button>
-        <p className="text-sm text-[#69696d]">
-          Вопрос {currentQuestion ? activeQuestionIndex + 1 : '—'} из{' '}
+        <p className="text-sm text-muted-foreground">
+          {'Question'} {currentQuestion ? activeQuestionIndex + 1 : '—'} {'of'}{' '}
           {totalQuestions}
         </p>
         <Button
@@ -470,7 +475,7 @@ function ListeningTestRunner({
           }
           onClick={() => setActiveQuestionIndex((index) => index + 1)}
         >
-          Далее
+          {'Next'}
         </Button>
       </div>
       {!preview ? (
@@ -531,16 +536,16 @@ function ProtectedAudio({ assetId }: { assetId: string }) {
   )
   if (query.isPending) {
     return (
-      <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-        <span className="inline-block size-2 animate-pulse rounded-full bg-blue-500" />
-        <span>Загружаем аудио…</span>
+      <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="inline-block size-2 animate-pulse rounded-full bg-primary" />
+        <span>{'Loading audio…'}</span>
       </div>
     )
   }
   return url ? (
     <audio className="mt-3 w-full" controls preload="metadata" src={url} />
   ) : (
-    <span className="text-sm text-amber-700">Аудио недоступно</span>
+    <span className="text-sm text-warning-fg">{'Audio unavailable'}</span>
   )
 }
 
@@ -566,13 +571,13 @@ function ProtectedImage({ assetId }: { assetId: string }) {
     <img
       className="max-h-[520px] w-full rounded-lg border object-contain"
       src={url}
-      alt="Схема задания Listening"
+      alt={'Listening question diagram'}
     />
   ) : (
-    <p role="status" className="text-sm text-amber-700">
+    <p role="status" className="text-sm text-warning-fg">
       {query.isPending
-        ? 'Загружаем изображение…'
-        : 'Изображение недоступно. Проверьте файл в редакторе.'}
+        ? 'Loading image…'
+        : 'Image unavailable. Check the file in the editor.'}
     </p>
   )
 }
@@ -617,7 +622,7 @@ function StudentGroup({
     >
       <div>
         {!isCompletion ? (
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#3b82f6]">
+          <p className="text-xs font-semibold normal-case tracking-wide text-primary">
             {group.type.replaceAll('_', ' ')}
           </p>
         ) : null}
@@ -635,7 +640,7 @@ function StudentGroup({
           className={
             isCompletion
               ? 'whitespace-pre-wrap text-sm leading-loose'
-              : 'whitespace-pre-wrap rounded-lg bg-[#f7f7f5] p-4 text-sm'
+              : 'whitespace-pre-wrap rounded-lg bg-background p-4 text-sm'
           }
         >
           {isCompletion ? (
@@ -683,7 +688,7 @@ function StudentGroup({
                   {open && evidenceText && answerKey?.quote.trim() ? (
                     <div className="mt-3 rounded-xl border p-4">
                       <p className="mb-2 text-sm font-semibold">
-                        Текст аудио — место ответа
+                        {'Audio transcript — answer location'}
                       </p>
                       <div className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed">
                         <PreviewEvidenceText
@@ -725,7 +730,7 @@ function StudentQuestion({
 
   const prompt = (
     <p className="font-medium">
-      <span className="mr-2 text-[#3b82f6]">{question.number}.</span>
+      <span className="mr-2 text-primary">{question.number}.</span>
       {question.prompt.replace('{{answer}}', '_____')}
     </p>
   )
@@ -734,7 +739,7 @@ function StudentQuestion({
     const hasGap = /\{\{\s*(?:\d+|answer)\s*\}\}|_{3,}/.test(question.prompt)
     return (
       <p className="text-sm leading-loose">
-        <span className="mr-2 text-[#3b82f6]">{question.number}.</span>
+        <span className="mr-2 text-primary">{question.number}.</span>
         <ListeningCompletionText
           text={hasGap ? question.prompt : `${question.prompt} {{answer}}`}
           questions={[question]}
@@ -758,7 +763,7 @@ function StudentQuestion({
               onAnswer(questionId, { value: event.target.value })
             }
           }}
-          placeholder="Ваш ответ"
+          placeholder={'Your answer'}
         />
       </div>
     )

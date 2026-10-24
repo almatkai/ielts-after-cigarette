@@ -1,7 +1,7 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestUrl } from '@tanstack/react-start/server'
 
-export const BLOG_SITE_NAME = 'Daiyndyq IELTS'
+export const BLOG_SITE_NAME = 'Yrys Academy'
 export const BLOG_TITLE = `Блог ${BLOG_SITE_NAME}`
 export const BLOG_DESCRIPTION =
   'Стратегии, разборы и личный опыт подготовки к IELTS от авторов с подтверждённым баллом 7.5+.'
@@ -10,14 +10,16 @@ export const BLOG_DESCRIPTION =
 // comes from the proxied request on the server and the location in the browser.
 const getSiteOrigin = createIsomorphicFn()
   .server(() => {
-    const configured = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '')
+    const configured =
+      import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '') || undefined
     return (
       configured ??
       getRequestUrl({ xForwardedHost: true, xForwardedProto: true }).origin
     )
   })
   .client(() => {
-    const configured = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '')
+    const configured =
+      import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '') || undefined
     return configured ?? window.location.origin
   })
 

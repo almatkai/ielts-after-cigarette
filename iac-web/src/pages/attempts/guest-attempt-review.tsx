@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import type { AttemptDetail } from '@/features/attempts/api'
 import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-review'
+import { useLanguage } from '@/lib/i18n'
 
 export function GuestAttemptReview({
   attempt,
@@ -25,6 +26,7 @@ export function GuestAttemptReview({
   attempt: AttemptDetail
   embedded?: boolean
 }) {
+  const { t } = useLanguage()
   const [improvement, setImprovement] = useState<string | null>(null)
   const preview = attempt.guestPreview
   const objective =
@@ -32,7 +34,7 @@ export function GuestAttemptReview({
   const skill =
     attempt.materialType.charAt(0).toUpperCase() + attempt.materialType.slice(1)
   const buttonClass =
-    'inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+    'inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   // An explicit server projection is required, including during mixed-version rollouts.
   const safeAttempt = {
     ...attempt,
@@ -59,19 +61,23 @@ export function GuestAttemptReview({
               className="h-auto justify-self-start p-0"
             >
               <Link to="/try">
-                <ArrowLeft aria-hidden />К пробному тесту
+                <ArrowLeft aria-hidden />
+                {t('К пробному тесту')}
               </Link>
             </Button>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h1 className="text-2xl font-semibold">{skill}: разбор ошибок</h1>
+              <h1 className="text-[28px] sm:text-[36px] font-semibold">
+                {skill}: {t('разбор ошибок')}
+              </h1>
               <GuestLockedBand skill={skill} />
             </div>
           </>
         ) : null}
         {preview && preview.totalMistakes > 0 ? (
-          <p className="text-sm text-[#69696d]">
-            <span>Без аккаунта доступны 30% ошибок</span> ·{' '}
-            {preview.availableMistakes} из {preview.totalMistakes} разборов.
+          <p className="text-sm text-muted-foreground">
+            <span>{t('Без аккаунта доступны 30% ошибок')}</span> ·{' '}
+            {preview.availableMistakes} {t('из')} {preview.totalMistakes}{' '}
+            {t('разборов')}.
           </p>
         ) : null}
         {objective ? (
@@ -82,11 +88,14 @@ export function GuestAttemptReview({
           />
         ) : (
           <>
-            <h2 className="text-lg font-semibold">{skill} · рекомендации</h2>
+            <h2 className="text-lg font-semibold">
+              {skill} · {t('рекомендации')}
+            </h2>
             {!preview?.totalMistakes ? (
-              <p className="text-sm text-[#69696d]">
-                ИИ не выделил отдельных рекомендаций. Полный отчёт доступен
-                после входа.
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  'ИИ не выделил отдельных рекомендаций. Полный отчёт доступен после входа.',
+                )}
               </p>
             ) : null}
             {(preview?.improvements ?? []).map((item) => (
@@ -97,25 +106,25 @@ export function GuestAttemptReview({
               >
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
                   <p className="text-sm font-semibold">
-                    {item.label} · рекомендация {item.number}
+                    {item.label} · {t('рекомендация')} {item.number}
                   </p>
                   {item.locked ? (
                     <GuestSignInButton
-                      className={`${buttonClass} border-[#e7e7e4] text-[#69696d]`}
-                      label={`Разобрать рекомендацию ${item.number}: войти в аккаунт`}
+                      className={`${buttonClass} border-border text-muted-foreground`}
+                      label={`${t('Разобрать рекомендацию')} ${item.number}: ${t('войти в аккаунт')}`}
                     >
                       <Lock aria-hidden className="size-4" />
-                      Разобрать ошибку
+                      {t('Разобрать ошибку')}
                     </GuestSignInButton>
                   ) : (
                     <button
                       type="button"
-                      className={`${buttonClass} border-blue-200 text-[#2563eb] hover:bg-blue-50`}
+                      className={`${buttonClass} border-border-strong text-primary-hover hover:bg-primary-soft`}
                       onClick={() => setImprovement(item.text ?? '')}
-                      aria-label={`Разобрать рекомендацию ${item.number}`}
+                      aria-label={`${t('Разобрать рекомендацию')} ${item.number}`}
                     >
                       <LampCharge aria-hidden className="size-4" />
-                      Разобрать ошибку
+                      {t('Разобрать ошибку')}
                     </button>
                   )}
                 </CardContent>
@@ -130,7 +139,7 @@ export function GuestAttemptReview({
           }}
         >
           <DialogContent>
-            <DialogTitle>Разбор ошибки</DialogTitle>
+            <DialogTitle>{t('Разбор ошибки')}</DialogTitle>
             <DialogDescription className="whitespace-pre-wrap text-sm leading-6">
               {improvement}
             </DialogDescription>

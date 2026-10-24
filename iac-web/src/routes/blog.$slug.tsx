@@ -43,7 +43,7 @@ export const Route = createFileRoute('/blog/$slug')({
     const description = post.description || BLOG_TITLE
     const image = post.coverMediaId
       ? blogMediaAbsoluteUrl(post.coverMediaId)
-      : null
+      : siteUrl('/og-yrys.png')
     const modified = post.contentUpdatedAt ?? post.publishedAt
 
     return {
@@ -63,6 +63,12 @@ export const Route = createFileRoute('/blog/$slug')({
         { property: 'og:title', content: post.title },
         { property: 'og:description', content: description },
         { property: 'og:url', content: url },
+        {
+          property: 'og:image:alt',
+          content: post.coverMediaId
+            ? post.title
+            : 'Yrys Academy — Подготовка к IELTS онлайн',
+        },
         ...(image ? [{ property: 'og:image', content: image }] : []),
         ...(post.publishedAt
           ? [{ property: 'article:published_time', content: post.publishedAt }]
@@ -98,7 +104,14 @@ export const Route = createFileRoute('/blog/$slug')({
                 dateModified: modified ?? undefined,
                 timeRequired: `PT${post.readingTimeMinutes}M`,
                 author: { '@type': 'Person', name: post.author.displayName },
-                publisher: { '@type': 'Organization', name: BLOG_SITE_NAME },
+                publisher: {
+                  '@type': 'Organization',
+                  name: BLOG_SITE_NAME,
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: siteUrl('/brand/yrys-mark.png'),
+                  },
+                },
                 isPartOf: { '@type': 'Blog', url: siteUrl('/blog') },
               },
               {

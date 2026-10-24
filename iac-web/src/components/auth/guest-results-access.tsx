@@ -69,7 +69,7 @@ export function GuestLockedBand({ skill }: { skill: string }) {
   return (
     <GuestSignInButton
       label={`${skill}: войти, чтобы увидеть оценку`}
-      className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-[#2563eb] transition-colors hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+      className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-primary-hover transition-colors hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <span
         aria-hidden

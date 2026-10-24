@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import {
   Book,
   Category,
@@ -17,29 +18,31 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [logoutIsPending, setLogoutIsPending] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const isAdmin = auth.hasAnyRole(['ADMIN'])
   const groups = [
     {
       id: 'overview',
-      label: 'Обзор',
+      label: t('Обзор'),
       visible: true,
       items: linkOptions([
         {
           to: '/admin',
-          label: 'Обзор',
+          label: t('Обзор'),
           icon: ShieldTick,
           visible: true,
           activeOptions: { exact: true },
         },
         {
           to: '/admin/analytics',
-          label: 'Аналитика',
+          label: t('Аналитика'),
           icon: TrendUp,
           visible: isAdmin,
         },
@@ -47,69 +50,69 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     },
     {
       id: 'materials',
-      label: 'Учебные материалы',
+      label: t('Учебные материалы'),
       visible: auth.hasAnyPermission(['CONTENT_EDITOR']),
       items: linkOptions([
         {
           to: '/admin/reading/materials',
-          label: 'Reading материалы',
+          label: t('Reading материалы'),
           icon: Book,
         },
         {
           to: '/admin/listening/tests',
-          label: 'Listening тесты',
+          label: t('Listening тесты'),
           icon: Headphone,
         },
         {
           to: '/admin/writing/materials',
-          label: 'Writing материалы',
+          label: t('Writing материалы'),
           icon: Edit2,
         },
         {
           to: '/admin/speaking/materials',
-          label: 'Speaking материалы',
+          label: t('Speaking материалы'),
           icon: Microphone2,
         },
         {
           to: '/admin/full-mocks',
-          label: 'Архив Full Mock',
+          label: t('Архив Full Mock'),
           icon: ClipboardTick,
         },
       ]),
     },
     {
       id: 'blog',
-      label: 'Блог и авторы',
+      label: t('Блог и авторы'),
       visible: auth.hasAnyPermission(['BLOG_MODERATOR']),
       items: linkOptions([
-        { to: '/admin/blog/posts', label: 'Статьи блога', icon: Edit2 },
+        { to: '/admin/blog/posts', label: t('Статьи блога'), icon: Edit2 },
         {
           to: '/admin/writers/applications',
-          label: 'Заявки авторов',
+          label: t('Заявки авторов'),
           icon: People,
         },
       ]),
     },
     {
       id: 'users',
-      label: 'Пользователи',
+      label: t('Пользователи'),
       visible: isAdmin,
       items: linkOptions([
-        { to: '/admin/users', label: 'Пользователи', icon: People },
+        { to: '/admin/users', label: t('Пользователи'), icon: People },
         { to: '/admin/waitlist', label: 'Waitlist', icon: People },
       ]),
     },
     {
       id: 'system',
-      label: 'Система',
+      label: t('Система'),
       visible: isAdmin,
       items: linkOptions([
         {
           to: '/admin/ai-providers',
-          label: 'AI-провайдеры',
+          label: t('AI-провайдеры'),
           icon: ClipboardTick,
         },
-        { to: '/admin/admins', label: 'Администраторы', icon: UserEdit },
+        { to: '/admin/admins', label: t('Администраторы'), icon: UserEdit },
       ]),
     },
   ]
@@ -125,18 +128,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5] text-[#111111]">
-      <header className="border-b border-[#e7e7e4] bg-white">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex min-h-16 max-w-[1280px] items-center justify-between gap-4 px-5 sm:px-7">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-[#111111] text-white">
-              <ShieldTick className="size-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">IAC Admin</p>
-              <p className="truncate text-xs text-[#808084]">
+            <BrandLogo />
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-sm font-semibold">
+                {t('Администрирование')}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
                 {auth.user?.displayName} ·{' '}
-                {auth.user?.role === 'EDITOR' ? 'Сотрудник' : auth.user?.role}
+                {auth.user?.role === 'EDITOR'
+                  ? t('Сотрудник')
+                  : auth.user?.role}
               </p>
             </div>
           </div>
@@ -144,7 +149,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               className="lg:hidden"
-              aria-label="Меню"
+              aria-label={t('Меню')}
               aria-expanded={navOpen}
               aria-controls="admin-navigation"
               onClick={() => setNavOpen(!navOpen)}
@@ -154,7 +159,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link to="/">
                 <Category aria-hidden />
-                Кабинет студента
+                {t('Кабинет студента')}
               </Link>
             </Button>
             <Button
@@ -162,11 +167,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               variant="ghost"
               disabled={logoutIsPending}
               onClick={() => void handleLogout()}
-              aria-label="Выйти из аккаунта"
+              aria-label={t('Выйти из аккаунта')}
             >
               <Logout aria-hidden />
               <span className="hidden sm:inline">
-                {logoutIsPending ? 'Выходим…' : 'Выйти'}
+                {logoutIsPending ? t('Выходим…') : t('Выйти')}
               </span>
             </Button>
           </div>
@@ -175,7 +180,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="mx-auto grid max-w-[1280px] gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:py-8">
         <nav
-          aria-label="Администрирование"
+          aria-label={t('Администрирование')}
           id="admin-navigation"
           onClick={(event) => {
             if (event.target instanceof Element && event.target.closest('a'))
@@ -189,7 +194,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <section key={group.id} aria-labelledby={`admin-nav-${group.id}`}>
                 <h2
                   id={`admin-nav-${group.id}`}
-                  className="mb-2 px-4 text-xs font-medium text-[#808084]"
+                  className="mb-2 px-4 text-xs font-medium text-muted-foreground"
                 >
                   {group.label}
                 </h2>
@@ -207,12 +212,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                           }
                           activeProps={{
                             className:
-                              'bg-[#eff6ff] font-semibold text-[#1d4ed8]',
+                              'bg-primary-soft font-semibold text-primary',
                           }}
                           inactiveProps={{
-                            className: 'text-[#69696d] hover:bg-[#f4f4f1]',
+                            className: 'text-muted-foreground hover:bg-muted',
                           }}
-                          className="flex min-h-10 items-center gap-3 rounded-[10px] px-4 py-2 text-sm no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
+                          className="flex min-h-10 items-center gap-3 rounded-[10px] px-4 py-2 text-sm no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                           <Icon className="size-[18px] shrink-0" aria-hidden />
                           {label}

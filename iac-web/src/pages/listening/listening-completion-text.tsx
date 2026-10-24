@@ -50,7 +50,7 @@ export function ListeningCompletionText({
           key={index}
           title={`Вопрос ${question.number}`}
           aria-label={`Ответ на вопрос ${question.number}: ${answer || 'не отвечено'}`}
-          className="inline-block max-w-full border-b border-slate-500 px-1 text-center"
+          className="inline-block max-w-full border-b border-border-strong px-1 text-center"
           style={{ minWidth: '6ch' }}
         >
           {answer || '\u00a0'}
@@ -61,7 +61,7 @@ export function ListeningCompletionText({
           aria-label={`Ответ на вопрос ${question.number}`}
           title={`Вопрос ${question.number}`}
           aria-current={questionId === activeQuestionId ? 'step' : undefined}
-          className={`inline-block max-w-full rounded-none border-0 border-b bg-transparent px-1 py-0 text-center text-base leading-normal text-inherit outline-none focus:border-[#3b82f6] focus:ring-0 sm:text-sm ${questionId === activeQuestionId ? 'border-[#3b82f6]' : 'border-slate-500'}`}
+          className={`inline-block max-w-full rounded-none border-0 border-b bg-transparent px-1 py-0 text-center text-base leading-normal text-inherit outline-none focus:border-primary focus:ring-0 sm:text-sm ${questionId === activeQuestionId ? 'border-primary' : 'border-border-strong'}`}
           style={{ width: `${Math.max(6, answer.length + 1)}ch` }}
           value={answer}
           autoFocus={focusFirstGap}

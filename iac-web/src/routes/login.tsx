@@ -9,6 +9,7 @@ import {
 } from '#/features/auth/google-identity'
 import type { LoginReturnPath } from '#/features/auth/google-identity'
 import { useAuth } from '#/features/auth/auth-store'
+import { tr } from '@/lib/i18n'
 
 export const Route = createFileRoute('/login')({
   ssr: false,
@@ -45,7 +46,7 @@ export const Route = createFileRoute('/login')({
   },
   head: () => ({
     meta: [
-      { title: 'Войти в Daiyndyq IELTS — подготовка к IELTS' },
+      { title: tr('Войти — Yrys Academy') },
       {
         name: 'description',
         content: 'Вход в личный кабинет платформы подготовки к IELTS.',
@@ -76,7 +77,7 @@ function LoginPage() {
     <AuthShell>
       {returning ? (
         <p
-          className="px-6 py-8 text-center text-sm text-[#475569]"
+          className="px-6 py-8 text-center text-sm text-muted-foreground"
           role="status"
         >
           Завершаем вход через Google…

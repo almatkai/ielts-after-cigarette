@@ -3,6 +3,7 @@ import type {
   AttemptMaterialType,
   MistakeDetail,
 } from '@/features/attempts/api'
+import type { Language } from '@/lib/i18n-types'
 
 type MistakesSearch = {
   skill: AttemptMaterialType
@@ -50,7 +51,10 @@ export function hydrateMistake(detail: MistakeDetail, index: number) {
   return { ...item, ...detail.contexts[item.contextIndex] }
 }
 
-export function mistakeCountLabel(count: number) {
+export function mistakeCountLabel(count: number, language: Language = 'ru') {
+  if (language === 'kk') return `${count} қате`
+  if (language === 'en')
+    return `${count} ${count === 1 ? 'mistake' : 'mistakes'}`
   const lastTwo = count % 100
   const last = count % 10
   const word =

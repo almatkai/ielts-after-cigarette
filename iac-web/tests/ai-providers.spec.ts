@@ -74,6 +74,15 @@ async function mockAdmin(
           },
         },
       })
+    if (url.pathname.endsWith('/admin/ai-limits'))
+      return route.fulfill({
+        json: {
+          assistantLimit: 100,
+          guestAssistantLimit: 15,
+          writingLimit: 25,
+          speakingLimit: 25,
+        },
+      })
     if (url.pathname.endsWith('/routing')) {
       if (request.method() === 'PUT')
         routing = {

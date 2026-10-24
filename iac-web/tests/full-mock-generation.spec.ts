@@ -122,14 +122,14 @@ test('opening a section renders the nested route and requests its material', asy
     },
   )
   await page.goto('./exam/full-mock-sessions/generated-session')
-  await page.getByRole('link', { name: 'Продолжить' }).click()
+  await page.getByRole('link', { name: 'Resume section' }).click()
   await expect(
-    page.getByRole('heading', { name: 'Не удалось открыть секцию Full Mock' }),
+    page.getByRole('heading', { name: 'Could not open the Full Mock section' }),
   ).toBeVisible()
   expect(sectionReads).toBeGreaterThan(0)
   await page.reload()
   await expect(
-    page.getByRole('heading', { name: 'Не удалось открыть секцию Full Mock' }),
+    page.getByRole('heading', { name: 'Could not open the Full Mock section' }),
   ).toBeVisible()
 })
 
@@ -464,7 +464,7 @@ for (const [index, skill] of skills.entries()) {
       { skill },
     )
     await page.goto('./exam/full-mock-sessions/generated-session')
-    const open = page.getByRole('link', { name: 'Продолжить' })
+    const open = page.getByRole('link', { name: 'Resume section' })
     await open.hover()
     await page.clock.runFor(400)
     expect(reads).toBe(0)
@@ -473,7 +473,7 @@ for (const [index, skill] of skills.entries()) {
       page.getByRole('heading', { name: material.title }).first(),
     ).toBeAttached()
     const timer = page.locator(
-      `[aria-label="${skill === 'speaking' ? 'Время секции Speaking' : skill === 'reading' ? 'Осталось' : 'Оставшееся время'}"]`,
+      `[aria-label="${skill === 'speaking' ? 'Speaking time remaining' : 'Time remaining'}"]`,
     )
     await expect(timer).toBeVisible()
     await page.clock.pauseAt(new Date(now.getTime() + 60000))
@@ -486,23 +486,21 @@ for (const [index, skill] of skills.entries()) {
     await page.clock.pauseAt(new Date(now.getTime() + 120000))
     await expect(timer).toHaveText('08:00')
 
-    await page.getByRole('button', { name: 'Продолжить позже' }).first().click()
+    await page.getByRole('button', { name: 'Continue later' }).first().click()
     await expect(
-      page
-        .getByRole('alert')
-        .filter({ hasText: 'Не удалось сохранить черновик' }),
+      page.getByRole('alert').filter({ hasText: 'Could not save draft:' }),
     ).toBeVisible()
     await expect(page).toHaveURL(new RegExp(`/sections/${index + 1}$`))
     expect(pauses).toBe(1)
     failPause = false
-    await page.getByRole('button', { name: 'Продолжить позже' }).first().click()
+    await page.getByRole('button', { name: 'Continue later' }).first().click()
     await expect(page).toHaveURL(/full-mock-sessions\/generated-session$/)
-    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await expect(page.getByText('Paused at · 08:00')).toBeVisible()
     await page.clock.runFor(120000)
-    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await expect(page.getByText('Paused at · 08:00')).toBeVisible()
     await page.clock.resume()
     await page.reload()
-    await expect(page.getByText('На паузе · 08:00')).toBeVisible()
+    await expect(page.getByText('Paused at · 08:00')).toBeVisible()
     await page.clock.pauseAt(
       new Date((await page.evaluate(() => Date.now())) + 1000),
     )
@@ -633,24 +631,31 @@ for (const [index, skill] of skills.entries()) {
 
     // Prime a fresh (<15s) IN_PROGRESS cache entry before opening the runner.
     await page.goto('./exam/full-mock-sessions/generated-session')
-    await expect(page.getByText('Текущая', { exact: true })).toBeVisible()
+    await expect(page.getByText('Current', { exact: true })).toBeVisible()
     await page.evaluate(() => {
       const seen: string[] = []
       Object.assign(window, { sectionCompletionScreens: seen })
       new MutationObserver(() => {
-        for (const text of ['Секция завершена', 'Продолжить Full Mock']) {
+        for (const text of [
+          'Секция завершена',
+          'Продолжить Full Mock',
+          'Section complete',
+          'Continue the Full Mock',
+        ]) {
           if (document.body.innerText.includes(text)) seen.push(text)
         }
       }).observe(document.body, { childList: true, subtree: true })
     })
     const historyLength = await page.evaluate(() => history.length)
-    await page.getByRole('link', { name: 'Продолжить', exact: true }).click()
+    await page
+      .getByRole('link', { name: 'Resume section', exact: true })
+      .click()
     await expect(
       page.getByRole('heading', { name: material.title }).first(),
     ).toBeAttached()
     if (skill === 'writing') {
       await page.getByRole('textbox').fill('A response to the first task.')
-      await page.getByRole('button', { name: 'Далее', exact: true }).click()
+      await page.getByRole('button', { name: 'Next', exact: true }).click()
       await page.getByRole('textbox').fill('A response to the second task.')
     } else if (skill === 'speaking') {
       await page.getByRole('textbox').fill('A spoken response as a transcript.')
@@ -660,24 +665,22 @@ for (const [index, skill] of skills.entries()) {
     )
     const sectionReadsBeforeSubmit = sectionReads
     if (skill === 'speaking') {
-      await page.getByRole('button', { name: 'Отправить на проверку' }).click()
+      await page.getByRole('button', { name: 'Submit for assessment' }).click()
     } else {
       await page
-        .getByRole('button', { name: 'Завершить тест', exact: true })
+        .getByRole('button', { name: 'Finish test', exact: true })
         .click()
-      await page.getByRole('button', { name: 'Завершить', exact: true }).click()
+      await page.getByRole('button', { name: 'Finish', exact: true }).click()
     }
 
     await expect(page).toHaveURL(
       /\/exam\/full-mock-sessions\/generated-session$/,
     )
-    await expect(page.getByText('Сдано', { exact: true })).toHaveCount(
+    await expect(page.getByText('Submitted', { exact: true })).toHaveCount(
       index < 2 ? index + 1 : index,
     )
     if (index >= 2)
-      await expect(page.getByText('Проверяется', { exact: true })).toHaveCount(
-        1,
-      )
+      await expect(page.getByText('Assessing', { exact: true })).toHaveCount(1)
     for (const [position, name] of skills.entries()) {
       await expect(
         page.getByText(
@@ -689,8 +692,8 @@ for (const [index, skill] of skills.entries()) {
     const next = page.getByRole('button', {
       name:
         index === 3
-          ? 'Завершить и показать отчёт'
-          : 'Продолжить к следующей секции',
+          ? 'Finish and show the report'
+          : 'Continue to the next section',
       exact: true,
     })
     await expect(next).toBeEnabled()
@@ -708,7 +711,7 @@ for (const [index, skill] of skills.entries()) {
     await expect(
       page.getByRole('button', { name: /Разобрать ошибку/ }),
     ).toHaveCount(0)
-    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    await expect(page.getByText('Overall IELTS band')).toHaveCount(0)
 
     // Polling may refresh PROCESSING, but must neither wait for AI nor advance.
     await page.clock.runFor(20000)
@@ -722,7 +725,7 @@ for (const [index, skill] of skills.entries()) {
       await advanced
       await page.clock.runFor(100)
       await expect(
-        page.getByRole('link', { name: 'Продолжить', exact: true }),
+        page.getByRole('link', { name: 'Resume section', exact: true }),
       ).toHaveAttribute('href', new RegExp(`/sections/${index + 2}$`))
       expect(advances).toBe(1)
       expect(sectionReads).toBe(sectionReadsBeforeSubmit)
@@ -777,7 +780,7 @@ for (const state of ['unopened', 'running', 'paused', 'completed']) {
     await page.goto('./exam/full-mock-sessions/generated-session')
     if (state === 'paused')
       await page.setViewportSize({ width: 390, height: 844 })
-    await page.getByRole('button', { name: 'Вернуться на сайт' }).click()
+    await page.getByRole('button', { name: 'Return to site' }).click()
     await expect(page).toHaveURL(/\/app\/$/)
     expect(pauseCalls).toBe(state === 'running' ? 1 : 0)
     expect(finishCalls).toBe(0)
@@ -805,7 +808,7 @@ test('return to site stays in the mock if pausing fails', async ({ page }) => {
       route.fulfill({ status: 503, json: { code: 'DEPENDENCY_UNAVAILABLE' } }),
   )
   await page.goto('./exam/full-mock-sessions/generated-session')
-  await page.getByRole('button', { name: 'Вернуться на сайт' }).click()
+  await page.getByRole('button', { name: 'Return to site' }).click()
   await expect(page.getByRole('alert')).toBeVisible()
   await expect(page).toHaveURL(/full-mock-sessions\/generated-session$/)
 })

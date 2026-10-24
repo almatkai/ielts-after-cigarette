@@ -7,7 +7,9 @@ import { DashboardSidebar } from './dashboard-sidebar'
 import { AiAssistantFloatingWidget } from './ai-assistant-widget'
 import { LoginDialog } from '@/components/auth/login-dialog'
 import type { MouseEvent } from 'react'
+import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 const accountDestinations = [
   '/listening',
@@ -18,7 +20,6 @@ const accountDestinations = [
   '/mistakes',
   '/progress',
   '/profile',
-  '/settings',
 ] as const
 type AccountDestination = (typeof accountDestinations)[number]
 
@@ -32,6 +33,7 @@ type DashboardShellProps = {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { user } = useAuth()
+  const { isVisible: mascotIsVisible } = useMascotVisibility()
   const router = useRouter()
   const [loginIsOpen, setLoginIsOpen] = useState(false)
   const [loginDestination, setLoginDestination] = useState<AccountDestination>()
@@ -85,6 +87,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
     await router.invalidate()
   }
   const [navigationIsOpen, setNavigationIsOpen] = useState(false)
+  const { t } = useLanguage()
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -109,7 +112,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
   return (
     <div
-      className="min-h-screen bg-[#f7f7f5] text-[#111111]"
+      className={`min-h-screen bg-background text-foreground${user ? ' assistant-shell' : ''}`}
+      data-assistant={mascotIsVisible ? 'fox' : 'compact'}
       onClickCapture={requireLogin}
     >
       <DashboardSidebar className="fixed inset-y-0 left-0 z-40 hidden lg:flex" />
@@ -118,9 +122,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-overlay"
             onClick={() => setNavigationIsOpen(false)}
-            aria-label="Закрыть меню"
+            aria-label={t('Закрыть меню')}
           />
           <DashboardSidebar
             id="dashboard-mobile-navigation"
@@ -134,13 +138,13 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
       <div className="min-h-screen lg:pl-[260px] min-w-0 overflow-x-clip">
         <DashboardHeader
-          pageTitle={pageTitle}
+          pageTitle={pageTitle ? t(pageTitle) : null}
           onOpenNavigation={() => setNavigationIsOpen(true)}
         />
         <main className="min-h-[calc(100vh-56px)] sm:min-h-[calc(100vh-64px)] p-3 sm:p-7 lg:p-9 min-w-0 max-w-full overflow-x-clip">
           {children}
         </main>
-        {user ? <AiAssistantFloatingWidget /> : null}
+        {user ? <AiAssistantFloatingWidget hidden={navigationIsOpen} /> : null}
       </div>
       <LoginDialog
         open={loginIsOpen}

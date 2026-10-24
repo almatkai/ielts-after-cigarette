@@ -12,6 +12,7 @@ import {
   writingKeys,
 } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 const writingImportTemplate = JSON.stringify(
   {
@@ -49,6 +50,7 @@ const writingImportTemplate = JSON.stringify(
 )
 
 export function WritingImportPage() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [source, setSource] = useState('')
   const parseMutation = useMutation({
@@ -69,23 +71,30 @@ export function WritingImportPage() {
   return (
     <div className="grid max-w-4xl gap-5">
       <div>
-        <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+        <Button
+          asChild
+          variant="link"
+          className="h-auto p-0 text-muted-foreground"
+        >
           <Link to="/admin/writing/materials">
-            <ArrowLeft aria-hidden />К библиотеке
+            <ArrowLeft aria-hidden />
+            {t('К библиотеке')}
           </Link>
         </Button>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-          Импорт Writing
+        <h1 className="mt-3 text-3xl font-semibold tracking-normal">
+          {t('Импорт Writing')}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[#69696d]">
-          Вставьте JSON-массив материалов или объект{' '}
-          <code>{'{"materials":[...]}'}</code>. Каждый материал проходит ту же
-          валидацию, что и ручной редактор.
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {t('Вставьте JSON-массив материалов или объект')}{' '}
+          <code>{'{"materials":[...]}'}</code>.{' '}
+          {t(
+            'Каждый материал проходит ту же валидацию, что и ручной редактор.',
+          )}
         </p>
       </div>
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>JSON-источник</CardTitle>
+          <CardTitle>{t('JSON-источник')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <Textarea
@@ -100,7 +109,7 @@ export function WritingImportPage() {
             variant="outline"
             onClick={() => setSource(writingImportTemplate)}
           >
-            Вставить пример шаблона
+            {t('Вставить пример шаблона')}
           </Button>
           <Button
             type="button"
@@ -108,10 +117,10 @@ export function WritingImportPage() {
             onClick={() => parseMutation.mutate()}
           >
             <DocumentUpload aria-hidden />
-            {parseMutation.isPending ? 'Проверяем…' : 'Проверить импорт'}
+            {parseMutation.isPending ? t('Проверяем…') : t('Проверить импорт')}
           </Button>
           {parseMutation.isError ? (
-            <p className="text-sm text-[#e23b3b]">
+            <p className="text-sm text-destructive">
               {getErrorMessage(parseMutation.error)}
             </p>
           ) : null}
@@ -120,22 +129,25 @@ export function WritingImportPage() {
       {result ? (
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle>Результат проверки</CardTitle>
+            <CardTitle>{t('Результат проверки')}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             {result.errors.length > 0 ? (
-              <ul className="list-disc pl-5 text-sm text-[#e23b3b]">
+              <ul className="list-disc pl-5 text-sm text-destructive">
                 {result.errors.map((error) => (
                   <li key={`${error.item}-${error.message}`}>
-                    {error.item ? `Материал ${error.item}: ` : ''}
+                    {error.item ? `${t('Материал')} ${error.item}: ` : ''}
                     {error.message}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="flex items-center gap-2 text-sm text-emerald-700">
+              <p className="flex items-center gap-2 text-sm text-success">
                 <TickCircle className="size-4" aria-hidden />
-                Готово к импорту: {result.materials.length} материалов.
+                {t('Готово к импорту: {count} материалов.').replace(
+                  '{count}',
+                  String(result.materials.length),
+                )}
               </p>
             )}
             <Button
@@ -143,15 +155,17 @@ export function WritingImportPage() {
               disabled={!canImport || importMutation.isPending}
               onClick={() => importMutation.mutate()}
             >
-              {importMutation.isPending ? 'Импортируем…' : 'Подтвердить импорт'}
+              {importMutation.isPending
+                ? t('Импортируем…')
+                : t('Подтвердить импорт')}
             </Button>
             {importMutation.isError ? (
-              <p className="text-sm text-[#e23b3b]">
+              <p className="text-sm text-destructive">
                 {getErrorMessage(importMutation.error)}
               </p>
             ) : null}
             {importMutation.isSuccess ? (
-              <p className="text-sm text-emerald-700">Импорт завершён.</p>
+              <p className="text-sm text-success">{t('Импорт завершён.')}</p>
             ) : null}
           </CardContent>
         </Card>

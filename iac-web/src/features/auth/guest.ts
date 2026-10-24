@@ -1,10 +1,24 @@
-import { apiClient } from '@/lib/api/client'
+import { ApiError, apiClient } from '@/lib/api/client'
 import type { FullMockSession } from '@/features/fullmock/api'
 
 export type GuestSession = {
   id: string
   expiresAt: string
   sessionId: string | null
+}
+
+export const guestTrialExpiredMessage =
+  'Срок гостевого доступа истёк. Войдите для продолжения подготовки'
+
+export function isGuestTrialExpired(error: unknown) {
+  // Legacy session responses use GUEST_EXPIRED even when no cookie exists.
+  // Only a start denial or an explicit session reason proves trial expiry.
+  return (
+    error instanceof ApiError &&
+    error.code === 'GUEST_EXPIRED' &&
+    (error.status === 403 ||
+      (error.status === 401 && error.details?.reason === 'trial_expired'))
+  )
 }
 
 export const getGuestSession = () =>
@@ -68,5 +82,6 @@ export function canBrowseWithoutAccount(pathname: string) {
     '/reading',
     '/writing',
     '/speaking',
+    '/settings',
   ].includes(pathname)
 }

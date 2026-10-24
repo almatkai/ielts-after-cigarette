@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/landing/brand'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import {
   ArrowLeft,
@@ -8,6 +9,7 @@ import {
 } from 'iconsax-react'
 import { Link } from '@tanstack/react-router'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage, tr } from '@/lib/i18n'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -18,6 +20,7 @@ import type { PublicReadingMaterial } from '@/features/reading/api'
 import { formatAnswer } from '@/features/attempts/attempt-ui'
 import type { Option } from '@/features/attempts/attempt-ui'
 import { MistakeRetryDialog } from '@/features/attempts/mistake-retry-dialog'
+import '@/lib/i18n-content'
 
 export function ReadingReviewSplitRunner({
   attempt,
@@ -26,6 +29,7 @@ export function ReadingReviewSplitRunner({
   attempt: AttemptDetail
   material: PublicReadingMaterial
 }) {
+  const { t } = useLanguage()
   const { guest } = useAuth()
   const review = attempt.review ?? []
   const reviewByQuestionId = useMemo(
@@ -116,35 +120,44 @@ export function ReadingReviewSplitRunner({
   }, [currentQuestion])
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[1780px] flex-col gap-2.5 p-2.5 sm:p-3.5 lg:p-4 overflow-hidden bg-[#fafaf8]">
+    <div className="mx-auto flex h-dvh w-full max-w-[1780px] flex-col gap-2.5 p-2.5 sm:p-3.5 lg:p-4 overflow-hidden bg-background">
       {/* ВЕРХНЯЯ ШАПКА */}
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e7e7e4] bg-white px-3.5 py-2.5 sm:px-4 shadow-xs shrink-0">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-3.5 py-2.5 sm:px-4 shadow-none shrink-0">
         <div className="flex items-center gap-3">
+          <BrandLogo variant="mark" />
           <Button
             asChild
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 px-2.5 text-slate-600 hover:text-slate-900"
+            className="h-8 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
           >
             {guest ? (
-              <Link to="/try"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К пробному тесту</span></Link>
+              <Link to="/try">
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">
+                  {t('К пробному тесту')}
+                </span>
+              </Link>
             ) : (
-              <Link to="/mistakes"><ArrowLeft className="size-4" aria-hidden /><span className="hidden sm:inline">К ошибкам</span></Link>
+              <Link to="/mistakes">
+                <ArrowLeft className="size-4" aria-hidden />
+                <span className="hidden sm:inline">{t('К ошибкам')}</span>
+              </Link>
             )}
           </Button>
           <div className="hidden md:block">
-            <h1 className="text-sm font-semibold text-slate-900 truncate max-w-[240px] lg:max-w-[360px]">
+            <h1 className="font-sans text-sm font-semibold text-foreground truncate max-w-[240px] lg:max-w-[360px]">
               {material.title}
             </h1>
-            <span className="text-[11px] text-slate-500">
-              Интерактивный разбор ответов
+            <span className="text-[11px] text-muted-foreground">
+              {t('Интерактивный разбор ответов')}
             </span>
           </div>
         </div>
 
         {/* Вкладки Разделов (Passages) по центру */}
         {passages.length > 1 && (
-          <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-white p-1">
+          <div className="flex items-center gap-1 rounded-[10px] border border-border bg-card p-1">
             {passages.map((passage, passageIndex) => {
               const isCurrentPassage =
                 currentQuestion?.passageIndex === passageIndex
@@ -162,21 +175,23 @@ export function ReadingReviewSplitRunner({
                   className={cn(
                     'flex items-center gap-2 rounded-[8px] px-3 py-1 text-xs font-semibold transition-all select-none',
                     isCurrentPassage
-                      ? 'bg-[#3b82f6] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                      ? 'bg-primary text-primary-foreground shadow-none'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                   )}
                 >
-                  <span>Раздел {passageIndex + 1}</span>
+                  <span>
+                    {t('Раздел')} {passageIndex + 1}
+                  </span>
                   {pErrors > 0 ? (
                     <span
                       className={cn(
                         'rounded-full px-1.5 py-0.2 text-[10px] font-bold',
                         isCurrentPassage
-                          ? 'bg-white/30 text-white'
-                          : 'bg-rose-100 text-rose-700',
+                          ? 'bg-primary-hover text-primary-foreground'
+                          : 'bg-destructive-soft text-destructive',
                       )}
                     >
-                      {pErrors} ош.
+                      {pErrors} {t('ош.')}
                     </span>
                   ) : null}
                 </button>
@@ -187,18 +202,18 @@ export function ReadingReviewSplitRunner({
 
         {/* Фильтры и статистика */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-[10px] border border-[#e7e7e4] bg-[#fafaf9] p-0.5 text-xs">
+          <div className="flex items-center gap-1 rounded-[10px] border border-border bg-background p-0.5 text-xs">
             <button
               type="button"
               onClick={() => setFilterStatus('all')}
               className={cn(
                 'px-2.5 py-1 rounded-[7px] font-medium transition-colors',
                 filterStatus === 'all'
-                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900',
+                  ? 'bg-card text-foreground font-semibold shadow-none'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              Все ({totalQuestions})
+              {t('Все')} ({totalQuestions})
             </button>
             <button
               type="button"
@@ -206,11 +221,11 @@ export function ReadingReviewSplitRunner({
               className={cn(
                 'px-2.5 py-1 rounded-[7px] font-medium transition-colors',
                 filterStatus === 'errors'
-                  ? 'bg-rose-500 text-white font-semibold shadow-2xs'
-                  : 'text-rose-700 hover:bg-rose-50',
+                  ? 'bg-destructive text-primary-foreground font-semibold shadow-none'
+                  : 'text-destructive hover:bg-destructive-soft',
               )}
             >
-              Ошибки ({errorCount})
+              {t('Ошибки')} ({errorCount})
             </button>
             <button
               type="button"
@@ -218,17 +233,17 @@ export function ReadingReviewSplitRunner({
               className={cn(
                 'px-2.5 py-1 rounded-[7px] font-medium transition-colors',
                 filterStatus === 'correct'
-                  ? 'bg-emerald-600 text-white font-semibold shadow-2xs'
-                  : 'text-emerald-700 hover:bg-emerald-50',
+                  ? 'bg-success text-primary-foreground font-semibold shadow-none'
+                  : 'text-success hover:bg-success-bg',
               )}
             >
-              Верно ({correctCount})
+              {t('Верно')} ({correctCount})
             </button>
           </div>
 
           <Badge
             variant="outline"
-            className="hidden sm:inline-flex text-xs font-bold text-slate-800 bg-white"
+            className="hidden sm:inline-flex text-xs font-bold text-foreground bg-card"
           >
             Score: {correctCount}/{totalQuestions}
           </Badge>
@@ -238,30 +253,30 @@ export function ReadingReviewSplitRunner({
       {/* Основная рабочая зона — сплит на 2 колонки */}
       <div className="grid flex-1 min-h-0 gap-3 lg:grid-cols-2 overflow-hidden">
         {/* ЛЕВАЯ КОЛОНКА: Текст Reading Passage с подсветкой доказательств */}
-        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[10px] border border-border bg-card shadow-none">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-card shrink-0">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe] shrink-0">
+              <span className="rounded-sm bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary border border-primary-soft shrink-0">
                 {passages.length > 1
-                  ? `Раздел ${(currentQuestion?.passageIndex ?? 0) + 1}`
-                  : 'Текст'}
+                  ? `${t('Раздел')} ${(currentQuestion?.passageIndex ?? 0) + 1}`
+                  : t('Текст')}
               </span>
-              <h2 className="text-sm font-semibold text-slate-900 truncate">
+              <h2 className="text-sm font-semibold text-foreground truncate">
                 {currentPassage?.title}
               </h2>
             </div>
             {/* Контролы размера шрифта */}
-            <div className="flex items-center gap-1 rounded-[8px] p-0.5 border border-[#e7e7e4] bg-white shrink-0">
+            <div className="flex items-center gap-1 rounded-[8px] p-0.5 border border-border bg-card shrink-0">
               <button
                 type="button"
                 onClick={() => setPassageFontSize('sm')}
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'sm'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Уменьшить шрифт"
+                title={t('Уменьшить шрифт')}
               >
                 A-
               </button>
@@ -271,10 +286,10 @@ export function ReadingReviewSplitRunner({
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'md'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Стандартный шрифт"
+                title={t('Стандартный шрифт')}
               >
                 A
               </button>
@@ -284,17 +299,17 @@ export function ReadingReviewSplitRunner({
                 className={cn(
                   'px-2 py-0.5 text-xs font-semibold rounded-[6px] transition-colors',
                   passageFontSize === 'lg'
-                    ? 'bg-[#3b82f6] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ? 'bg-primary text-primary-foreground shadow-none'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
                 )}
-                title="Увеличить шрифт"
+                title={t('Увеличить шрифт')}
               >
                 A+
               </button>
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 select-text bg-white">
+          <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 select-text bg-card">
             <HighlightedPassageText
               body={currentPassage?.body ?? ''}
               quote={activeQuote}
@@ -304,29 +319,29 @@ export function ReadingReviewSplitRunner({
         </Card>
 
         {/* ПРАВАЯ КОЛОНКА: Вопросы с интерактивным разбором каждого ответа */}
-        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[16px] border border-[#e7e7e4] bg-white shadow-xs">
-          <div className="border-b border-[#ededeb] px-5 py-3.5 bg-white shrink-0">
+        <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[10px] border border-border bg-card shadow-none">
+          <div className="border-b border-border px-5 py-3.5 bg-card shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[#eff6ff] px-2.5 py-0.5 text-xs font-bold text-[#3b82f6] border border-[#dbeafe]">
-                  Вопросы
+                <span className="rounded-sm bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary border border-primary-soft">
+                  {t('Вопросы')}
                 </span>
-                <span className="text-xs text-slate-500 font-medium">
+                <span className="text-xs text-muted-foreground font-medium">
                   {currentPassage?.questionGroups.length}{' '}
                   {currentPassage?.questionGroups.length === 1
-                    ? 'группа'
-                    : 'групп'}{' '}
-                  вопросов
+                    ? t('группа')
+                    : t('групп')}{' '}
+                  {t('вопросов')}
                 </span>
               </div>
-              <span className="text-xs font-semibold text-slate-500">
-                Активный вопрос:{' '}
+              <span className="text-xs font-semibold text-muted-foreground">
+                {t('Активный вопрос')}:{' '}
                 {currentQuestion?.reviewItem?.number ?? activeQuestionIndex + 1}
               </span>
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 bg-[#fcfcfb] space-y-6">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 bg-background space-y-6">
             {currentPassage?.questionGroups.map((group) => {
               const groupQuestions = group.questions.filter((q) => {
                 const item = q.id ? reviewByQuestionId.get(q.id) : undefined
@@ -339,12 +354,12 @@ export function ReadingReviewSplitRunner({
 
               return (
                 <div key={group.id ?? group.position} className="space-y-3">
-                  <div className="border-b border-[#ededeb] pb-2">
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 border border-slate-200">
+                  <div className="border-b border-border pb-2">
+                    <span className="rounded-sm bg-muted px-2.5 py-0.5 text-[11px] font-bold normal-case text-foreground border border-border">
                       {group.type.replaceAll('_', ' ')}
                     </span>
                     {group.instructions ? (
-                      <p className="mt-1.5 text-xs leading-relaxed text-[#69696d]">
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                         {group.instructions}
                       </p>
                     ) : null}
@@ -384,7 +399,7 @@ export function ReadingReviewSplitRunner({
       </div>
 
       {/* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (Сетка 1-40) */}
-      <footer className="rounded-[14px] border border-[#e7e7e4] bg-white p-2.5 shadow-xs shrink-0">
+      <footer className="rounded-[10px] border border-border bg-card p-2.5 shadow-none shrink-0">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {questions.map((item, index) => {
             const isCurrent = index === activeQuestionIndex
@@ -401,14 +416,15 @@ export function ReadingReviewSplitRunner({
                 onClick={() => setActiveQuestionIndex(index)}
                 className={cn(
                   'flex size-8 shrink-0 items-center justify-center rounded-[8px] text-xs font-bold transition-all select-none',
-                  isCurrent && 'ring-2 ring-[#3b82f6] ring-offset-1 scale-105',
+                  isCurrent &&
+                    'ring-2 ring-primary ring-offset-1 ring-offset-card scale-105',
                   isCorrect
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    ? 'bg-success-bg text-success border border-success'
                     : isAnswered
-                      ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                      : 'bg-slate-100 text-slate-500 border border-slate-200',
+                      ? 'bg-destructive-soft text-destructive border border-destructive'
+                      : 'bg-muted text-muted-foreground border border-border',
                 )}
-                title={`Вопрос ${num}: ${isCorrect ? 'Верно' : 'Ошибка'}`}
+                title={`${t('Вопрос')} ${num}: ${isCorrect ? t('Верно') : t('Ошибка')}`}
               >
                 {num}
               </button>
@@ -445,6 +461,7 @@ function ReviewQuestionCard({
   onSelect: () => void
   onRetry: () => void
 }) {
+  const { t } = useLanguage()
   const [expandedExplanation, setExpandedExplanation] = useState(false)
   const isCorrect = item.isCorrect
 
@@ -453,12 +470,12 @@ function ReviewQuestionCard({
       id={`review-split-q-${item.questionId}`}
       onClick={onSelect}
       className={cn(
-        'rounded-[14px] border p-4 bg-white transition-all cursor-pointer shadow-2xs space-y-3',
+        'rounded-[10px] border p-4 bg-card transition-all cursor-pointer shadow-none space-y-3',
         isCurrent
-          ? 'border-[#3b82f6] ring-1 ring-[#3b82f6]'
+          ? 'border-primary ring-1 ring-primary'
           : isCorrect
-            ? 'border-emerald-200/80 hover:border-emerald-300'
-            : 'border-rose-200/80 hover:border-rose-300',
+            ? 'border-success-bg/80 hover:border-success'
+            : 'border-destructive-soft/80 hover:border-destructive',
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -467,21 +484,21 @@ function ReviewQuestionCard({
             className={cn(
               'flex size-6 items-center justify-center rounded-[6px] text-xs font-bold',
               isCurrent
-                ? 'bg-[#3b82f6] text-white'
-                : 'bg-slate-100 text-slate-800',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-foreground',
             )}
           >
             {item.number}
           </span>
           {isCorrect ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
-              <TickCircle className="size-3.5 text-emerald-600" />
-              Верно (+{item.pointsAwarded} б.)
+            <span className="inline-flex items-center gap-1 rounded-sm bg-success-bg px-2.5 py-0.5 text-xs font-semibold text-success border border-success-bg">
+              <TickCircle className="size-3.5 text-success" />
+              {t('Верно')} (+{item.pointsAwarded} {t('б.')})
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 border border-rose-200">
-              <CloseCircle className="size-3.5 text-rose-600" />
-              Ошибка (0 б.)
+            <span className="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-2.5 py-0.5 text-xs font-semibold text-destructive border border-destructive-soft">
+              <CloseCircle className="size-3.5 text-destructive" />
+              {t('Ошибка')} (0 {t('б.')})
             </span>
           )}
         </div>
@@ -496,15 +513,15 @@ function ReviewQuestionCard({
               e.stopPropagation()
               onRetry()
             }}
-            className="h-7 text-xs font-semibold border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 gap-1 rounded-[8px]"
+            className="h-7 text-xs font-semibold border-destructive-soft bg-destructive-soft text-destructive hover:bg-destructive-soft gap-1 rounded-[8px]"
           >
-            <LampCharge className="size-3.5 text-rose-600" />
-            Разобрать
+            <LampCharge className="size-3.5 text-destructive" />
+            {t('Разобрать')}
           </Button>
         )}
       </div>
 
-      <p className="text-xs sm:text-sm font-medium text-slate-800 leading-relaxed">
+      <p className="text-xs sm:text-sm font-medium text-foreground leading-relaxed">
         {item.prompt.replace('{{answer}}', '_____')}
       </p>
 
@@ -514,17 +531,17 @@ function ReviewQuestionCard({
           className={cn(
             'rounded-[8px] border p-2.5',
             isCorrect
-              ? 'border-emerald-200 bg-emerald-50/50 text-emerald-950'
-              : 'border-rose-200 bg-rose-50/50 text-rose-950',
+              ? 'border-success-bg bg-success-bg/50 text-success'
+              : 'border-destructive-soft bg-destructive-soft/50 text-destructive',
           )}
         >
-          <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">
-            Ваш ответ
+          <span className="block text-[10px] font-semibold normal-case text-muted-foreground mb-0.5">
+            {t('Ваш ответ')}
           </span>
           <span
             className={cn(
               'font-semibold',
-              !isCorrect && 'line-through text-rose-800',
+              !isCorrect && 'line-through text-destructive',
             )}
           >
             {formatAnswer(item.answer, options)}
@@ -532,11 +549,11 @@ function ReviewQuestionCard({
         </div>
 
         {/* Правильный ответ */}
-        <div className="rounded-[8px] border border-emerald-200 bg-emerald-50/70 p-2.5 text-emerald-950">
-          <span className="block text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-0.5">
-            Правильный ответ
+        <div className="rounded-[8px] border border-success-bg bg-success-bg/70 p-2.5 text-success">
+          <span className="block text-[10px] font-semibold normal-case text-success mb-0.5">
+            {t('Правильный ответ')}
           </span>
-          <span className="font-bold text-emerald-900">
+          <span className="font-bold text-success">
             {formatAnswer(item.correctAnswer, options)}
           </span>
         </div>
@@ -551,35 +568,35 @@ function ReviewQuestionCard({
               e.stopPropagation()
               setExpandedExplanation((v) => !v)
             }}
-            className="flex items-center gap-1.5 text-xs font-medium text-[#2563eb] hover:text-blue-700"
+            className="flex items-center gap-1.5 text-xs font-medium text-primary-hover hover:text-primary"
           >
             <InfoCircle className="size-3.5" />
             <span>
               {expandedExplanation
-                ? 'Скрыть объяснение'
-                : 'Показать разбор и цитату'}
+                ? t('Скрыть объяснение')
+                : t('Показать разбор и цитату')}
             </span>
           </button>
 
           {expandedExplanation && (
-            <div className="mt-2.5 rounded-[10px] border border-blue-100 bg-[#f0f7ff] p-3 text-xs leading-relaxed text-slate-700 space-y-2">
+            <div className="mt-2.5 rounded-[10px] border border-border-strong bg-primary-soft p-3 text-xs leading-relaxed text-foreground space-y-2">
               {item.quote ? (
                 <div>
-                  <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Цитата из текста:
+                  <span className="font-semibold text-primary block text-[11px] normal-case">
+                    {t('Цитата из текста')}:
                   </span>
-                  <blockquote className="font-serif italic text-slate-800 mt-1 pl-2 border-l-2 border-blue-400">
+                  <blockquote className="font-sans text-foreground mt-1 pl-2 bg-muted rounded-md px-4 py-3 border-primary">
                     «{item.quote}»
                   </blockquote>
                 </div>
               ) : null}
               {item.explanation ? (
                 <div>
-                  <span className="font-semibold text-[#1d4ed8] block text-[11px] uppercase tracking-wider">
-                    Пояснение:
+                  <span className="font-semibold text-primary block text-[11px] normal-case">
+                    {t('Пояснение')}:
                   </span>
-                  <p className="whitespace-pre-wrap mt-0.5 text-slate-700">
-                    {item.explanation}
+                  <p className="whitespace-pre-wrap mt-0.5 text-foreground">
+                    {tr(item.explanation)}
                   </p>
                 </div>
               ) : null}
@@ -612,7 +629,7 @@ function HighlightedPassageText({
     return (
       <div
         className={cn(
-          'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+          'whitespace-pre-wrap font-sans text-foreground space-y-4',
           fontSize === 'sm' && 'text-[14px] leading-[1.65]',
           fontSize === 'md' && 'text-[15.5px] leading-[1.8]',
           fontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
@@ -640,7 +657,7 @@ function HighlightedPassageText({
         return (
           <div
             className={cn(
-              'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+              'whitespace-pre-wrap font-sans text-foreground space-y-4',
               fontSize === 'sm' && 'text-[14px] leading-[1.65]',
               fontSize === 'md' && 'text-[15.5px] leading-[1.8]',
               fontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
@@ -649,7 +666,7 @@ function HighlightedPassageText({
             {before}
             <span
               ref={quoteRef}
-              className="bg-amber-200/90 text-amber-950 font-medium px-1 rounded transition-all shadow-xs ring-2 ring-amber-300 ring-offset-1"
+              className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1 ring-offset-card"
             >
               {matchText}
             </span>
@@ -662,7 +679,7 @@ function HighlightedPassageText({
     return (
       <div
         className={cn(
-          'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+          'whitespace-pre-wrap font-sans text-foreground space-y-4',
           fontSize === 'sm' && 'text-[14px] leading-[1.65]',
           fontSize === 'md' && 'text-[15.5px] leading-[1.8]',
           fontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
@@ -680,7 +697,7 @@ function HighlightedPassageText({
   return (
     <div
       className={cn(
-        'whitespace-pre-wrap font-serif text-slate-800 space-y-4',
+        'whitespace-pre-wrap font-sans text-foreground space-y-4',
         fontSize === 'sm' && 'text-[14px] leading-[1.65]',
         fontSize === 'md' && 'text-[15.5px] leading-[1.8]',
         fontSize === 'lg' && 'text-[17.5px] leading-[1.9]',
@@ -689,7 +706,7 @@ function HighlightedPassageText({
       {before}
       <span
         ref={quoteRef}
-        className="bg-amber-200/90 text-amber-950 font-medium px-1 rounded transition-all shadow-xs ring-2 ring-amber-300 ring-offset-1"
+        className="bg-highlight text-highlight-foreground font-medium px-1 rounded transition-all shadow-none ring-2 ring-warning-fg ring-offset-1 ring-offset-card"
       >
         {matchText}
       </span>

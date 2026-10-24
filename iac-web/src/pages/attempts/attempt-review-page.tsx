@@ -25,6 +25,7 @@ import type {
 import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 import { ObjectiveAttemptReview } from '@/features/attempts/objective-attempt-review'
 import { useAuth } from '@/features/auth/auth-store'
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
@@ -39,6 +40,7 @@ export function AttemptReviewPage({
   attemptId: string
   embedded?: boolean
 }) {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const detailQuery = useAttemptDetail(attemptId)
   const attempt = detailQuery.data ?? null
@@ -61,13 +63,13 @@ export function AttemptReviewPage({
   })
 
   if (detailQuery.isPending) {
-    return <LoadingState label="Загрузка…" />
+    return <LoadingState label={t('Загрузка…')} />
   }
 
   if (!attempt) {
     return (
       <ErrorState
-        title="Не удалось загрузить попытку"
+        title={t('Не удалось загрузить попытку')}
         message={getErrorMessage(detailQuery.error)}
         onRetry={() => void detailQuery.refetch()}
       />
@@ -79,7 +81,7 @@ export function AttemptReviewPage({
   }
 
   const material = materialQuery.data ?? null
-  const aiEvaluation = evaluationFor(attempt)
+  const aiEvaluation = evaluationFor(attempt, t)
 
   if (attempt.status === 'SUBMITTED' && (attempt.guestPreview || !user)) {
     return <GuestAttemptReview attempt={attempt} embedded={embedded} />
@@ -95,7 +97,8 @@ export function AttemptReviewPage({
             className="h-auto justify-self-start p-0"
           >
             <Link to="/progress">
-              <ArrowLeft aria-hidden />К прогрессу
+              <ArrowLeft aria-hidden />
+              {t('К прогрессу')}
             </Link>
           </Button>
         ) : null}
@@ -117,15 +120,16 @@ export function AttemptReviewPage({
           <>
             <Button asChild variant="link" className="h-auto p-0">
               <Link to="/progress">
-                <ArrowLeft aria-hidden />К прогрессу
+                <ArrowLeft aria-hidden />
+                {t('К прогрессу')}
               </Link>
             </Button>
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
-              Работа над ошибками
+            <h1 className="text-[28px] sm:text-[36px] mt-3 font-semibold tracking-normal">
+              {t('Работа над ошибками')}
             </h1>
           </>
         ) : null}
-        <p className="mt-2 text-sm text-[#69696d]">
+        <p className="mt-2 text-sm text-muted-foreground">
           {skillLabel(attempt.materialType)}
         </p>
       </div>
@@ -150,21 +154,22 @@ export function AttemptReviewPage({
           ) : null}
         </>
       ) : (
-        <p className="text-sm text-[#69696d]">Нет ошибок</p>
+        <p className="text-sm text-muted-foreground">{t('Нет ошибок')}</p>
       )}
     </div>
   )
 }
 
 function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
+  const { t } = useLanguage()
   const assessment = attempt.writingAssessment ?? attempt.speakingAssessment
   return (
-    <Card className="rounded-[16px] border-[#e7e7e4] shadow-none">
+    <Card className="rounded-[10px] border-border shadow-none">
       <CardContent className="p-6">
-        <p className="text-sm text-[#69696d]">
+        <p className="text-sm text-muted-foreground">
           {assessment?.status === 'FAILED'
-            ? 'Не удалось проверить'
-            : 'Проверяется'}
+            ? t('Не удалось проверить')
+            : t('Проверяется')}
         </p>
       </CardContent>
     </Card>
@@ -172,16 +177,19 @@ function ProcessingAttempt({ attempt }: { attempt: AttemptDetail }) {
 }
 
 function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
+  const { t } = useLanguage()
   const { guest } = useAuth()
   if (attempt.status === 'ABANDONED') {
     return (
       <Card>
         <CardContent className="grid gap-4 p-6">
-          <p className="font-semibold">Секция завершена без оценки</p>
-          <p>Сохранённые черновики:</p>
+          <p className="font-semibold">{t('Секция завершена без оценки')}</p>
+          <p>{t('Сохранённые черновики')}:</p>
           {(attempt.answers ?? []).map((item, index) => (
             <div key={item.questionId} className="whitespace-pre-wrap">
-              <p className="font-medium">Ответ {index + 1}</p>
+              <p className="font-medium">
+                {t('Ответ')} {index + 1}
+              </p>
               <p>
                 {String(
                   item.answer.value ??
@@ -201,9 +209,9 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
     return (
       <Card>
         <CardContent className="grid gap-3 p-6">
-          <p>Разбор появится после сдачи секции.</p>
+          <p>{t('Разбор появится после сдачи секции.')}</p>
           <Button asChild>
-            <Link to="/try">Вернуться к пробному тесту</Link>
+            <Link to="/try">{t('Вернуться к пробному тесту')}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -212,36 +220,38 @@ function InProgressAttempt({ attempt }: { attempt: AttemptDetail }) {
   return (
     <Card className="shadow-none">
       <CardContent className="grid justify-items-center gap-3 p-10 text-center">
-        <p className="font-semibold">Попытка ещё не завершена</p>
-        <p className="text-sm text-[#69696d]">Разбор появится после сдачи.</p>
+        <p className="font-semibold">{t('Попытка ещё не завершена')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('Разбор появится после сдачи.')}
+        </p>
         <Button asChild>
           {attempt.materialType === 'listening' ? (
             <Link
               to="/exam/listening/$testId"
               params={{ testId: attempt.materialId }}
             >
-              Продолжить практику
+              {t('Продолжить практику')}
             </Link>
           ) : attempt.materialType === 'reading' ? (
             <Link
               to="/exam/reading/$materialId"
               params={{ materialId: attempt.materialId }}
             >
-              Продолжить практику
+              {t('Продолжить практику')}
             </Link>
           ) : attempt.materialType === 'writing' ? (
             <Link
               to="/exam/writing/$materialId"
               params={{ materialId: attempt.materialId }}
             >
-              Продолжить практику
+              {t('Продолжить практику')}
             </Link>
           ) : (
             <Link
               to="/exam/speaking/$materialId"
               params={{ materialId: attempt.materialId }}
             >
-              Продолжить практику
+              {t('Продолжить практику')}
             </Link>
           )}
         </Button>
@@ -270,7 +280,10 @@ type AIEvaluation = {
   }[]
 }
 
-function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
+function evaluationFor(
+  attempt: AttemptDetail,
+  t: (source: string) => string,
+): AIEvaluation | null {
   if (attempt.speakingEvaluation) {
     const evaluation = attempt.speakingEvaluation
     const isPronunciationAvailable = Boolean(
@@ -292,7 +305,9 @@ function evaluationFor(attempt: AttemptDetail): AIEvaluation | null {
             ...evaluation.criteria.pronunciation,
             unavailable: !isPronunciationAvailable,
             feedback: !isPronunciationAvailable
-              ? 'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.'
+              ? t(
+                  'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
+                )
               : evaluation.criteria.pronunciation.feedback,
           },
         ],
@@ -316,17 +331,20 @@ function AIEvaluationReview({
   attempt: AttemptDetail
   evaluation: AIEvaluation
 }) {
+  const { t } = useLanguage()
   const criteriaList = evaluation.criteria.map(([label, criterion]) => ({
     label,
     band: criterion.band,
     unavailable: criterion.unavailable,
-    displayBand: criterion.unavailable ? 'Не определяется' : undefined,
+    displayBand: criterion.unavailable ? t('Не определяется') : undefined,
   }))
 
   const bandNote =
     evaluation.skill === 'Speaking' && !evaluation.pronunciationAvailable
-      ? 'Учебная оценка по 3 критериям (система пока не может определить произношение)'
-      : `Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`
+      ? t(
+          'Учебная оценка по 3 критериям (система пока не может определить произношение)',
+        )
+      : t(`Оценка сформирована по 4 критериям IELTS ${evaluation.skill}`)
 
   return (
     <>
@@ -337,14 +355,14 @@ function AIEvaluationReview({
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
         durationMinutes={attempt.materialType === 'writing' ? 60 : 15}
-        paceUnit={attempt.materialType === 'writing' ? 'эссе' : 'часть'}
+        paceUnit={attempt.materialType === 'writing' ? t('эссе') : t('часть')}
       />
       {evaluation.summary ? (
-        <Card className="rounded-[16px] border border-[#e7e7e4] bg-white p-5 shadow-xs">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-            Резюме проверки
+        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
+          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
+            {t('Резюме проверки')}
           </p>
-          <p className="text-sm leading-relaxed text-slate-700">
+          <p className="text-sm leading-relaxed text-foreground">
             {evaluation.summary}
           </p>
         </Card>
@@ -353,30 +371,32 @@ function AIEvaluationReview({
         {evaluation.criteria.map(([label, criterion]) => (
           <Card
             key={label}
-            className={`rounded-[16px] border bg-white shadow-xs ${
+            className={`rounded-[10px] border bg-card shadow-none ${
               criterion.unavailable
-                ? 'border-amber-200/80 bg-amber-50/20'
-                : 'border-[#e7e7e4]'
+                ? 'border-warning-bg/80 bg-warning-bg/20'
+                : 'border-border'
             }`}
           >
             <CardContent className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-slate-900">{label}</h2>
+                <h2 className="font-semibold text-foreground">{label}</h2>
                 {criterion.unavailable ? (
-                  <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
-                    Пока не определяется
+                  <span className="rounded-md bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg border border-warning-bg">
+                    {t('Пока не определяется')}
                   </span>
                 ) : (
-                  <span className="rounded-md bg-blue-50 px-2 py-0.5 text-sm font-bold text-[#3b82f6]">
+                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-sm font-bold text-primary">
                     {criterion.band.toFixed(1)}
                   </span>
                 )}
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {criterion.feedback ||
                   (criterion.unavailable
-                    ? 'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.'
-                    : 'Комментарий не получен.')}
+                    ? t(
+                        'Наша система пока не может определить произношение. Оценка рассчитывается по 3 критериям: беглость, вокабуляр и грамматика.',
+                      )
+                    : t('Комментарий не получен.'))}
               </p>
             </CardContent>
           </Card>
@@ -390,18 +410,20 @@ function AIEvaluationReview({
           <CardContent className="grid gap-3 text-sm leading-6">
             <p>{part.feedback}</p>
             {part.transcript ? (
-              <p className="whitespace-pre-wrap rounded-xl bg-[#f7f7f5] p-4">
+              <p className="whitespace-pre-wrap rounded-xl bg-background p-4">
                 {part.transcript}
               </p>
             ) : null}
             {part.strengths.length > 0 ? (
               <p>
-                <strong>Сильные стороны:</strong> {part.strengths.join(' · ')}
+                <strong>{t('Сильные стороны')}:</strong>{' '}
+                {part.strengths.join(' · ')}
               </p>
             ) : null}
             {part.improvements.length > 0 ? (
               <p>
-                <strong>Что улучшить:</strong> {part.improvements.join(' · ')}
+                <strong>{t('Что улучшить')}:</strong>{' '}
+                {part.improvements.join(' · ')}
               </p>
             ) : null}
           </CardContent>
@@ -418,10 +440,11 @@ function SpeakingRecordings({
   attemptId: string
   recordings: SpeakingRecording[]
 }) {
+  const { t } = useLanguage()
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <CardTitle>Ваши аудиозаписи</CardTitle>
+        <CardTitle>{t('Ваши аудиозаписи')}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
         {recordings.map((recording, index) => (
@@ -446,21 +469,24 @@ function SpeakingRecordingPlayer({
   recording: SpeakingRecording
   label: string
 }) {
+  const { t } = useLanguage()
   const query = useQuery({
     queryKey: ['attempts', attemptId, 'recordings', recording.partId],
     queryFn: () => getSpeakingRecordingBlob(attemptId, recording.partId),
   })
   const source = useBlobUrl(query.data)
   return (
-    <div className="grid gap-2 rounded-xl border border-[#ededeb] p-4">
+    <div className="grid gap-2 rounded-xl border border-border p-4">
       <p className="text-sm font-medium">{label}</p>
       {source ? <audio controls src={source} className="w-full" /> : null}
       {query.isPending ? (
-        <p className="text-sm text-[#69696d]">Загружаем запись…</p>
+        <p className="text-sm text-muted-foreground">
+          {t('Загружаем запись…')}
+        </p>
       ) : null}
       {query.isError ? (
-        <p className="text-sm text-[#e23b3b]">
-          Не удалось загрузить аудиозапись.
+        <p className="text-sm text-destructive">
+          {t('Не удалось загрузить аудиозапись.')}
         </p>
       ) : null}
     </div>

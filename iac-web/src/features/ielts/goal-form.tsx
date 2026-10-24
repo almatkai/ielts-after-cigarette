@@ -31,13 +31,14 @@ import {
   validateGoal,
 } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type { GoalFormValues } from '@/features/ielts/api'
 
 const targetScores = ['5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5'] as const
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const emptyGoalForm: GoalFormValues = {
   targetScore: '',
@@ -68,6 +69,7 @@ export function GoalFields({
   idPrefix = 'goal',
   elevated = false,
 }: GoalFieldsProps) {
+  const { t } = useLanguage()
   const overlayClassName = elevated ? 'z-[90]' : undefined
   const formatId = `${idPrefix}-exam-format`
   const scoreId = `${idPrefix}-target-score`
@@ -76,14 +78,14 @@ export function GoalFields({
   return (
     <div className="grid min-w-0 gap-5 sm:grid-cols-2 [&>*]:min-w-0">
       <div className="grid gap-2">
-        <Label htmlFor={formatId}>Формат IELTS</Label>
+        <Label htmlFor={formatId}>{t('Формат IELTS')}</Label>
         <Select
           name="examFormat"
           value={form.examFormat}
           onValueChange={(value) => onChange('examFormat', value)}
         >
           <SelectTrigger id={formatId} className={selectClassName}>
-            <SelectValue placeholder="Выберите формат" />
+            <SelectValue placeholder={t('Выберите формат')} />
           </SelectTrigger>
           <SelectContent position="popper" className={overlayClassName}>
             <SelectItem value="academic">Academic</SelectItem>
@@ -91,21 +93,21 @@ export function GoalFields({
           </SelectContent>
         </Select>
         {errors.examFormat ? (
-          <p className="text-xs text-[#c92f2f]" role="alert">
-            {errors.examFormat}
+          <p className="text-xs text-destructive" role="alert">
+            {t(errors.examFormat)}
           </p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor={scoreId}>Целевой балл</Label>
+        <Label htmlFor={scoreId}>{t('Целевой балл')}</Label>
         <Select
           name="targetScore"
           value={form.targetScore}
           onValueChange={(value) => onChange('targetScore', value)}
         >
           <SelectTrigger id={scoreId} className={selectClassName}>
-            <SelectValue placeholder="Выберите балл" />
+            <SelectValue placeholder={t('Выберите балл')} />
           </SelectTrigger>
           <SelectContent position="popper" className={overlayClassName}>
             {targetScores.map((score) => (
@@ -116,14 +118,14 @@ export function GoalFields({
           </SelectContent>
         </Select>
         {errors.targetScore ? (
-          <p className="text-xs text-[#c92f2f]" role="alert">
-            {errors.targetScore}
+          <p className="text-xs text-destructive" role="alert">
+            {t(errors.targetScore)}
           </p>
         ) : null}
       </div>
 
       <div className="grid gap-2 sm:col-span-2">
-        <Label htmlFor={dateId}>Планируемая дата экзамена</Label>
+        <Label htmlFor={dateId}>{t('Планируемая дата экзамена')}</Label>
         <ExamDatePicker
           id={dateId}
           value={form.examDate}
@@ -132,8 +134,8 @@ export function GoalFields({
           contentClassName={elevated ? 'z-[90]' : undefined}
         />
         {errors.examDate ? (
-          <p className="text-xs text-[#c92f2f]" role="alert">
-            {errors.examDate}
+          <p className="text-xs text-destructive" role="alert">
+            {t(errors.examDate)}
           </p>
         ) : null}
       </div>
@@ -151,6 +153,7 @@ type GoalDialogProps = {
  * без перехода в профиль. После сохранения обновляет dashboard.
  */
 export function GoalDialog({ children }: GoalDialogProps) {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<Partial<GoalFormValues>>({})
@@ -208,7 +211,7 @@ export function GoalDialog({ children }: GoalDialogProps) {
     try {
       await goalMutation.mutateAsync(form)
     } catch (error) {
-      setMessage(getErrorMessage(error))
+      setMessage(t(getErrorMessage(error)))
     }
   }
 
@@ -219,50 +222,51 @@ export function GoalDialog({ children }: GoalDialogProps) {
         {isSaved ? (
           <>
             <DialogHeader>
-              <span className="grid size-10 place-items-center rounded-[10px] bg-[#eff6ff] text-[#3b82f6]">
+              <span className="grid size-10 place-items-center rounded-[10px] bg-primary-soft text-primary">
                 <TickCircle className="size-5" aria-hidden />
               </span>
-              <DialogTitle className="mt-1">Цель обновлена</DialogTitle>
+              <DialogTitle className="mt-1">{t('Цель обновлена')}</DialogTitle>
               <DialogDescription>
-                Dashboard уже пересчитан под новый балл и дату экзамена.
+                {t('Dashboard уже пересчитан под новый балл и дату экзамена.')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
               >
-                Готово
+                {t('Готово')}
               </Button>
             </DialogFooter>
           </>
         ) : (
           <form className="grid gap-4" onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>Настроить цель</DialogTitle>
+              <DialogTitle>{t('Настроить цель')}</DialogTitle>
               <DialogDescription>
-                Формат, целевой балл и дата экзамена — под них строится план
-                подготовки.
+                {t(
+                  'Формат, целевой балл и дата экзамена — под них строится план подготовки.',
+                )}
               </DialogDescription>
             </DialogHeader>
 
             {profileQuery.isPending ? (
-              <p className="py-6 text-center text-sm text-[#69696d]">
-                Загружаем текущую цель…
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                {t('Загружаем текущую цель…')}
               </p>
             ) : profileQuery.isError ? (
               <div className="grid gap-3 py-2">
-                <p className="text-sm text-[#69696d]">
-                  Не удалось загрузить текущую цель.
+                <p className="text-sm text-muted-foreground">
+                  {t('Не удалось загрузить текущую цель.')}
                 </p>
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-10 w-fit rounded-[9px] border-[#deded9] bg-white px-4 shadow-none"
+                  className="h-10 w-fit rounded-[9px] border-border bg-card px-4 shadow-none"
                   onClick={() => void profileQuery.refetch()}
                 >
-                  Повторить
+                  {t('Повторить')}
                 </Button>
               </div>
             ) : (
@@ -275,26 +279,28 @@ export function GoalDialog({ children }: GoalDialogProps) {
                   elevated
                 />
                 {message ? (
-                  <p className="text-sm text-[#c92f2f]" role="alert">
-                    {message}
+                  <p className="text-sm text-destructive" role="alert">
+                    {t(message)}
                   </p>
                 ) : null}
-                <DialogFooter className="mt-1 border-t border-[#ededeb] pt-4">
+                <DialogFooter className="mt-1 border-t border-border pt-4">
                   <DialogClose asChild>
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-10 rounded-[9px] border-[#deded9] bg-white px-5 shadow-none"
+                      className="h-10 rounded-[9px] border-border bg-card px-5 shadow-none"
                     >
-                      Отмена
+                      {t('Отмена')}
                     </Button>
                   </DialogClose>
                   <Button
                     type="submit"
                     disabled={goalMutation.isPending}
-                    className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                    className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                   >
-                    {goalMutation.isPending ? 'Сохраняем…' : 'Сохранить цель'}
+                    {goalMutation.isPending
+                      ? t('Сохраняем…')
+                      : t('Сохранить цель')}
                   </Button>
                 </DialogFooter>
               </>

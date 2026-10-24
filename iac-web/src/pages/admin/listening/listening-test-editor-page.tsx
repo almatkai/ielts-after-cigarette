@@ -37,6 +37,7 @@ import {
   uploadListeningMedia,
 } from '@/features/listening/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 import type {
   ListeningGroup,
@@ -121,6 +122,7 @@ function PartAudioPlayer({
   assetId: string
   onAudioRef?: (el: HTMLAudioElement | null) => void
 }) {
+  const { t } = useLanguage()
   const query = useQuery({
     queryKey: ['listening', 'media', assetId],
     queryFn: () => getListeningMediaBlob(assetId),
@@ -136,7 +138,11 @@ function PartAudioPlayer({
     [url],
   )
   if (query.isPending) {
-    return <span className="text-xs text-slate-500">Загружаем аудиоплеер…</span>
+    return (
+      <span className="text-xs text-muted-foreground">
+        {t('Загружаем аудиоплеер…')}
+      </span>
+    )
   }
   if (!url) return null
   return (
@@ -151,6 +157,7 @@ function PartAudioPlayer({
 }
 
 export function ListeningTestEditorPage({ testId }: { testId?: string }) {
+  const { t } = useLanguage()
   const editing = Boolean(testId)
   const auth = useAuth()
   const navigate = useNavigate()
@@ -191,7 +198,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           params: { testId: test.id },
           replace: true,
         })
-      setMessage('Черновик сохранён.')
+      setMessage(t('Черновик сохранён.'))
     },
   })
   const publishMutation = useMutation({
@@ -207,7 +214,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
       await queryClient.invalidateQueries({
         queryKey: listeningKeys.adminTests,
       })
-      setMessage('Тест опубликован и доступен студентам.')
+      setMessage(t('Тест опубликован и доступен студентам.'))
     },
     onError: (error) => setMessage(getErrorMessage(error)),
   })
@@ -219,7 +226,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
       await queryClient.invalidateQueries({
         queryKey: listeningKeys.adminTests,
       })
-      setMessage('Тест перенесён в архив.')
+      setMessage(t('Тест перенесён в архив.'))
     },
   })
   const transcribeMutation = useMutation({
@@ -233,7 +240,9 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
         queryKey: listeningKeys.adminTests,
       })
       setMessage(
-        'Аудио успешно расшифровано нейросетью! Таймкоды и подсказки расставлены.',
+        t(
+          'Аудио успешно расшифровано нейросетью! Таймкоды и подсказки расставлены.',
+        ),
       )
     },
     onError: (error) => setMessage(getErrorMessage(error)),
@@ -281,11 +290,16 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     file: File,
     assign: (id: string) => void,
   ) => {
-    setMessage(`Загружаем ${file.name}…`)
+    setMessage(t('Загружаем {name}…').replace('{name}', file.name))
     try {
       const media = await uploadListeningMedia(kind, file)
       assign(media.id)
-      setMessage(`${media.originalName} загружен. Сохраните черновик.`)
+      setMessage(
+        t('{name} загружен. Сохраните черновик.').replace(
+          '{name}',
+          media.originalName,
+        ),
+      )
     } catch (error) {
       setMessage(getErrorMessage(error))
     }
@@ -323,17 +337,19 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
     }
   }
 
-  if (editing && query.isPending) return <p>Загружаем конструктор…</p>
+  if (editing && query.isPending) return <p>{t('Загружаем конструктор…')}</p>
   if (editing && query.isError)
     return (
       <div role="alert" className="grid gap-3">
-        <p>Не удалось загрузить тест: {getErrorMessage(query.error)}</p>
+        <p>
+          {t('Не удалось загрузить тест:')} {getErrorMessage(query.error)}
+        </p>
         <Button
           type="button"
           variant="outline"
           onClick={() => void query.refetch()}
         >
-          Повторить
+          {t('Повторить')}
         </Button>
       </div>
     )
@@ -343,12 +359,12 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
         <div>
           <Button asChild variant="link" className="h-auto p-0">
             <Link to="/admin/listening/tests">
-              <ArrowLeft aria-hidden /> К Listening тестам
+              <ArrowLeft aria-hidden /> {t('К Listening тестам')}
             </Link>
           </Button>
           <div className="mt-3 flex items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-              {editing ? 'Listening конструктор' : 'Новый Listening тест'}
+            <h1 className="text-3xl font-semibold tracking-normal">
+              {editing ? t('Listening конструктор') : t('Новый Listening тест')}
             </h1>
             {query.data ? (
               <Badge variant="outline">{query.data.status}</Badge>
@@ -364,7 +380,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               onClick={() => void handlePreview()}
             >
               <Eye aria-hidden />
-              {dirty ? 'Сохранить и открыть тест' : 'Предпросмотр теста'}
+              {dirty ? t('Сохранить и открыть тест') : t('Предпросмотр теста')}
             </Button>
           ) : null}
           {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -380,21 +396,25 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               onClick={() => {
                 if (
                   window.confirm(
-                    'Запустить AI STT транскрибацию аудио и автоматическую расстановку таймкодов для всех вопросов теста?',
+                    t(
+                      'Запустить AI STT транскрибацию аудио и автоматическую расстановку таймкодов для всех вопросов теста?',
+                    ),
                   )
                 ) {
                   setMessage(
-                    'Отправляем аудио в AI STT сервис и вычисляем таймкоды вопросов (это займет 10–25 сек)…',
+                    t(
+                      'Отправляем аудио в AI STT сервис и вычисляем таймкоды вопросов (это займет 10–25 сек)…',
+                    ),
                   )
                   transcribeMutation.mutate()
                 }
               }}
-              className="border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 font-medium"
+              className="border-border-strong bg-primary-soft text-primary hover:bg-primary-soft hover:text-primary font-medium"
             >
-              <Magicpen aria-hidden className="size-4 text-purple-600 mr-1" />
+              <Magicpen aria-hidden className="size-4 text-primary mr-1" />
               {transcribeMutation.isPending
-                ? 'STT транскрибация…'
-                : 'AI STT Расшифровка'}
+                ? t('STT транскрибация…')
+                : t('AI STT Расшифровка')}
             </Button>
           ) : null}
           {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -413,7 +433,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               }}
             >
               <Send2 aria-hidden />
-              {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
+              {publishMutation.isPending ? t('Публикуем…') : t('Опубликовать')}
             </Button>
           ) : null}
           {testId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -422,12 +442,12 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               variant="outline"
               disabled={archiveMutation.isPending}
               onClick={() => {
-                if (window.confirm('Архивировать этот Listening тест?')) {
+                if (window.confirm(t('Архивировать этот Listening тест?'))) {
                   archiveMutation.mutate()
                 }
               }}
             >
-              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
+              {archiveMutation.isPending ? t('Архивируем…') : t('Архивировать')}
             </Button>
           ) : null}
           {testId && query.data ? (
@@ -436,7 +456,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               variant="outline"
               onClick={() => setExportOpen(true)}
             >
-              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт V1
+              <ExportCurve aria-hidden className="size-4 mr-1.5" />{' '}
+              {t('Экспорт V1')}
             </Button>
           ) : null}
           <Button
@@ -446,9 +467,9 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               publishMutation.isPending ||
               archiveMutation.isPending
             }
-            className="bg-[#3b82f6] hover:bg-[#2563eb]"
+            className="bg-primary hover:bg-primary-hover"
           >
-            <Save2 aria-hidden /> Сохранить
+            <Save2 aria-hidden /> {t('Сохранить')}
           </Button>
         </div>
       </div>
@@ -463,17 +484,17 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
         />
       ) : null}
       {message ? (
-        <div className="rounded-lg border bg-white px-4 py-3 text-sm">
+        <div className="rounded-lg border bg-card px-4 py-3 text-sm">
           {message}
         </div>
       ) : null}
 
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>Метаданные</CardTitle>
+          <CardTitle>{t('Метаданные')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <Field label="Название">
+          <Field label={t('Название')}>
             <Input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -486,7 +507,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               placeholder="listening-test-105"
             />
           </Field>
-          <Field label="Тип экзамена">
+          <Field label={t('Тип экзамена')}>
             <select
               className="h-10 rounded-md border px-3"
               value={form.examType}
@@ -501,7 +522,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
               <option value="general">General</option>
             </select>
           </Field>
-          <Field label="Продолжительность">
+          <Field label={t('Продолжительность')}>
             <Input
               type="number"
               min={1}
@@ -513,7 +534,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="Описание">
+            <Field label={t('Описание')}>
               <Textarea
                 value={form.description}
                 onChange={(e) =>
@@ -527,7 +548,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
 
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>Общее аудио теста</CardTitle>
+          <CardTitle>{t('Общее аудио теста')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
@@ -535,11 +556,11 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             <label
               className={
                 form.parts.length > 0
-                  ? 'cursor-pointer text-sm font-semibold text-[#1d4ed8]'
-                  : 'cursor-not-allowed text-sm font-semibold text-[#9b9b9f]'
+                  ? 'cursor-pointer text-sm font-semibold text-primary'
+                  : 'cursor-not-allowed text-sm font-semibold text-muted-foreground'
               }
             >
-              Загрузить один файл для всех Parts
+              {t('Загрузить один файл для всех Parts')}
               <input
                 className="sr-only"
                 type="file"
@@ -561,17 +582,21 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 }}
               />
             </label>
-            <span className="text-xs text-[#69696d]">
+            <span className="text-xs text-muted-foreground">
               {sharedAudioAssetId
-                ? `Общий audio asset: ${sharedAudioAssetId}`
+                ? t('Общий audio asset: {id}').replace(
+                    '{id}',
+                    sharedAudioAssetId,
+                  )
                 : form.parts.length > 0
-                  ? 'Общий аудиофайл ещё не прикреплён'
-                  : 'Сначала импортируйте или добавьте Parts'}
+                  ? t('Общий аудиофайл ещё не прикреплён')
+                  : t('Сначала импортируйте или добавьте Parts')}
             </span>
           </div>
-          <p className="mt-2 text-xs text-[#69696d]">
-            Один непрерывный файл будет воспроизводиться без перезапуска при
-            переходе между вопросами и частями теста.
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(
+              'Один непрерывный файл будет воспроизводиться без перезапуска при переходе между вопросами и частями теста.',
+            )}
           </p>
         </CardContent>
       </Card>
@@ -590,11 +615,11 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 })
               }
             >
-              Удалить part
+              {t('Удалить part')}
             </Button>
           </CardHeader>
           <CardContent className="grid gap-5">
-            <Field label="Название part">
+            <Field label={t('Название part')}>
               <Input
                 value={part.title}
                 onChange={(e) =>
@@ -604,8 +629,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             </Field>
             <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
               <ExportCurve className="size-5" aria-hidden />
-              <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
-                Загрузить аудио
+              <label className="cursor-pointer text-sm font-semibold text-primary">
+                {t('Загрузить аудио')}
                 <input
                   className="sr-only"
                   type="file"
@@ -619,18 +644,18 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                   }}
                 />
               </label>
-              <span className="text-xs text-[#69696d]">
+              <span className="text-xs text-muted-foreground">
                 {part.audioAssetId
                   ? `asset ${part.audioAssetId}`
-                  : 'аудио не прикреплено'}
+                  : t('аудио не прикреплено')}
               </span>
             </div>
             {part.audioAssetId ? (
-              <div className="rounded-lg border bg-slate-50 p-2.5">
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                  <span className="font-semibold flex items-center gap-1.5 text-slate-700">
-                    <VolumeHigh className="size-3.5 text-blue-600" />
-                    Плеер предпросмотра аудио
+              <div className="rounded-lg border bg-card p-2.5">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                  <span className="font-semibold flex items-center gap-1.5 text-foreground">
+                    <VolumeHigh className="size-3.5 text-primary" />
+                    {t('Плеер предпросмотра аудио')}
                   </span>
                   <span>Part {partIndex + 1}</span>
                 </div>
@@ -644,46 +669,46 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             ) : null}
 
             {part.transcript ? (
-              <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 space-y-3">
+              <div className="rounded-xl border border-border-strong bg-primary-soft/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">
-                      Стенограмма аудио (AI STT Transcript)
+                    <span className="text-xs font-bold text-primary normal-case">
+                      {t('Стенограмма аудио (AI STT Transcript)')}
                     </span>
                     <Badge
                       variant="outline"
-                      className="bg-white text-blue-700 border-blue-200 text-[11px]"
+                      className="bg-card text-primary border-border-strong text-[11px]"
                     >
-                      {part.transcriptSegments?.length ?? 0} сегментов
+                      {part.transcriptSegments?.length ?? 0} {t('сегментов')}
                     </Badge>
                   </div>
                 </div>
 
                 {part.transcriptSegments &&
                 part.transcriptSegments.length > 0 ? (
-                  <div className="max-h-60 overflow-y-auto space-y-1.5 rounded-lg border border-blue-100 bg-white p-3 text-xs">
+                  <div className="max-h-60 overflow-y-auto space-y-1.5 rounded-lg border border-border-strong bg-card p-3 text-xs">
                     {part.transcriptSegments.map((seg) => (
                       <div
                         key={seg.id}
-                        className="flex items-start gap-2 hover:bg-slate-50 p-1 rounded"
+                        className="flex items-start gap-2 hover:bg-card p-1 rounded"
                       >
                         <button
                           type="button"
                           onClick={() => handleSeek(partIndex, seg.start)}
-                          className="shrink-0 font-mono text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
-                          title="Перемотать аудио на эту секунду"
+                          className="shrink-0 font-mono text-[11px] font-semibold text-primary hover:text-primary bg-primary-soft hover:bg-primary-soft px-1.5 py-0.5 rounded transition-colors"
+                          title={t('Перемотать аудио на эту секунду')}
                         >
                           ▶ {formatSeconds(seg.start)} -{' '}
                           {formatSeconds(seg.end)}
                         </button>
-                        <span className="text-slate-700 leading-relaxed">
+                        <span className="text-foreground leading-relaxed">
                           {seg.text}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap bg-white p-3 rounded-lg border border-blue-100 max-h-48 overflow-y-auto">
+                  <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap bg-card p-3 rounded-lg border border-border-strong max-h-48 overflow-y-auto">
                     {part.transcript}
                   </p>
                 )}
@@ -692,10 +717,15 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
             {part.groups.map((group, groupIndex) => (
               <div
                 key={groupIndex}
-                className="grid gap-4 rounded-xl border bg-[#fafaf8] p-4"
+                className="grid gap-4 rounded-xl border bg-background p-4"
               >
                 <div className="flex flex-wrap items-end gap-3">
-                  <Field label={`Group ${groupIndex + 1} — тип`}>
+                  <Field
+                    label={t('Group {number} — тип').replace(
+                      '{number}',
+                      String(groupIndex + 1),
+                    )}
+                  >
                     <select
                       className="h-10 rounded-md border px-3"
                       value={group.type}
@@ -721,10 +751,10 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                       })
                     }
                   >
-                    Удалить group
+                    {t('Удалить group')}
                   </Button>
                 </div>
-                <Field label="Инструкция">
+                <Field label={t('Инструкция')}>
                   <Textarea
                     value={group.instructions}
                     onChange={(e) =>
@@ -734,7 +764,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                     }
                   />
                 </Field>
-                <Field label="Общий контекст / форма / таблица">
+                <Field label={t('Общий контекст / форма / таблица')}>
                   <Textarea
                     rows={5}
                     value={group.context}
@@ -743,7 +773,9 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                         context: e.target.value,
                       })
                     }
-                    placeholder="Используйте {{answer}} в отображаемых пропусках"
+                    placeholder={t(
+                      'Используйте {{answer}} в отображаемых пропусках',
+                    )}
                   />
                 </Field>
                 <Field label="Group config JSON">
@@ -760,8 +792,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 </Field>
                 <div className="flex items-center gap-3 rounded-lg border p-3">
                   <Image className="size-5" aria-hidden />
-                  <label className="cursor-pointer text-sm font-semibold text-[#1d4ed8]">
-                    Загрузить карту/схему
+                  <label className="cursor-pointer text-sm font-semibold text-primary">
+                    {t('Загрузить карту/схему')}
                     <input
                       className="sr-only"
                       type="file"
@@ -777,19 +809,24 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                       }}
                     />
                   </label>
-                  <span className="text-xs text-[#69696d]">
+                  <span className="text-xs text-muted-foreground">
                     {group.imageAssetId
                       ? `asset ${group.imageAssetId}`
-                      : 'изображение не прикреплено'}
+                      : t('изображение не прикреплено')}
                   </span>
                 </div>
                 {group.questions.map((question, questionIndex) => (
                   <div
                     key={questionIndex}
-                    className="grid gap-3 rounded-lg border bg-white p-3"
+                    className="grid gap-3 rounded-lg border bg-card p-3"
                   >
                     <div className="flex items-center justify-between">
-                      <strong>Вопрос {question.number || '?'}</strong>
+                      <strong>
+                        {t('Вопрос {number}').replace(
+                          '{number}',
+                          String(question.number || '?'),
+                        )}
+                      </strong>
                       <Button
                         type="button"
                         variant="ghost"
@@ -801,11 +838,11 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           })
                         }
                       >
-                        Удалить
+                        {t('Удалить')}
                       </Button>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
-                      <Field label="Номер">
+                      <Field label={t('Номер')}>
                         <Input
                           type="number"
                           min={1}
@@ -820,7 +857,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           }
                         />
                       </Field>
-                      <Field label="Текст">
+                      <Field label={t('Текст')}>
                         <Textarea
                           value={question.prompt}
                           onChange={(e) =>
@@ -836,8 +873,8 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                     </div>
 
                     {/* Audio Timestamps & Hint/Quote Editor */}
-                    <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-blue-100 bg-blue-50/30 p-3">
-                      <Field label="Таймкод начала ответа (сек)">
+                    <div className="grid gap-3 sm:grid-cols-2 rounded-lg border border-border-strong bg-primary-soft/30 p-3">
+                      <Field label={t('Таймкод начала ответа (сек)')}>
                         <div className="flex items-center gap-2">
                           <Input
                             type="number"
@@ -873,7 +910,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           />
                           {typeof question.content.timestampStart ===
                             'number' && (
-                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                            <span className="text-xs font-mono text-muted-foreground shrink-0">
                               ({formatSeconds(question.content.timestampStart)})
                             </span>
                           )}
@@ -890,16 +927,16 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                                     question.content.timestampStart as number,
                                   )
                                 }
-                                className="h-9 px-2.5 text-xs text-blue-600 shrink-0 hover:bg-blue-50"
-                                title="Слушать с этой секунды"
+                                className="h-9 px-2.5 text-xs text-primary shrink-0 hover:bg-primary-soft"
+                                title={t('Слушать с этой секунды')}
                               >
-                                <Play className="size-3 mr-1 text-blue-600" />
-                                <span>Слушать</span>
+                                <Play className="size-3 mr-1 text-primary" />
+                                <span>{t('Слушать')}</span>
                               </Button>
                             )}
                         </div>
                       </Field>
-                      <Field label="Таймкод конца ответа (сек)">
+                      <Field label={t('Таймкод конца ответа (сек)')}>
                         <div className="flex items-center gap-2">
                           <Input
                             type="number"
@@ -934,7 +971,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                           />
                           {typeof question.content.timestampEnd ===
                             'number' && (
-                            <span className="text-xs font-mono text-slate-600 shrink-0">
+                            <span className="text-xs font-mono text-muted-foreground shrink-0">
                               ({formatSeconds(question.content.timestampEnd)})
                             </span>
                           )}
@@ -942,10 +979,14 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                       </Field>
 
                       <div className="sm:col-span-2">
-                        <Field label="Цитата-доказательство из аудио (Quote)">
+                        <Field
+                          label={t('Цитата-доказательство из аудио (Quote)')}
+                        >
                           <Textarea
                             rows={2}
-                            placeholder="Фраза или предложение из аудиозаписи, подтверждающее ответ..."
+                            placeholder={t(
+                              'Фраза или предложение из аудиозаписи, подтверждающее ответ...',
+                            )}
                             value={
                               typeof question.content.quote === 'string'
                                 ? question.content.quote
@@ -969,10 +1010,16 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                       </div>
 
                       <div className="sm:col-span-2">
-                        <Field label="Подсказка к поиску ответа (Scaffolding Hint на русском)">
+                        <Field
+                          label={t(
+                            'Подсказка к поиску ответа (Scaffolding Hint на русском)',
+                          )}
+                        >
                           <Textarea
                             rows={2}
-                            placeholder="Наводящая подсказка для студента: на что обратить внимание или какие ключевые слова слушать..."
+                            placeholder={t(
+                              'Наводящая подсказка для студента: на что обратить внимание или какие ключевые слова слушать...',
+                            )}
                             value={
                               typeof question.content.hint === 'string'
                                 ? question.content.hint
@@ -1063,7 +1110,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                     })
                   }}
                 >
-                  <Add aria-hidden /> Добавить вопрос
+                  <Add aria-hidden /> {t('Добавить вопрос')}
                 </Button>
               </div>
             ))}
@@ -1083,7 +1130,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
                 })
               }
             >
-              <Add aria-hidden /> Добавить группу
+              <Add aria-hidden /> {t('Добавить группу')}
             </Button>
           </CardContent>
         </Card>
@@ -1101,7 +1148,7 @@ export function ListeningTestEditorPage({ testId }: { testId?: string }) {
           })
         }
       >
-        <Add aria-hidden /> Добавить Part
+        <Add aria-hidden /> {t('Добавить Part')}
       </Button>
     </form>
   )

@@ -34,8 +34,9 @@ import type {
   SpeakingPartInput,
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
-const fieldClassName = 'border-[#deded9] bg-white shadow-none'
+const fieldClassName = 'border-border bg-card shadow-none'
 
 const emptyForm: SpeakingMaterialInput = {
   slug: '',
@@ -94,6 +95,7 @@ export function SpeakingMaterialEditorPage({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const editing = Boolean(materialId)
+  const { t } = useLanguage()
   const [form, setForm] = useState<SpeakingMaterialInput>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
   const [exportOpen, setExportOpen] = useState(false)
@@ -133,7 +135,7 @@ export function SpeakingMaterialEditorPage({
         return
       }
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Черновик сохранён.')
+      setMessage(t('Черновик сохранён.'))
     },
   })
   const publishMutation = useMutation({
@@ -147,7 +149,7 @@ export function SpeakingMaterialEditorPage({
         queryKey: speakingKeys.adminMaterial(material.id),
       })
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Материал опубликован.')
+      setMessage(t('Материал опубликован.'))
     },
   })
   const archiveMutation = useMutation({
@@ -161,7 +163,7 @@ export function SpeakingMaterialEditorPage({
         queryKey: speakingKeys.adminMaterial(material.id),
       })
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Материал перенесён в архив.')
+      setMessage(t('Материал перенесён в архив.'))
     },
   })
   const update = <TKey extends keyof SpeakingMaterialInput>(
@@ -181,12 +183,16 @@ export function SpeakingMaterialEditorPage({
     archiveMutation.isPending
 
   if (materialQuery.isPending && editing)
-    return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t('Загружаем материал…')}
+      </p>
+    )
   if (materialQuery.isError)
     return (
       <Card className="shadow-none">
-        <CardContent className="p-6 text-center text-sm text-[#e23b3b]">
-          Не удалось загрузить материал.
+        <CardContent className="p-6 text-center text-sm text-destructive">
+          {t('Не удалось загрузить материал.')}
         </CardContent>
       </Card>
     )
@@ -202,22 +208,27 @@ export function SpeakingMaterialEditorPage({
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
+          >
             <Link to="/admin/speaking/materials">
-              <ArrowLeft aria-hidden />К библиотеке
+              <ArrowLeft aria-hidden />
+              {t('К библиотеке')}
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-              {editing ? 'Редактор Speaking' : 'Новый Speaking-материал'}
+            <h1 className="text-3xl font-semibold tracking-normal">
+              {editing ? t('Редактор Speaking') : t('Новый Speaking-материал')}
             </h1>
             {material ? (
               <Badge variant="outline">{material.status}</Badge>
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
-              Версия {material.currentVersionNumber} · revision{' '}
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t('Версия')} {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
           ) : null}
@@ -234,7 +245,7 @@ export function SpeakingMaterialEditorPage({
               }}
             >
               <Send2 aria-hidden />
-              Опубликовать
+              {t('Опубликовать')}
             </Button>
           ) : null}
           {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -243,12 +254,12 @@ export function SpeakingMaterialEditorPage({
               variant="outline"
               disabled={pending}
               onClick={() => {
-                if (window.confirm('Архивировать этот Speaking-материал?')) {
+                if (window.confirm(t('Архивировать этот Speaking-материал?'))) {
                   archiveMutation.mutate()
                 }
               }}
             >
-              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
+              {archiveMutation.isPending ? t('Архивируем…') : t('Архивировать')}
             </Button>
           ) : null}
           {materialId && material ? (
@@ -257,12 +268,13 @@ export function SpeakingMaterialEditorPage({
               variant="outline"
               onClick={() => setExportOpen(true)}
             >
-              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт JSON
+              <ExportCurve aria-hidden className="size-4 mr-1.5" />{' '}
+              {t('Экспорт JSON')}
             </Button>
           ) : null}
           <Button type="submit" disabled={pending}>
             <Save2 aria-hidden />
-            {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
+            {saveMutation.isPending ? t('Сохраняем…') : t('Сохранить черновик')}
           </Button>
         </div>
       </div>
@@ -281,7 +293,7 @@ export function SpeakingMaterialEditorPage({
           role="status"
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
         >
-          <TickCircle className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-success" aria-hidden />
           {message}
         </p>
       ) : null}
@@ -290,7 +302,7 @@ export function SpeakingMaterialEditorPage({
       archiveMutation.isError ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-sm text-destructive"
         >
           {getErrorMessage(
             saveMutation.error ??
@@ -301,10 +313,10 @@ export function SpeakingMaterialEditorPage({
       ) : null}
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>Метаданные</CardTitle>
+          <CardTitle>{t('Метаданные')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 sm:grid-cols-2">
-          <Field label="Название" className="sm:col-span-2">
+          <Field label={t('Название')} className="sm:col-span-2">
             <Input
               value={form.title}
               onChange={(event) => update('title', event.target.value)}
@@ -315,11 +327,11 @@ export function SpeakingMaterialEditorPage({
             <Input
               value={form.slug}
               onChange={(event) => update('slug', event.target.value)}
-              placeholder="создастся автоматически"
+              placeholder={t('создастся автоматически')}
               className={fieldClassName}
             />
           </Field>
-          <Field label="Формат экзамена">
+          <Field label={t('Формат экзамена')}>
             <select
               value={form.examType}
               onChange={(event) =>
@@ -334,7 +346,7 @@ export function SpeakingMaterialEditorPage({
               <option value="general">General Training</option>
             </select>
           </Field>
-          <Field label="Сложность">
+          <Field label={t('Сложность')}>
             <select
               value={form.difficulty}
               onChange={(event) =>
@@ -350,7 +362,7 @@ export function SpeakingMaterialEditorPage({
               <option value="advanced">Advanced</option>
             </select>
           </Field>
-          <Field label="Краткое описание" className="sm:col-span-2">
+          <Field label={t('Краткое описание')} className="sm:col-span-2">
             <Textarea
               value={form.description}
               onChange={(event) => update('description', event.target.value)}
@@ -380,6 +392,7 @@ function PartEditor({
   part: SpeakingPartInput
   onChange: (patch: Partial<SpeakingPartInput>) => void
 }) {
+  const { t } = useLanguage()
   const updateQuestion = (index: number, prompt: string) =>
     onChange({
       questions: part.questions.map((question, questionIndex) =>
@@ -409,14 +422,14 @@ function PartEditor({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-5">
-        <Field label="Тема / карточка">
+        <Field label={t('Тема / карточка')}>
           <Textarea
             value={part.title}
             onChange={(event) => onChange({ title: event.target.value })}
             rows={3}
           />
         </Field>
-        <Field label="Инструкция">
+        <Field label={t('Инструкция')}>
           <Textarea
             value={part.instructions}
             onChange={(event) => onChange({ instructions: event.target.value })}
@@ -424,7 +437,7 @@ function PartEditor({
           />
         </Field>
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Подготовка, секунд">
+          <Field label={t('Подготовка, секунд')}>
             <Input
               type="number"
               min={0}
@@ -436,7 +449,7 @@ function PartEditor({
               className={fieldClassName}
             />
           </Field>
-          <Field label="Ответ, секунд">
+          <Field label={t('Ответ, секунд')}>
             <Input
               type="number"
               min={30}
@@ -450,7 +463,7 @@ function PartEditor({
           </Field>
         </div>
         {part.type === 'part2' ? (
-          <Field label="Cue-card: одна подсказка на строку">
+          <Field label={t('Cue-card: одна подсказка на строку')}>
             <Textarea
               value={cueText}
               onChange={(event) =>
@@ -468,7 +481,7 @@ function PartEditor({
         ) : (
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-3">
-              <Label>Вопросы экзаменатора</Label>
+              <Label>{t('Вопросы экзаменатора')}</Label>
               <Button
                 type="button"
                 variant="outline"
@@ -476,7 +489,7 @@ function PartEditor({
                 onClick={addQuestion}
               >
                 <Add aria-hidden />
-                Добавить
+                {t('Добавить')}
               </Button>
             </div>
             {part.questions.map((question, index) => (
@@ -493,7 +506,10 @@ function PartEditor({
                   type="button"
                   variant="outline"
                   size="icon"
-                  aria-label={`Удалить вопрос ${index + 1}`}
+                  aria-label={t('Удалить вопрос {number}').replace(
+                    '{number}',
+                    String(index + 1),
+                  )}
                   disabled={part.questions.length <= 2}
                   onClick={() => removeQuestion(index)}
                 >

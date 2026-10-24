@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ApiError } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 type FieldErrors = Partial<Record<'title' | 'slug' | 'bodyHtml', string>>
 
@@ -33,6 +34,7 @@ function hasText(html: string) {
 }
 
 export function BlogPostEditorPage() {
+  const { t } = useLanguage()
   const params = useParams({ strict: false })
   const postId = params.postId
 
@@ -47,14 +49,18 @@ export function BlogPostEditorPage() {
 
   if (!postId) return <EditorForm post={null} />
   if (existingQuery.isPending) {
-    return <p className="text-sm text-[#69696d]">Загружаем статью…</p>
+    return (
+      <p className="text-sm text-muted-foreground">{t('Загружаем статью…')}</p>
+    )
   }
   if (!existingQuery.data) {
     return (
       <div className="mx-auto grid w-full max-w-[880px] gap-4">
-        <p className="text-sm text-[#69696d]">Статья не найдена.</p>
+        <p className="text-sm text-muted-foreground">
+          {t('Статья не найдена.')}
+        </p>
         <Button asChild variant="outline" className="justify-self-start">
-          <Link to="/writer/posts">Мои статьи</Link>
+          <Link to="/writer/posts">{t('Мои статьи')}</Link>
         </Button>
       </div>
     )
@@ -65,6 +71,7 @@ export function BlogPostEditorPage() {
 }
 
 function EditorForm({ post }: { post: BlogPostDto | null }) {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const isNew = post === null
@@ -151,13 +158,13 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
         <div className="min-w-0">
           <Link
             to="/writer/posts"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#69696d] no-underline transition-colors hover:text-[#2563eb]"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary-hover"
           >
             <ArrowLeft className="size-4" aria-hidden />
-            Мои статьи
+            {t('Мои статьи')}
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">
-            {isNew ? 'Новая статья' : 'Редактирование статьи'}
+          <h1 className="text-[28px] sm:text-[36px] mt-2 font-semibold tracking-normal">
+            {isNew ? t('Новая статья') : t('Редактирование статьи')}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -165,7 +172,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
             <Button asChild variant="outline">
               <Link to="/blog/$slug" params={{ slug: post.slug }}>
                 <Export className="size-4" aria-hidden />
-                Открыть
+                {t('Открыть')}
               </Link>
             </Button>
           ) : null}
@@ -174,22 +181,22 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
             onClick={handleSave}
           >
             {saveMutation.isPending
-              ? 'Сохраняем…'
+              ? t('Сохраняем…')
               : isNew
-                ? 'Сохранить черновик'
-                : 'Сохранить'}
+                ? t('Сохранить черновик')
+                : t('Сохранить')}
           </Button>
         </div>
       </div>
 
       {error ? (
-        <p className="rounded-[10px] bg-[#fef2f2] px-4 py-3 text-sm text-[#c92f2f]">
-          {error}
+        <p className="rounded-[10px] bg-destructive-soft px-4 py-3 text-sm text-destructive">
+          {t(error)}
         </p>
       ) : null}
 
       <div className="grid gap-1.5">
-        <Label htmlFor="post-title">Заголовок *</Label>
+        <Label htmlFor="post-title">{t('Заголовок *')}</Label>
         <Input
           id="post-title"
           value={title}
@@ -197,16 +204,18 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
             setTitle(event.target.value)
             setFieldErrors(({ title: _, ...rest }) => rest)
           }}
-          placeholder="О чём статья?"
+          placeholder={t('О чём статья?')}
           aria-invalid={Boolean(fieldErrors.title)}
         />
         <FieldError message={fieldErrors.title} />
       </div>
 
       <div className="grid gap-1.5">
-        <Label htmlFor="post-slug">Адрес статьи</Label>
-        <div className="flex min-w-0 items-center rounded-[10px] border border-[#e7e7e4] bg-white focus-within:border-[#93b4f5]">
-          <span className="shrink-0 pl-3 text-sm text-[#a0a0a4]">/blog/</span>
+        <Label htmlFor="post-slug">{t('Адрес статьи')}</Label>
+        <div className="flex min-w-0 items-center rounded-[10px] border border-border bg-card focus-within:border-primary-soft">
+          <span className="shrink-0 pl-3 text-sm text-muted-foreground">
+            /blog/
+          </span>
           <input
             id="post-slug"
             value={effectiveSlug}
@@ -227,66 +236,70 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
                 setSlugEdited(false)
                 setSlug('')
               }}
-              className="shrink-0 px-3 text-xs font-semibold text-[#2563eb]"
+              className="shrink-0 px-3 text-xs font-semibold text-primary-hover"
             >
-              Из заголовка
+              {t('Из заголовка')}
             </button>
           ) : null}
         </div>
         {fieldErrors.slug ? (
           <FieldError message={fieldErrors.slug} />
         ) : (
-          <p className="text-xs text-[#808084]">
+          <p className="text-xs text-muted-foreground">
             {isNew
-              ? 'Создаётся автоматически из заголовка. Можно изменить.'
-              : 'Меняйте осторожно: старые ссылки на статью перестанут работать.'}
+              ? t('Создаётся автоматически из заголовка. Можно изменить.')
+              : t(
+                  'Меняйте осторожно: старые ссылки на статью перестанут работать.',
+                )}
           </p>
         )}
       </div>
 
       <div className="grid gap-1.5">
-        <Label htmlFor="post-description">Краткое описание</Label>
+        <Label htmlFor="post-description">{t('Краткое описание')}</Label>
         <Textarea
           id="post-description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           rows={2}
-          placeholder="Один-два предложения для карточки статьи и превью в поиске"
+          placeholder={t(
+            'Один-два предложения для карточки статьи и превью в поиске',
+          )}
         />
       </div>
 
       <div className="grid gap-1.5">
-        <Label>Обложка</Label>
+        <Label>{t('Обложка')}</Label>
         {coverMediaId ? (
-          <div className="relative overflow-hidden rounded-[12px] border border-[#e7e7e4]">
+          <div className="relative overflow-hidden rounded-[10px] border border-border">
             <img
               src={blogMediaUrl(coverMediaId)}
-              alt="Обложка статьи"
+              alt={t('Обложка статьи')}
               className="aspect-[16/6] w-full object-cover"
             />
             <button
               type="button"
               onClick={() => setCoverMediaId(null)}
-              className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-[8px] bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#111111] shadow-sm hover:bg-white"
+              className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-[8px] bg-card px-2.5 py-1.5 text-xs font-semibold text-foreground shadow-none hover:bg-card"
             >
               <CloseCircle className="size-4" aria-hidden />
-              Убрать
+              {t('Убрать')}
             </button>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => coverInputRef.current?.click()}
-            className="flex items-center gap-3 rounded-[12px] border border-dashed border-[#c9c9c4] bg-[#fbfbfa] px-4 py-4 text-left transition-colors hover:bg-[#f4f4f1]"
+            className="flex items-center gap-3 rounded-[10px] border border-dashed border-border-strong bg-background px-4 py-4 text-left transition-colors hover:bg-muted"
           >
             <DocumentUpload
-              className="size-5 shrink-0 text-[#69696d]"
+              className="size-5 shrink-0 text-muted-foreground"
               aria-hidden
             />
-            <span className="text-sm text-[#69696d]">
+            <span className="text-sm text-muted-foreground">
               {coverMutation.isPending
-                ? 'Загружаем…'
-                : 'Загрузить обложку (PNG, JPG, WebP или GIF)'}
+                ? t('Загружаем…')
+                : t('Загрузить обложку (PNG, JPG, WebP или GIF)')}
             </span>
           </button>
         )}
@@ -304,7 +317,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
       </div>
 
       <div className="grid gap-1.5">
-        <Label>Текст статьи *</Label>
+        <Label>{t('Текст статьи *')}</Label>
         <BlogRichTextEditor
           content={bodyHtml}
           onChange={(html) => {
@@ -319,6 +332,7 @@ function EditorForm({ post }: { post: BlogPostDto | null }) {
 }
 
 function FieldError({ message }: { message?: string }) {
+  const { t } = useLanguage()
   if (!message) return null
-  return <p className="text-xs text-[#c92f2f]">{message}</p>
+  return <p className="text-xs text-destructive">{t(message)}</p>
 }

@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
+import { useLanguage } from '@/lib/i18n'
+
 export function SortableProviderCard({
   id,
   name,
@@ -13,6 +15,7 @@ export function SortableProviderCard({
   disabled: boolean
   children: ReactNode
 }) {
+  const { t } = useLanguage()
   const {
     attributes,
     listeners,
@@ -31,7 +34,7 @@ export function SortableProviderCard({
         transition,
         zIndex: isDragging ? 2 : undefined,
       }}
-      className={`relative border-b border-slate-100 py-5 pl-14 pr-5 last:border-0 ${isDragging ? 'rounded-xl bg-blue-50 shadow-md ring-1 ring-blue-300' : 'bg-white'}`}
+      className={`relative border-b border-border py-5 pl-14 pr-5 last:border-0 ${isDragging ? 'rounded-xl bg-primary-soft shadow-none ring-1 ring-primary' : 'bg-card'}`}
     >
       <button
         type="button"
@@ -39,9 +42,9 @@ export function SortableProviderCard({
         {...attributes}
         {...listeners}
         disabled={disabled}
-        aria-label={`Переместить ${name}`}
-        title="Перетащите; с клавиатуры: пробел, стрелки, пробел"
-        className="absolute left-3 top-6 flex h-9 w-8 touch-none items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-blue-600 focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40 cursor-grab active:cursor-grabbing"
+        aria-label={`${t('Переместить')} ${name}`}
+        title={t('Перетащите; с клавиатуры: пробел, стрелки, пробел')}
+        className="absolute left-3 top-6 flex h-9 w-8 touch-none items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40 cursor-grab active:cursor-grabbing"
       >
         <svg
           aria-hidden="true"

@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MarkdownContent } from './markdown-content'
 
 import { Badge } from '@/components/ui/badge'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { getErrorMessage } from '@/lib/api/client'
 import { streamAssistantChat } from '@/features/assistant/stream'
@@ -38,13 +39,15 @@ type Message = {
 
 const STORAGE_KEY = 'iac_yuki_chat_messages_v1'
 
-function getInitialMessages(): Message[] {
+function getInitialMessages(t: (source: string) => string): Message[] {
   return [
     {
       id: 'welcome',
       sender: 'fox',
-      text: 'Привет! Меня зовут Юки 🦊 — я твой наставник по IELTS. Могу подсказать структуру эссе, разобрать критерии Band Descriptors, объяснить логику вопросов в Reading и дать советы по таймингу. Что тебя интересует?',
-      time: 'сейчас',
+      text: t(
+        'Привет! Меня зовут Юки 🦊 — я твой наставник по IELTS. Могу подсказать структуру эссе, разобрать критерии Band Descriptors, объяснить логику вопросов в Reading и дать советы по таймингу. Что тебя интересует?',
+      ),
+      time: t('сейчас'),
     },
   ]
 }
@@ -58,6 +61,7 @@ export function AiAssistantChatWindow({
   isOpen,
   onClose,
 }: AiAssistantChatWindowProps) {
+  const { t } = useLanguage()
   const foxSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
@@ -73,7 +77,7 @@ export function AiAssistantChatWindow({
         // Fallback to initial
       }
     }
-    return getInitialMessages()
+    return getInitialMessages(t)
   })
 
   const [input, setInput] = useState('')
@@ -413,7 +417,9 @@ export function AiAssistantChatWindow({
                   ...message,
                   text:
                     getErrorMessage(err) ||
-                    'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                    t(
+                      'Соединение с чатом прервалось. Проверь подключение и попробуй ещё раз.',
+                    ),
                   isError: true,
                   isPending: false,
                 }
@@ -433,7 +439,7 @@ export function AiAssistantChatWindow({
     requestRef.current?.abort()
     requestRef.current = null
     setIsTyping(false)
-    setMessages(getInitialMessages())
+    setMessages(getInitialMessages(t))
     setInput('')
     try {
       sessionStorage.removeItem(STORAGE_KEY)
@@ -455,9 +461,9 @@ export function AiAssistantChatWindow({
         maxHeight: 'calc(100vh - 36px)',
       }}
       className={cn(
-        'fixed z-50 flex flex-col overflow-hidden origin-bottom-right',
+        'assistant-chat-original text-slate-800 fixed z-50 flex flex-col overflow-hidden origin-bottom-right',
         'bottom-4 right-4 sm:bottom-6 sm:right-6',
-        'rounded-3xl bg-white/95 backdrop-blur-xl border border-slate-200/90',
+        'rounded-[24px] bg-white/95 backdrop-blur-xl border border-slate-200/90',
         'shadow-[0_24px_60px_-15px_rgba(15,23,42,0.28),0_0_0_1px_rgba(226,232,240,0.6)]',
         isResizing
           ? 'transition-none select-none'
@@ -472,8 +478,10 @@ export function AiAssistantChatWindow({
         onPointerDown={(e) => handleResizeStart(e, 'top-left')}
         onDoubleClick={toggleExpand}
         className="absolute top-0 left-0 size-8 z-30 flex items-center justify-center cursor-nwse-resize group/corner select-none touch-none"
-        title="Потяните для изменения размера (дважды кликните для переключения)"
-        aria-label="Изменить размер окна"
+        title={t(
+          'Потяните для изменения размера (дважды кликните для переключения)',
+        )}
+        aria-label={t('Изменить размер окна')}
       >
         <div className="absolute top-2 left-2 size-3.5 rounded-tl-lg border-t-2 border-l-2 border-slate-300/90 group-hover/corner:border-blue-500 group-hover/corner:scale-110 group-active/corner:border-blue-600 transition-all flex items-start justify-start p-0.5">
           <div className="size-1 rounded-full bg-slate-300/90 group-hover/corner:bg-blue-500 transition-colors" />
@@ -484,27 +492,27 @@ export function AiAssistantChatWindow({
       <div
         onPointerDown={(e) => handleResizeStart(e, 'top')}
         className="absolute top-0 left-8 right-4 h-2 z-20 cursor-ns-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
-        title="Потяните для изменения высоты"
+        title={t('Потяните для изменения высоты')}
       />
 
       {/* Left Edge Resize Strip */}
       <div
         onPointerDown={(e) => handleResizeStart(e, 'left')}
         className="absolute top-8 left-0 bottom-4 w-2 z-20 cursor-ew-resize select-none touch-none hover:bg-blue-500/20 transition-colors"
-        title="Потяните для изменения ширины"
+        title={t('Потяните для изменения ширины')}
       />
 
       {/* Modern Messenger Header */}
       <div
         onDoubleClick={toggleExpand}
-        title="Дважды кликните, чтобы увеличить или уменьшить окно"
+        title={t('Дважды кликните, чтобы увеличить или уменьшить окно')}
         className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 px-4 py-3 select-none"
       >
         <div className="flex items-center gap-2.5">
           <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-white bg-blue-50 shadow-xs ring-1 ring-blue-100 flex items-center justify-center">
             <img
               src={foxSrc}
-              alt="Юки"
+              alt={t('Юки')}
               className="size-full object-contain p-0.5"
             />
             <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-white bg-emerald-500 ring-1 ring-emerald-400/40" />
@@ -513,15 +521,15 @@ export function AiAssistantChatWindow({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-bold text-slate-900 tracking-tight">
-                Юки
+                {t('Юки')}
               </span>
-              <Badge className="border-none bg-blue-50 text-blue-700 px-1.5 py-0 text-[10px] font-bold">
+              <Badge className="rounded-full border-none bg-blue-50 text-blue-700 px-1.5 py-0 text-[10px] font-bold">
                 IELTS AI
               </Badge>
             </div>
             <p className="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
               <span className="inline-block size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Онлайн наставник
+              {t('Онлайн наставник')}
             </p>
           </div>
         </div>
@@ -531,9 +539,9 @@ export function AiAssistantChatWindow({
             <button
               type="button"
               onClick={handleReset}
-              title="Очистить диалог"
-              className="p-1.5 rounded-xl hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
-              aria-label="Очистить диалог"
+              title={t('Очистить диалог')}
+              className="min-h-11 min-w-11 flex items-center justify-center p-1.5 rounded-[18px] hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
+              aria-label={t('Очистить диалог')}
             >
               <Refresh className="size-4" />
             </button>
@@ -542,9 +550,9 @@ export function AiAssistantChatWindow({
           <button
             type="button"
             onClick={onClose}
-            title="Закрыть чат"
-            className="p-1.5 rounded-xl hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
-            aria-label="Закрыть чат"
+            title={t('Закрыть чат')}
+            className="min-h-11 min-w-11 flex items-center justify-center p-1.5 rounded-[18px] hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
+            aria-label={t('Закрыть чат')}
           >
             <CloseCircle className="size-5" />
           </button>
@@ -567,15 +575,19 @@ export function AiAssistantChatWindow({
                 <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
                   <img
                     src={foxSrc}
-                    alt="Юки"
+                    alt={t('Юки')}
                     className="size-full object-contain"
                   />
                 </div>
               ) : null}
 
               <div
+                style={{
+                  backgroundColor:
+                    msg.sender === 'user' ? '#2563eb' : undefined,
+                }}
                 className={cn(
-                  'max-w-[85%] rounded-2xl p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
+                  'assistant-message max-w-[85%] rounded-[16px] p-3 text-xs sm:text-[13px] leading-relaxed shadow-2xs',
                   msg.sender === 'user'
                     ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-xs shadow-blue-500/10'
                     : msg.isError
@@ -593,7 +605,7 @@ export function AiAssistantChatWindow({
                 <div
                   className={cn(
                     'mt-1 text-[9px] font-medium text-right select-none',
-                    msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400',
+                    msg.sender === 'user' ? 'text-white' : 'text-slate-500',
                   )}
                 >
                   {msg.time}
@@ -607,16 +619,16 @@ export function AiAssistantChatWindow({
             <div className="size-6 shrink-0 overflow-hidden rounded-full border border-blue-200 bg-blue-50/60 p-0.5 flex items-center justify-center">
               <img
                 src={foxSrc}
-                alt="Юки"
+                alt={t('Юки')}
                 className="size-full object-contain"
               />
             </div>
-            <div className="rounded-2xl rounded-bl-xs bg-white border border-slate-200/80 px-3.5 py-2.5 shadow-2xs flex items-center gap-1.5">
+            <div className="rounded-[16px] rounded-bl-xs bg-white border border-slate-200/80 px-3.5 py-2.5 shadow-2xs flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:-0.3s]" />
               <span className="size-1.5 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
               <span className="size-1.5 rounded-full bg-blue-600 animate-bounce" />
               <span className="text-[11px] text-slate-400 ml-1.5 font-medium">
-                Юки думает...
+                {t('Юки думает...')}
               </span>
             </div>
           </div>
@@ -632,8 +644,8 @@ export function AiAssistantChatWindow({
           <button
             type="button"
             onClick={() => scrollPrompts('left')}
-            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 size-6 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-            aria-label="Прокрутить темы влево"
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 size-11 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            aria-label={t('Прокрутить темы влево')}
           >
             <ArrowLeft2 className="size-3.5" />
           </button>
@@ -658,11 +670,11 @@ export function AiAssistantChatWindow({
               type="button"
               onClick={() => {
                 if (hasDragged.current) return
-                handleSend(prompt)
+                handleSend(t(prompt))
               }}
               className="rounded-full border border-slate-200/90 bg-white hover:border-blue-300 hover:bg-blue-50/80 hover:text-blue-600 text-[11px] font-medium text-slate-600 px-2.5 py-1 transition-all whitespace-nowrap cursor-pointer shadow-2xs shrink-0 select-none active:scale-95"
             >
-              {prompt}
+              {t(prompt)}
             </button>
           ))}
         </div>
@@ -672,8 +684,8 @@ export function AiAssistantChatWindow({
           <button
             type="button"
             onClick={() => scrollPrompts('right')}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 size-6 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-            aria-label="Прокрутить темы вправо"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 size-11 rounded-full bg-white/95 shadow-md border border-slate-200/90 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            aria-label={t('Прокрутить темы вправо')}
           >
             <ArrowRight2 className="size-3.5" />
           </button>
@@ -692,19 +704,19 @@ export function AiAssistantChatWindow({
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Спроси Юки о подготовке к IELTS..."
-          className="flex-1 bg-slate-50/90 border border-slate-200/90 rounded-2xl px-3.5 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          placeholder={t('Спроси Юки о подготовке к IELTS...')}
+          className="min-w-0 min-h-11 flex-1 bg-slate-50/90 border border-slate-200/90 rounded-[16px] px-3.5 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
         />
         <button
           type="submit"
           disabled={!input.trim() || isTyping}
           className={cn(
-            'size-9 rounded-xl flex items-center justify-center transition-all shrink-0',
+            'size-11 rounded-[18px] flex items-center justify-center transition-all shrink-0',
             input.trim() && !isTyping
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 hover:bg-blue-700 hover:scale-105 active:scale-95 cursor-pointer'
+              ? 'bg-[#3C82F6] text-white shadow-md shadow-blue-500/25 hover:bg-blue-700 hover:scale-105 active:scale-95 cursor-pointer'
               : 'bg-slate-100 text-slate-400 cursor-not-allowed',
           )}
-          aria-label="Отправить"
+          aria-label={t('Отправить')}
         >
           <Send2 className="size-4" />
         </button>

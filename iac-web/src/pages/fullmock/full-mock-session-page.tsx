@@ -17,6 +17,7 @@ import {
 import type { FullMockSession, FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { FullMockReport } from './full-mock-report'
+import { tr } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
   listening: 'Listening',
@@ -87,16 +88,16 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Загружаем экзаменационную сессию…"
-        description="Получаем статус секций, таймеры и расписание Full Mock..."
+        label="Loading your exam session…"
+        description="Loading section status, timers, and the Full Mock schedule..."
       />
     )
   }
   if (query.isError)
     return (
       <ErrorState
-        title="Не удалось загрузить Full Mock"
-        message={getErrorMessage(query.error)}
+        title="Could not load the Full Mock"
+        message={tr(getErrorMessage(query.error))}
         onRetry={() => void query.refetch()}
       />
     )
@@ -114,7 +115,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               ? 'Academic'
               : 'General Training'}
           </Badge>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+          <h1 className="text-[28px] sm:text-[36px] mt-2 font-semibold tracking-normal">
             {session.mockTest.title}
           </h1>
         </div>
@@ -124,12 +125,12 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           onClick={() => returnToSite.mutate()}
         >
           <ArrowLeft aria-hidden />
-          {returnToSite.isPending ? 'Сохраняем…' : 'Вернуться на сайт'}
+          {returnToSite.isPending ? 'Saving…' : 'Return to site'}
         </Button>
       </div>
       {returnToSite.isError ? (
-        <p role="alert" className="text-sm text-[#e23b3b]">
-          Не удалось приостановить тест: {getErrorMessage(returnToSite.error)}
+        <p role="alert" className="text-sm text-destructive">
+          Could not pause the test: {tr(getErrorMessage(returnToSite.error))}
         </p>
       ) : null}
       {session.status === 'SUBMITTED' ? (
@@ -150,27 +151,27 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
             current.attempt.status,
           ) ? (
-            <Card className="border-[#dbeafe] bg-[#eff6ff] shadow-none">
+            <Card className="border-primary-soft bg-primary-soft shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} завершён. Можно перейти дальше.
+                  {labels[current.skill]} is complete. You can continue.
                 </p>
                 <Button
                   disabled={advance.isPending || returnToSite.isPending}
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
-                    ? 'Переходим…'
+                    ? 'Continuing…'
                     : session.currentSection === 4
-                      ? 'Завершить и показать отчёт'
-                      : 'Продолжить к следующей секции'}
+                      ? 'Finish and show the report'
+                      : 'Continue to the next section'}
                 </Button>
               </CardContent>
             </Card>
           ) : null}
           {advance.isError ? (
-            <p className="text-sm text-[#e23b3b]">
-              {getErrorMessage(advance.error)}
+            <p className="text-sm text-destructive">
+              {tr(getErrorMessage(advance.error))}
             </p>
           ) : null}
         </>
@@ -201,7 +202,7 @@ function SectionCard({
   const locked = section.position > currentSection
   return (
     <Card
-      className={isCurrent ? 'border-[#93c5fd] shadow-none' : 'shadow-none'}
+      className={isCurrent ? 'border-primary-soft shadow-none' : 'shadow-none'}
     >
       <CardHeader>
         <div className="flex flex-col items-start gap-2">
@@ -209,40 +210,40 @@ function SectionCard({
             0{section.position} · {labels[section.skill]}
           </CardTitle>
           {completed ? (
-            <Badge className="bg-emerald-600">
+            <Badge className="bg-success">
               <TickCircle aria-hidden />
               {section.attempt.status === 'ABANDONED'
-                ? 'Время вышло'
+                ? 'Time is up'
                 : section.attempt.status === 'PROCESSING'
-                  ? 'Проверяется'
-                  : 'Сдано'}
+                  ? 'Assessing'
+                  : 'Submitted'}
             </Badge>
           ) : locked ? (
             <Badge variant="outline">
               <Lock aria-hidden />
-              Закрыто
+              Locked
             </Badge>
           ) : (
-            <Badge variant="secondary">Текущая</Badge>
+            <Badge variant="secondary">Current</Badge>
           )}
         </div>
       </CardHeader>
       <CardContent>
-        <p className="mb-4 text-sm text-[#69696d]">
+        <p className="mb-4 text-sm text-muted-foreground">
           {section.durationMinutes ??
             (section.skill === 'listening'
               ? 30
               : section.skill === 'speaking'
                 ? 15
                 : 60)}{' '}
-          минут
+          minutes
         </p>
         {isCurrent && !completed ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionLink section={section} sessionId={sessionId} />
             {section.remainingMilliseconds != null ? (
               <Badge variant="outline">
-                На паузе · {formatRemainingTime(section.remainingMilliseconds)}
+                Paused at · {formatRemainingTime(section.remainingMilliseconds)}
               </Badge>
             ) : section.deadlineAt ? (
               <div className="flex items-center gap-2">
@@ -251,7 +252,7 @@ function SectionCard({
                   disabled={pause.isPending}
                   onClick={() => pause.mutate()}
                 >
-                  На паузу
+                  Pause
                 </Button>
                 <ExamTimer deadlineAt={section.deadlineAt} />
               </div>
@@ -259,8 +260,8 @@ function SectionCard({
           </div>
         ) : null}
         {pause.isError ? (
-          <p role="alert" className="mt-3 text-sm text-red-600">
-            {getErrorMessage(pause.error)}
+          <p role="alert" className="mt-3 text-sm text-destructive">
+            {tr(getErrorMessage(pause.error))}
           </p>
         ) : null}
       </CardContent>
@@ -278,7 +279,7 @@ function SectionLink({
   const content = (
     <>
       <PlayCircle aria-hidden />
-      Продолжить
+      Resume section
     </>
   )
   return (

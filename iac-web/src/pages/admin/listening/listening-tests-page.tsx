@@ -22,8 +22,10 @@ import {
 } from '@/features/listening/api'
 import type { ListeningTest } from '@/features/listening/api'
 import { useAuth } from '@/features/auth/auth-store'
+import { useLanguage } from '@/lib/i18n'
 
 export function ListeningTestsPage() {
+  const { t } = useLanguage()
   const auth = useAuth()
   const [exportTest, setExportTest] = useState<ListeningTest | null>(null)
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null)
@@ -48,35 +50,35 @@ export function ListeningTestsPage() {
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#3b82f6]">
+          <p className="text-xs font-semibold normal-case text-primary">
             Listening
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-            Listening тесты
+          <h1 className="mt-2 text-3xl font-semibold tracking-normal">
+            {t('Listening тесты')}
           </h1>
-          <p className="mt-2 text-sm text-[#69696d]">
-            Аудио, части теста и группы вопросов.
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t('Аудио, части теста и группы вопросов.')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
             <Link to="/admin/listening/import">
-              <DocumentUpload aria-hidden /> Импортировать
+              <DocumentUpload aria-hidden /> {t('Импортировать')}
             </Link>
           </Button>
-          <Button asChild className="bg-[#3b82f6] hover:bg-[#2563eb]">
+          <Button asChild className="bg-primary hover:bg-primary-hover">
             <Link to="/admin/listening/tests/new">
-              <Add aria-hidden /> Создать вручную
+              <Add aria-hidden /> {t('Создать вручную')}
             </Link>
           </Button>
         </div>
       </div>
-      {query.isPending ? <p>Загружаем…</p> : null}
+      {query.isPending ? <p>{t('Загружаем…')}</p> : null}
       {query.data?.items.length === 0 ? (
         <Card className="border-dashed shadow-none">
           <CardContent className="grid place-items-center gap-3 p-16 text-center">
-            <Headphone className="size-8 text-[#999]" aria-hidden />
-            <p className="font-semibold">Listening тестов пока нет</p>
+            <Headphone className="size-8 text-muted-foreground" aria-hidden />
+            <p className="font-semibold">{t('Listening тестов пока нет')}</p>
           </CardContent>
         </Card>
       ) : null}
@@ -90,13 +92,13 @@ export function ListeningTestsPage() {
                   <Badge variant="outline">{test.status}</Badge>
                 </div>
                 {test.hasUnpublishedChanges ? (
-                  <p className="mt-1 text-xs text-amber-700">
-                    Есть неопубликованные изменения
+                  <p className="mt-1 text-xs text-warning-fg">
+                    {t('Есть неопубликованные изменения')}
                   </p>
                 ) : null}
-                <p className="mt-1 text-sm text-[#69696d]">
-                  {test.examType} · {test.durationMinutes} минут · version{' '}
-                  {test.currentVersionNumber}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {test.examType} · {test.durationMinutes} {t('минут')} ·
+                  version {test.currentVersionNumber}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -108,7 +110,7 @@ export function ListeningTestsPage() {
                       preload={false}
                     >
                       <Eye aria-hidden />
-                      Предпросмотр теста
+                      {t('Предпросмотр теста')}
                     </Link>
                   </Button>
                 ) : null}
@@ -119,14 +121,14 @@ export function ListeningTestsPage() {
                   onClick={() => void handleExport(test.id)}
                 >
                   <ExportCurve aria-hidden />
-                  {exportLoadingId === test.id ? 'Загрузка…' : 'Экспорт'}
+                  {exportLoadingId === test.id ? t('Загрузка…') : t('Экспорт')}
                 </Button>
                 <Button asChild variant="outline">
                   <Link
                     to="/admin/listening/tests/$testId"
                     params={{ testId: test.id }}
                   >
-                    <Edit aria-hidden /> Редактировать
+                    <Edit aria-hidden /> {t('Редактировать')}
                   </Link>
                 </Button>
               </div>

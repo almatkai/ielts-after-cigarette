@@ -13,6 +13,7 @@ import { ReadingAttemptRunner } from '@/pages/reading/reading-student-page'
 import { SpeakingAttemptRunner } from '@/pages/speaking/speaking-student-page'
 import { WritingAttemptRunner } from '@/pages/writing/writing-student-page'
 import { getErrorMessage } from '@/lib/api/client'
+import { tr } from '@/lib/i18n'
 
 export function FullMockSectionPage({
   sessionId,
@@ -65,16 +66,16 @@ export function FullMockSectionPage({
     return (
       <ExamLoadingScreen
         badge="IELTS Full Mock"
-        label="Открываем секцию экзамена…"
-        description="Инициализируем материалы следующей части полного пробного тестирования..."
+        label="Opening the exam section…"
+        description="Preparing the materials for the next part of the full mock exam..."
       />
     )
   }
   if (query.isError) {
     return (
       <ErrorState
-        title="Не удалось открыть секцию Full Mock"
-        message={getErrorMessage(query.error)}
+        title="Could not open the Full Mock section"
+        message={tr(getErrorMessage(query.error))}
         onRetry={() => void query.refetch()}
       />
     )

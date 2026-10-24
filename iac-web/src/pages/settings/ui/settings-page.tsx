@@ -1,3 +1,4 @@
+import { useThemePreference } from '@/features/theme/theme'
 import { useForm } from '@tanstack/react-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -23,7 +24,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { ErrorState, LoadingState } from '@/features/attempts/attempt-ui'
-import { authStore } from '@/features/auth/auth-store'
+import { authStore, useAuth } from '@/features/auth/auth-store'
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { useMascotVisibility } from '@/features/assistant/mascot-store'
 import {
   getProfile,
@@ -32,14 +34,16 @@ import {
   updateProfile,
 } from '@/features/ielts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
+import { LanguagePicker } from '@/components/ui/language-picker'
 
-const cardClassName = 'gap-0 rounded-[16px] border-[#e7e7e4] py-0 shadow-none'
+const cardClassName = 'gap-0 rounded-[10px] border-border py-0 shadow-none'
 
 const fieldClassName =
-  'h-11 min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const selectClassName =
-  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-[#deded9] bg-white shadow-none focus-visible:border-[#3b82f6] focus-visible:ring-0'
+  'h-11 w-full min-w-0 max-w-full rounded-[9px] border-border bg-card shadow-none focus-visible:border-primary focus-visible:ring-0'
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(2, 'Укажите имя не короче 2 символов'),
@@ -93,12 +97,16 @@ function firstError(errors: unknown[]) {
 }
 
 export function SettingsPage() {
+  const { preference, setPreference } = useThemePreference()
+  const { t } = useLanguage()
+  const { user } = useAuth()
   const { isVisible: isMascotVisible, setVisible: setMascotVisible } =
     useMascotVisibility()
   const queryClient = useQueryClient()
   const profileQuery = useQuery({
     queryKey: queryKeys.profile,
     queryFn: ({ signal }) => getProfile(signal),
+    enabled: Boolean(user),
   })
   const profile = profileQuery.data ?? null
   const [profileMessage, setProfileMessage] = useState<string | null>(null)
@@ -119,7 +127,7 @@ export function SettingsPage() {
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setProfileMessage('Профиль сохранён.')
       } catch (error) {
-        setProfileMessage(getErrorMessage(error))
+        setProfileMessage(t(getErrorMessage(error)))
       }
     },
   })
@@ -143,7 +151,7 @@ export function SettingsPage() {
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setGoalMessage('Цель обновлена.')
       } catch (error) {
-        setGoalMessage(getErrorMessage(error))
+        setGoalMessage(t(getErrorMessage(error)))
       }
     },
   })
@@ -164,14 +172,38 @@ export function SettingsPage() {
     }
   }, [profile, initialized, profileForm, goalForm])
 
+  // Гость может выбрать язык без регистрации; остальное откроется после входа.
+  if (!user) {
+    return (
+      <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+        <LanguageSettingsCard />
+        <Card className={cardClassName}>
+          <CardHeader className="border-b border-border p-5 sm:p-6">
+            <CardTitle className="text-base tracking-[-0.02em]">
+              {t('Профиль и цель')}
+            </CardTitle>
+            <CardDescription className="mt-1 leading-5">
+              {t(
+                'Профиль, цель подготовки и напоминания доступны после входа.',
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 sm:p-6">
+            <LoginToContinue />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (profileQuery.isPending) {
-    return <LoadingState label="Загружаем настройки…" />
+    return <LoadingState label={t('Загружаем настройки…')} />
   }
   if (profileQuery.isError) {
     return (
       <ErrorState
-        title="Не удалось загрузить профиль"
-        message={getErrorMessage(profileQuery.error)}
+        title={t('Не удалось загрузить профиль')}
+        message={t(getErrorMessage(profileQuery.error))}
         onRetry={() => void profileQuery.refetch()}
       />
     )
@@ -179,23 +211,56 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
+      <LanguageSettingsCard />
       <div>
-        <h2 className="text-lg font-semibold tracking-[-0.025em] text-[#111111]">
-          Настройте профиль и цель
+        <h2 className="text-lg font-semibold tracking-[-0.025em] text-foreground">
+          {t('Настройте профиль и цель')}
         </h2>
-        <p className="mt-1 text-sm leading-6 text-[#69696d]">
-          Укажите целевой балл и дату экзамена — по ним строится ваш план
-          подготовки.
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          {t(
+            'Укажите целевой балл и дату экзамена — по ним строится ваш план подготовки.',
+          )}
         </p>
       </div>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="p-5 sm:p-6">
+          <CardTitle className="text-base">{t('Тема оформления')}</CardTitle>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 sm:px-6">
+          <div
+            role="group"
+            aria-label={t('Тема оформления')}
+            className="inline-flex flex-wrap gap-1 rounded-lg border border-border bg-muted p-1"
+          >
+            {(
+              [
+                { value: 'system', label: 'Системная' },
+                { value: 'light', label: 'Светлая' },
+                { value: 'dark', label: 'Тёмная' },
+              ] as const
+            ).map((theme) => (
+              <button
+                type="button"
+                key={theme.value}
+                aria-pressed={preference === theme.value}
+                onClick={() => setPreference(theme.value)}
+                className={`min-h-11 rounded-md px-3 text-sm font-semibold transition-colors ${preference === theme.value ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-card'}`}
+              >
+                {t(theme.label)}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className={cardClassName}>
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Профиль
+            {t('Профиль')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Имя аккаунта.
+            {t('Имя аккаунта.')}
           </CardDescription>
         </CardHeader>
         <form
@@ -214,39 +279,42 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Имя</Label>
+                  <Label htmlFor={field.name}>{t('Имя')}</Label>
                   <Input
                     id={field.name}
                     autoComplete="name"
-                    placeholder="Как к вам обращаться"
+                    placeholder={t('Как к вам обращаться')}
                     value={field.state.value}
                     onChange={(event) => field.handleChange(event.target.value)}
                     onBlur={field.handleBlur}
                     className={fieldClassName}
                   />
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                    <p className="text-xs text-destructive" role="alert">
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
               )}
             </profileForm.Field>
             {profileMessage ? (
-              <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
-                {profileMessage}
+              <p
+                className="text-sm text-muted-foreground sm:col-span-2"
+                role="status"
+              >
+                {t(profileMessage)}
               </p>
             ) : null}
           </CardContent>
-          <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+          <CardFooter className="justify-end border-t border-border px-5 py-4 sm:px-6">
             <profileForm.Subscribe selector={(state) => state.isSubmitting}>
               {(isSubmitting) => (
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                 >
-                  {isSubmitting ? 'Сохраняем…' : 'Сохранить профиль'}
+                  {isSubmitting ? t('Сохраняем…') : t('Сохранить профиль')}
                 </Button>
               )}
             </profileForm.Subscribe>
@@ -255,12 +323,12 @@ export function SettingsPage() {
       </Card>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Цель подготовки
+            {t('Цель подготовки')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Целевой балл, формат и дата экзамена.
+            {t('Целевой балл, формат и дата экзамена.')}
           </CardDescription>
         </CardHeader>
         <form
@@ -279,13 +347,13 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Целевой балл</Label>
+                  <Label htmlFor={field.name}>{t('Целевой балл')}</Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
                   >
                     <SelectTrigger id={field.name} className={selectClassName}>
-                      <SelectValue placeholder="Выберите балл" />
+                      <SelectValue placeholder={t('Выберите балл')} />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       {targetBandOptions.map((band) => (
@@ -296,8 +364,8 @@ export function SettingsPage() {
                     </SelectContent>
                   </Select>
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                    <p className="text-xs text-destructive" role="alert">
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -309,13 +377,13 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name}>Формат IELTS</Label>
+                  <Label htmlFor={field.name}>{t('Формат IELTS')}</Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
                   >
                     <SelectTrigger id={field.name} className={selectClassName}>
-                      <SelectValue placeholder="Выберите формат" />
+                      <SelectValue placeholder={t('Выберите формат')} />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       <SelectItem value="academic">Academic</SelectItem>
@@ -323,8 +391,8 @@ export function SettingsPage() {
                     </SelectContent>
                   </Select>
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                    <p className="text-xs text-destructive" role="alert">
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
@@ -336,7 +404,9 @@ export function SettingsPage() {
             >
               {(field) => (
                 <div className="grid gap-2 sm:col-span-2">
-                  <Label htmlFor={field.name}>Планируемая дата экзамена</Label>
+                  <Label htmlFor={field.name}>
+                    {t('Планируемая дата экзамена')}
+                  </Label>
                   <Input
                     id={field.name}
                     type="date"
@@ -347,28 +417,31 @@ export function SettingsPage() {
                     className={fieldClassName}
                   />
                   {firstError(field.state.meta.errors) ? (
-                    <p className="text-xs text-[#c92f2f]" role="alert">
-                      {firstError(field.state.meta.errors)}
+                    <p className="text-xs text-destructive" role="alert">
+                      {t(firstError(field.state.meta.errors) ?? '')}
                     </p>
                   ) : null}
                 </div>
               )}
             </goalForm.Field>
             {goalMessage ? (
-              <p className="text-sm text-[#69696d] sm:col-span-2" role="status">
-                {goalMessage}
+              <p
+                className="text-sm text-muted-foreground sm:col-span-2"
+                role="status"
+              >
+                {t(goalMessage)}
               </p>
             ) : null}
           </CardContent>
-          <CardFooter className="justify-end border-t border-[#ededeb] px-5 py-4 sm:px-6">
+          <CardFooter className="justify-end border-t border-border px-5 py-4 sm:px-6">
             <goalForm.Subscribe selector={(state) => state.isSubmitting}>
               {(isSubmitting) => (
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-[9px] bg-[#3b82f6] px-5 shadow-none hover:bg-[#2563eb]"
+                  className="h-10 rounded-[9px] bg-primary px-5 shadow-none hover:bg-primary-hover"
                 >
-                  {isSubmitting ? 'Сохраняем…' : 'Сохранить цель'}
+                  {isSubmitting ? t('Сохраняем…') : t('Сохранить цель')}
                 </Button>
               )}
             </goalForm.Subscribe>
@@ -377,12 +450,12 @@ export function SettingsPage() {
       </Card>
 
       <Card className={cardClassName}>
-        <CardHeader className="border-b border-[#ededeb] p-5 sm:p-6">
+        <CardHeader className="border-b border-border p-5 sm:p-6">
           <CardTitle className="text-base tracking-[-0.02em]">
-            Персонаж-помощник
+            {t('Помощник Юки')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Управление отображением питомца Юки в интерфейсе.
+            {t('Управление отображением питомца Юки в интерфейсе.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-5 sm:p-6">
@@ -390,25 +463,47 @@ export function SettingsPage() {
             <div className="space-y-0.5">
               <Label
                 htmlFor="mascot-toggle"
-                className="text-sm font-medium text-[#111111] cursor-pointer"
+                className="text-sm font-medium text-foreground cursor-pointer"
               >
-                Показывать питомца (Юки)
+                {t('Показывать питомца (Юки)')}
               </Label>
-              <p className="text-xs leading-5 text-[#69696d]">
-                Отображать анимированного лисёнка в правом нижнем углу экрана.
-                Если отключить, останется компактная кнопка быстрого перехода в
-                чат.
+              <p className="text-xs leading-5 text-muted-foreground">
+                {t(
+                  'Отображать анимированного лисёнка в правом нижнем углу экрана. Если отключить, останется компактная кнопка быстрого перехода в чат.',
+                )}
               </p>
             </div>
             <Switch
               id="mascot-toggle"
               checked={isMascotVisible}
               onCheckedChange={setMascotVisible}
-              className="data-[state=checked]:bg-[#3b82f6]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+// Язык — персональная настройка устройства, доступная и гостям без аккаунта.
+function LanguageSettingsCard() {
+  const { t } = useLanguage()
+  return (
+    <Card className={cardClassName}>
+      <CardHeader className="border-b border-border p-5 sm:p-6">
+        <CardTitle className="text-base tracking-[-0.02em]">
+          {t('Язык интерфейса')}
+        </CardTitle>
+        <CardDescription className="mt-1 leading-5">
+          {t(
+            'Выберите язык приложения. Настройка сохранится на этом устройстве.',
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-5 sm:p-6">
+        <LanguagePicker />
+      </CardContent>
+    </Card>
   )
 }

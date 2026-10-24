@@ -5,6 +5,8 @@ import type { PublicListeningTest } from '@/features/listening/api'
 import type { PublicReadingMaterial } from '@/features/reading/api'
 import type { PublicSpeakingMaterial } from '@/features/speaking/api'
 import type { PublicWritingMaterial } from '@/features/writing/api'
+import { getStoredLanguage } from '@/lib/i18n'
+import type { Language } from '@/lib/i18n'
 
 export type AttemptStatus =
   'IN_PROGRESS' | 'PROCESSING' | 'SUBMITTED' | 'ABANDONED'
@@ -261,7 +263,8 @@ export type AttemptMaterialType =
   'listening' | 'reading' | 'writing' | 'speaking'
 
 export const attemptKeys = {
-  detail: (id: string) => ['attempts', id] as const,
+  detail: (id: string, language?: Language) =>
+    ['attempts', id, language ?? getStoredLanguage()] as const,
   status: (id: string) => ['attempts', id, 'status'] as const,
   list: (materialType: AttemptMaterialType) =>
     ['attempts', 'list', materialType] as const,
@@ -294,20 +297,31 @@ export const listAttemptHistory = (cursor?: string, signal?: AbortSignal) =>
     { signal },
   )
 
+// Stored review translations live in the backend DB; pass the device
+// language so explanation/hint arrive translated (RU stays the default).
+export function reviewLangParam(language: Language = getStoredLanguage()) {
+  return language === 'ru' ? '' : `lang=${language}`
+}
+
 export const listMistakeAttempts = (
   materialType: AttemptMaterialType,
   page: number,
   signal?: AbortSignal,
-) =>
-  apiClient.request<MistakeAttemptsPage>(
-    `/api/v1/attempts/mistakes/attempts?materialType=${materialType}&page=${page}&limit=12`,
+) => {
+  const lang = reviewLangParam()
+  return apiClient.request<MistakeAttemptsPage>(
+    `/api/v1/attempts/mistakes/attempts?materialType=${materialType}&page=${page}&limit=12${lang ? `&${lang}` : ''}`,
     { signal },
   )
+}
 
-export const getMistakeDetail = (attemptId: string, signal?: AbortSignal) =>
-  apiClient.request<MistakeDetail>(`/api/v1/attempts/${attemptId}/mistakes`, {
-    signal,
-  })
+export const getMistakeDetail = (attemptId: string, signal?: AbortSignal) => {
+  const lang = reviewLangParam()
+  return apiClient.request<MistakeDetail>(
+    `/api/v1/attempts/${attemptId}/mistakes${lang ? `?${lang}` : ''}`,
+    { signal },
+  )
+}
 
 export const getAttemptMaterial = (attemptId: string, signal?: AbortSignal) =>
   apiClient.request<PublicListeningTest | PublicReadingMaterial>(
@@ -377,5 +391,10 @@ export const getAttemptStatus = (attemptId: string, signal?: AbortSignal) =>
     { signal },
   )
 
-export const getAttempt = (attemptId: string, signal?: AbortSignal) =>
-  apiClient.request<AttemptDetail>(`/api/v1/attempts/${attemptId}`, { signal })
+export const getAttempt = (attemptId: string, signal?: AbortSignal) => {
+  const lang = reviewLangParam()
+  return apiClient.request<AttemptDetail>(
+    `/api/v1/attempts/${attemptId}${lang ? `?${lang}` : ''}`,
+    { signal },
+  )
+}

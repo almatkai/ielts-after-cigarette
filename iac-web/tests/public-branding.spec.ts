@@ -13,9 +13,9 @@ const user = {
 }
 
 for (const [path, title] of [
-  ['./', 'Daiyndyq IELTS — сдай IELTS выше 7.0 с первого раза'],
-  ['./practice', 'Практика — Daiyndyq IELTS'],
-  ['./profile', 'Профиль — Daiyndyq IELTS'],
+  ['./', 'Yrys Academy — подготовка к IELTS онлайн'],
+  ['./practice', 'Практика — Yrys Academy'],
+  ['./profile', 'Профиль — Yrys Academy'],
 ]) {
   test(`student page title uses the public brand: ${path}`, async ({
     page,
@@ -61,7 +61,7 @@ for (const [path, title] of [
     await expect(page).toHaveTitle(title)
     await expect(
       page.getByRole('link', {
-        name: 'Daiyndyq IELTS — к обзору',
+        name: 'Yrys Academy — к обзору',
         exact: true,
       }),
     ).toBeVisible()

@@ -2,14 +2,22 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Turnstile } from '@/components/auth/turnstile'
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { Button } from '@/components/ui/button'
 import { authStore, useAuth } from '@/features/auth/auth-store'
-import { getGuestConfig, startGuestMock } from '@/features/auth/guest'
+import {
+  getGuestConfig,
+  guestTrialExpiredMessage,
+  isGuestTrialExpired,
+  startGuestMock,
+} from '@/features/auth/guest'
 import { fullMockKeys } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
 export function GuestTrialCard() {
-  const { guest, initialized } = useAuth()
+  const { t } = useLanguage()
+  const { guest, guestExpired, initialized } = useAuth()
   const navigate = useNavigate()
   const client = useQueryClient()
   const [token, setToken] = useState('')
@@ -28,31 +36,44 @@ export function GuestTrialCard() {
         params: { sessionId: session.id },
       })
     },
-    onError: () => {
+    onError: (error) => {
+      if (isGuestTrialExpired(error)) {
+        authStore.expireGuest()
+        return
+      }
       setToken('')
       setChallengeVersion((value) => value + 1)
     },
   })
   return (
     <section
-      aria-label="Бесплатный Full Mock"
-      className="grid gap-4 rounded-2xl border border-[#dbeafe] bg-white p-5 sm:p-7"
+      aria-label={t('Бесплатный Full Mock')}
+      className="grid gap-4 rounded-xl border border-primary-soft bg-card p-5 sm:p-7"
     >
       <div>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-          Полный пробный IELTS
+          {t('Полный пробный IELTS')}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#69696d]">
-          Проверьте свой уровень IELTS — пройдите полный пробный тест.
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          {t('Проверьте свой уровень IELTS — пройдите полный пробный тест.')}
         </p>
       </div>
-      {guest?.sessionId ? (
+      {guestExpired ? (
+        <>
+          <p role="alert" className="text-sm text-destructive">
+            {t(guestTrialExpiredMessage)}
+          </p>
+          <div className="w-fit">
+            <LoginToContinue />
+          </div>
+        </>
+      ) : guest?.sessionId ? (
         <Button asChild className="w-fit">
           <Link
             to="/exam/full-mock-sessions/$sessionId"
             params={{ sessionId: guest.sessionId }}
           >
-            Открыть мой тест и результаты
+            {t('Открыть мой тест и результаты')}
           </Link>
         </Button>
       ) : (
@@ -65,13 +86,15 @@ export function GuestTrialCard() {
             />
           ) : null}
           {config.data && !config.data.enabled ? (
-            <p role="status" className="text-sm text-[#69696d]">
-              Гостевой запуск пока недоступен. Войдите в аккаунт для подготовки.
+            <p role="status" className="text-sm text-muted-foreground">
+              {t(
+                'Гостевой запуск пока недоступен. Войдите в аккаунт для подготовки.',
+              )}
             </p>
           ) : null}
           {config.isError || start.isError ? (
-            <p role="alert" className="text-sm text-red-600">
-              {getErrorMessage(start.error ?? config.error)}
+            <p role="alert" className="text-sm text-destructive">
+              {t(getErrorMessage(start.error ?? config.error))}
             </p>
           ) : null}
           <Button
@@ -85,26 +108,32 @@ export function GuestTrialCard() {
             }
             onClick={() => start.mutate()}
           >
-            {start.isPending ? 'Готовим тест…' : 'Начать бесплатный Full Mock'}
+            {start.isPending
+              ? t('Готовим тест…')
+              : t('Начать бесплатный Full Mock')}
           </Button>
-          <p className="text-xs leading-5 text-[#808084]">
-            Нажимая «Начать», вы принимаете{' '}
+          <p className="text-xs leading-5 text-muted-foreground">
+            {t('Нажимая «Начать», вы принимаете')}{' '}
             <Link to="/terms" className="underline">
-              условия использования
+              {t('условия использования')}
             </Link>{' '}
-            и{' '}
+            {t('и')}{' '}
             <Link to="/privacy" className="underline">
-              политику конфиденциальности
+              {t('политика конфиденциальности')}
             </Link>
-            , включая обработку ответов и аудио для AI-проверки. Таймер каждой
-            секции начнётся при её открытии.
+            {t(
+              ', включая обработку ответов и аудио для AI-проверки. Таймер каждой секции начнётся при её открытии.',
+            )}
           </p>
         </>
       )}
-      <p className="text-sm text-[#69696d]">
-        Для других тестов{' '}
-        <Link to="/login" className="font-semibold text-[#2563eb] underline">
-          войдите в аккаунт
+      <p className="text-sm text-muted-foreground">
+        {t('Для других тестов')}{' '}
+        <Link
+          to="/login"
+          className="font-semibold text-primary-hover underline"
+        >
+          {t('войдите в аккаунт')}
         </Link>
         .
       </p>

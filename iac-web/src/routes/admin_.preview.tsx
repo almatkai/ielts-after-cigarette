@@ -1,4 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { tr } from '@/lib/i18n'
 
 // Non-nested admin route: the exam fills the viewport, without admin sidebar.
 export const Route = createFileRoute('/admin_/preview')({
@@ -14,7 +15,7 @@ export const Route = createFileRoute('/admin_/preview')({
   },
   head: () => ({
     meta: [
-      { title: 'Предпросмотр теста — IAC' },
+      { title: tr('Предпросмотр теста — Yrys Academy') },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

@@ -34,8 +34,9 @@ import type {
   WritingTaskInput,
 } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { useLanguage } from '@/lib/i18n'
 
-const fieldClassName = 'border-[#deded9] bg-white shadow-none'
+const fieldClassName = 'border-border bg-card shadow-none'
 
 const emptyForm: WritingMaterialInput = {
   slug: '',
@@ -71,6 +72,7 @@ export function WritingMaterialEditorPage({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const editing = Boolean(materialId)
+  const { t } = useLanguage()
   const [form, setForm] = useState<WritingMaterialInput>(emptyForm)
   const [message, setMessage] = useState<string | null>(null)
   const [exportOpen, setExportOpen] = useState(false)
@@ -112,7 +114,7 @@ export function WritingMaterialEditorPage({
         return
       }
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Черновик сохранён.')
+      setMessage(t('Черновик сохранён.'))
     },
   })
   const publishMutation = useMutation({
@@ -128,14 +130,19 @@ export function WritingMaterialEditorPage({
         queryKey: writingKeys.adminMaterial(material.id),
       })
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Материал опубликован.')
+      setMessage(t('Материал опубликован.'))
     },
   })
   const uploadMutation = useMutation({
     mutationFn: uploadWritingMedia,
     onSuccess: (media) => {
       updateTask(0, { visualAssetId: media.id, visualUrl: undefined })
-      setMessage(`${media.originalName} загружен. Сохраните черновик.`)
+      setMessage(
+        t('{name} загружен. Сохраните черновик.').replace(
+          '{name}',
+          media.originalName,
+        ),
+      )
     },
   })
   const archiveMutation = useMutation({
@@ -149,7 +156,7 @@ export function WritingMaterialEditorPage({
         queryKey: writingKeys.adminMaterial(material.id),
       })
       setForm((current) => ({ ...current, revision: material.revision }))
-      setMessage('Материал перенесён в архив.')
+      setMessage(t('Материал перенесён в архив.'))
     },
   })
 
@@ -180,13 +187,17 @@ export function WritingMaterialEditorPage({
   }
 
   if (materialQuery.isPending && editing) {
-    return <p className="text-sm text-[#69696d]">Загружаем материал…</p>
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t('Загружаем материал…')}
+      </p>
+    )
   }
   if (materialQuery.isError) {
     return (
       <Card className="shadow-none">
-        <CardContent className="p-6 text-center text-sm text-[#e23b3b]">
-          Не удалось загрузить материал.
+        <CardContent className="p-6 text-center text-sm text-destructive">
+          {t('Не удалось загрузить материал.')}
         </CardContent>
       </Card>
     )
@@ -211,22 +222,27 @@ export function WritingMaterialEditorPage({
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Button asChild variant="link" className="h-auto p-0 text-[#69696d]">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 text-muted-foreground"
+          >
             <Link to="/admin/writing/materials">
-              <ArrowLeft aria-hidden />К библиотеке
+              <ArrowLeft aria-hidden />
+              {t('К библиотеке')}
             </Link>
           </Button>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-[-0.04em]">
-              {editing ? 'Редактор Writing' : 'Новый Writing-материал'}
+            <h1 className="text-3xl font-semibold tracking-normal">
+              {editing ? t('Редактор Writing') : t('Новый Writing-материал')}
             </h1>
             {material ? (
               <Badge variant="outline">{material.status}</Badge>
             ) : null}
           </div>
           {material ? (
-            <p className="mt-2 text-xs text-[#808084]">
-              Версия {material.currentVersionNumber} · revision{' '}
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t('Версия')} {material.currentVersionNumber} · revision{' '}
               {material.revision}
             </p>
           ) : null}
@@ -243,7 +259,7 @@ export function WritingMaterialEditorPage({
               }}
             >
               <Send2 aria-hidden />{' '}
-              {publishMutation.isPending ? 'Публикуем…' : 'Опубликовать'}
+              {publishMutation.isPending ? t('Публикуем…') : t('Опубликовать')}
             </Button>
           ) : null}
           {materialId && auth.hasAnyPermission(['CONTENT_EDITOR']) ? (
@@ -252,12 +268,12 @@ export function WritingMaterialEditorPage({
               variant="outline"
               disabled={pending}
               onClick={() => {
-                if (window.confirm('Архивировать этот Writing-материал?')) {
+                if (window.confirm(t('Архивировать этот Writing-материал?'))) {
                   archiveMutation.mutate()
                 }
               }}
             >
-              {archiveMutation.isPending ? 'Архивируем…' : 'Архивировать'}
+              {archiveMutation.isPending ? t('Архивируем…') : t('Архивировать')}
             </Button>
           ) : null}
           {materialId && material ? (
@@ -266,12 +282,13 @@ export function WritingMaterialEditorPage({
               variant="outline"
               onClick={() => setExportOpen(true)}
             >
-              <ExportCurve aria-hidden className="size-4 mr-1.5" /> Экспорт JSON
+              <ExportCurve aria-hidden className="size-4 mr-1.5" />{' '}
+              {t('Экспорт JSON')}
             </Button>
           ) : null}
           <Button type="submit" disabled={pending}>
             <Save2 aria-hidden />
-            {saveMutation.isPending ? 'Сохраняем…' : 'Сохранить черновик'}
+            {saveMutation.isPending ? t('Сохраняем…') : t('Сохранить черновик')}
           </Button>
         </div>
       </div>
@@ -290,7 +307,7 @@ export function WritingMaterialEditorPage({
           className="flex items-center gap-2 rounded-xl border p-3 text-sm"
           role="status"
         >
-          <TickCircle className="size-4 text-emerald-600" aria-hidden />
+          <TickCircle className="size-4 text-success" aria-hidden />
           {message}
         </p>
       ) : null}
@@ -299,7 +316,7 @@ export function WritingMaterialEditorPage({
       archiveMutation.isError ||
       uploadMutation.isError ? (
         <p
-          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-[#e23b3b]"
+          className="rounded-xl border border-destructive-soft bg-destructive-soft p-3 text-sm text-destructive"
           role="alert"
         >
           {getErrorMessage(
@@ -312,10 +329,10 @@ export function WritingMaterialEditorPage({
       ) : null}
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle>Метаданные</CardTitle>
+          <CardTitle>{t('Метаданные')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5 sm:grid-cols-2">
-          <Field label="Название" className="sm:col-span-2">
+          <Field label={t('Название')} className="sm:col-span-2">
             <Input
               value={form.title}
               onChange={(event) => update('title', event.target.value)}
@@ -326,11 +343,11 @@ export function WritingMaterialEditorPage({
             <Input
               value={form.slug}
               onChange={(event) => update('slug', event.target.value)}
-              placeholder="создастся автоматически"
+              placeholder={t('создастся автоматически')}
               className={fieldClassName}
             />
           </Field>
-          <Field label="Формат экзамена">
+          <Field label={t('Формат экзамена')}>
             <select
               value={form.examType}
               onChange={(event) =>
@@ -344,7 +361,7 @@ export function WritingMaterialEditorPage({
               <option value="general">General Training</option>
             </select>
           </Field>
-          <Field label="Сложность">
+          <Field label={t('Сложность')}>
             <select
               value={form.difficulty}
               onChange={(event) =>
@@ -360,7 +377,7 @@ export function WritingMaterialEditorPage({
               <option value="advanced">Advanced</option>
             </select>
           </Field>
-          <Field label="Лимит времени, минуты">
+          <Field label={t('Лимит времени, минуты')}>
             <Input
               type="number"
               min={5}
@@ -372,7 +389,7 @@ export function WritingMaterialEditorPage({
               className={fieldClassName}
             />
           </Field>
-          <Field label="Краткое описание" className="sm:col-span-2">
+          <Field label={t('Краткое описание')} className="sm:col-span-2">
             <Textarea
               value={form.description}
               onChange={(event) => update('description', event.target.value)}
@@ -388,7 +405,7 @@ export function WritingMaterialEditorPage({
         examType={form.examType}
         uploadPending={uploadMutation.isPending}
         onUploadVisual={(file) => {
-          setMessage(`Загружаем ${file.name}…`)
+          setMessage(t('Загружаем {name}…').replace('{name}', file.name))
           uploadMutation.mutate(file)
         }}
       />
@@ -433,13 +450,14 @@ function TaskEditor({
   uploadPending?: boolean
   onUploadVisual?: (file: File) => void
 }) {
+  const { t } = useLanguage()
   return (
     <Card className="shadow-none">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-5">
-        <Field label="Формулировка задания">
+        <Field label={t('Формулировка задания')}>
           <Textarea
             value={task.prompt}
             onChange={(event) => onChange({ prompt: event.target.value })}
@@ -447,7 +465,7 @@ function TaskEditor({
             placeholder="Write at least 150 words…"
           />
         </Field>
-        <Field label="Минимум слов">
+        <Field label={t('Минимум слов')}>
           <Input
             type="number"
             min={1}
@@ -462,7 +480,7 @@ function TaskEditor({
         {examType === 'academic' ? (
           <div className="grid gap-5">
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Тип визуала">
+              <Field label={t('Тип визуала')}>
                 <select
                   value={task.visualType ?? 'bar_chart'}
                   onChange={(event) =>
@@ -484,14 +502,14 @@ function TaskEditor({
                   <option value="mixed">Mixed</option>
                 </select>
               </Field>
-              <Field label="Изображение задания">
-                <label className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#deded9] bg-white px-3 text-sm font-medium">
+              <Field label={t('Изображение задания')}>
+                <label className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-border bg-card px-3 text-sm font-medium">
                   <DocumentUpload className="size-4" aria-hidden />
                   {uploadPending
-                    ? 'Загружаем…'
+                    ? t('Загружаем…')
                     : task.visualAssetId
-                      ? 'Заменить изображение'
-                      : 'Загрузить изображение'}
+                      ? t('Заменить изображение')
+                      : t('Загрузить изображение')}
                   <input
                     className="sr-only"
                     type="file"
@@ -505,30 +523,35 @@ function TaskEditor({
                   />
                 </label>
                 {task.visualAssetId ? (
-                  <p className="text-xs text-emerald-700">
-                    Изображение прикреплено: {task.visualAssetId}
+                  <p className="text-xs text-success">
+                    {t('Изображение прикреплено: {id}').replace(
+                      '{id}',
+                      task.visualAssetId,
+                    )}
                   </p>
                 ) : null}
               </Field>
             </div>
-            <Field label="Скрытые данные для AI-проверки">
+            <Field label={t('Скрытые данные для AI-проверки')}>
               <Textarea
                 value={task.assessmentNotes ?? ''}
                 onChange={(event) =>
                   onChange({ assessmentNotes: event.target.value })
                 }
                 rows={8}
-                placeholder="Опишите все ключевые факты, значения, изменения и обязательные сравнения. Студент этот текст не увидит."
+                placeholder={t(
+                  'Опишите все ключевые факты, значения, изменения и обязательные сравнения. Студент этот текст не увидит.',
+                )}
               />
             </Field>
-            <p className="text-xs leading-5 text-[#69696d]">
-              Текстовая AI-модель использует эту разметку, чтобы проверить
-              точность описания изображения. Не добавляйте готовое эссе — только
-              проверяемые факты и ожидаемые сравнения.
+            <p className="text-xs leading-5 text-muted-foreground">
+              {t(
+                'Текстовая AI-модель использует эту разметку, чтобы проверить точность описания изображения. Не добавляйте готовое эссе — только проверяемые факты и ожидаемые сравнения.',
+              )}
             </p>
           </div>
         ) : examType === 'general' ? (
-          <Field label="Тон письма">
+          <Field label={t('Тон письма')}>
             <select
               value={task.letterTone ?? 'formal'}
               onChange={(event) =>
@@ -546,7 +569,7 @@ function TaskEditor({
             </select>
           </Field>
         ) : task.position === 2 ? (
-          <Field label="Тип эссе">
+          <Field label={t('Тип эссе')}>
             <select
               value={task.essayType ?? 'opinion'}
               onChange={(event) =>

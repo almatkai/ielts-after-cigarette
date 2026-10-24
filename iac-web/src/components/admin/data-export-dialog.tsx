@@ -63,19 +63,19 @@ export function DataExportDialog({
             </DialogTitle>
             <Badge
               variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200 font-mono text-[11px]"
+              className="bg-primary-soft text-primary border-border-strong font-mono text-[11px]"
             >
               {formatLabel}
             </Badge>
           </div>
-          <DialogDescription className="text-xs text-slate-500">
+          <DialogDescription className="text-xs text-muted-foreground">
             Данные в формате, полностью готовом для повторного импорта или
             сохранения резервной копии.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative flex-1 min-h-[300px] max-h-[55vh] flex flex-col rounded-xl border border-slate-200 bg-slate-50/80 overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2 bg-slate-100/80 text-[11px] font-mono text-slate-500">
+        <div className="relative flex-1 min-h-[300px] max-h-[55vh] flex flex-col rounded-xl border border-border bg-card/80 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2 bg-muted/80 text-[11px] font-mono text-muted-foreground">
             <span>{filename}</span>
             <span>
               {content.length.toLocaleString()} симв. • {lineCount} строк
@@ -100,12 +100,12 @@ export function DataExportDialog({
             >
               {copied ? (
                 <>
-                  <TickCircle className="size-4 text-emerald-600" />
-                  <span className="text-emerald-700">Скопировано!</span>
+                  <TickCircle className="size-4 text-success" />
+                  <span className="text-success">Скопировано!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="size-4 text-slate-600" />
+                  <Copy className="size-4 text-muted-foreground" />
                   <span>Копировать в буфер</span>
                 </>
               )}
@@ -114,7 +114,7 @@ export function DataExportDialog({
               type="button"
               size="sm"
               onClick={handleDownload}
-              className="gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white h-9 shadow-2xs"
+              className="gap-1.5 text-xs font-semibold bg-primary hover:bg-primary-hover text-primary-foreground h-9 shadow-none"
             >
               <DocumentDownload className="size-4" />
               <span>Скачать файл</span>
@@ -125,7 +125,7 @@ export function DataExportDialog({
             variant="ghost"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="text-xs text-slate-500 h-9"
+            className="text-xs text-muted-foreground h-9"
           >
             Закрыть
           </Button>

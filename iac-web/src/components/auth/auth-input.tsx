@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 type AuthInputProps = {
@@ -33,6 +34,7 @@ export function AuthInput({
   inputMode,
   maxLength,
 }: AuthInputProps) {
+  const { t } = useLanguage()
   const [passwordIsVisible, setPasswordIsVisible] = useState(false)
   const isPassword = type === 'password'
   const inputType = isPassword && passwordIsVisible ? 'text' : type
@@ -42,7 +44,7 @@ export function AuthInput({
     <div>
       <Label
         htmlFor={id}
-        className="mb-2 block text-sm font-semibold text-[#0f172a]"
+        className="mb-2 block text-sm font-semibold text-foreground"
       >
         {label}
       </Label>
@@ -61,9 +63,9 @@ export function AuthInput({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-12 w-full rounded-[10px] border bg-white px-4 text-[15px] text-[#0f172a] outline-none transition-colors placeholder:text-[#94a3b8] focus-visible:border-[#3b82f6] focus-visible:ring-0 focus-visible:outline-none aria-invalid:ring-0',
+            'h-12 w-full rounded-[10px] border bg-card px-4 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-0 focus-visible:outline-none aria-invalid:ring-0',
             isPassword && 'pr-12',
-            error ? 'border-[#dc2626]' : 'border-[#cbd5e1]',
+            error ? 'border-destructive' : 'border-border-strong',
           )}
         />
         {isPassword ? (
@@ -72,8 +74,10 @@ export function AuthInput({
             variant="ghost"
             size="icon"
             onClick={() => setPasswordIsVisible((visible) => !visible)}
-            className="absolute top-1/2 right-1.5 grid size-10 -translate-y-1/2 place-items-center rounded-[9px] text-[#475569] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
-            aria-label={passwordIsVisible ? 'Скрыть пароль' : 'Показать пароль'}
+            className="absolute top-1/2 right-1.5 grid size-10 -translate-y-1/2 place-items-center rounded-[9px] text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            aria-label={
+              passwordIsVisible ? t('Скрыть пароль') : t('Показать пароль')
+            }
             aria-pressed={passwordIsVisible}
           >
             {passwordIsVisible ? (
@@ -98,10 +102,10 @@ export function AuthInput({
         {error ? (
           <p
             id={errorId}
-            className="text-xs leading-4 text-[#dc2626]"
+            className="text-xs leading-4 text-destructive"
             role="alert"
           >
-            {error}
+            {t(error)}
           </p>
         ) : null}
       </div>

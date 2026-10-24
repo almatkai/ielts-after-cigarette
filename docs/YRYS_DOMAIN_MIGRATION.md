@@ -17,40 +17,21 @@ landing repository. DNS, certificates, Google/Turnstile consoles and release
 are still external work. No database migration or secret/client rotation is
 needed; old-domain cookies/localStorage do not cross domains.
 
-## Combining with the independent Yrys rebrand
+## Combined release status
 
-This branch starts at main and deliberately contains no rebrand assets, fonts
-or broad rebrand commits. In the eventual approved combined release, retain the
-new `links.ts` origin, optional canonical build wiring and empty-value fallback.
-The current main root has no absolute OG host. The rebrand root and generator
-exist only on `origin/feat/yrys-academy-rebrand` and still embed the old domain.
+`release/yrys-academy` integrates this main-based branch with the selected
+localized Yrys rebrand. The three domain replacements from
+`docs/rebrand-domain.patch` are already applied to the actual combined root
+and generator; do not apply that patch again. `LocalizedBrandHead` preserves
+the new absolute host while choosing the RU/KK card after hydration.
 
-Apply the checked-in **minimal integration patch** only after those rebrand
-files and their existing dependencies are present, from repository root:
+Both 1200×630 cards were regenerated with the locked Golos and Python
+dependencies and visually checked. The generator changed only the hostname
+in the cards; approved source artwork, geometry, icons and manifest remain
+unchanged. Combined verification and the exact source commit inventory are
+recorded in `docs/RELEASE_YRYS_ACADEMY.md`; those checks replace the earlier
+isolated domain-branch verification limits.
 
-```sh
-git apply --check docs/rebrand-domain.patch
-git apply docs/rebrand-domain.patch
-cd iac-web
-# Install the rebrand branch's locked JS dependencies first.
-pnpm install --frozen-lockfile
-python3 -m venv .brand-venv
-.brand-venv/bin/pip install -r brand/requirements.txt
-.brand-venv/bin/python brand/build-assets.py
-```
-
-The patch changes exactly three domain literals: `og:image`, `twitter:image`
-in `src/routes/__root.tsx` to `https://ielts.yrys.academy/app/og-yrys.png`, and
-the printed hostname in `brand/build-assets.py` to `ielts.yrys.academy`.
-Do not copy generated Yrys assets into this domain-only branch. If already
-patched, inspect the literals instead of applying the patch twice.
-
-Review and commit the regenerated `public/og-yrys.png` and
-`public/og-yrys-kk.png` in the combined release. The generator can also rewrite
-icons/manifest/fonts: inspect its full diff and reject unrelated changes. Keep
-the rebrand's Golos dependencies and approved source pixels; do not replace
-them with main's assets. Inspect both 1200×630 cards visually, then rerun scoped
-format/type/lint/build checks and confirm SSR OG URLs use the new host. The
-host nginx static matcher includes `webmanifest` for the rebrand manifest.
-Legal-page canonicals remain an independent SEO follow-up; this migration does
-not change their rendering or indexing policy.
+The app keeps relative `/app/` navigation, noindex app routes and the hidden
+public blog. Production still requires the landing cutover/runbook and new
+frontend/backend image builds. No deployment is performed by this branch.

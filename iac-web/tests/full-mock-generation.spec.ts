@@ -521,6 +521,215 @@ for (const [index, skill] of skills.entries()) {
   })
 }
 
+for (const [index, skill] of skills.entries()) {
+  test(`${skill} submission returns directly to a fresh session without auto-advance`, async ({
+    page,
+  }) => {
+    const now = new Date()
+    await page.clock.install({ time: now })
+    await mockAPI(page, overview())
+    const mock = session()
+    mock.currentSection = index + 1
+    for (const section of mock.sections.slice(0, index)) {
+      section.attempt.status = 'SUBMITTED'
+    }
+    const attempt = {
+      ...mock.sections[index].attempt,
+      startedAt: now.toISOString(),
+      answers: [],
+      recordings: [],
+    }
+    const result = {
+      ...attempt,
+      status: index < 2 ? 'SUBMITTED' : 'PROCESSING',
+      reviewLocked: true,
+      fullMockSessionId: mock.id,
+    }
+    const material = {
+      id: `${skill}-material`,
+      title: `${skill} submission material`,
+      examType: 'academic',
+      durationMinutes: 60,
+      body: 'Reading passage',
+      kind: 'PASSAGE',
+      questionGroups: [],
+      parts:
+        skill === 'speaking'
+          ? [
+              {
+                id: 'part-1',
+                position: 1,
+                type: 'part1',
+                title: 'Interview',
+                instructions: 'Speak',
+                preparationSeconds: 0,
+                responseSeconds: 120,
+                cueCard: [],
+                questions: [],
+              },
+            ]
+          : [],
+      tasks: [
+        {
+          id: 'task-1',
+          position: 1,
+          type: 'task1',
+          prompt: 'Describe this chart',
+          minimumWords: 150,
+        },
+        {
+          id: 'task-2',
+          position: 2,
+          type: 'task2',
+          prompt: 'Discuss education',
+          minimumWords: 250,
+        },
+      ],
+    }
+    let submitted = false
+    let submits = 0
+    let sessionReadsAfterSubmit = 0
+    let sectionReads = 0
+    let advances = 0
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session',
+      (route) => {
+        if (submitted) sessionReadsAfterSubmit++
+        return route.fulfill({ json: mock })
+      },
+    )
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session/sections/*',
+      (route) => {
+        sectionReads++
+        return route.fulfill({
+          json: {
+            skill,
+            position: index + 1,
+            attempt,
+            material,
+            deadlineAt: new Date(now.getTime() + 600000).toISOString(),
+          },
+        })
+      },
+    )
+    await page.route(`**/api/v1/attempts/${skill}-attempt`, (route) =>
+      route.fulfill({ json: submitted ? result : attempt }),
+    )
+    await page.route(`**/api/v1/attempts/${skill}-attempt/submit`, (route) => {
+      submits++
+      submitted = true
+      mock.sections[index].attempt = result
+      return route.fulfill({ json: result })
+    })
+    await page.route(
+      '**/api/v1/full-mock-sessions/generated-session/advance',
+      (route) => {
+        advances++
+        mock.currentSection++
+        return route.fulfill({ json: mock })
+      },
+    )
+
+    // Prime a fresh (<15s) IN_PROGRESS cache entry before opening the runner.
+    await page.goto('./exam/full-mock-sessions/generated-session')
+    await expect(page.getByText('Текущая', { exact: true })).toBeVisible()
+    await page.evaluate(() => {
+      const seen: string[] = []
+      Object.assign(window, { sectionCompletionScreens: seen })
+      new MutationObserver(() => {
+        for (const text of ['Секция завершена', 'Продолжить Full Mock']) {
+          if (document.body.innerText.includes(text)) seen.push(text)
+        }
+      }).observe(document.body, { childList: true, subtree: true })
+    })
+    const historyLength = await page.evaluate(() => history.length)
+    await page.getByRole('link', { name: 'Продолжить', exact: true }).click()
+    await expect(
+      page.getByRole('heading', { name: material.title }).first(),
+    ).toBeAttached()
+    if (skill === 'writing') {
+      await page.getByRole('textbox').fill('A response to the first task.')
+      await page.getByRole('button', { name: 'Далее', exact: true }).click()
+      await page.getByRole('textbox').fill('A response to the second task.')
+    } else if (skill === 'speaking') {
+      await page.getByRole('textbox').fill('A spoken response as a transcript.')
+    }
+    await page.clock.pauseAt(
+      new Date((await page.evaluate(() => Date.now())) + 100),
+    )
+    const sectionReadsBeforeSubmit = sectionReads
+    if (skill === 'speaking') {
+      await page.getByRole('button', { name: 'Отправить на проверку' }).click()
+    } else {
+      await page
+        .getByRole('button', { name: 'Завершить тест', exact: true })
+        .click()
+      await page.getByRole('button', { name: 'Завершить', exact: true }).click()
+    }
+
+    await expect(page).toHaveURL(
+      /\/exam\/full-mock-sessions\/generated-session$/,
+    )
+    await expect(page.getByText('Сдано', { exact: true })).toHaveCount(
+      index < 2 ? index + 1 : index,
+    )
+    if (index >= 2)
+      await expect(page.getByText('Проверяется', { exact: true })).toHaveCount(
+        1,
+      )
+    for (const [position, name] of skills.entries()) {
+      await expect(
+        page.getByText(
+          `0${position + 1} · ${name.charAt(0).toUpperCase() + name.slice(1)}`,
+          { exact: true },
+        ),
+      ).toBeVisible()
+    }
+    const next = page.getByRole('button', {
+      name:
+        index === 3
+          ? 'Завершить и показать отчёт'
+          : 'Продолжить к следующей секции',
+      exact: true,
+    })
+    await expect(next).toBeEnabled()
+    expect(submits).toBe(1)
+    expect(sessionReadsAfterSubmit).toBeGreaterThan(0)
+    // Only the session key is invalidated: section reads open/resume timers.
+    expect(sectionReads).toBe(sectionReadsBeforeSubmit)
+    expect(advances).toBe(0)
+    expect(await page.evaluate(() => history.length)).toBe(historyLength + 1)
+    expect(
+      await page.evaluate(() =>
+        Reflect.get(window, 'sectionCompletionScreens'),
+      ),
+    ).toEqual([])
+    await expect(
+      page.getByRole('button', { name: /Разобрать ошибку/ }),
+    ).toHaveCount(0)
+    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+
+    // Polling may refresh PROCESSING, but must neither wait for AI nor advance.
+    await page.clock.runFor(20000)
+    await expect(next).toBeEnabled()
+    expect(advances).toBe(0)
+    if (index < 3) {
+      const advanced = page.waitForResponse(
+        '**/full-mock-sessions/generated-session/advance',
+      )
+      await next.click()
+      await advanced
+      await page.clock.runFor(100)
+      await expect(
+        page.getByRole('link', { name: 'Продолжить', exact: true }),
+      ).toHaveAttribute('href', new RegExp(`/sections/${index + 2}$`))
+      expect(advances).toBe(1)
+      expect(sectionReads).toBe(sectionReadsBeforeSubmit)
+    }
+  })
+}
+
 for (const state of ['unopened', 'running', 'paused', 'completed']) {
   test(`return to site preserves a ${state} mock without finishing it`, async ({
     page,

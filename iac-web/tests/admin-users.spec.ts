@@ -366,6 +366,7 @@ for (const access of [
       'Writing материалы',
       'Speaking материалы',
       'Архив Full Mock',
+      'Редактура Academic',
       'Статьи блога',
       'Заявки авторов',
       'Пользователи',

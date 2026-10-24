@@ -1,6 +1,7 @@
 import { CloseCircle, Messages1 } from 'iconsax-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { FoxMascot } from './fox-mascot'
 import { cn } from '@/lib/utils'
 import { useMascotVisibility } from '@/features/assistant/mascot-store'
@@ -13,8 +14,10 @@ const AiAssistantChatWindow = lazy(() =>
 
 export function AiAssistantFloatingWidget({
   className,
+  compact = false,
 }: {
   className?: string
+  compact?: boolean
 }) {
   const foxSrc = `${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`
   const { isVisible, setVisible } = useMascotVisibility()
@@ -111,7 +114,23 @@ export function AiAssistantFloatingWidget({
       ) : null}
 
       {/* 2. Floating Mascot & Comic Speech Bubble (shown when isVisible is true, smoothly hidden when chat is open) */}
-      {isVisible ? (
+      {compact ? (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="min-h-11"
+            aria-label="Открыть чат с Юки"
+            onClick={() => setChatIsOpen(true)}
+          >
+            <Messages1
+              size={18}
+              className="text-muted-foreground"
+              aria-hidden
+            />{' '}
+            Спросить Юки
+          </Button>
+        </div>
+      ) : isVisible ? (
         <div
           className={cn(
             'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end select-none origin-bottom-right transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)',

@@ -1,10 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import {
-  bandChange,
-  completedAttempts,
-  previousMaterialAttempt,
-} from '@/features/attempts/attempt-history'
-import { BandChange } from '@/features/attempts/band-change'
+import { completedAttempts } from '@/features/attempts/attempt-history'
 import { useAttemptHistory } from '@/features/attempts/use-attempt-history'
 import { formatDateTime } from '@/lib/date'
 
@@ -41,11 +36,11 @@ export function SidebarProgress({ onNavigate }: { onNavigate?: () => void }) {
         </button>
       ) : items.length === 0 ? (
         <p className="px-3.5 pt-3 text-xs leading-5 text-[#808084]">
-          После первого теста здесь появятся оценки и изменения результата.
+          После первого теста здесь появятся результаты работ.
         </p>
       ) : (
         <div className="mt-2 space-y-1">
-          {items.slice(0, 3).map((item, index) => (
+          {items.slice(0, 3).map((item) => (
             <Link
               key={item.id}
               to="/attempts/$attemptId"
@@ -57,8 +52,11 @@ export function SidebarProgress({ onNavigate }: { onNavigate?: () => void }) {
                 <span className="text-[11px] capitalize text-[#808084]">
                   {item.materialType}
                 </span>
-                <span className="text-xs font-semibold tabular-nums text-[#2563eb]">
-                  Band {item.band?.toFixed(1) ?? '—'}
+                <span className="text-right text-xs font-semibold tabular-nums text-[#69696d]">
+                  {item.materialType === 'reading' ||
+                  item.materialType === 'listening'
+                    ? `${item.score ?? '—'}/${item.maxScore ?? '—'}`
+                    : 'Разбор готов'}
                 </span>
               </div>
               <p
@@ -75,12 +73,6 @@ export function SidebarProgress({ onNavigate }: { onNavigate?: () => void }) {
                     )[0]
                   }
                 </span>
-                <BandChange
-                  value={bandChange(
-                    item,
-                    previousMaterialAttempt(items, index),
-                  )}
-                />
               </div>
             </Link>
           ))}

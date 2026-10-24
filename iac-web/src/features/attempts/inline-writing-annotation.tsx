@@ -33,7 +33,7 @@ export function InlineWritingAnnotation({
           type="button"
           aria-label={`${feedbackLabel}: ${text}`}
           aria-pressed={selected}
-          className={`inline text-left font-serif text-base sm:text-lg cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
+          className={`inline text-left text-sm leading-6 cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
             isError
               ? `underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 text-red-950 hover:bg-red-100/90 ${
                   selected ? 'bg-red-100 ring-2 ring-red-400' : 'bg-red-50/80'
@@ -77,7 +77,7 @@ export function InlineWritingAnnotation({
             <span aria-hidden>×</span>
           </PopoverPrimitive.Close>
         </div>
-        <p className="font-serif text-base font-semibold leading-snug text-emerald-700 whitespace-pre-wrap">
+        <p className="text-sm font-semibold leading-5 text-foreground whitespace-pre-wrap">
           {annotation.replacement}
         </p>
         {annotation.explanationRu && (

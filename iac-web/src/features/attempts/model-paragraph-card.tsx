@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 export function ModelParagraphCard({
@@ -6,43 +6,44 @@ export function ModelParagraphCard({
 }: {
   modelParagraph: string
 }) {
+  const contentId = useId()
   const [isOpen, setIsOpen] = useState(true)
 
   if (!modelParagraph) return null
 
   return (
-    <div className="rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/30 to-white p-5 shadow-xs">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs text-xs font-bold">
-            ★
-          </span>
-          <div>
-            <h4 className="text-sm font-bold text-slate-900">
-              {'Образец абзаца на Band 8.0+'}
-            </h4>
-            <p className="text-xs text-slate-500">
-              Пример формулировки с точной лексикой и разнообразными
-              конструкциями
-            </p>
-          </div>
+    <section
+      className="min-w-0 rounded-2xl border border-border bg-muted/30 p-4 sm:p-5"
+      aria-label="Пример абзаца для сравнения"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h4 className="text-base font-semibold">
+            Пример абзаца для сравнения
+          </h4>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            Сравните лексику и построение предложений со своим ответом.
+          </p>
         </div>
         <Button
           type="button"
           variant="ghost"
           size="sm"
+          className="min-h-11 shrink-0"
+          aria-expanded={isOpen}
+          aria-controls={contentId}
           onClick={() => setIsOpen(!isOpen)}
-          className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
         >
           {isOpen ? 'Скрыть' : 'Показать'}
         </Button>
       </div>
-
-      {isOpen && (
-        <div className="mt-3.5 rounded-xl border border-blue-200 bg-white/95 p-4 font-serif text-sm sm:text-base leading-relaxed text-slate-800 shadow-2xs">
-          <p className="italic">“{modelParagraph}”</p>
-        </div>
-      )}
-    </div>
+      <div
+        id={contentId}
+        hidden={!isOpen}
+        className="mt-4 whitespace-pre-wrap break-words text-sm leading-7"
+      >
+        {modelParagraph}
+      </div>
+    </section>
   )
 }

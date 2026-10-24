@@ -102,7 +102,9 @@ for (const skill of ['listening', 'reading']) {
     await expect(
       sidebar.getByText('История прогресса', { exact: true }),
     ).toBeVisible()
-    await expect(sidebar.getByText('+1.5 band', { exact: true })).toBeVisible()
+    await expect(sidebar.getByText('+1.5 band', { exact: true })).toHaveCount(0)
+    await expect(sidebar.getByText('32/40', { exact: true })).toBeVisible()
+    await expect(sidebar.getByText('24/40', { exact: true })).toBeVisible()
   })
 }
 
@@ -220,11 +222,16 @@ test('retake bypasses cached result and updates the library and sidebar after su
     page
       .getByRole('region', { name: 'История прогресса' })
       .getByText('+0.5 band'),
+  ).toHaveCount(0)
+  await expect(
+    page
+      .getByRole('region', { name: 'История прогресса' })
+      .getByText('32/40', { exact: true }),
   ).toBeVisible()
   await expect(
     page
       .getByRole('region', { name: 'История прогресса' })
-      .getByText('Band 7.5'),
+      .getByText('35/40', { exact: true }),
   ).toBeVisible()
 })
 

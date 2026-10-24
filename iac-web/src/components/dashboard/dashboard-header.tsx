@@ -46,7 +46,7 @@ export function DashboardHeader({
         </div>
         <span className="hidden h-7 w-px bg-[#eeeeeb] sm:block lg:hidden" />
         {pageTitle ? (
-          <div className="min-w-0 flex-1">
+          <div className="hidden min-w-0 flex-1 min-[641px]:block">
             <p className="hidden text-[10px] font-semibold tracking-[0.08em] text-[#9a9a9d] uppercase lg:block">
               Рабочее пространство
             </p>

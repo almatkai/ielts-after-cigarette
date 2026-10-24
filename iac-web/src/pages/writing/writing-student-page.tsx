@@ -476,7 +476,7 @@ export function WritingAttemptResult({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
         skill="writing"
         fullMockSessionId={fullMockSessionId}
@@ -485,8 +485,8 @@ export function WritingAttemptResult({
       />
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          Работа над ошибками
+        <h1 className="text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
+          Разбор: Writing
         </h1>
         <p className="mt-1 text-sm text-slate-500">{material.title}</p>
       </div>

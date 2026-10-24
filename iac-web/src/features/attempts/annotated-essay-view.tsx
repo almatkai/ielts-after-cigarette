@@ -83,12 +83,12 @@ export function AnnotatedEssayView({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-[#e7e7e4] bg-[#fbfbf9] p-5 sm:p-6 shadow-2xs">
-        <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200/70">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <div className="rounded-xl border border-border bg-muted/40 p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+          <p className="text-xs font-medium text-muted-foreground">
             {'Текст вашего эссе с замечаниями'}
           </p>
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="size-2 rounded-full bg-red-500" />
               {'Ошибки'}
@@ -100,7 +100,7 @@ export function AnnotatedEssayView({
           </div>
         </div>
 
-        <div className="font-serif text-base sm:text-lg leading-relaxed sm:leading-loose text-slate-800 whitespace-pre-wrap">
+        <div className="whitespace-pre-wrap text-sm leading-6 text-foreground">
           {segments.map((seg, idx) => {
             if (!seg.annotation) {
               return <span key={idx}>{seg.text}</span>
@@ -136,10 +136,10 @@ export function AnnotatedEssayView({
         </p>
       ) : (
         <div className="space-y-2.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <p className="text-xs font-medium text-muted-foreground">
             {'Разбор ошибок и улучшений'} ({annotations.length})
           </p>
-          <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="grid divide-y divide-border">
             {annotations.map((ann) => {
               const isError = ann.severity === 'error'
               const isSelected = selectedId === ann.id
@@ -158,12 +158,8 @@ export function AnnotatedEssayView({
                     }
                   }}
                   onClick={() => setSelectedId(ann.id)}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                    isSelected
-                      ? isError
-                        ? 'border-red-400 bg-red-50/50 shadow-xs ring-1 ring-red-400'
-                        : 'border-amber-400 bg-amber-50/50 shadow-xs ring-1 ring-amber-400'
-                      : 'border-[#e7e7e4] bg-white hover:border-slate-300 hover:shadow-xs'
+                  className={`cursor-pointer rounded-lg px-3 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                    isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -176,18 +172,16 @@ export function AnnotatedEssayView({
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline gap-1.5">
-                        <span className="font-serif text-sm line-through text-slate-400">
+                        <span className="text-sm text-muted-foreground line-through">
                           {ann.quote}
                         </span>
                         <span className="text-xs text-slate-400">→</span>
-                        <span className="font-serif text-sm font-bold text-emerald-700">
+                        <span className="text-sm font-semibold text-foreground">
                           {ann.replacement}
                         </span>
                         <span
-                          className={`ml-auto text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                            isError
-                              ? 'bg-red-50 text-red-700'
-                              : 'bg-amber-50 text-amber-700'
+                          className={`ml-auto text-xs font-medium ${
+                            isError ? 'text-red-700' : 'text-amber-700'
                           }`}
                         >
                           {isError ? 'Ошибка' : 'Рекомендация'} · {ann.type}
@@ -195,7 +189,7 @@ export function AnnotatedEssayView({
                       </div>
 
                       {ann.explanationRu && (
-                        <p className="mt-1.5 text-xs text-slate-700 leading-relaxed">
+                        <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
                           {ann.explanationRu}
                         </p>
                       )}
@@ -206,10 +200,7 @@ export function AnnotatedEssayView({
                             {'Варианты'}:
                           </span>
                           {ann.alternatives.map((alt, i) => (
-                            <span
-                              key={i}
-                              className="rounded bg-slate-100 px-1.5 py-0.2 text-[11px] font-medium text-slate-700"
-                            >
+                            <span key={i} className="text-xs text-foreground">
                               {alt}
                             </span>
                           ))}

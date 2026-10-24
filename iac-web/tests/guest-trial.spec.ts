@@ -1,6 +1,21 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
+// Authentication unlocks detailed results; it never validates legacy AI bands.
+async function expectUnscoredReport(page: Page, authenticated: boolean) {
+  await expect(
+    page.getByRole('heading', {
+      name: 'Результаты пробного экзамена',
+      exact: true,
+      includeHidden: true,
+    }),
+  ).toBeVisible()
+  await expect(page.getByText('6.5', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('22/40', { exact: true })).toHaveCount(
+    authenticated ? 2 : 0,
+  )
+}
+
 async function guestAPI(
   page: Page,
   restored = false,
@@ -35,6 +50,8 @@ async function guestAPI(
           id: `${skill}-guest`,
           status: 'SUBMITTED',
           materialType: skill,
+          score: ['listening', 'reading'].includes(skill) ? 22 : null,
+          maxScore: ['listening', 'reading'].includes(skill) ? 40 : null,
           band: 6.5,
         },
       }),
@@ -234,12 +251,12 @@ test('anonymous visitor starts a mock, opens 30% AI review and restores it after
   await expect(page.getByRole('checkbox')).toHaveCount(0)
   await start.click()
   await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
-  await expect(page.getByText('Итоговый IELTS band')).toBeVisible()
+  await expectUnscoredReport(page, false)
   expect(starts).toEqual([
     { examType: 'academic', turnstileToken: '', acceptedTerms: true },
   ])
   await expect(
-    page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
+    page.getByRole('button', { name: /войти, чтобы увидеть полный разбор/ }),
   ).toHaveCount(4)
   await page.getByRole('button', { name: 'Выбрать Writing' }).click()
   await expect(page.getByText(/3 из 10 разборов/)).toBeVisible()
@@ -719,7 +736,7 @@ for (const skill of ['reading', 'listening']) {
 }
 
 for (const registration of [false, true]) {
-  test(`guest report ${registration ? 'registration' : 'login'} claims the mock and unlocks section bands`, async ({
+  test(`guest report ${registration ? 'registration' : 'login'} claims the mock and unlocks full review without unvalidated bands`, async ({
     page,
   }) => {
     const { claims } = await guestAPI(page, true)
@@ -743,10 +760,10 @@ for (const registration of [false, true]) {
       route.fulfill({ status: 201, json: modalAccount }),
     )
     await page.goto('./exam/full-mock-sessions/guest-mock')
-    await expect(page.getByText('6.5', { exact: true })).toHaveCount(1)
+    await expectUnscoredReport(page, false)
     await page
       .getByRole('button', {
-        name: 'Reading: войти, чтобы увидеть оценку',
+        name: 'Reading: войти, чтобы увидеть полный разбор',
         exact: true,
       })
       .click()
@@ -762,9 +779,9 @@ for (const registration of [false, true]) {
     }
     await expect(login).toHaveCount(0)
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
-    await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+    await expectUnscoredReport(page, true)
     await expect(
-      page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
+      page.getByRole('button', { name: /войти, чтобы увидеть полный разбор/ }),
     ).toHaveCount(0)
     expect(claims).toEqual(['Bearer account-token'])
     await page.getByRole('button', { name: 'Выбрать Reading' }).click()
@@ -819,17 +836,19 @@ test('failed guest result claim keeps the preview locked and permits retry', asy
   })
   await page.goto('./exam/full-mock-sessions/guest-mock')
   await page
-    .getByRole('button', { name: 'Writing: войти, чтобы увидеть оценку' })
+    .getByRole('button', {
+      name: 'Writing: войти, чтобы увидеть полный разбор',
+    })
     .click()
   const login = page.getByRole('dialog', { name: 'Войти или создать аккаунт' })
   await login.getByRole('button', { name: 'Continue with Google' }).click()
   await expect(login.getByRole('alert')).toContainText(
     'Сервис временно недоступен',
   )
-  await expect(page.getByText('6.5', { exact: true })).toHaveCount(1)
+  await expectUnscoredReport(page, false)
   await login.getByRole('button', { name: 'Continue with Google' }).click()
   await expect(login).toHaveCount(0)
-  await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+  await expectUnscoredReport(page, true)
   expect(claims).toEqual(['Bearer account-token'])
 })
 
@@ -867,7 +886,9 @@ test('registration retries a failed claim without registering the account twice'
   })
   await page.goto('./exam/full-mock-sessions/guest-mock')
   await page
-    .getByRole('button', { name: 'Reading: войти, чтобы увидеть оценку' })
+    .getByRole('button', {
+      name: 'Reading: войти, чтобы увидеть полный разбор',
+    })
     .click()
   const login = page.getByRole('dialog', { name: 'Войти или создать аккаунт' })
   await login.getByRole('button', { name: 'Continue with Google' }).click()
@@ -880,7 +901,7 @@ test('registration retries a failed claim without registering the account twice'
   await expect(login.getByText(/Сервис временно недоступен/)).toBeVisible()
   await submit.click()
   await expect(login).toHaveCount(0)
-  await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+  await expectUnscoredReport(page, true)
   expect(registrations).toBe(1)
 })
 
@@ -932,10 +953,10 @@ test('fresh authenticated restore claims a completed guest mock before loading i
     route.fulfill({ json: modalAccount }),
   )
   await page.goto('./exam/full-mock-sessions/guest-mock')
-  await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+  await expectUnscoredReport(page, true)
   expect(claims).toEqual(['Bearer account-token'])
   await expect(
-    page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
+    page.getByRole('button', { name: /войти, чтобы увидеть полный разбор/ }),
   ).toHaveCount(0)
 })
 
@@ -1010,9 +1031,9 @@ for (const mobile of [false, true]) {
       .click()
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-retake$/)
     await page.goto('./exam/full-mock-sessions/guest-mock')
-    await expect(page.getByText('6.5', { exact: true })).toHaveCount(1)
+    await expectUnscoredReport(page, false)
     await expect(
-      page.getByRole('button', { name: /войти, чтобы увидеть оценку/ }),
+      page.getByRole('button', { name: /войти, чтобы увидеть полный разбор/ }),
     ).toHaveCount(4)
     await page
       .getByRole('link', { name: 'Открыть последнюю попытку', exact: true })
@@ -1088,7 +1109,7 @@ test('signed-in student can retake a completed mock without using the guest API'
     route.fulfill({ json: fresh }),
   )
   await page.goto('./exam/full-mock-sessions/guest-mock')
-  await expect(page.getByText('6.5', { exact: true })).toHaveCount(5)
+  await expectUnscoredReport(page, true)
   await page
     .getByRole('button', { name: 'Пересдать тест', exact: true })
     .click()

@@ -13,3 +13,6 @@ dist-ssr
 __unconfig*
 todos.json
 .vscode
+artifact/
+test-results/
+playwright-report/

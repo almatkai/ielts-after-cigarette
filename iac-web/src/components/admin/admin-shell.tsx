@@ -48,7 +48,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     {
       id: 'materials',
       label: 'Учебные материалы',
-      visible: auth.hasAnyPermission(['CONTENT_EDITOR']),
+      visible: auth.hasAnyPermission(['CONTENT_EDITOR']) || isAdmin,
       items: linkOptions([
         {
           to: '/admin/reading/materials',
@@ -74,6 +74,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           to: '/admin/full-mocks',
           label: 'Архив Full Mock',
           icon: ClipboardTick,
+        },
+        {
+          to: '/admin/learning-content',
+          label: 'Редактура Academic',
+          icon: ClipboardTick,
+          visible: isAdmin,
         },
       ]),
     },

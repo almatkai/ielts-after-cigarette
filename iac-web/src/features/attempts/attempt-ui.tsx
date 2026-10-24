@@ -662,6 +662,7 @@ export function AttemptPerformanceReport({
   submittedAt,
   durationMinutes,
   paceUnit = 'вопрос',
+  showBand = true,
 }: {
   band: number | null | undefined
   bandNote?: string
@@ -674,6 +675,7 @@ export function AttemptPerformanceReport({
   submittedAt?: string | null
   durationMinutes?: number
   paceUnit?: string
+  showBand?: boolean
 }) {
   const cefrDescription = cefrLevel(band)
 
@@ -722,6 +724,22 @@ export function AttemptPerformanceReport({
       ? Math.min(100, Math.round((effectiveCorrect / effectiveTotal) * 100))
       : 0
   const incorrectCount = Math.max(0, effectiveTotal - effectiveCorrect)
+
+  if (!showBand) {
+    return (
+      <section
+        aria-label="Ограничения учебного разбора"
+        className="grid gap-2 text-sm leading-6"
+      >
+        <p className="font-semibold">Учебный разбор</p>
+        <p className="text-[#69696d]">
+          Разбор ИИ помогает выбрать, что исправить. Точность оценивания ещё не
+          подтверждена; ориентировочный балл IELTS не рассчитан.
+        </p>
+        {bandNote ? <p className="text-[#69696d]">{bandNote}</p> : null}
+      </section>
+    )
+  }
 
   return (
     <div className="rounded-[20px] border border-[#e7e7e4] bg-white p-5 sm:p-7 shadow-xs">

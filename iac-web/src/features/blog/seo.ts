@@ -10,14 +10,16 @@ export const BLOG_DESCRIPTION =
 // comes from the proxied request on the server and the location in the browser.
 const getSiteOrigin = createIsomorphicFn()
   .server(() => {
-    const configured = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '')
+    const configured =
+      import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '') || undefined
     return (
       configured ??
       getRequestUrl({ xForwardedHost: true, xForwardedProto: true }).origin
     )
   })
   .client(() => {
-    const configured = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '')
+    const configured =
+      import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '') || undefined
     return configured ?? window.location.origin
   })
 

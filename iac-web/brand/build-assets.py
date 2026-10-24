@@ -84,7 +84,7 @@ for lang, caption in [('ru','Подготовка к IELTS онлайн'), ('kk'
     heading=ImageFont.truetype(BytesIO(font_bytes.getvalue()),30)
     domain=ImageFont.truetype(BytesIO(font_bytes.getvalue()),23)
     draw.text((490,265),caption,font=heading,fill='#17191C')
-    draw.text((490,322),'ielts.academy-ai.kz',font=domain,fill='#5E6468')
+    draw.text((490,322),'ielts.yrys.academy',font=domain,fill='#5E6468')
     canvas.save(OUT / ('og-yrys.png' if lang=='ru' else 'og-yrys-kk.png'))
 
 # BASE_URL is /app/ in vite.config.ts; preserve the application's deployment scope.

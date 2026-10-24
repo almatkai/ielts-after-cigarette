@@ -206,15 +206,15 @@ test('each task opens inline feedback and keeps its detailed card', async ({
   const taskOne = page.getByRole('region', { name: 'Writing Task 1' })
   const taskTwo = page.getByRole('region', { name: 'Writing Task 2' })
   const error = taskOne.getByRole('button', {
-    name: 'Ошибка 1: visitors has increased',
+    name: 'Error 1: visitors has increased',
     exact: true,
   })
   const suggestion = taskTwo.getByRole('button', {
-    name: 'Рекомендация 1: Many people study abroad',
+    name: 'Suggestion 1: Many people study abroad',
     exact: true,
   })
   const secondCard = taskTwo.getByRole('button', {
-    name: 'Рекомендация 1',
+    name: 'Suggestion 1',
     exact: true,
   })
   await expect(error).toHaveClass(/decoration-destructive/)
@@ -226,7 +226,7 @@ test('each task opens inline feedback and keeps its detailed card', async ({
   await suggestion.scrollIntoViewIfNeeded()
   const scrollBefore = await page.evaluate(() => window.scrollY)
   await suggestion.click()
-  const popup = page.getByRole('dialog', { name: 'Рекомендация 1' })
+  const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
   await expect(popup).toBeVisible()
   await expect(popup.getByText('An alternative formulation')).toBeVisible()
   await expect(
@@ -237,7 +237,7 @@ test('each task opens inline feedback and keeps its detailed card', async ({
   await expect(secondCard).not.toBeFocused()
   await expect(secondCard).toHaveAttribute('aria-pressed', 'true')
   await expect(
-    taskOne.getByRole('button', { name: 'Ошибка 1', exact: true }),
+    taskOne.getByRole('button', { name: 'Error 1', exact: true }),
   ).toHaveAttribute('aria-pressed', 'false')
   expect(await suggestion.getAttribute('aria-controls')).toBe(
     await popup.getAttribute('id'),
@@ -253,12 +253,12 @@ test('each task opens inline feedback and keeps its detailed card', async ({
 
   await error.focus()
   await page.keyboard.press('Enter')
-  const errorPopup = page.getByRole('dialog', { name: 'Ошибка 1' })
+  const errorPopup = page.getByRole('dialog', { name: 'Error 1' })
   await expect(errorPopup).toBeVisible()
   await expect(
-    taskOne.getByRole('button', { name: 'Ошибка 1', exact: true }),
+    taskOne.getByRole('button', { name: 'Error 1', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
-  await errorPopup.getByRole('button', { name: 'Закрыть' }).click()
+  await errorPopup.getByRole('button', { name: 'Close' }).click()
   await expect(errorPopup).not.toBeVisible()
   await expect(error).toBeFocused()
   expect(errors).toEqual([])
@@ -271,11 +271,11 @@ test('writing feedback fits a narrow screen', async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page
       .getByRole('button', {
-        name: 'Рекомендация 1: Many people study abroad',
+        name: 'Suggestion 1: Many people study abroad',
         exact: true,
       })
       .click()
-    const popup = page.getByRole('dialog', { name: 'Рекомендация 1' })
+    const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
     await expect(popup).toBeVisible()
     await expect(popup).toHaveAttribute('data-side', 'top')
     const bounds = await popup.boundingBox()
@@ -286,7 +286,7 @@ test('writing feedback fits a narrow screen', async ({ page }) => {
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width)
     await expect(
-      page.getByRole('button', { name: 'Рекомендация 1', exact: true }),
+      page.getByRole('button', { name: 'Suggestion 1', exact: true }),
     ).toBeVisible()
     await page.keyboard.press('Escape')
   }
@@ -299,15 +299,15 @@ for (const screen of ['history', 'bank', 'fullmock'] as const) {
     await openWritingReview(page, screen)
     const taskTwo = page.getByRole('region', { name: 'Writing Task 2' })
     const highlight = taskTwo.getByRole('button', {
-      name: 'Рекомендация 1: Many people study abroad',
+      name: 'Suggestion 1: Many people study abroad',
       exact: true,
     })
     await expect(highlight).toBeVisible()
     await highlight.click()
-    const popup = page.getByRole('dialog', { name: 'Рекомендация 1' })
+    const popup = page.getByRole('dialog', { name: 'Suggestion 1' })
     await expect(popup).toBeVisible()
     await expect(
-      taskTwo.getByRole('button', { name: 'Рекомендация 1', exact: true }),
+      taskTwo.getByRole('button', { name: 'Suggestion 1', exact: true }),
     ).toHaveAttribute('aria-pressed', 'true')
     await page.keyboard.press('Escape')
     await expect(
@@ -333,9 +333,12 @@ test('a saved evaluation without inline annotations still displays the essay hon
     page.getByText('Many people study abroad.', { exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByText('Замечаний к отдельным фрагментам в этой проверке нет.', {
-      exact: true,
-    }),
+    page.getByText(
+      'This assessment has no feedback on individual text passages.',
+      {
+        exact: true,
+      },
+    ),
   ).toHaveCount(2)
   await expect(page.locator('[id^="annotation-card-"]')).toHaveCount(0)
 })

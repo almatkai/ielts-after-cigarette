@@ -418,7 +418,9 @@ function AIEvaluationCard({
       criterion: detail.speakingEvaluation?.criteria.pronunciation,
       unavailable: !isPronunciationAvailable,
       feedback: !isPronunciationAvailable
-        ? t('Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.')
+        ? t(
+            'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
+          )
         : detail.speakingEvaluation?.criteria.pronunciation.feedback,
     },
   ]

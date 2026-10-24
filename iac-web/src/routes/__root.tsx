@@ -39,7 +39,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { property: 'og:site_name', content: 'Yrys Academy' },
       {
         property: 'og:image',
-        content: 'https://ielts.academy-ai.kz/app/og-yrys.png',
+        content: 'https://ielts.yrys.academy/app/og-yrys.png',
       },
       {
         property: 'og:image:alt',
@@ -47,7 +47,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         name: 'twitter:image',
-        content: 'https://ielts.academy-ai.kz/app/og-yrys.png',
+        content: 'https://ielts.yrys.academy/app/og-yrys.png',
       },
     ],
     links: [

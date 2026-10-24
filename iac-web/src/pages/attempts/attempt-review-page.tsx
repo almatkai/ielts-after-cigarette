@@ -120,7 +120,8 @@ export function AttemptReviewPage({
           <>
             <Button asChild variant="link" className="h-auto p-0">
               <Link to="/progress">
-                <ArrowLeft aria-hidden />{t('К прогрессу')}
+                <ArrowLeft aria-hidden />
+                {t('К прогрессу')}
               </Link>
             </Button>
             <h1 className="text-[28px] sm:text-[36px] mt-3 font-semibold tracking-normal">
@@ -279,7 +280,10 @@ type AIEvaluation = {
   }[]
 }
 
-function evaluationFor(attempt: AttemptDetail, t: (source: string) => string): AIEvaluation | null {
+function evaluationFor(
+  attempt: AttemptDetail,
+  t: (source: string) => string,
+): AIEvaluation | null {
   if (attempt.speakingEvaluation) {
     const evaluation = attempt.speakingEvaluation
     const isPronunciationAvailable = Boolean(

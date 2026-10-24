@@ -260,7 +260,7 @@ export function SettingsPage() {
             {t('Профиль')}
           </CardTitle>
           <CardDescription className="mt-1 leading-5">
-            Имя аккаунта.
+            {t('Имя аккаунта.')}
           </CardDescription>
         </CardHeader>
         <form

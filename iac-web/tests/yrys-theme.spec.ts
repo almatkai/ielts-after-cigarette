@@ -406,7 +406,7 @@ test('device locale changes keep branded titles, navigation and OG in sync witho
   ).toBeAttached()
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     'content',
-    /og-yrys-kk\.png$/,
+    'https://ielts.yrys.academy/app/og-yrys-kk.png',
   )
   await page
     .getByRole('combobox', { name: 'Тілді таңдаңыз', exact: true })
@@ -525,12 +525,15 @@ for (const locale of ['ru', 'kk', 'en'] as const) {
             ),
           ).toHaveCount(0)
           if (name === 'overview') {
-            await expect(
-              page.locator('meta[property="og:image"]'),
-            ).toHaveAttribute(
-              'content',
-              new RegExp(`og-yrys${locale === 'kk' ? '-kk' : ''}\\.png$`),
-            )
+            for (const selector of [
+              'meta[property="og:image"]',
+              'meta[name="twitter:image"]',
+            ]) {
+              await expect(page.locator(selector)).toHaveAttribute(
+                'content',
+                `https://ielts.yrys.academy/app/og-yrys${locale === 'kk' ? '-kk' : ''}.png`,
+              )
+            }
             await expect(
               page.getByRole('link', { name: labels.logo }).first(),
             ).toBeAttached()

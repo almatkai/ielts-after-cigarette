@@ -400,7 +400,7 @@ function OverviewContent({
       </div>
 
       <Panel
-        title="Гости → Full Mock → регистрация"
+        title={t('Гости → Full Mock → регистрация')}
         icon={<Profile2User className="size-[18px]" aria-hidden />}
       >
         <GuestConversionContent conversion={overview.guestConversion} />

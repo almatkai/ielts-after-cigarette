@@ -714,30 +714,16 @@ test('submission immediately shows this test’s mistake cards', async ({
   ).toHaveCount(0)
 })
 
-test('Full Mock cards select the section; tabs stay in this exam after reload', async ({
+test('Full Mock cards select inline review and retain the section after reload', async ({
   page,
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-<<<<<<< HEAD
-  await page
-    .getByRole('link', { name: 'Reading: работа над ошибками', exact: true })
-=======
   const cards = page.getByRole('group', { name: 'Full Mock sections' })
   await cards
     .getByRole('button', { name: 'Show Reading review', exact: true })
->>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
     .click()
-  const tabs = page.getByRole('navigation', { name: 'Секции Full Mock' })
   await expect(
-<<<<<<< HEAD
-    tabs.getByRole('link', { name: 'Reading', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
-  await expect(
-    page.getByText('reading: wrong question', { exact: true }),
-  ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Listening', exact: true }).click()
-=======
     cards.getByRole('button', { name: 'Show Reading review', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await expect(page).toHaveURL(/\/mock-session\?section=2$/)
@@ -747,7 +733,6 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   await cards
     .getByRole('button', { name: 'Show Listening review', exact: true })
     .click()
->>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
   ).toBeVisible()
@@ -756,19 +741,6 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   ).toHaveCount(0)
   await page.reload()
   await expect(
-<<<<<<< HEAD
-    tabs.getByRole('link', { name: 'Listening', exact: true }),
-  ).toHaveAttribute('aria-current', 'page')
-  await tabs.getByRole('link', { name: 'Writing', exact: true }).click()
-  await expect(
-    page.getByText('Writing suggestion', { exact: false }),
-  ).toBeVisible()
-  await tabs.getByRole('link', { name: 'Speaking', exact: true }).click()
-  await expect(
-    page.getByText('Speaking suggestion', { exact: false }),
-  ).toBeVisible()
-  await page.getByRole('link', { name: 'К результату', exact: true }).click()
-=======
     cards.getByRole('button', { name: 'Show Listening review', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await cards
@@ -786,7 +758,6 @@ test('Full Mock cards select the section; tabs stay in this exam after reload', 
   await expect(
     page.getByRole('navigation', { name: 'Full Mock sections' }),
   ).toHaveCount(0)
->>>>>>> 3c252a0 (test: align dev exam selectors and Yrys review fixtures)
   await expect(
     page.getByRole('heading', { name: 'Full Mock test', exact: true }),
   ).toBeVisible()

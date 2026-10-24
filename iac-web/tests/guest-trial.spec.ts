@@ -1318,6 +1318,8 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
           'PRIVATE_',
           'Секция завершена',
           'Продолжить Full Mock',
+          'Section complete',
+          'Continue the Full Mock',
         ]) {
           if (document.querySelector('body')?.innerText.includes(text))
             leaks.push(text)
@@ -1351,15 +1353,15 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
     await page.goto(`./attempts/${skill}-guest`)
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
     await expect(
-      page.getByRole('button', { name: 'Завершить и показать отчёт' }),
+      page.getByRole('button', { name: 'Finish and show the report' }),
     ).toBeEnabled()
-    await expect(page.getByText('Сдано', { exact: true })).toHaveCount(3)
-    await expect(page.getByText('Проверяется', { exact: true })).toBeVisible()
+    await expect(page.getByText('Submitted', { exact: true })).toHaveCount(3)
+    await expect(page.getByText('Assessing', { exact: true })).toBeVisible()
     await expect(page.getByText(/PRIVATE_/)).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: /Разобрать ошибку/ }),
     ).toHaveCount(0)
-    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    await expect(page.getByText('Overall IELTS band')).toHaveCount(0)
     expect(
       await page.evaluate(() => Reflect.get(window, 'lockedReviewLeaks')),
     ).toEqual([])

@@ -79,6 +79,11 @@ export const authTranslations: TranslationMap = {
     en: 'Enter the full number, for example +7 700 123 45 67',
   },
 
+  'Срок гостевого доступа истёк. Войдите для продолжения подготовки': {
+    kk: 'Қонақ рұқсатының мерзімі аяқталды. Дайындықты жалғастыру үшін кіріңіз.',
+    en: 'Guest access has expired. Sign in to continue preparing.',
+  },
+
   // Turnstile
   'Не удалось загрузить проверку безопасности. Обновите страницу.': {
     kk: 'Қауіпсіздік тексерімін жүктеу мүмкін болмады. Бетті жаңартыңыз.',

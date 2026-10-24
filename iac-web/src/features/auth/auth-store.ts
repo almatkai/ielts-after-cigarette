@@ -7,7 +7,11 @@ import {
 } from '@/features/auth/google-auth'
 import type { CompleteGoogleRegistrationInput } from '@/features/auth/google-auth'
 import { ApiError, apiClient, getErrorMessage } from '@/lib/api/client'
-import { claimGuestResults, getGuestSession } from '@/features/auth/guest'
+import {
+  claimGuestResults,
+  getGuestSession,
+  isGuestTrialExpired,
+} from '@/features/auth/guest'
 import type { GuestSession } from '@/features/auth/guest'
 
 export type UserRole = 'STUDENT' | 'WRITER' | 'EDITOR' | 'ADMIN'
@@ -39,6 +43,7 @@ export type AuthResponse = {
 type AuthSnapshot = {
   user: UserDto | null
   guest: GuestSession | null
+  guestExpired: boolean
   accessToken: string | null
   initialized: boolean
   loading: boolean
@@ -48,6 +53,7 @@ type AuthSnapshot = {
 const initialSnapshot: AuthSnapshot = {
   user: null,
   guest: null,
+  guestExpired: false,
   accessToken: null,
   initialized: false,
   loading: false,
@@ -86,9 +92,18 @@ export class AuthStore {
   hasGuestSession = () => Boolean(this.snapshot.guest)
 
   restoreGuest = async () => {
-    const guest = await getGuestSession()
-    this.patch({ guest })
-    return guest
+    try {
+      const guest = await getGuestSession()
+      this.patch({ guest, guestExpired: false })
+      return guest
+    } catch (error) {
+      if (isGuestTrialExpired(error)) this.expireGuest()
+      throw error
+    }
+  }
+
+  expireGuest = () => {
+    this.patch({ guest: null, guestExpired: true })
   }
 
   hasAnyRole = (roles: readonly UserRole[]) => {
@@ -162,6 +177,9 @@ export class AuthStore {
       })
     } finally {
       this.clear()
+      // The guest cookie outlives account auth. Restore its entry state after
+      // logout as well, so a consumed trial cannot offer another start.
+      await this.restoreGuest().catch(() => {})
     }
   }
 
@@ -224,6 +242,7 @@ export class AuthStore {
     this.set({
       user: response.user,
       guest: null,
+      guestExpired: false,
       accessToken: response.accessToken,
       initialized: true,
       loading: false,
@@ -235,6 +254,7 @@ export class AuthStore {
     this.completedRegistration = null
     this.set({
       ...initialSnapshot,
+      guestExpired: this.snapshot.guestExpired,
       initialized: true,
       ...overrides,
     })

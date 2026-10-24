@@ -1347,3 +1347,349 @@ test('mobile login dialog fits and can be dismissed without starting a trial', a
   await expect(page).toHaveURL(/\/app\/?$/)
   expect(starts).toEqual([])
 })
+
+const expiredTrialMessage =
+  'Срок гостевого доступа истёк. Войдите для продолжения подготовки'
+
+async function mockTrialChallenge(page: Page) {
+  await page.route(
+    'https://challenges.cloudflare.com/turnstile/v0/api.js*',
+    (route) =>
+      route.fulfill({
+        contentType: 'application/javascript',
+        body: `window.trialChallengeRenders = 0;
+          window.turnstile = {
+            render(element, options) {
+              window.trialChallengeRenders++;
+              element.textContent = 'Challenge verified';
+              options.callback('verified-test-token');
+              return 'trial-widget';
+            }, remove() {}
+          }`,
+      }),
+  )
+}
+
+async function countTrialChallenges(page: Page) {
+  return page.evaluate(
+    () =>
+      (window as Window & { trialChallengeRenders?: number })
+        .trialChallengeRenders ?? 0,
+  )
+}
+
+async function expectExpiredTrial(page: Page) {
+  const card = page.getByRole('region', { name: 'Бесплатный Full Mock' })
+  await expect(card.getByRole('alert')).toHaveText(expiredTrialMessage)
+  await expect(
+    card.getByRole('button', { name: 'Начать бесплатный Full Mock' }),
+  ).toHaveCount(0)
+  await expect(card.getByText('Challenge verified')).toHaveCount(0)
+  await expect(
+    card.getByRole('link', { name: 'Войти в аккаунт', exact: true }),
+  ).toHaveAttribute('href', '/app/login')
+}
+
+test('expired guest restore shows sign-in without rendering a challenge or starting again', async ({
+  page,
+}) => {
+  const { starts } = await guestAPI(
+    page,
+    false,
+    true,
+    ['academic'],
+    'test-site-key',
+  )
+  await mockTrialChallenge(page)
+  await page.route('**/api/v1/guest/session', (route) =>
+    route.fulfill({
+      status: 401,
+      json: {
+        code: 'GUEST_EXPIRED',
+        message: expiredTrialMessage,
+        details: { reason: 'trial_expired' },
+      },
+    }),
+  )
+  await page.goto('./')
+  await expectExpiredTrial(page)
+  expect(await countTrialChallenges(page)).toBe(0)
+  expect(starts).toEqual([])
+  await page
+    .getByRole('region', { name: 'Бесплатный Full Mock' })
+    .getByRole('link', { name: 'Войти в аккаунт', exact: true })
+    .click()
+  await expect(
+    page.getByRole('dialog', { name: 'Войти или создать аккаунт' }),
+  ).toBeVisible()
+  await expect(page).toHaveURL(/\/app\/?$/)
+  await page.keyboard.press('Escape')
+  await expectExpiredTrial(page)
+  await page.reload()
+  await expectExpiredTrial(page)
+})
+
+test('expired guest start on a legacy backend becomes terminal and survives navigation', async ({
+  page,
+}) => {
+  await guestAPI(page, false, true, ['academic'], 'test-site-key')
+  await mockTrialChallenge(page)
+  let starts = 0
+  await page.route('**/api/v1/guest/session', (route) =>
+    route.fulfill({
+      status: 401,
+      json: {
+        code: 'GUEST_EXPIRED',
+        message: 'Гостевая сессия отсутствует или истекла',
+      },
+    }),
+  )
+  await page.route('**/api/v1/guest/start', (route) => {
+    starts++
+    return route.fulfill({
+      status: 403,
+      json: { code: 'GUEST_EXPIRED', message: expiredTrialMessage },
+    })
+  })
+  await page.goto('./')
+  await expect(page.getByText('Challenge verified')).toBeVisible()
+  const renders = await countTrialChallenges(page)
+  await page
+    .getByRole('button', { name: 'Начать бесплатный Full Mock' })
+    .click()
+  await expectExpiredTrial(page)
+  expect(await countTrialChallenges(page)).toBe(renders)
+  await page
+    .getByRole('region', { name: 'Бесплатный Full Mock' })
+    .getByRole('link', { name: 'Войти в аккаунт', exact: true })
+    .click()
+  await expect(
+    page.getByRole('dialog', { name: 'Войти или создать аккаунт' }),
+  ).toBeVisible()
+  await page.keyboard.press('Escape')
+  await page.getByRole('link', { name: 'Практика', exact: true }).click()
+  await expect(page).toHaveURL(/\/practice$/)
+  await page.getByRole('link', { name: 'Обзор', exact: true }).click()
+  await expectExpiredTrial(page)
+  expect(starts).toBe(1)
+})
+
+for (const code of ['GUEST_CHALLENGE_FAILED', 'DEPENDENCY_UNAVAILABLE']) {
+  test(`retryable guest start ${code} still renews the challenge and can start`, async ({
+    page,
+  }) => {
+    const { starts } = await guestAPI(
+      page,
+      false,
+      true,
+      ['academic'],
+      'test-site-key',
+    )
+    await mockTrialChallenge(page)
+    if (code === 'DEPENDENCY_UNAVAILABLE') {
+      await page.route(
+        '**/api/v1/guest/session',
+        (route) =>
+          route.fulfill({
+            status: 503,
+            json: { code: 'DEPENDENCY_UNAVAILABLE' },
+          }),
+        { times: 1 },
+      )
+    }
+    await page.route(
+      '**/api/v1/guest/start',
+      (route) =>
+        route.fulfill({
+          status: code === 'GUEST_CHALLENGE_FAILED' ? 403 : 503,
+          json: { code, message: 'Повторите попытку' },
+        }),
+      { times: 1 },
+    )
+    await page.goto('./')
+    const start = page.getByRole('button', {
+      name: 'Начать бесплатный Full Mock',
+    })
+    await expect(start).toBeEnabled()
+    const renders = await countTrialChallenges(page)
+    await start.click()
+    await expect(
+      page
+        .getByRole('region', { name: 'Бесплатный Full Mock' })
+        .getByRole('alert'),
+    ).toBeVisible()
+    await expect(start).toBeEnabled()
+    expect(await countTrialChallenges(page)).toBeGreaterThan(renders)
+    await start.click()
+    await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
+    expect(starts).toHaveLength(1)
+  })
+}
+
+test('expired guest state survives failed login and restores after account logout', async ({
+  page,
+}) => {
+  const { claims, starts } = await guestAPI(page)
+  await mockModalGoogle(page)
+  let accountActive = false
+  let loginAttempts = 0
+  await page.route('**/api/v1/guest/session', (route) =>
+    route.fulfill({
+      status: 401,
+      json: {
+        code: 'GUEST_EXPIRED',
+        message: expiredTrialMessage,
+        details: { reason: 'trial_expired' },
+      },
+    }),
+  )
+  await page.route('**/api/v1/auth/refresh', (route) =>
+    accountActive
+      ? route.fulfill({ json: modalAccount })
+      : route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } }),
+  )
+  await page.route('**/api/v1/auth/google', (route) => {
+    loginAttempts++
+    if (loginAttempts === 1)
+      return route.fulfill({
+        status: 503,
+        json: { code: 'DEPENDENCY_UNAVAILABLE' },
+      })
+    accountActive = true
+    return route.fulfill({ json: modalAccount })
+  })
+  await page.route('**/api/v1/auth/logout', (route) => {
+    accountActive = false
+    return route.fulfill({ status: 204 })
+  })
+  await page.route('**/api/v1/attempts*', (route) =>
+    route.fulfill({ json: { items: [] } }),
+  )
+  await page.goto('./')
+  await expectExpiredTrial(page)
+  await page
+    .getByRole('region', { name: 'Бесплатный Full Mock' })
+    .getByRole('link', { name: 'Войти в аккаунт', exact: true })
+    .click()
+  await page.getByRole('button', { name: 'Continue with Google' }).click()
+  await expect(
+    page.getByText('Сервис временно недоступен. Попробуйте немного позже.'),
+  ).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expectExpiredTrial(page)
+  await page
+    .getByRole('region', { name: 'Бесплатный Full Mock' })
+    .getByRole('link', { name: 'Войти в аккаунт', exact: true })
+    .click()
+  await page.getByRole('button', { name: 'Continue with Google' }).click()
+  await expect(
+    page.getByRole('link', { name: 'Открыть профиль' }),
+  ).toContainText('Student')
+  await expect(
+    page.getByText(expiredTrialMessage, { exact: true }),
+  ).toHaveCount(0)
+  await page.reload()
+  await expect(
+    page.getByRole('link', { name: 'Открыть профиль' }),
+  ).toContainText('Student')
+  await expect(
+    page.getByText(expiredTrialMessage, { exact: true }),
+  ).toHaveCount(0)
+  await page.getByRole('button', { name: 'Выйти', exact: true }).click()
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Выйти', exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/login$/)
+  await page
+    .getByRole('link', { name: 'Попробовать один Full Mock без регистрации' })
+    .click()
+  await expectExpiredTrial(page)
+  expect(starts).toEqual([])
+  expect(claims).toEqual([])
+})
+
+test('guest trial expiring between restore and start replaces the start card with sign-in', async ({
+  page,
+}) => {
+  await guestAPI(page, false, true, ['academic'], 'test-site-key')
+  await mockTrialChallenge(page)
+  let starts = 0
+  await page.route('**/api/v1/guest/session', (route) =>
+    route.fulfill({
+      json: {
+        id: 'guest-actor',
+        expiresAt: new Date(Date.now() + 60_000).toISOString(),
+        sessionId: null,
+      },
+    }),
+  )
+  await page.route('**/api/v1/guest/start', (route) => {
+    starts++
+    return route.fulfill({
+      status: 403,
+      json: { code: 'GUEST_EXPIRED', message: expiredTrialMessage },
+    })
+  })
+  await page.goto('./')
+  const start = page.getByRole('button', {
+    name: 'Начать бесплатный Full Mock',
+  })
+  await expect(start).toBeEnabled()
+  const renders = await countTrialChallenges(page)
+  await start.click()
+  await expectExpiredTrial(page)
+  expect(await countTrialChallenges(page)).toBe(renders)
+  expect(starts).toBe(1)
+})
+
+for (const locale of [
+  {
+    language: 'kk',
+    region: 'Тегін Full Mock',
+    message:
+      'Қонақ рұқсатының мерзімі аяқталды. Дайындықты жалғастыру үшін кіріңіз.',
+    signIn: 'Аккаунтқа кіру',
+  },
+  {
+    language: 'en',
+    region: 'Free Full Mock',
+    message: 'Guest access has expired. Sign in to continue preparing.',
+    signIn: 'Sign in',
+  },
+]) {
+  test(`expired guest entry preserves the ${locale.language} locale`, async ({
+    page,
+  }) => {
+    const { starts } = await guestAPI(
+      page,
+      false,
+      true,
+      ['academic'],
+      'test-site-key',
+    )
+    await mockTrialChallenge(page)
+    await page.addInitScript((language) => {
+      window.localStorage.setItem('daiyndyq-language', language)
+    }, locale.language)
+    await page.route('**/api/v1/guest/session', (route) =>
+      route.fulfill({
+        status: 401,
+        json: {
+          code: 'GUEST_EXPIRED',
+          message: expiredTrialMessage,
+          details: { reason: 'trial_expired' },
+        },
+      }),
+    )
+    await page.goto('./')
+    const card = page.getByRole('region', { name: locale.region })
+    await expect(card.getByRole('alert')).toHaveText(locale.message)
+    await expect(
+      card.getByRole('link', { name: locale.signIn, exact: true }),
+    ).toHaveAttribute('href', '/app/login')
+    await expect(card.getByRole('button')).toHaveCount(0)
+    expect(await countTrialChallenges(page)).toBe(0)
+    expect(starts).toEqual([])
+  })
+}

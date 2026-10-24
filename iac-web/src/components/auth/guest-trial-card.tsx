@@ -2,16 +2,22 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Turnstile } from '@/components/auth/turnstile'
+import { LoginToContinue } from '@/components/auth/guest-shell'
 import { Button } from '@/components/ui/button'
 import { authStore, useAuth } from '@/features/auth/auth-store'
-import { getGuestConfig, startGuestMock } from '@/features/auth/guest'
+import {
+  getGuestConfig,
+  guestTrialExpiredMessage,
+  isGuestTrialExpired,
+  startGuestMock,
+} from '@/features/auth/guest'
 import { fullMockKeys } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 
 export function GuestTrialCard() {
   const { t } = useLanguage()
-  const { guest, initialized } = useAuth()
+  const { guest, guestExpired, initialized } = useAuth()
   const navigate = useNavigate()
   const client = useQueryClient()
   const [token, setToken] = useState('')
@@ -30,7 +36,11 @@ export function GuestTrialCard() {
         params: { sessionId: session.id },
       })
     },
-    onError: () => {
+    onError: (error) => {
+      if (isGuestTrialExpired(error)) {
+        authStore.expireGuest()
+        return
+      }
       setToken('')
       setChallengeVersion((value) => value + 1)
     },
@@ -48,7 +58,16 @@ export function GuestTrialCard() {
           {t('Проверьте свой уровень IELTS — пройдите полный пробный тест.')}
         </p>
       </div>
-      {guest?.sessionId ? (
+      {guestExpired ? (
+        <>
+          <p role="alert" className="text-sm text-destructive">
+            {t(guestTrialExpiredMessage)}
+          </p>
+          <div className="w-fit">
+            <LoginToContinue />
+          </div>
+        </>
+      ) : guest?.sessionId ? (
         <Button asChild className="w-fit">
           <Link
             to="/exam/full-mock-sessions/$sessionId"

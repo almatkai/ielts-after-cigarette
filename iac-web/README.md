@@ -22,7 +22,7 @@ On iPhone/iPad, Google sign-in uses a full-page redirect so it can return
 without a popup's `window.opener` in Safari and in-app browsers. Other platforms
 keep the popup. Until the redirect URI below is registered, Google blocks iOS
 sign-in with `redirect_uri_mismatch`. Add
-`https://ielts.academy-ai.kz/api/v1/auth/google` to **Authorized redirect URIs**
+`https://ielts.yrys.academy/api/v1/auth/google` to **Authorized redirect URIs**
 for the Google OAuth web client (the exact origin + `/api/v1/auth/google` on
 other environments). Keep the site's origin in **Authorized JavaScript origins**.
 Deploy the backend form handler before this frontend. The production reverse
@@ -98,7 +98,15 @@ pnpm check
 
 Pushes to `main` run formatting, type, lint, and production-build checks, publish
 the Node/Nitro image to GHCR, and deploy it through the GitHub `production`
-Environment. `VITE_API_BASE_URL` is compiled into the browser bundle.
+Environment. `VITE_API_BASE_URL` and the optional canonical origin `VITE_SITE_URL`
+are compiled into the image by CI and Docker build arguments. For production set
+both GitHub `production` variables to `https://ielts.yrys.academy` (origin only:
+no `/app` or `/api`; the API client appends `/api/v1`). Rebuild the image after
+changing them. Leave `VITE_SITE_URL` empty for localhost/development so canonical
+URLs follow the request origin; use the existing development API origin there.
+
+See [domain migration notes](../docs/YRYS_DOMAIN_MIGRATION.md) for the cutover
+runbook location and the separate rebrand integration patch.
 
 ## Shadcn
 

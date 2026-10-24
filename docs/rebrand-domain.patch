@@ -1,0 +1,19 @@
+--- a/iac-web/src/routes/__root.tsx
++++ b/iac-web/src/routes/__root.tsx
+@@ -39,3 +39,3 @@
+         property: 'og:image',
+-        content: 'https://ielts.academy-ai.kz/app/og-yrys.png',
++        content: 'https://ielts.yrys.academy/app/og-yrys.png',
+       },
+@@ -47,3 +47,3 @@
+         name: 'twitter:image',
+-        content: 'https://ielts.academy-ai.kz/app/og-yrys.png',
++        content: 'https://ielts.yrys.academy/app/og-yrys.png',
+       },
+--- a/iac-web/brand/build-assets.py
++++ b/iac-web/brand/build-assets.py
+@@ -86,3 +86,3 @@
+     draw.text((490,265),caption,font=heading,fill='#17191C')
+-    draw.text((490,322),'ielts.academy-ai.kz',font=domain,fill='#5E6468')
++    draw.text((490,322),'ielts.yrys.academy',font=domain,fill='#5E6468')
+     canvas.save(OUT / ('og-yrys.png' if lang=='ru' else 'og-yrys-kk.png'))

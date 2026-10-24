@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { PrivacyPage } from '@/pages/legal/privacy-page'
 import { tr } from '@/lib/i18n'
+import { siteUrl } from '@/features/blog/seo'
 
 export const Route = createFileRoute('/privacy')({
   ssr: false,
@@ -15,6 +16,7 @@ export const Route = createFileRoute('/privacy')({
       },
       { name: 'robots', content: 'index, follow' },
     ],
+    links: [{ rel: 'canonical', href: siteUrl('/privacy') }],
   }),
   component: PrivacyPage,
 })

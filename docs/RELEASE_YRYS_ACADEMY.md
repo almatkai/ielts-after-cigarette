@@ -81,14 +81,17 @@ playwright test --reporter=line`; own free port and server from this
 
 ## External release prerequisites
 
-Parent-reported infrastructure state: new-host DNS/proxied A and TLS with
-Cloudflare strict mode are ready at the server; production images still use
-the old release. Independently verify this external state at cutover.
-Google OAuth authorized origins/redirects, API CORS and Turnstile host settings
-must support `ielts.yrys.academy`. Rebuild frontend/backend images with the new
-origin-only build variables; runtime env changes do not update baked frontend
-URLs. Keep empty/unset `VITE_SITE_URL` for local/dev origin fallback.
-Old-host cookies and localStorage cannot transfer; users sign in again.
+The parent-observed status dated 2026-10-24 is recorded in
+[the current domain runbook](YRYS_DOMAIN_MIGRATION.md#external-status-supplied-by-the-parent-2026-10-24).
+GitHub build variables, existing Google client/consent branding and old/new
+CORS/Turnstile allowlists are configured; DNS/TLS/Full (strict) and the vhost
+asset repair are active. These are supplied observations, not external checks
+by the SEO executor. Product images remain old. Real Google login and a real
+Turnstile challenge remain uncompleted. At release, revalidate settings and
+approve exact image SHAs before rebuilding/deploying; runtime env changes do
+not update baked frontend URLs. Keep empty/unset `VITE_SITE_URL` for local/dev
+origin fallback. Old-host cookies/localStorage do not transfer; users sign in
+again.
 
 Backend companion candidate: `release/yrys-academy` at
 `ae71c0fa091069f1a3eb4f136f5cab35e052dac6` (parent assembled/pushed).
@@ -97,7 +100,61 @@ expiry `b663730` and domain `b3f76bb`, while retaining main admin media,
 backup and CI. Parent reports combined SQL and full Go test/vet/build passing
 on local PostgreSQL 17. Fresh-production migrations 43/44 are fixed in that
 backend candidate; repair of an existing dev database is separate work.
-No live database or backend image has been deployed.
+The parent read-only production SQL check on 2026-10-24 observed version 42,
+`dirty=false`. Apply fresh corrected migrations 43/44 only at the separately
+authorized backend release deployment. No live database write or backend
+image deployment was performed by this frontend work.
 
-This frontend task creates no PR, performs no push and deploys nothing.
-Parent independently reviews the final candidate before pushing the release.
+The original candidate assembly created no PR, pushed nothing and deployed
+nothing. The later SEO follow-up is authorized to commit/push only
+`release/yrys-academy`; main/dev merges, PRs and deployments remain excluded.
+
+## SEO follow-up, 2026-10-24
+
+Starting frontend release HEAD: `2b6895988d4129707225134dde4df2b3f3a2e322`.
+Only the legal route heads change product behavior: `/app/privacy` and
+`/app/terms` now declare one query-free canonical each through existing
+`siteUrl`. Production uses the configured new origin; local/dev preserves the
+request/browser origin fallback. Public legal indexability, private/admin
+noindex and hidden-blog discovery policy are retained.
+
+The exact audit found no retired public brand/domain in active app source,
+public manifest or brand generators. Remaining `daiyndyq-language` occurrences
+are internal compatibility keys and stay unchanged. Approved public/source
+assets, RU/KK/EN UI, English exam labels, legal contact email, Full Mock direct
+return, auth/storage contracts and coexistence configuration are untouched.
+English landing/new localization/AI feedback language changes are separate
+work. Current documents reflect parent-observed external status without
+claiming independent dashboard, runtime, SSH or database verification.
+
+`iac-web/tests/seo-built.mjs` checks a caller-specified loopback Nitro build:
+initial legal canonical/indexing and current identity, private/admin noindex,
+hidden blog/pages/feeds, manifest and hydrated RU/KK/EN canonical navigation.
+External browser requests are blocked and API requests are mocked; these are
+local SEO checks, not real Google/Turnstile or live API verification.
+
+Follow-up validation (current checkout, not the historical 227-test run):
+
+- `pnpm exec tsc --noEmit`: passed with no diagnostics.
+- Scoped ESLint and Prettier on the two route files and the new SEO script:
+  passed. `git diff --check`: passed.
+- `pnpm test:regression`: 37/37 passed.
+- Three production-mode Vite/Nitro builds: passed with `VITE_SITE_URL` empty,
+  unset, and `https://ielts.yrys.academy`. The final `.output` uses production
+  API/site origins. Builds ran with a minimal public environment and a
+  temporary Node filesystem guard that makes `.env*` absent; no actual env
+  files/secrets were read. Existing pnpm-option/chunk-size warnings remain.
+- Each artifact passed `node tests/seo-built.mjs <loopback-origin>
+<expected-canonical-origin>` against its own temporary server: ports 64279
+  (empty), 64343 (unset), 64391 (production). SSR canonical queries are stripped;
+  hydrated RU/KK/EN client navigation retains exactly one canonical. All local
+  servers and browsers were stopped. The full 227-test suite was not rerun.
+- Scoped XERJ refresh hit the server's existing HTTP 429 memory circuit breaker
+  (RSS 853 MB, watermark 768 MB) and was stopped. Its partial index is not
+  evidence of completeness; exact `rg` and current-file review supplied the
+  audit. No global index reset or server configuration change was attempted.
+- Full incremental diff from `2b689598` and net release file/commit scope
+  against unchanged `origin/main` (`f4bf666`) were reviewed. The release retains
+  its previously approved localization/rebrand/domain/guest changes. No new
+  unrelated feature, whole-dev merge, asset regeneration, config or auth change
+  is introduced. Full Mock completion remains byte-identical to main.

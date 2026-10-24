@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+import { attemptKeys, getAttempt } from '@/features/attempts/api'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   GuestLockedBand,
@@ -7,9 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/features/auth/auth-store'
 import type { FullMockSession } from '@/features/fullmock/api'
 import { AttemptReviewPage } from '@/pages/attempts/attempt-review-page'
+import { useLanguage } from '@/lib/i18n'
 import { FullMockRetake } from './full-mock-retake'
 
 export function FullMockReport({ session }: { session: FullMockSession }) {
+  const { language } = useLanguage()
   const { user } = useAuth()
   const { section: requestedSection } = useSearch({
     from: '/exam/full-mock-sessions/$sessionId',
@@ -23,18 +27,34 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
   return (
     <GuestResultsAccess>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-baseline gap-3">
-          <span className="font-display text-4xl font-semibold tracking-normal text-primary-hover">
-            {session.overallBand?.toFixed(1) ?? '—'}
-          </span>
-          <h2 className="text-sm font-semibold">Overall IELTS band</h2>
+        <div className="grid gap-2">
+          <h2 className="text-lg font-semibold">
+            {language === 'en'
+              ? 'Mock exam results'
+              : language === 'kk'
+                ? 'Сынақ емтиханының нәтижелері'
+                : 'Результаты пробного экзамена'}
+          </h2>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            {language === 'en'
+              ? 'An overall estimated band is not available: the scale and automated assessments have not been validated. Use task results and feedback to guide your next practice.'
+              : language === 'kk'
+                ? 'Жалпы болжамды балл әзірге есептелмейді: шкала мен автоматты бағалар расталмаған. Келесі жаттығу үшін тапсырма нәтижелері мен талдауды пайдаланыңыз.'
+                : 'Общий ориентировочный балл пока не рассчитан: шкала и автоматические оценки не подтверждены. Используйте результаты заданий и разбор для следующей практики.'}
+          </p>
         </div>
         <FullMockRetake sessionId={session.id} />
       </div>
       <div
         className="grid grid-cols-2 gap-3 lg:grid-cols-4"
         role="group"
-        aria-label="Full Mock sections"
+        aria-label={
+          language === 'en'
+            ? 'Full Mock sections'
+            : language === 'kk'
+              ? 'Full Mock бөлімдері'
+              : 'Секции Full Mock'
+        }
       >
         {session.sections.map((section) => {
           const skill =
@@ -48,7 +68,13 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
             >
               <button
                 type="button"
-                aria-label={`Show ${skill} review`}
+                aria-label={
+                  language === 'en'
+                    ? `Show ${skill} review`
+                    : language === 'kk'
+                      ? `${skill} таңдау`
+                      : `Выбрать ${skill}`
+                }
                 aria-pressed={active}
                 aria-controls="full-mock-review"
                 onClick={() =>
@@ -75,19 +101,41 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
                       : section.skill === 'speaking'
                         ? 15
                         : 60)}{' '}
-                  minutes
+                  {language === 'en'
+                    ? 'minutes'
+                    : language === 'kk'
+                      ? 'минут'
+                      : 'минут'}
                 </span>
                 <Badge variant="secondary" className="w-fit">
                   {ungraded
-                    ? 'Not graded'
+                    ? language === 'en'
+                      ? 'Not graded'
+                      : language === 'kk'
+                        ? 'Бағаланбаған'
+                        : 'Без оценки'
                     : section.attempt.status === 'PROCESSING'
-                      ? 'Assessing'
-                      : 'Submitted'}
+                      ? language === 'en'
+                        ? 'Assessing'
+                        : language === 'kk'
+                          ? 'Тексерілуде'
+                          : 'Проверяется'
+                      : language === 'en'
+                        ? 'Submitted'
+                        : language === 'kk'
+                          ? 'Тапсырылды'
+                          : 'Сдано'}
                 </Badge>
-                <span className="h-9 text-xl font-semibold text-primary-hover">
-                  {locked && !ungraded
-                    ? null
-                    : (section.attempt.band?.toFixed(1) ?? '—')}
+                <span className="min-h-9 text-sm font-semibold text-primary-hover">
+                  {locked && !ungraded ? null : section.attempt.status !==
+                    'SUBMITTED' ? (
+                    '—'
+                  ) : section.skill === 'reading' ||
+                    section.skill === 'listening' ? (
+                    `${section.attempt.score ?? '—'}/${section.attempt.maxScore ?? '—'}`
+                  ) : (
+                    <SubjectiveReviewStatus attemptId={section.attempt.id} />
+                  )}
                 </span>
               </button>
               {locked && !ungraded ? (
@@ -102,12 +150,22 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
       {selected ? (
         <section
           id="full-mock-review"
-          aria-label={`${selected.skill} review`}
+          aria-label={
+            language === 'en'
+              ? `${selected.skill} review`
+              : language === 'kk'
+                ? `${selected.skill} талдауы`
+                : `Работа над ошибками ${selected.skill}`
+          }
           className="min-w-0"
         >
           {selected.attempt.status === 'ABANDONED' ? (
             <p className="text-sm text-muted-foreground">
-              This section finished without a score.
+              {language === 'en'
+                ? 'This section finished without a score.'
+                : language === 'kk'
+                  ? 'Бөлім бағасыз аяқталды.'
+                  : 'Секция завершена без оценки.'}
             </p>
           ) : (
             <AttemptReviewPage
@@ -119,5 +177,36 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
         </section>
       ) : null}
     </GuestResultsAccess>
+  )
+}
+
+function SubjectiveReviewStatus({ attemptId }: { attemptId: string }) {
+  const { language, t } = useLanguage()
+  const query = useQuery({
+    queryKey: attemptKeys.detail(attemptId),
+    queryFn: ({ signal }) => getAttempt(attemptId, signal),
+  })
+  if (query.isPending) return <>{t('Загружаем разбор этой попытки…')}</>
+  if (
+    query.isError ||
+    !(query.data.writingEvaluation || query.data.speakingEvaluation)
+  )
+    return (
+      <>
+        {language === 'en'
+          ? 'Review not yet available'
+          : language === 'kk'
+            ? 'Талдау әзірге қолжетімсіз'
+            : 'Разбор пока недоступен'}
+      </>
+    )
+  return (
+    <>
+      {language === 'en'
+        ? 'Review ready'
+        : language === 'kk'
+          ? 'Талдау дайын'
+          : 'Разбор готов'}
+    </>
   )
 }

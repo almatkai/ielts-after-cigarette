@@ -1,7 +1,6 @@
 import { BrandLogo } from '@/components/landing/brand'
 import {
   ArrowLeft,
-  Book,
   Microphone2,
   StopCircle,
   TickCircle,
@@ -10,6 +9,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useAttemptDetail } from '@/features/attempts/use-attempt-detail'
 import { FullMockSectionComplete } from '@/pages/fullmock/full-mock-section-complete'
+import { AttemptLearningBridge } from '@/features/study-plan/attempt-learning-bridge'
 import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -48,7 +48,7 @@ import type {
 } from '@/features/speaking/api'
 import { getErrorMessage } from '@/lib/api/client'
 import { useExamTimer } from '@/features/attempts/exam-timer'
-import { tr } from '@/lib/i18n'
+import { tr, useLanguage } from '@/lib/i18n'
 
 type PartPhase = 'ready' | 'preparing' | 'recording' | 'uploading' | 'finished'
 
@@ -337,6 +337,7 @@ function SpeakingPartRunner({
   totalParts: number
   stopRecorderRef: React.RefObject<(() => Promise<void>) | null>
 }) {
+  const { language } = useLanguage()
   const [phase, setPhase] = useState<PartPhase>('ready')
   const [remaining, setRemaining] = useState(part.responseSeconds)
   const [prepared, setPrepared] = useState(false)
@@ -498,8 +499,11 @@ function SpeakingPartRunner({
             placeholder="Type your answer or say it aloud—your audio will be transcribed automatically."
           />
           <p className="text-xs text-muted-foreground">
-            'Our system can’t assess pronunciation yet. Your score will be based
-            on fluency, vocabulary, and grammatical accuracy.'
+            {language === 'en'
+              ? 'Typed responses help you practise wording. Text cannot establish pronunciation or speaking pace; audio is saved separately. An estimated Speaking band is not currently calculated.'
+              : language === 'kk'
+                ? 'Мәтіндік жауап ойды жеткізуді жаттықтыруға көмектеседі. Мәтіннен айтылым мен сөйлеу қарқынын бағалау мүмкін емес; аудиожазба бөлек сақталады. Speaking бойынша болжамды балл әзірге есептелмейді.'
+                : 'Набранный ответ подходит для практики формулировок. По тексту нельзя проверить произношение и темп устной речи; аудиозапись сохраняется отдельно. Ориентировочный балл Speaking пока не рассчитывается.'}
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5">
@@ -594,6 +598,7 @@ export function SpeakingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
+  const { t } = useLanguage()
   const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.speakingEvaluation
   const assessment = detailQuery.data?.speakingAssessment
@@ -603,7 +608,7 @@ export function SpeakingAttemptResult({
     return sessionId ? <FullMockSectionComplete sessionId={sessionId} /> : null
   }
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
         skill="speaking"
         fullMockSessionId={fullMockSessionId}
@@ -612,8 +617,8 @@ export function SpeakingAttemptResult({
       />
 
       <div>
-        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-          {'Review your work'}
+        <h1 className="text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
+          {t('Разбор')}: Speaking
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{material.title}</p>
       </div>
@@ -657,6 +662,7 @@ function SpeakingEvaluationView({
   material: PublicSpeakingMaterial
   evaluation: SpeakingEvaluation
 }) {
+  const { language, t } = useLanguage()
   const isPronunciationAvailable = Boolean(
     evaluation.pronunciationAvailable &&
     evaluation.criteria.pronunciation.band > 0,
@@ -685,7 +691,11 @@ function SpeakingEvaluationView({
       {
         ...evaluation.criteria.pronunciation,
         feedback: !isPronunciationAvailable
-          ? 'Our system can’t assess pronunciation yet. This score is based on fluency, vocabulary, and grammar.'
+          ? language === 'en'
+            ? 'Pronunciation has not been assessed. Feedback on fluency, vocabulary and grammar is available.'
+            : language === 'kk'
+              ? 'Айтылым бағаланбаған. Сөйлеу еркіндігі, сөздік қор және грамматика туралы пікірлер қолжетімді.'
+              : 'Произношение не проверено. Доступны комментарии по беглости, лексике и грамматике.'
           : evaluation.criteria.pronunciation.feedback,
       },
       !isPronunciationAvailable,
@@ -694,92 +704,138 @@ function SpeakingEvaluationView({
 
   return (
     <div className="space-y-6">
-      <AttemptPerformanceReport
-        band={evaluation.overallBand}
-        bandNote={
-          isPronunciationAvailable
-            ? 'Practice score across 4 IELTS Speaking criteria'
-            : 'Practice score across 3 criteria (pronunciation is not assessed yet)'
+      {evaluation.summary ? (
+        <Card className="gap-2 rounded-[16px] border-border bg-card p-4 shadow-none sm:p-5">
+          <p className="text-base font-semibold">
+            {language === 'en'
+              ? 'AI review summary'
+              : language === 'kk'
+                ? 'ЖИ талдауының қорытындысы'
+                : 'Резюме разбора ИИ'}
+          </p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {evaluation.summary}
+          </p>
+        </Card>
+      ) : null}
+
+      <section
+        className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+        aria-label={
+          language === 'en'
+            ? 'Speaking criteria'
+            : language === 'kk'
+              ? 'Speaking критерийлері'
+              : 'Критерии Speaking'
         }
+      >
+        <h2 className="mb-3 text-base font-semibold">
+          {language === 'en'
+            ? 'Criteria feedback'
+            : language === 'kk'
+              ? 'Критерийлер бойынша талдау'
+              : 'Разбор по критериям'}
+        </h2>
+        <table className="block w-full text-left text-sm sm:table">
+          <thead className="hidden text-xs text-muted-foreground sm:table-header-group">
+            <tr>
+              <th scope="col" className="w-1/3 pb-2 pr-5 font-medium">
+                {language === 'en' ? 'Criterion' : 'Критерий'}
+              </th>
+              <th scope="col" className="pb-2 font-medium">
+                {language === 'en'
+                  ? 'Feedback'
+                  : language === 'kk'
+                    ? 'Пікір'
+                    : 'Комментарий'}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="block divide-y divide-border sm:table-row-group">
+            {criteriaFeedback.map(([label, criterion, unavailable]) => (
+              <tr key={label} className="block py-3 sm:table-row">
+                <th
+                  scope="row"
+                  className="block pb-1 text-left align-top font-medium sm:table-cell sm:py-3 sm:pr-5"
+                >
+                  {label}
+                </th>
+                <td className="block text-muted-foreground sm:table-cell sm:py-3">
+                  {unavailable ? (
+                    <p className="mb-1 text-xs font-medium text-warning-fg">
+                      {t('Пока не определяется')}
+                    </p>
+                  ) : null}
+                  {criterion.feedback ||
+                    (language === 'en'
+                      ? 'No feedback provided.'
+                      : language === 'kk'
+                        ? 'Пікір берілмеген.'
+                        : 'Комментарий не получен.')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      {evaluation.parts.map((part, index) => (
+        <Card
+          key={part.partId}
+          className="gap-4 rounded-2xl border-border bg-card shadow-none"
+        >
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">
+              Part {index + 1}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid min-w-0 items-start gap-5 text-sm leading-6 lg:grid-cols-2">
+            <section className="min-w-0">
+              <h3 className="mb-2 text-base font-semibold">{t('Ваш ответ')}</h3>
+              {part.transcript ? (
+                <p className="whitespace-pre-wrap break-words rounded-xl bg-muted/50 p-4">
+                  {part.transcript}
+                </p>
+              ) : (
+                <p className="text-muted-foreground">
+                  {language === 'en'
+                    ? 'Transcript unavailable.'
+                    : language === 'kk'
+                      ? 'Жауап транскрипциясы қолжетімсіз.'
+                      : 'Расшифровка ответа недоступна.'}
+                </p>
+              )}
+            </section>
+            <section className="min-w-0 space-y-4">
+              <h3 className="text-base font-semibold">
+                {language === 'en'
+                  ? 'Response feedback'
+                  : language === 'kk'
+                    ? 'Жауапқа пікір'
+                    : 'Комментарий к ответу'}
+              </h3>
+              <p className="text-muted-foreground">{part.feedback}</p>
+              <FeedbackList
+                title={t('Сильные стороны')}
+                items={part.strengths}
+              />
+              <FeedbackList
+                title={t('Что улучшить')}
+                items={part.improvements}
+              />
+            </section>
+          </CardContent>
+        </Card>
+      ))}
+      <AttemptLearningBridge attemptId={attempt.id} />
+      <AttemptPerformanceReport
+        showBand={false}
+        band={evaluation.overallBand}
         criteria={criteriaList}
         startedAt={attempt.startedAt}
         submittedAt={attempt.submittedAt}
         durationMinutes={material.parts.length * 5}
         paceUnit={'part'}
       />
-
-      {evaluation.summary ? (
-        <Card className="rounded-[10px] border border-border bg-card p-5 shadow-none">
-          <p className="text-xs font-semibold normal-case text-muted-foreground mb-1">
-            {'Examiner summary'}
-          </p>
-          <p className="text-sm leading-relaxed text-foreground">
-            {evaluation.summary}
-          </p>
-        </Card>
-      ) : null}
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        {criteriaFeedback.map(([label, criterion, unavailable]) => (
-          <Card
-            key={label}
-            className={`rounded-[10px] border bg-card shadow-none ${
-              unavailable
-                ? 'border-warning-bg/80 bg-warning-bg/20'
-                : 'border-border'
-            }`}
-          >
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="font-semibold text-foreground">{label}</h2>
-                {unavailable ? (
-                  <span className="rounded-md bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg border border-warning-bg">
-                    {'Not assessed yet'}
-                  </span>
-                ) : (
-                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-sm font-bold text-primary">
-                    {criterion.band.toFixed(1)}
-                  </span>
-                )}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {criterion.feedback ||
-                  (unavailable
-                    ? 'Our system can’t assess pronunciation yet. The score uses 3 criteria: fluency, vocabulary, and grammar.'
-                    : 'No comment provided.')}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      {evaluation.parts.map((part, index) => (
-        <Card key={part.partId} className="shadow-none">
-          <CardHeader>
-            <CardTitle>Part {index + 1}</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 text-sm leading-6">
-            <p>{part.feedback}</p>
-            {part.transcript ? (
-              <div className="rounded-xl bg-background p-4">
-                <p className="mb-1 text-xs font-semibold text-muted-foreground">
-                  {'TRANSCRIPT'}
-                </p>
-                {part.transcript}
-              </div>
-            ) : null}
-            <FeedbackList title={'Strengths'} items={part.strengths} />
-            <FeedbackList
-              title={'Areas to improve'}
-              items={part.improvements}
-            />
-          </CardContent>
-        </Card>
-      ))}
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Book className="size-4" aria-hidden />
-        'This score is for practice only; your official IELTS result is
-        determined by an examiner.'
-      </p>
     </div>
   )
 }

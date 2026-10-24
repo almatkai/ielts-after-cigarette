@@ -30,7 +30,7 @@ import { WritingReview } from '@/features/attempts/writing-review'
 import { getWritingMediaBlob } from '@/features/writing/api'
 import type { PublicWritingMaterial, WritingTask } from '@/features/writing/api'
 import { getErrorMessage } from '@/lib/api/client'
-import { tr } from '@/lib/i18n'
+import { tr, useLanguage } from '@/lib/i18n'
 
 export function WritingStudentPage({
   materialId,
@@ -466,6 +466,7 @@ export function WritingAttemptResult({
   onRetake?: () => Promise<void> | void
   isRetaking?: boolean
 }) {
+  const { t } = useLanguage()
   const detailQuery = useAttemptDetail(attempt.id)
   const evaluation = detailQuery.data?.writingEvaluation
   const assessment = detailQuery.data?.writingAssessment
@@ -476,7 +477,7 @@ export function WritingAttemptResult({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 p-3 sm:p-6 lg:p-8">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5 p-3 sm:p-6 lg:p-8">
       <AttemptResultHeader
         skill="writing"
         fullMockSessionId={fullMockSessionId}
@@ -485,8 +486,8 @@ export function WritingAttemptResult({
       />
 
       <div>
-        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-          {'Review your work'}
+        <h1 className="text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
+          {t('Разбор')}: Writing
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{material.title}</p>
       </div>

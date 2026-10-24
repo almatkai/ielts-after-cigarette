@@ -293,14 +293,17 @@ for (const theme of ['light', 'dark'] as const) {
       }),
     )
     await page.goto('./attempts/band-result')
-    const score = page
-      .locator('.font-display')
-      .filter({ hasText: /^7\.0$/ })
-      .first()
-    await expect(score).toBeVisible()
-    await expect(score).toHaveCSS('font-family', /Tektur/)
-    await contrast(score)
-    await capture(page, `result-band-${theme}`)
+    // Subjective feedback no longer presents an unvalidated IELTS band.
+    // Keep typography/contrast coverage on the actual review content instead.
+    await expect(page.getByText('7.0', { exact: true })).toHaveCount(0)
+    await expect(
+      page.getByRole('region', { name: 'Ограничения учебного разбора' }),
+    ).toBeVisible()
+    const reviewSummary = page.getByText('Speaking feedback', { exact: true })
+    await expect(reviewSummary).toBeVisible()
+    await expect(reviewSummary).toHaveCSS('font-family', /Golos/)
+    await contrast(reviewSummary)
+    await capture(page, `result-feedback-${theme}`)
 
     await page.setViewportSize({ width: 360, height: 844 })
     await page.goto('./')

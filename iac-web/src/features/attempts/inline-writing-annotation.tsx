@@ -33,7 +33,7 @@ export function InlineWritingAnnotation({
           type="button"
           aria-label={`${feedbackLabel}: ${text}`}
           aria-pressed={selected}
-          className={`inline text-left font-sans text-base sm:text-lg cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
+          className={`inline text-left font-sans text-sm leading-6 cursor-pointer transition-all duration-150 rounded px-1 -mx-0.5 ${
             isError
               ? `underline decoration-wavy decoration-destructive decoration-2 underline-offset-4 text-destructive hover:bg-destructive-soft/90 ${
                   selected
@@ -79,7 +79,7 @@ export function InlineWritingAnnotation({
             <span aria-hidden>×</span>
           </PopoverPrimitive.Close>
         </div>
-        <p className="font-sans text-base font-semibold leading-snug text-success whitespace-pre-wrap">
+        <p className="font-sans text-sm font-semibold leading-5 text-success whitespace-pre-wrap">
           {annotation.replacement}
         </p>
         {annotation.explanationRu && (
@@ -87,7 +87,7 @@ export function InlineWritingAnnotation({
             {annotation.explanationRu}
           </p>
         )}
-        <PopoverPrimitive.Arrow className="fill-white" />
+        <PopoverPrimitive.Arrow className="fill-popover" />
       </PopoverContent>
     </Popover>
   )

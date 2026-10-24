@@ -18,11 +18,13 @@ import {
 
 type DashboardHeaderProps = {
   pageTitle: string | null
+  hideTitleOnMobile?: boolean
   onOpenNavigation: () => void
 }
 
 export function DashboardHeader({
   pageTitle,
+  hideTitleOnMobile = false,
   onOpenNavigation,
 }: DashboardHeaderProps) {
   const { user } = useAuth()
@@ -48,7 +50,9 @@ export function DashboardHeader({
         </div>
         <span className="hidden h-7 w-px bg-border sm:block lg:hidden" />
         {pageTitle ? (
-          <div className="min-w-0 flex-1">
+          <div
+            className={`min-w-0 flex-1${hideTitleOnMobile ? ' hidden min-[641px]:block' : ''}`}
+          >
             <p className="hidden text-[10px] font-semibold text-muted-foreground normal-case lg:block">
               {t('Рабочее пространство')}
             </p>

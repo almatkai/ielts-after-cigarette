@@ -1,20 +1,35 @@
-import { Link } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+
+import { fullMockKeys } from '@/features/fullmock/api'
 
 export function FullMockSectionComplete({ sessionId }: { sessionId: string }) {
-  return (
-    <div className="mx-auto grid w-full max-w-[1120px] gap-4 px-4 py-6 sm:px-6">
-      <h1 className="text-[28px] sm:text-[36px] font-semibold">
-        Section complete
-      </h1>
-      <p className="text-sm text-muted-foreground">
-        Your results and review will open after the Full Mock is finished.
-      </p>
-      <Button asChild className="justify-self-start">
-        <Link to="/exam/full-mock-sessions/$sessionId" params={{ sessionId }}>
-          Continue the Full Mock
-        </Link>
-      </Button>
-    </div>
-  )
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    let cancelled = false
+    // Submit updates the attempt, but the session can still be fresh in cache.
+    // Invalidate only the session: section reads can start/resume their timers.
+    void queryClient
+      .invalidateQueries({
+        queryKey: fullMockKeys.session(sessionId),
+        exact: true,
+      })
+      .then(() => {
+        if (!cancelled) {
+          void navigate({
+            to: '/exam/full-mock-sessions/$sessionId',
+            params: { sessionId },
+            replace: true,
+          })
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [queryClient, navigate, sessionId])
+
+  return null
 }

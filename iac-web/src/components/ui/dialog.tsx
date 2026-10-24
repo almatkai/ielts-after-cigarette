@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
-import { CloseSquare } from 'iconsax-react'
+import { Add } from 'iconsax-react'
+import { Button } from '@/components/ui/button'
 
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n'
 
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -50,6 +52,7 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const { t } = useLanguage()
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -63,9 +66,15 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close className="absolute top-5 right-5 rounded-[8px] p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none">
-            <CloseSquare className="size-5" aria-hidden />
-            <span className="sr-only">Закрыть</span>
+          <DialogPrimitive.Close asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 size-11 rounded-lg text-muted-foreground sm:size-9"
+              aria-label={t('Закрыть')}
+            >
+              <Add className="size-5 rotate-45" aria-hidden />
+            </Button>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>

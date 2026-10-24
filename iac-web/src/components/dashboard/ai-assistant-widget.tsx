@@ -1,6 +1,7 @@
 import { CloseCircle, Messages1 } from 'iconsax-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { FoxMascot } from './fox-mascot'
+import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { useMascotVisibility } from '@/features/assistant/mascot-store'
@@ -17,9 +18,11 @@ const focusRing =
 export function AiAssistantFloatingWidget({
   className,
   hidden = false,
+  compact = false,
 }: {
   className?: string
   hidden?: boolean
+  compact?: boolean
 }) {
   const { t } = useLanguage()
   const { isVisible, setVisible } = useMascotVisibility()
@@ -114,7 +117,8 @@ export function AiAssistantFloatingWidget({
         pageVisible &&
         isVisible &&
         !chatIsOpen &&
-        !hidden
+        !hidden &&
+        !compact
       ) {
         window.addEventListener('mousemove', handleMouseMove, { passive: true })
         document.addEventListener('mouseleave', resetEyes)
@@ -126,7 +130,7 @@ export function AiAssistantFloatingWidget({
       detach()
       fine.removeEventListener('change', updateTracking)
     }
-  }, [motionAllowed, pageVisible, isVisible, chatIsOpen, hidden])
+  }, [motionAllowed, pageVisible, isVisible, chatIsOpen, hidden, compact])
 
   const openChat = () => {
     setChatWasOpened(true)
@@ -175,7 +179,24 @@ export function AiAssistantFloatingWidget({
           />
         </Suspense>
       ) : null}
-      {!chatIsOpen && !hidden ? (
+      {!chatIsOpen && !hidden && compact ? (
+        <div className="flex justify-end">
+          <Button
+            ref={triggerRef}
+            variant="outline"
+            className="min-h-11"
+            aria-label={t('Открыть чат с Юки')}
+            onClick={openChat}
+          >
+            <Messages1
+              size={18}
+              className="text-muted-foreground"
+              aria-hidden
+            />{' '}
+            {t('Спросить Юки')}
+          </Button>
+        </div>
+      ) : !chatIsOpen && !hidden ? (
         <div
           data-testid="yuki-widget"
           className={cn(

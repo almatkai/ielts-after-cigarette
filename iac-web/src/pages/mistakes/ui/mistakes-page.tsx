@@ -1,3 +1,4 @@
+import { AttemptLearningBridge } from '@/features/study-plan/attempt-learning-bridge'
 import { WritingReview } from '@/features/attempts/writing-review'
 import { ArrowLeft, ArrowRight, MessageQuestion } from 'iconsax-react'
 import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -41,14 +42,55 @@ const skills: AttemptMaterialType[] = [
   'writing',
   'speaking',
 ]
-const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-})
+const learningCopy: Partial<Record<string, { en: string; kk: string }>> = {
+  'Сохранённые работы': { en: 'Saved work', kk: 'Сақталған жұмыстар' },
+  'Работа сохранена · без подтверждённой оценки IELTS': {
+    en: 'Work saved · no validated IELTS score',
+    kk: 'Жұмыс сақталды · расталған IELTS бағасы жоқ',
+  },
+  'Результат сохранён': { en: 'Result saved', kk: 'Нәтиже сақталды' },
+  'Разбор пока недоступен': {
+    en: 'Review not yet available',
+    kk: 'Талдау әзірге қолжетімсіз',
+  },
+  'Здесь появятся комментарии к завершённым работам.': {
+    en: 'Feedback on completed work will appear here.',
+    kk: 'Аяқталған жұмыстардың пікірлері осында пайда болады.',
+  },
+  'Произношение в этом разборе не определяется. Текст и расшифровка не подтверждают произношение.':
+    {
+      en: 'Pronunciation is not assessed in this review. Text and transcripts do not establish pronunciation.',
+      kk: 'Бұл талдауда айтылым бағаланбайды. Мәтін мен транскрипция айтылымды растамайды.',
+    },
+  'учебный разбор': { en: 'practice review', kk: 'оқу талдауы' },
+  'Ограничения учебного разбора': {
+    en: 'Practice review limitations',
+    kk: 'Оқу талдауының шектеулері',
+  },
+  'Автоматические комментарии не проверены специалистом и не являются оценкой IELTS.':
+    {
+      en: 'Automated feedback has not been validated by a specialist and is not an IELTS assessment.',
+      kk: 'Автоматты пікірлерді маман тексермеген және олар IELTS бағасы емес.',
+    },
+  'Текстовый ответ и расшифровка не подтверждают беглость и произношение. Наличие аудиозаписи и её анализ смотрите в полном разборе работы.':
+    {
+      en: 'Typed responses and transcripts do not establish fluency or pronunciation. See the full review for audio availability and analysis.',
+      kk: 'Мәтіндік жауап пен транскрипция сөйлеу еркіндігі мен айтылымды растамайды. Аудиожазба мен оның талдауын толық талдаудан қараңыз.',
+    },
+}
+function useMistakesCopy() {
+  const { language, t } = useLanguage()
+  return {
+    language,
+    t: (source: string) =>
+      language === 'ru'
+        ? t(source)
+        : (learningCopy[source]?.[language] ?? t(source)),
+  }
+}
 
 export function MistakesPage() {
-  const { t, language } = useLanguage()
+  const { t, language } = useMistakesCopy()
   const { skill, page, attempt } = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
   const queryClient = useQueryClient()
@@ -59,6 +101,11 @@ export function MistakesPage() {
     ...mistakeListCache,
   })
   const selected = listQuery.data?.items.find((item) => item.id === attempt)
+  const dateFormatter = new Intl.DateTimeFormat(language, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-5">
@@ -115,7 +162,7 @@ export function MistakesPage() {
             <p>
               {skill === 'reading' || skill === 'listening'
                 ? t('Попытки с ошибками')
-                : t('Завершённые разборы')}
+                : t('Сохранённые работы')}
             </p>
             <p>{t('Последние сначала')}</p>
           </div>
@@ -170,9 +217,18 @@ export function MistakesPage() {
                       <span
                         className={`text-sm font-medium ${item.mistakeCount !== null ? 'text-destructive' : 'text-primary'}`}
                       >
-                        {item.mistakeCount !== null
-                          ? mistakeCountLabel(item.mistakeCount, language)
-                          : `Band ${item.band?.toFixed(1) ?? '—'}`}
+                        {skill === 'writing' || skill === 'speaking'
+                          ? t(
+                              'Работа сохранена · без подтверждённой оценки IELTS',
+                            )
+                          : item.mistakeCount !== null
+                            ? mistakeCountLabel(item.mistakeCount, language)
+                            : t('Результат сохранён')}
+                        {(skill === 'reading' || skill === 'listening') &&
+                        typeof item.score === 'number' &&
+                        typeof item.maxScore === 'number'
+                          ? ` · ${item.score}/${item.maxScore}`
+                          : ''}
                       </span>
                       <Button
                         variant="outline"
@@ -248,7 +304,7 @@ function AttemptMistakes({
   skill: AttemptMaterialType
   onBack: () => void
 }) {
-  const { t, language } = useLanguage()
+  const { t, language } = useMistakesCopy()
   const [retryIndex, setRetryIndex] = useState<number | null>(null)
   const detailQuery = useQuery({
     queryKey: attemptKeys.mistakeDetail(attemptId),
@@ -321,7 +377,9 @@ function AttemptMistakes({
           !detailQuery.data.writingEvaluation &&
           !detailQuery.data.speakingEvaluation ? (
             <p className="py-6 text-sm text-muted-foreground">
-              {t('В этой попытке нет ошибок для разбора.')}
+              {materialType === 'writing' || materialType === 'speaking'
+                ? t('Разбор пока недоступен')
+                : t('В этой попытке нет ошибок для разбора.')}
             </p>
           ) : null}
         </>
@@ -342,7 +400,7 @@ function AttemptMistakes({
 }
 
 function EmptyMistakesState({ skill }: { skill: AttemptMaterialType }) {
-  const { t } = useLanguage()
+  const { t } = useMistakesCopy()
   const objective = skill === 'reading' || skill === 'listening'
   return (
     <Card className={cardClassName}>
@@ -357,9 +415,7 @@ function EmptyMistakesState({ skill }: { skill: AttemptMaterialType }) {
             ? t(
                 'Здесь появятся завершённые попытки с неверными или пропущенными ответами.',
               )
-            : t(
-                'Здесь появятся оценки и обратная связь по завершённым попыткам.',
-              )}
+            : t('Здесь появятся комментарии к завершённым работам.')}
         </p>
         <Button asChild variant="outline" className="shadow-none">
           <Link to={`/${skill}`}>
@@ -378,7 +434,7 @@ function AIEvaluationCard({
   detail: MistakeDetail
   skill: AttemptMaterialType
 }) {
-  const { t } = useLanguage()
+  const { t } = useMistakesCopy()
   if (detail.writingEvaluation) {
     return (
       <WritingReview
@@ -389,10 +445,9 @@ function AIEvaluationCard({
   }
   const evaluation = detail.speakingEvaluation
   if (!evaluation) return null
-  const isSpeaking = skill === 'speaking' || Boolean(detail.speakingEvaluation)
   const isPronunciationAvailable = Boolean(
-    detail.speakingEvaluation?.pronunciationAvailable &&
-    detail.speakingEvaluation.criteria.pronunciation.band > 0,
+    evaluation.pronunciationAvailable &&
+    evaluation.criteria.pronunciation.band > 0,
   )
   const criteria = [
     {
@@ -417,11 +472,11 @@ function AIEvaluationCard({
       label: 'Pronunciation',
       criterion: detail.speakingEvaluation?.criteria.pronunciation,
       unavailable: !isPronunciationAvailable,
-      feedback: !isPronunciationAvailable
-        ? t(
-            'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
-          )
-        : detail.speakingEvaluation?.criteria.pronunciation.feedback,
+      feedback: isPronunciationAvailable
+        ? evaluation.criteria.pronunciation.feedback
+        : t(
+            'Произношение в этом разборе не определяется. Текст и расшифровка не подтверждают произношение.',
+          ),
     },
   ]
 
@@ -431,20 +486,29 @@ function AIEvaluationCard({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
             <MessageQuestion className="size-4 text-primary" aria-hidden />
-            {materialTypeLabels[skill]} · Band{' '}
-            {evaluation.overallBand.toFixed(1)}
+            {materialTypeLabels[skill]} · {t('учебный разбор')}
           </CardTitle>
-          {isSpeaking && !isPronunciationAvailable ? (
-            <span className="text-xs text-muted-foreground">
-              {t(
-                'Оценка по 3 критериям (произношение пока не определяется нашей системой)',
-              )}
-            </span>
-          ) : null}
         </div>
       </CardHeader>
       <CardContent className="grid gap-4 p-5">
-        <p className="text-sm leading-6 text-primary">{evaluation.summary}</p>
+        <section
+          aria-label={t('Ограничения учебного разбора')}
+          className="grid gap-2 text-sm leading-6 text-muted-foreground"
+        >
+          <p>
+            {t(
+              'Автоматические комментарии не проверены специалистом и не являются оценкой IELTS.',
+            )}
+          </p>
+          <p>
+            {t(
+              'Текстовый ответ и расшифровка не подтверждают беглость и произношение. Наличие аудиозаписи и её анализ смотрите в полном разборе работы.',
+            )}
+          </p>
+        </section>
+        <p className="text-sm leading-6 text-muted-foreground">
+          {evaluation.summary}
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {criteria.map(({ label, criterion, unavailable, feedback }) =>
             criterion ? (
@@ -459,14 +523,10 @@ function AIEvaluationCard({
                 <p className="flex items-center justify-between gap-2 text-sm font-medium">
                   {label}
                   {unavailable ? (
-                    <span className="rounded-md border border-warning-bg bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg">
+                    <span className="text-xs text-muted-foreground">
                       {t('Пока не определяется')}
                     </span>
-                  ) : (
-                    <span className="text-primary">
-                      {criterion.band.toFixed(1)}
-                    </span>
-                  )}
+                  ) : null}
                 </p>
                 {feedback ? (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -477,6 +537,7 @@ function AIEvaluationCard({
             ) : null,
           )}
         </div>
+        <AttemptLearningBridge attemptId={detail.attempt.id} />
       </CardContent>
     </Card>
   )

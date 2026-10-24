@@ -59,6 +59,7 @@ const secondaryDashboardPages = [
 // Writer pages carry their own heading, so the shell header shows no title.
 export function getDashboardPageTitle(pathname: string): string | null {
   if (pathname.startsWith('/writer/posts')) return null
+  if (pathname.startsWith('/plan/learning')) return 'Работа над ошибками'
 
   const navigationItem = [
     ...primaryDashboardNavigation,

@@ -1,7 +1,32 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import type { StudyResponse } from '../src/features/study-plan/api'
+import { learningFixture } from './fixtures/learning'
 
 async function auth(page: Page) {
+  // Progress now renders the study summary before the paginated history.
+  const study: StudyResponse = {
+    today: '2026-10-24',
+    timezone: 'UTC',
+    settings: {
+      dailyMinutes: 45,
+      studyDays: [1, 2, 3, 4, 5],
+      weeklyMockEnabled: false,
+    },
+    goal: { targetBand: null, examDate: null, examType: 'academic' },
+    plan: null,
+    recommendations: [],
+    evidence: [],
+    overallBand: null,
+    progress: [],
+    limitations: [],
+  }
+  await page.route('**/api/v1/study-plan', (route) =>
+    route.fulfill({ json: study }),
+  )
+  await page.route('**/api/v1/study-plan/learning', (route) =>
+    route.fulfill({ json: learningFixture() }),
+  )
   await page.route('**/api/v1/auth/refresh', (route) =>
     route.fulfill({
       json: {
@@ -144,7 +169,15 @@ for (const initiallyProcessing of [false, true]) {
     })
     await auth(page)
     await page.goto('./exam/full-mock-sessions/session')
-    await expect(page.getByText('Overall IELTS band')).toBeVisible()
+    await expect(
+      page.getByRole('heading', {
+        name: 'Результаты пробного экзамена',
+        exact: true,
+      }),
+    ).toBeVisible()
+    await expect(page.getByText('Итоговый IELTS band')).toHaveCount(0)
+    await expect(page.getByText('Overall IELTS band')).toHaveCount(0)
+    await expect(page.getByText('7.0', { exact: true })).toHaveCount(0)
     const initial = reads
     if (initiallyProcessing) {
       await page.clock.runFor(10_100)

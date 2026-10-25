@@ -147,6 +147,11 @@ const baseTranslations: TranslationMap = {
     en: 'Set up your profile and goal',
   },
   'Язык интерфейса': { kk: 'Интерфейс тілі', en: 'Interface language' },
+  Интерфейс: { kk: 'Интерфейс', en: 'Interface' },
+  'Сохраняется на этом устройстве.': {
+    kk: 'Осы құрылғыда сақталады.',
+    en: 'Saved on this device.',
+  },
   'Выберите язык приложения. Настройка сохранится на этом устройстве.': {
     kk: 'Қолданба тілін таңдаңыз. Таңдауыңыз осы құрылғыда сақталады.',
     en: 'Choose your app language. Your choice is saved on this device.',

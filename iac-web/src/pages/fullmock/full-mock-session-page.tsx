@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { retryAttemptAssessment } from '@/features/attempts/api'
 import { useAuth } from '@/features/auth/auth-store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -39,7 +40,9 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
       const session = cachedQuery.state.data
       return session?.status === 'IN_PROGRESS' ||
         session?.sections.some(
-          (section) => section.attempt.status === 'PROCESSING',
+          (section) =>
+            section.attempt.status === 'PROCESSING' ||
+            ['QUEUED', 'PROCESSING'].includes(section.assessmentStatus ?? ''),
         )
         ? 10_000
         : false
@@ -105,6 +108,18 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
   const current = session.sections.find(
     (section) => section.position === session.currentSection,
   )
+  const analyzing = session.sections.some(
+    (section) =>
+      section.attempt.status === 'PROCESSING' ||
+      ['QUEUED', 'PROCESSING'].includes(section.assessmentStatus ?? ''),
+  )
+  const failed = session.sections.some(
+    (section) => section.assessmentStatus === 'FAILED',
+  )
+  const readyCount = session.sections.filter((section) =>
+    ['SUBMITTED', 'ABANDONED'].includes(section.attempt.status),
+  ).length
+  const waitingForReport = session.currentSection === 4 && (analyzing || failed)
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] content-start gap-5 px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -133,7 +148,7 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
           Could not pause the test: {tr(getErrorMessage(returnToSite.error))}
         </p>
       ) : null}
-      {session.status === 'SUBMITTED' ? (
+      {session.status === 'SUBMITTED' && !analyzing && !failed ? (
         <FullMockReport key={session.id} session={session} />
       ) : (
         <>
@@ -147,6 +162,26 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
               />
             ))}
           </div>
+          {analyzing ? (
+            <p
+              role="status"
+              aria-live="polite"
+              className="flex items-center gap-2 text-sm text-muted-foreground"
+            >
+              <span
+                aria-hidden
+                className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+              />
+              Analyzing saved answers… {readyCount} of {session.sections.length}{' '}
+              sections ready.
+            </p>
+          ) : null}
+          {failed ? (
+            <p role="alert" className="text-sm text-destructive">
+              Analysis failed. Your saved answers are safe. Retry analysis in
+              that section to prepare your report.
+            </p>
+          ) : null}
           {current &&
           ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
             current.attempt.status,
@@ -154,10 +189,16 @@ export function FullMockSessionPage({ sessionId }: { sessionId: string }) {
             <Card className="border-primary-soft bg-primary-soft shadow-none">
               <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
                 <p className="text-sm font-medium">
-                  {labels[current.skill]} is complete. You can continue.
+                  {waitingForReport
+                    ? 'Your answers are saved. The report will be available when analysis finishes.'
+                    : `${labels[current.skill]} is complete. You can continue.`}
                 </p>
                 <Button
-                  disabled={advance.isPending || returnToSite.isPending}
+                  disabled={
+                    advance.isPending ||
+                    returnToSite.isPending ||
+                    waitingForReport
+                  }
                   onClick={() => advance.mutate()}
                 >
                   {advance.isPending
@@ -195,10 +236,23 @@ function SectionCard({
     onSuccess: (session) =>
       client.setQueryData(fullMockKeys.session(sessionId), session),
   })
+  const retry = useMutation({
+    mutationFn: () => retryAttemptAssessment(section.attempt.id),
+    onSuccess: async () => {
+      client.removeQueries({
+        queryKey: [...fullMockKeys.session(sessionId), 'sections'],
+      })
+      await client.invalidateQueries({
+        queryKey: fullMockKeys.session(sessionId),
+        exact: true,
+      })
+    },
+  })
+  const failed = section.assessmentStatus === 'FAILED'
   const isCurrent = section.position === currentSection
-  const completed = ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(
-    section.attempt.status,
-  )
+  const completed =
+    ['SUBMITTED', 'PROCESSING', 'ABANDONED'].includes(section.attempt.status) ||
+    ['QUEUED', 'PROCESSING'].includes(section.assessmentStatus ?? '')
   const locked = section.position > currentSection
   return (
     <Card
@@ -209,13 +263,20 @@ function SectionCard({
           <CardTitle className="text-base">
             0{section.position} · {labels[section.skill]}
           </CardTitle>
-          {completed ? (
+          {failed ? (
+            <Badge variant="destructive">Analysis failed</Badge>
+          ) : completed ? (
             <Badge className="bg-success">
               <TickCircle aria-hidden />
               {section.attempt.status === 'ABANDONED'
                 ? 'Time is up'
-                : section.attempt.status === 'PROCESSING'
-                  ? 'Assessing'
+                : section.attempt.status === 'PROCESSING' ||
+                    ['QUEUED', 'PROCESSING'].includes(
+                      section.assessmentStatus ?? '',
+                    )
+                  ? section.assessmentStatus === 'QUEUED'
+                    ? 'Queued for analysis'
+                    : 'Analyzing'
                   : 'Submitted'}
             </Badge>
           ) : locked ? (
@@ -238,7 +299,15 @@ function SectionCard({
                 : 60)}{' '}
           minutes
         </p>
-        {isCurrent && !completed ? (
+        {failed ? (
+          <Button
+            variant="outline"
+            disabled={retry.isPending}
+            onClick={() => retry.mutate()}
+          >
+            {retry.isPending ? 'Retrying…' : 'Retry analysis'}
+          </Button>
+        ) : isCurrent && !completed ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionLink section={section} sessionId={sessionId} />
             {section.remainingMilliseconds != null ? (
@@ -258,6 +327,11 @@ function SectionCard({
               </div>
             ) : null}
           </div>
+        ) : null}
+        {retry.isError ? (
+          <p role="alert" className="mt-3 text-sm text-destructive">
+            {tr(getErrorMessage(retry.error))}
+          </p>
         ) : null}
         {pause.isError ? (
           <p role="alert" className="mt-3 text-sm text-destructive">

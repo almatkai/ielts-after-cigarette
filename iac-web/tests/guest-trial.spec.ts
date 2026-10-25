@@ -1354,9 +1354,9 @@ for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
     await expect(page).toHaveURL(/\/exam\/full-mock-sessions\/guest-mock$/)
     await expect(
       page.getByRole('button', { name: 'Finish and show the report' }),
-    ).toBeEnabled()
+    ).toBeDisabled()
     await expect(page.getByText('Submitted', { exact: true })).toHaveCount(3)
-    await expect(page.getByText('Assessing', { exact: true })).toBeVisible()
+    await expect(page.getByText('Analyzing', { exact: true })).toBeVisible()
     await expect(page.getByText(/PRIVATE_/)).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: /Разобрать ошибку/ }),

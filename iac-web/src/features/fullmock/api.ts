@@ -33,6 +33,7 @@ export type FullMockSession = {
   submittedAt: string | null
   mockTest: FullMockTest
   sections: {
+    assessmentStatus?: 'QUEUED' | 'PROCESSING' | 'READY' | 'FAILED'
     position: number
     skill: FullMockSkill
     attempt: Attempt

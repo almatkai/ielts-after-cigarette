@@ -680,7 +680,7 @@ for (const [index, skill] of skills.entries()) {
       index < 2 ? index + 1 : index,
     )
     if (index >= 2)
-      await expect(page.getByText('Assessing', { exact: true })).toHaveCount(1)
+      await expect(page.getByText('Analyzing', { exact: true })).toHaveCount(1)
     for (const [position, name] of skills.entries()) {
       await expect(
         page.getByText(
@@ -696,7 +696,8 @@ for (const [index, skill] of skills.entries()) {
           : 'Continue to the next section',
       exact: true,
     })
-    await expect(next).toBeEnabled()
+    if (index === 3) await expect(next).toBeDisabled()
+    else await expect(next).toBeEnabled()
     expect(submits).toBe(1)
     expect(sessionReadsAfterSubmit).toBeGreaterThan(0)
     // Only the session key is invalidated: section reads open/resume timers.
@@ -713,9 +714,11 @@ for (const [index, skill] of skills.entries()) {
     ).toHaveCount(0)
     await expect(page.getByText('Overall IELTS band')).toHaveCount(0)
 
-    // Polling may refresh PROCESSING, but must neither wait for AI nor advance.
+    // Saving returns immediately. Polling keeps the final report disabled
+    // during analysis and never advances the session automatically.
     await page.clock.runFor(20000)
-    await expect(next).toBeEnabled()
+    if (index === 3) await expect(next).toBeDisabled()
+    else await expect(next).toBeEnabled()
     expect(advances).toBe(0)
     if (index < 3) {
       const advanced = page.waitForResponse(

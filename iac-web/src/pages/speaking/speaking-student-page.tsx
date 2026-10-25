@@ -541,7 +541,7 @@ function SpeakingPartRunner({
                 onClick={onSubmit}
               >
                 {isSubmitting
-                  ? 'Assessing your response…'
+                  ? 'Saving your response…'
                   : 'Submit for assessment'}
               </Button>
             )}

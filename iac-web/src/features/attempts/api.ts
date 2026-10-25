@@ -398,3 +398,9 @@ export const getAttempt = (attemptId: string, signal?: AbortSignal) => {
     { signal },
   )
 }
+
+// Retry the immutable, already saved submission; no answers or timers change.
+export const retryAttemptAssessment = (attemptId: string) =>
+  apiClient.request<Attempt>(`/api/v1/attempts/${attemptId}/assessment/retry`, {
+    method: 'POST',
+  })

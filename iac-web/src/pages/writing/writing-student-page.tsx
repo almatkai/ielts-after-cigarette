@@ -263,14 +263,8 @@ export function WritingAttemptRunner({
         answeredCount={answeredCount}
         totalQuestions={material.tasks.length}
         isSubmitting={session.isSubmitting}
-        onContinueLater={handleContinueLater}
         isSavingAndExiting={session.isSavingAndExiting}
         disabled={!allTasksAnswered}
-        disabledMessage={
-          allTasksAnswered
-            ? undefined
-            : 'Answer both tasks. Responses below the recommended word count may receive a lower score.'
-        }
         onSubmit={session.submit}
       />
     </div>

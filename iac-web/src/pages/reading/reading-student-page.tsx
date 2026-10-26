@@ -613,7 +613,7 @@ function ReadingTestRunner({
                     : 'Questions'}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium">
-                  `${currentPassage.questionGroups.length} question groups`
+                  {`${currentPassage.questionGroups.length} question groups`}
                 </span>
               </div>
               <span className="text-xs font-semibold text-muted-foreground">

@@ -12,11 +12,17 @@
     "test:preview": "playwright test",
     "generate-routes": "tsr generate",
     "build": "vite build",
+    "build:cloudflare": "vite build --config vite.cloudflare.config.ts --mode cloudflare",
+    "artifact:cloudflare": "node scripts/cloudflare-artifact.mjs",
+    "test:cloudflare": "node scripts/cloudflare-smoke.mjs",
+    "dev:cloudflare": "node cloudflare/node_modules/wrangler/bin/wrangler.js dev --config wrangler.cloudflare.json --local --ip 127.0.0.1 --port 8787",
+    "check:cloudflare": "node cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config wrangler.cloudflare.json --dry-run --outdir .output-cloudflare.local/bundle",
     "preview": "vite preview",
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --check .",
-    "postinstall": "node scripts/patch-iconsax.mjs"
+    "postinstall": "node scripts/patch-iconsax.mjs",
+    "setup:cloudflare": "pnpm --dir cloudflare install --frozen-lockfile"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

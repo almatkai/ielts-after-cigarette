@@ -1,0 +1,9 @@
+{
+  "name": "iac-web-cloudflare-dev-tooling",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.3",
+  "devDependencies": {
+    "wrangler": "4.151.0"
+  }
+}

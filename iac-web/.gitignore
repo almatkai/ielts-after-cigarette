@@ -9,6 +9,9 @@ dist-ssr
 .codex
 .wrangler
 .output
+.output-cloudflare*
+.cloudflare-artifacts
+.dev.vars*
 .vinxi
 __unconfig*
 todos.json

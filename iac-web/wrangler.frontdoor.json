@@ -1,0 +1,11 @@
+{
+  "$schema": "cloudflare/node_modules/wrangler/config-schema.json",
+  "account_id": "ab39c7a0ec52f861379630cccb01061f",
+  "name": "ielts-dev",
+  "main": "cloudflare/frontdoor.mjs",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": true,
+  "preview_urls": false,
+  "services": [{ "binding": "DEV_WEB", "service": "ielts-web-dev" }],
+  "observability": { "enabled": false }
+}

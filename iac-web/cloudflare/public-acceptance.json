@@ -1,6 +1,6 @@
 {
   "format": "ielts-public-dev-acceptance/v1",
-  "checkedAt": "2026-10-28T05:43:50.292Z",
+  "checkedAt": "2026-10-28T05:45:00.142Z",
   "canonical": "https://ielts.woolet.cc",
   "sourceRevision": "b05d0622b7bfcc44dcddad3544c6e6d565041019",
   "artifact": ".cloudflare-artifacts/b05d0622b7bfcc44dcddad3544c6e6d565041019/7ff21a87a6ea",
@@ -70,7 +70,7 @@
       "status": 200,
       "contentType": "text/html; charset=utf-8",
       "bytes": 9952,
-      "sha256": "b79240d6c9dc90ac2393711ba3bf931051b501a24fbe915b3c4ce458f1bbd48a"
+      "sha256": "ff7d1ce8837f52e99cfb3cc381ffb8d7b378faa8e4ac77ecf8b964c0fd9716ca"
     },
     {
       "origin": "https://ielts.woolet.cc",
@@ -79,7 +79,7 @@
       "status": 200,
       "contentType": "text/html; charset=utf-8",
       "bytes": 8814,
-      "sha256": "8bceabaca7a54ce4741bfd221cd1f1bc50c0f6c91231a9135c67a98a393c02e8"
+      "sha256": "1e432b6bae2f6a660b763283e39653172e0b59d7984a128d2808a6b184c36fdb"
     },
     {
       "origin": "https://ielts.woolet.cc",
@@ -88,7 +88,7 @@
       "status": 200,
       "contentType": "text/html; charset=utf-8",
       "bytes": 8944,
-      "sha256": "2f4b1031d55dbee55dda478fc2b790661408309edb38745ef4088e63eecc3fee"
+      "sha256": "886abd04c2674bc46f9431aee00fbc8b5f6f8a11871a404c05f410fdaa054ce4"
     },
     {
       "origin": "https://ielts.woolet.cc",
@@ -97,7 +97,7 @@
       "status": 200,
       "contentType": "text/html; charset=utf-8",
       "bytes": 9477,
-      "sha256": "0e7a0d7027d4517ac17bce84c085c398007d1e3c7076697148dcdbf6139755da"
+      "sha256": "c5f460a6e60c1d2633df3444ee1d167ed47ddf2dd9d1a50427305a8badfa2898"
     },
     {
       "origin": "https://ielts.woolet.cc",
@@ -106,7 +106,7 @@
       "status": 404,
       "contentType": "text/html; charset=utf-8",
       "bytes": 12596,
-      "sha256": "baa7041d8d34d583229455afa0994c30587d0704b0b0e4edb93d2b95e24884c5"
+      "sha256": "fb8fd9787d0e8bff7949467be4270d7c269dc4e0a540929a3b4c3f94c4d2edb4"
     },
     {
       "origin": "https://ielts.woolet.cc",
@@ -715,7 +715,128 @@
       "status": 307,
       "contentType": null,
       "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "location": "/app/brand/yrys-horizontal%401x.png",
+      "assetPathNormalization": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/brand/yrys-horizontal%401x.png",
+      "method": "GET",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 2838,
+      "sha256": "4824e89947c8e43030662ed48cd9024bcd8fb909fb64e1c74367e3c73a3166ca",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/golos-text-cyrillic-ext-wght-normal-hICkpzq7.woff2",
+      "method": "GET",
+      "status": 200,
+      "contentType": "font/woff2",
+      "bytes": 17508,
+      "sha256": "70cf502d77aa23c8a573db8853f20a8db705d18414d170f257a9e939113aad47",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/guest/config",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 79,
+      "sha256": "a48868a21eb5bd50f97e648d4b14081eacd70778511920d05c749890c8c89847",
+      "guestEnabled": true,
+      "turnstileSiteKeyConfigured": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/listening/tests",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 4379,
+      "sha256": "bc540275306146280d591c6cc1dbc33ee0443feb436147e12f46260a76570005",
+      "items": 19
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/reading/materials",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 8416,
+      "sha256": "b395861f7687043a6e1b81f1135dcd30e80b4abb9d94cd73038e74f02b109227",
+      "items": 27
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/writing/materials",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 3323,
+      "sha256": "d407f93ce4f7198e4c53ee2e0200491df3a248eaa33fe7de5110b85de0ebcac8",
+      "items": 10
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/speaking/materials",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 1474,
+      "sha256": "979d4477761dd310b77be1a6f4a296ec7073f776465349dd8d85bf3d05d7bae5",
+      "items": 4
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/profile",
+      "method": "GET",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 159,
+      "sha256": "bd292577ffdffd4efc435349838698aa0c3b404672f41297d249437adb31895f"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/profile",
+      "method": "GET",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 159,
+      "sha256": "ac6bb27818a701d903be87f1ccb9c05302149aa3ea9ce6aa46aaeacd64a9b893"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/auth/refresh",
+      "method": "POST",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 128,
+      "sha256": "a40b841fef8c523567fe33177ea892041ddf1c66d99c97a66efe5f3c15c4529a"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 204,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cookies": [
+        {
+          "name": "iac_dev_refresh",
+          "attributes": [
+            "Path=/api/v1/auth",
+            "Max-Age=0",
+            "HttpOnly",
+            "Secure",
+            "SameSite=Lax"
+          ]
+        }
+      ]
     }
   ],
   "limitations": [
@@ -725,6 +846,5 @@
     "Success is not exhaustive CPU/memory/quota or concurrency coverage",
     "Mozilla user-agent preserves existing hostname protection; protection is unchanged"
   ],
-  "pass": false,
-  "failure": "/app/brand/yrys-horizontal@1x.png\n\n307 !== 200\n"
+  "pass": true
 }

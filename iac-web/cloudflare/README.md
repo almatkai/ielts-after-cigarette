@@ -69,7 +69,7 @@ isolate memory, provider flows, arbitrary concurrency or all shared-account quot
 ## Native public acceptance
 
 [public-acceptance.json](public-acceptance.json) records the pinned release,
-artifact digest, runtime overrides and **81 successful asserted HTTP checks**.
+artifact digest, runtime overrides and **82 successful asserted HTTP checks**.
 Only public response sizes/digests, status, route, asset parity and cleared-cookie
 attributes are recorded. No authorization header, cookie value, personal row or
 raw response body is written.

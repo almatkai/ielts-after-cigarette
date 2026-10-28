@@ -117,7 +117,18 @@ try {
   references.add('/app/brand/yrys-horizontal@1x.png')
   let fontChecked = false
   for (const path of references) {
-    const result = await request(path)
+    let result = await request(path)
+    if ([301, 302, 307, 308].includes(result.response.status)) {
+      const target = new URL(result.response.headers.get('location'), canonical)
+      assert.equal(target.origin, canonical)
+      assert.equal(
+        decodeURIComponent(target.pathname),
+        decodeURIComponent(path),
+      )
+      result.record.location = target.pathname + target.search
+      result.record.assetPathNormalization = true
+      result = await request(target.pathname + target.search)
+    }
     assert.equal(result.response.status, 200, path)
     const expected = readFileSync(
       resolve(artifact, 'source/.output-cloudflare.local/public', '.' + path),

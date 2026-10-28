@@ -1,0 +1,132 @@
+{
+  "format": "ielts-free-quota-boundary/v1",
+  "checkedAt": "2026-10-28T09:48:36.759637Z",
+  "ready": false,
+  "availability": "database_routes_temporarily_quota_limited",
+  "resetAt": "2026-10-29T00:00:00Z",
+  "resetAtAlmaty": "2026-10-29T05:00:00+05:00",
+  "toolingRevision": "2235e1f390e7c9253c1902dd06d77e4a70653c9c",
+  "frontendSourceRevision": "b05d0622b7bfcc44dcddad3544c6e6d565041019",
+  "artifact": ".cloudflare-artifacts/b05d0622b7bfcc44dcddad3544c6e6d565041019/3d0344c05551",
+  "manifestSha256": "56cd3811339f523ff499972ea920e5df519f2853047851e8804d4ece0030ec73",
+  "sourceFilesVerified": 416,
+  "sourceTreeUnchanged": true,
+  "assetReferencesChecked": 201,
+  "beforeFrontend": {
+    "id": "ff51e103-9020-4318-aff7-7eab3778fd90",
+    "created_on": "2026-10-28T05:38:25.447346Z",
+    "versions": [
+      {
+        "version_id": "65493ca0-2be8-4051-8e37-b4029f29ffef",
+        "percentage": 100
+      }
+    ]
+  },
+  "afterFrontend": {
+    "id": "2d26d787-481e-4716-88e2-fe9bc5d51239",
+    "created_on": "2026-10-28T09:45:42.278687Z",
+    "versions": [
+      {
+        "version_id": "fd7c12cf-8fde-40da-85b5-afdbac72df38",
+        "percentage": 100
+      }
+    ]
+  },
+  "beforeFrontdoor": {
+    "id": "bbae3db1-d1a3-4465-b239-3188e8535914",
+    "created_on": "2026-10-28T05:36:28.012641Z",
+    "versions": [
+      {
+        "version_id": "f2603b5f-17ff-4c8b-834f-95ebb469d2a4",
+        "percentage": 100
+      }
+    ]
+  },
+  "afterFrontdoor": {
+    "id": "894fa976-4137-4ca9-b25f-434f6a618993",
+    "created_on": "2026-10-28T09:46:07.734709Z",
+    "versions": [
+      {
+        "version_id": "545dbb5f-2d92-4f07-9eaf-c2b8904cf2a7",
+        "percentage": 100
+      }
+    ]
+  },
+  "settingsPreserved": {
+    "frontend": {
+      "bindingsSha256": "aa2de50cc6e72c26d3cd22516089f8eda049f78bfc08b940b9d8c29a925263a1",
+      "secretCount": 0,
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "IAC_CANONICAL_FRONTEND_ORIGIN",
+          "type": "plain_text"
+        },
+        {
+          "name": "IAC_DEV_BACKEND",
+          "type": "service",
+          "service": "ielts-api-dev"
+        },
+        {
+          "name": "IAC_DEV_BACKEND_ORIGIN",
+          "type": "plain_text"
+        },
+        {
+          "name": "IAC_RENDER",
+          "type": "durable_object_namespace"
+        }
+      ],
+      "usageModel": "standard",
+      "compatibilityDate": "2026-07-31",
+      "varsCount": 2
+    },
+    "frontdoor": {
+      "bindingsSha256": "db1dab8b06134339dae283280caa6ba820a98d2120e50f149664db651e57ba45",
+      "secretCount": 0,
+      "bindings": [
+        {
+          "name": "DEV_WEB",
+          "type": "service",
+          "service": "ielts-web-dev"
+        }
+      ],
+      "usageModel": "standard",
+      "compatibilityDate": "2026-10-19",
+      "varsCount": 0
+    }
+  },
+  "publicChecks": {
+    "htmlBefore": {
+      "path": "/app/",
+      "status": 200
+    },
+    "apiBefore": {
+      "path": "/api/v1/guest/config",
+      "status": 502
+    },
+    "apiAfter": {
+      "path": "/api/v1/guest/config",
+      "status": 503,
+      "cacheControl": "no-store",
+      "retryAfterSeconds": 51187,
+      "responseDate": "Wed, 28 Oct 2026 09:46:53 GMT",
+      "bodySha256": "340bc22c6eda18c80c31493287af1a68b59354ec590b46a8f3e662832128f1b5"
+    }
+  },
+  "localChecks": [
+    "6 native workerd/unit boundary tests",
+    "42 selected-source regressions",
+    "416 source hashes unchanged",
+    "201 SSR references",
+    "Wrangler dry-run",
+    "targeted ESLint and Prettier"
+  ],
+  "historicalAcceptance": "public-acceptance.json retains the 82 earlier checks for the previous deployed revision; these were not replayed while quota is exhausted",
+  "billingChangePerformed": false,
+  "productionChanged": false,
+  "providerCallsPerformed": false,
+  "nativeFixturesCreated": false
+}

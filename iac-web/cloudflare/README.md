@@ -1,5 +1,21 @@
 # IELTS DEV on ordinary Cloudflare Workers
 
+## Current availability — 2026-10-28
+
+**Database-dependent DEV routes are temporarily unavailable because the shared
+Cloudflare Free SQLite read allowance is exhausted.** The observed guest API
+returns `503`, `Cache-Control: no-store` and `Retry-After` until
+**2026-10-29 00:00 UTC (05:00 Almaty)**. The earlier `/app/` HTML request returned
+`200`; healthy responses continue unchanged. No paid upgrade or VPS fallback was
+introduced. Quota reset and affected routes still require a later confirmation.
+
+[quota-boundary-acceptance.json](quota-boundary-acceptance.json) records the
+current deployment, exact preserved binding/variable digests, six local boundary
+checks and one native API check after deployment. Only the exact platform Free
+row read/write quota exception is surfaced through the private frontend proxy;
+the frontdoor converts it to a Russian `503` response. Other proxy failures keep
+the existing `502`, and unknown frontdoor errors still propagate.
+
 ## Public cutover — 2026-10-28
 
 **https://ielts.woolet.cc/app/** now serves the selected DEV frontend through
@@ -12,12 +28,12 @@ The frontend release is source **b05d0622b7bfcc44dcddad3544c6e6d565041019**,
 compiled for **https://ielts.woolet.cc**, from this immutable artifact:
 
 ```text
-.cloudflare-artifacts/b05d0622b7bfcc44dcddad3544c6e6d565041019/7ff21a87a6ea/source
+.cloudflare-artifacts/b05d0622b7bfcc44dcddad3544c6e6d565041019/3d0344c05551/source
 ```
 
 Its manifest SHA-256 is
-`30c571f7e04ce9a9767332db99128571255f3d81b7a10b4bd999080b33f66570`.
-Tooling commit is `4e7877d0dbc0a951d29d718501fbc258435519ec`, with
+`56cd3811339f523ff499972ea920e5df519f2853047851e8804d4ece0030ec73`.
+Tooling commit is `2235e1f390e7c9253c1902dd06d77e4a70653c9c`, with
 `toolingWorktreeDirty:false`. All **416 archived Git files** remain byte-identical;
 only the three reviewed tooling overlays are additive. **201 SSR asset references**
 were checked. The build is a new Vite/Nitro build for the canonical origin, not a
@@ -27,25 +43,23 @@ Current deployment receipts:
 
 | Component       | Version                                | Role                                                                     |
 | --------------- | -------------------------------------- | ------------------------------------------------------------------------ |
-| `ielts-web-dev` | `65493ca0-2be8-4051-8e37-b4029f29ffef` | Canonical redirects, assets, private API forwarding and `IELTSRender` DO |
-| `ielts-dev`     | `f2603b5f-17ff-4c8b-834f-95ebb469d2a4` | Existing custom-domain frontdoor, private `DEV_WEB` service binding      |
+| `ielts-web-dev` | `fd7c12cf-8fde-40da-85b5-afdbac72df38` | Canonical redirects, assets, private API forwarding and `IELTSRender` DO |
+| `ielts-dev`     | `545dbb5f-2d92-4f07-9eaf-c2b8904cf2a7` | Existing custom-domain frontdoor, private `DEV_WEB` service binding      |
 
-The first frontend deployment of this artifact was
-`616d2b52-2025-405e-a464-77f6a902b612`. The current version enables the approved
-canonical runtime variable after the custom domain was switched. The artifact
-was not edited: deployment supplied both variables through Wrangler `--var`,
-preserving its native backend origin and service binding. The checked-in current
-config now also records `IAC_CANONICAL_FRONTEND_ORIGIN=https://ielts.woolet.cc`.
-Workers aliases redirect GET/HEAD to that authority, retaining path and query.
-An unapproved configured canonical origin fails closed.
+The current frontend deployment is `2d26d787-481e-4716-88e2-fe9bc5d51239`;
+the frontdoor deployment is `894fa976-4137-4ca9-b25f-434f6a618993`. Both kept all
+existing bindings, runtime variables and secret counts unchanged. Workers aliases
+retain the canonical authority/path/query policy; the only behavior change is
+the exact quota-error boundary. The historical 82-request public acceptance
+receipt below predates quota exhaustion and pins the prior deployed artifact.
 
 The backend cutover receipt supplied by root reports **50 application tables,
 15,540 rows, 52 objects (approximately 278 MB) and 68 coordination keys** imported,
 checksum-verified and activated in native SQLite DO/blob storage. This frontend's
 receipt independently verifies public API/catalog behavior; it does not repeat
-that full data reconciliation. Root stopped the five former DEV ingress/writer
-containers. At that handoff, old PostgreSQL/Redis/MinIO containers were retained
-for rollback; root owns their final shutdown. No frontend request depends on them.
+that full data reconciliation. Root stopped all ten IELTS DEV containers, including PostgreSQL/Redis/MinIO and
+the two legacy databases, and set their restart policy to `no`. Their volumes
+and original restart policies remain privately retained for reconciled rollback. No frontend request depends on them.
 
 ## Runtime and resource boundary
 
@@ -61,15 +75,16 @@ in this frontend architecture. SQLite DO/blob and the private audio Worker belon
 to the backend. The source Node/Docker build, application package/lockfile, UI,
 selective SSR rules and source features remain unchanged.
 
-The deployed frontend bundle is **10,314.09 KiB uncompressed / 1,776.21 KiB gzip**.
-Wrangler's actual deployment reported **11 ms module startup**. Successful native
+The deployed frontend bundle is **10,314.23 KiB uncompressed / 1,776.23 KiB gzip**.
+Wrangler's actual deployment reported **17 ms module startup**. Successful native
 requests below establish the checked paths; they do not measure worst-case
 isolate memory, provider flows, arbitrary concurrency or all shared-account quotas.
 
 ## Native public acceptance
 
-[public-acceptance.json](public-acceptance.json) records the pinned release,
-artifact digest, runtime overrides and **82 successful asserted HTTP checks**.
+[public-acceptance.json](public-acceptance.json) records the prior pinned release,
+artifact digest, runtime overrides and **82 historical successful asserted HTTP checks**.
+It was not overwritten or replayed during the current quota incident.
 Only public response sizes/digests, status, route, asset parity and cleared-cookie
 attributes are recorded. No authorization header, cookie value, personal row or
 raw response body is written.

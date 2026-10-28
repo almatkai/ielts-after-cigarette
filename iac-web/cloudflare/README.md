@@ -57,8 +57,10 @@ The backend cutover receipt supplied by root reports **50 application tables,
 15,540 rows, 52 objects (approximately 278 MB) and 68 coordination keys** imported,
 checksum-verified and activated in native SQLite DO/blob storage. This frontend's
 receipt independently verifies public API/catalog behavior; it does not repeat
-that full data reconciliation. Root stopped all ten IELTS DEV containers, including PostgreSQL/Redis/MinIO and
-the two legacy databases, and set their restart policy to `no`. Their volumes
+that full data reconciliation. Root stopped all thirteen related IELTS DEV/legacy containers and set their
+restart policy to `no`: the eight selected DEV services, two old databases and
+three already-inactive backend/web/landing artifacts. Those inactive artifacts
+were retired in place, not separately migrated. Their volumes
 and original restart policies remain privately retained for reconciled rollback. No frontend request depends on them.
 
 ## Runtime and resource boundary

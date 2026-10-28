@@ -1,0 +1,730 @@
+{
+  "format": "ielts-public-dev-acceptance/v1",
+  "checkedAt": "2026-10-28T05:43:50.292Z",
+  "canonical": "https://ielts.woolet.cc",
+  "sourceRevision": "b05d0622b7bfcc44dcddad3544c6e6d565041019",
+  "artifact": ".cloudflare-artifacts/b05d0622b7bfcc44dcddad3544c6e6d565041019/7ff21a87a6ea",
+  "manifestSha256": "30c571f7e04ce9a9767332db99128571255f3d81b7a10b4bd999080b33f66570",
+  "frontendVersion": "65493ca0-2be8-4051-8e37-b4029f29ffef",
+  "frontdoorVersion": "f2603b5f-17ff-4c8b-834f-95ebb469d2a4",
+  "versionProvenance": "Frontend Wrangler deployment receipt and root frontdoor cutover receipt; pinned release, not control-plane discovery",
+  "moduleStartupMsFromDeployment": 11,
+  "runtimeOverrides": {
+    "IAC_CANONICAL_FRONTEND_ORIGIN": "https://ielts.woolet.cc",
+    "IAC_DEV_BACKEND_ORIGIN": "https://ielts-api-dev.kairatovalmat2003.workers.dev"
+  },
+  "requests": [
+    {
+      "origin": "https://ielts-web-dev.kairatovalmat2003.workers.dev",
+      "path": "/app/login?native-check=1&next=%2Fapp%2Fpractice",
+      "method": "GET",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "location": "https://ielts.woolet.cc/app/login?native-check=1&next=%2Fapp%2Fpractice"
+    },
+    {
+      "origin": "https://ielts-web-dev.kairatovalmat2003.workers.dev",
+      "path": "/api/v1/guest/config?native-check=1",
+      "method": "HEAD",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "location": "https://ielts.woolet.cc/api/v1/guest/config?native-check=1"
+    },
+    {
+      "origin": "https://ielts-dev.kairatovalmat2003.workers.dev",
+      "path": "/app/login?native-check=1&next=%2Fapp%2Fpractice",
+      "method": "GET",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "location": "https://ielts.woolet.cc/app/login?native-check=1&next=%2Fapp%2Fpractice"
+    },
+    {
+      "origin": "https://ielts-dev.kairatovalmat2003.workers.dev",
+      "path": "/api/v1/guest/config?native-check=1",
+      "method": "HEAD",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "location": "https://ielts.woolet.cc/api/v1/guest/config?native-check=1"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/?native-check=1",
+      "method": "GET",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 9952,
+      "sha256": "b79240d6c9dc90ac2393711ba3bf931051b501a24fbe915b3c4ce458f1bbd48a"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/login",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 8814,
+      "sha256": "8bceabaca7a54ce4741bfd221cd1f1bc50c0f6c91231a9135c67a98a393c02e8"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/practice",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 8944,
+      "sha256": "2f4b1031d55dbee55dda478fc2b790661408309edb38745ef4088e63eecc3fee"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/full-mocks",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 9477,
+      "sha256": "0e7a0d7027d4517ac17bce84c085c398007d1e3c7076697148dcdbf6139755da"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/blog",
+      "method": "GET",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 12596,
+      "sha256": "baa7041d8d34d583229455afa0994c30587d0704b0b0e4edb93d2b95e24884c5"
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/styles-SdS9-JfN.css",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/css",
+      "bytes": 123678,
+      "sha256": "3177c262c1ad048201389abd5c1285af235f4aa57c40431e1aa2af96cedd4f14",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/index-CzXlRLdM.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 503544,
+      "sha256": "2f3d2b6eac66dc229b335db4b5f74ec5121e031b0b282d8367a5fd8bcdf6d1bd",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/react-CYuo-Lgd.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 8036,
+      "sha256": "d6614cc30b9c3c91f279a626be7ed57ab638d490854b563b396ff2783c6af210",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/react-dom-EBvBdL4R.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3535,
+      "sha256": "b21e11f07d554b5dad97c891db62fd68662b1c907f9b266fe232ae56bd9eba08",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useStore-JHZ3ixP_.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 19154,
+      "sha256": "e19dfa9dbea9a8d8cb917e0716ea26178311f68d5070e14686418edb1f4e0cb0",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/redirect-DnLf-3Zd.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 644,
+      "sha256": "36b81687eb2da3ee4650031a61e9fc19079c1bf0a64e70ad5ddd89a2322e062b",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/link-C5yIZJtD.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4466,
+      "sha256": "568b56978e2704fd5ee4aa4556ab2004cdf8eb623a4abfe12ecd148ca680abd9",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/route-C6MOqO8Q.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4127,
+      "sha256": "79f90140c708b3d2c32ccc3bd4976babeb57d4652df240fb8499381a58b98410",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/jsx-runtime-oxZg3LDB.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 424,
+      "sha256": "b8e6a15c602b5a740fa92efca89fba280f5cea89ddd6276ed755dfcb3c4127c6",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useRouter-CUHFOpii.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 140,
+      "sha256": "ca46dbc0c224c22bb8b42a5979508c68c982b5d42802d5d13ef8071820664c0d",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/matchContext-BKbXJiKh.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 131,
+      "sha256": "a916af99bd902c5b1587c3ac468cfb9012be90fff1355e5e8ca6ba36adfc0ff9",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useMatch-E6mViBY0.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 647,
+      "sha256": "404b101b5be85dc246d1fe2ef1a8ecab9f577e8ba8eb947ebb02267737009365",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useParams-Bj8gOB0u.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 258,
+      "sha256": "3b1a8cc09613fbacdfb03ffde86be5a75827ff6f365f48efd60041387a6f0e04",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useSearch-DV4ZY7Kx.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 218,
+      "sha256": "6cd453bd4ee11336185f6ccddc216f74a534a3401d482cc357acca5ce4b64595",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useNavigate-6YLqtwLE.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 217,
+      "sha256": "c2dcbec530e49934df3f3bbb5e112b552388124a6b630d04fec069a5332dd6a2",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/i18n-DDm9oULZ.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 320915,
+      "sha256": "befb726f6bf92c15b08bcad4b80e61b6c06a2354100c126e56b481d9414979ce",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/client-DJT345Gt.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 5949,
+      "sha256": "4cfc9e0d45518fddee267cf6c0727522e9c46dd813f1963dabea894f7b820827",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/prop-types-uduKu3bc.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1402,
+      "sha256": "257ceffdd420f52612c6bb78c17cf6361339cdd943f386e40cc9ce055743ca3b",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/ArrowDown2--9gYCa38.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 2658,
+      "sha256": "2a79a4f158798167e8457ce755d49e56beb260288637601b68e368648f4e0048",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/ArrowLeft-pidprxcu.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3248,
+      "sha256": "17b5d12b45ae9fe695ddf7d876c649178b26aa3672aede6f5c77cfce6eabcdeb",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/ArrowRight2-DYdYXkid.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 2668,
+      "sha256": "3d0fdec9f3efcf76c548db043de7063e2dc07a87eae379946b993cc3ac583b9e",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/attempt-ui-cPi4Ga4O.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 27271,
+      "sha256": "bae9194ea744cdb57973af01663e360085865be4a5882267e13d56140f9d69ff",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/CloseCircle-CUbsrWMA.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3682,
+      "sha256": "128e8347515108102aa84aa9b208fc9291f3c952122d62fc6a7359e6cc8c70de",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/TickCircle-BzQm81Dd.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3458,
+      "sha256": "70e59cecdefa39c1ad35020a1bb7c411e88c27236ed2610eb80c88838eee935a",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/utils-B6KiDbIe.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 27261,
+      "sha256": "4aa4469f22e93217839b25f2a62b9c9d9462d3126248636dad12a088cafd17a9",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/dist-CTMYCBZa.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3489,
+      "sha256": "3b79397f5558c4c94f838a38cf5d4bac5bdffd9be17a05f318278b54e98bbfbd",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/dist-C4-SC_UB.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 735,
+      "sha256": "49b58709d81e565fb4fef163edbb0649003126fe76d3a3c8cc1b78ed8b7408ee",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/es2015-D2jxtPAw.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 29992,
+      "sha256": "eb28566aca5c0ae97778ae05d3998f833a1422102022449ca2fecb7a4f506c8c",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/alert-dialog-C5NC4R9m.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3898,
+      "sha256": "e89045454dca63f03fedf699e73cb77e582a600779ae1a232146f3c23464869c",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/dist-Ci_PTD7m.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 635,
+      "sha256": "a7aaa06d18afcdfd1db164ad9c7ba0a997faea60f7b48e2f228d9ebbf0b1535e",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/button-D-6Wacwy.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1766,
+      "sha256": "4c75ebbebfbadb0c5eff0b55f3cee3730b26a9aa246937441c4035064d438468",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/auth-store-BFrfPmlt.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 5004,
+      "sha256": "e89540634e70cd1701cd55467b687112108ae42525e3a103b7dfd114686fcde1",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/QueryClientProvider-CRlk2ArR.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 7935,
+      "sha256": "dbe9624ccb9f97eb513964f8b1ad0cd15fc173935af6d905431341cc5e0e3b51",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useBaseQuery-ChtL3c8x.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 16555,
+      "sha256": "0d53e5229b7e30e9057043a03ecaa0c2901623595415db5c28385785f520abc4",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useQuery-CbQra7Ly.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 96,
+      "sha256": "6c6d574b7dbfd7fede417fbde36ce2dfbc7ed5abdf231bc576a88ebdd0954686",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/draft-buffer-BAXLVBvX.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 350,
+      "sha256": "7d7640be0ebd248ee10fd9bff2987c4d1ce12eb3ad6cd7b07d01963b223a2290",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/_app-IVIHVSCB.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 341,
+      "sha256": "7916ddcca685c17350fd4363ab03df6ea02ea14f9449fda86ec94a6093f9d1f7",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/dashboard-shell-yUlrs2Cb.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 154370,
+      "sha256": "90338e11f2726c2b57b673d6265a4fa35201ae1389bde4849b07ee72b41be821",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/guest-shell-C9guJjFe.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1201,
+      "sha256": "f235bed3d9a5bdd67c0bc9b863fc89207e82fad9a3cb419ebd8499d34243f884",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/_app.index-D94SmOaA.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 8618,
+      "sha256": "61cbe9bb6ee8ba007910486cc648095d853aa94cfb5b9c97d22165a5bcd85bea",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/ArrowRight-D9PfpvOo.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 3268,
+      "sha256": "df0732278c67e81b6d7d976efcdbe2abbea654f37ebfcd50f8509ffc9459b6a5",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/Weight-CPfi2Blt.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4219,
+      "sha256": "a1a1a984522ce1c51508c893dca8042eed84b9a9c1f341dde5e152e1f75f7379",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/Warning2-BAiIwi0p.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4939,
+      "sha256": "ed940c93b827ef66b9738ac4706c11f272f67ce4b3338a42e45b6842022e2e33",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/goal-form-CJhANmkt.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 24387,
+      "sha256": "80c5f5fa51436436d8e0e3dc3c59bbb21a2b65083c7c623ada14ff78f0e73a6d",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/User-C6Nj6ZBY.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 2994,
+      "sha256": "f9c6f39ec56b7779ec32d2ba10a2a66db77da2a9f5faeabe47a8accf5fd1a33a",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/card-17Hui8sy.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1150,
+      "sha256": "5f3d35ce65edf3abe082545893a0ed1c8c46217faabfa920827cb53998f63306",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/badge-Bj0bIkpn.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1460,
+      "sha256": "11d04478c2d610f28e7f686603ce63e1bcd050fa7f988a35bb318f23585e8f01",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/guest-trial-card-BfpTRpsf.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4638,
+      "sha256": "a98dd87e74e110badee41361d6344c8d58c45c8654e9f11fa644a83096005282",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/api-CeLWlH2K.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1525,
+      "sha256": "93fbc747d974fc27e7a07396ae2c6ec38e582f820027abdf6c09e8ba31b6448b",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/practice-page-CwbQw7yu.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 6389,
+      "sha256": "a48618a8594131c2f34c14d36f056909c9cc5c13b5e10059d99088f4c73177df",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/exam-attempt-routes-1AiTtNCI.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 443,
+      "sha256": "cc1230f0816d792ddc51d2128bc0691afb2a8dcd79f15f2de8d04fd143b2239b",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/login-DicMF2vX.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 1547,
+      "sha256": "809d74c1f2cf08d23168729acdfab35823299707d94bab0c45ec7e669347e1e4",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/login-form-DEHFi2Vd.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 19900,
+      "sha256": "fa3fbe34287abbbac44ae3d97c0a6e07c9957d3b281f93093bcfd69e15136747",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/language-picker-BIdu7qA-.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 791,
+      "sha256": "bf71b6d76d9cbb1d052126cbd423de95026292e24c5cef3f12d2e903c10ca1c6",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/_app.practice-DC0q79Hu.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 79,
+      "sha256": "4d07abdfbc4a1c4d0c235073b4ab0d83296d17e9425ff6cb2637893bbc8aa85a",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/_app.full-mocks-DrUxwpjh.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 8557,
+      "sha256": "be08d9de697b8e6918d795185dbb9660826a2eafbc665ff0a88eb8e3914f83da",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/PlayCircle-BTVbQrhv.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 4119,
+      "sha256": "f8472c302ccd02ba087a0105d6930a61700ecb330a77d5710526edd49672b100",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/useMutation-C1f_pOjI.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 2287,
+      "sha256": "14bd77c4dea3fc7fd4f7de5a4ce749e509e803bf3def791e2ebec5aa996b3036",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/assets/api--zwAMJ4Y.js",
+      "method": "GET",
+      "status": 200,
+      "contentType": "text/javascript",
+      "bytes": 763,
+      "sha256": "c904ba3ed69b7528072f4977127d06c97b94066b3b61513313529ec7ad98517c",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/favicon.png",
+      "method": "GET",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 9654,
+      "sha256": "3aefad9b821a4dcd48a0cc208c879d53205c82cc9bd4a8d49f2b1db75c9ef44e",
+      "exactArtifactBytes": true
+    },
+    {
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/brand/yrys-horizontal@1x.png",
+      "method": "GET",
+      "status": 307,
+      "contentType": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "limitations": [
+    "HTTP and byte checks; no real browser hydration or user interaction",
+    "No Google OAuth, Turnstile challenge, account creation or successful authentication",
+    "No paid provider, audio conversion, guest trial or data mutation",
+    "Success is not exhaustive CPU/memory/quota or concurrency coverage",
+    "Mozilla user-agent preserves existing hostname protection; protection is unchanged"
+  ],
+  "pass": false,
+  "failure": "/app/brand/yrys-horizontal@1x.png\n\n307 !== 200\n"
+}

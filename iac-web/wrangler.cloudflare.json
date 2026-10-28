@@ -7,7 +7,8 @@
   "workers_dev": true,
   "preview_urls": false,
   "vars": {
-    "IAC_DEV_BACKEND_ORIGIN": "https://ielts-api-dev.kairatovalmat2003.workers.dev"
+    "IAC_DEV_BACKEND_ORIGIN": "https://ielts-api-dev.kairatovalmat2003.workers.dev",
+    "IAC_CANONICAL_FRONTEND_ORIGIN": "https://ielts.woolet.cc"
   },
   "services": [
     {

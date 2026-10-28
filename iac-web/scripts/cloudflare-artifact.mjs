@@ -18,9 +18,13 @@ if (args[0] === '--') args.shift()
 const options = {}
 while (args.length) {
   const key = args.shift()
+  if (key === '--rolldown-wasm') {
+    options[key] = true
+    continue
+  }
   if (!['--revision', '--frontend-origin'].includes(key) || !args[0]) {
     throw new Error(
-      'Usage: artifact:cloudflare --revision FULL_SHA [--frontend-origin ORIGIN]',
+      'Usage: artifact:cloudflare --revision FULL_SHA [--frontend-origin ORIGIN] [--rolldown-wasm]',
     )
   }
   options[key] = args.shift()
@@ -73,6 +77,10 @@ const toolingDependencyLockSha256 = sha256(
   readFileSync(join(root, 'cloudflare/pnpm-lock.yaml')),
 )
 const builderSha256 = sha256(readFileSync(fileURLToPath(import.meta.url)))
+const bundlerAdapterSha256 = sha256(
+  readFileSync(join(root, 'scripts/cloudflare-vite.mjs')),
+)
+const bundlerRuntime = options['--rolldown-wasm'] ? 'wasi-pinned' : 'native'
 const toolingRevision = run('git', ['rev-parse', 'HEAD'], root, true)
   .toString()
   .trim()
@@ -83,6 +91,8 @@ const buildKey = sha256(
     toolingHashes,
     toolingDependencyLockSha256,
     builderSha256,
+    bundlerAdapterSha256,
+    bundlerRuntime,
     toolingRevision,
     frontendOrigin: env.IAC_CF_FRONTEND_ORIGIN,
   }),
@@ -124,19 +134,22 @@ for (const path of toolingFiles) {
 // replace its package.json/lockfile with main's or reuse another revision's tree.
 run('pnpm', ['install', '--frozen-lockfile'], source)
 run('pnpm', ['run', 'test:regression'], source)
-run(
-  'pnpm',
-  [
-    'exec',
-    'vite',
-    'build',
-    '--config',
-    'vite.cloudflare.config.ts',
-    '--mode',
-    'cloudflare',
-  ],
-  source,
-)
+const viteArguments = [
+  'build',
+  '--config',
+  'vite.cloudflare.config.ts',
+  '--mode',
+  'cloudflare',
+]
+if (options['--rolldown-wasm']) {
+  run(
+    process.execPath,
+    [join(root, 'scripts/cloudflare-vite.mjs'), ...viteArguments],
+    source,
+  )
+} else {
+  run('pnpm', ['exec', 'vite', ...viteArguments], source)
+}
 // Verify real output, including CSS hash agreement between client and SSR.
 const referencedAssets = new Set()
 function checkAssetReferences(directory) {
@@ -190,6 +203,9 @@ writeFileSync(
       toolingHashes,
       toolingDependencyLockSha256,
       builderSha256,
+      bundlerAdapterSha256,
+      bundlerRuntime,
+      sourceFilesVerified: sourceFiles.length,
       frontendOrigin: env.IAC_CF_FRONTEND_ORIGIN,
       nodeVersion: process.version,
       pnpmVersion: run('pnpm', ['--version'], source, true).toString().trim(),

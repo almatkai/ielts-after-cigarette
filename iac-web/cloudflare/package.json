@@ -4,6 +4,16 @@
   "type": "module",
   "packageManager": "pnpm@10.18.3",
   "devDependencies": {
+    "@rolldown/binding-wasm32-wasi": "1.1.5",
+    "@tailwindcss/oxide-wasm32-wasi": "4.3.3",
+    "lightningcss-wasm": "1.33.0",
+    "lightningcss-wasm-1-32-0": "npm:lightningcss-wasm@1.32.0",
+    "rolldown-wasm-1-2-1": "npm:@rolldown/binding-wasm32-wasi@1.2.1",
     "wrangler": "4.151.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@rolldown/binding-wasm32-wasi@1.2.1>@napi-rs/wasm-runtime": "1.2.2"
+    }
   }
 }

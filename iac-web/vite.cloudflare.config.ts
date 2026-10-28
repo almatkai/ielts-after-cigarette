@@ -18,12 +18,18 @@ export default defineConfig(() => {
     origin.hash ||
     !(
       (origin.protocol === 'https:' &&
-        origin.hostname.startsWith('ielts-web-dev.')) ||
+        !origin.port &&
+        [
+          'ielts.woolet.cc',
+          'ielts-web-dev.kairatovalmat2003.workers.dev',
+        ].includes(origin.hostname)) ||
       (origin.protocol === 'http:' &&
         ['127.0.0.1', 'localhost'].includes(origin.hostname))
     )
   ) {
-    throw new Error('Use the ielts-web-dev HTTPS origin or a local HTTP origin')
+    throw new Error(
+      'Use the approved IELTS DEV HTTPS origin or a local HTTP origin',
+    )
   }
 
   return {

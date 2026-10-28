@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -18,6 +18,16 @@ if (!existsSync(resolve(source, 'wrangler.cloudflare.json'))) {
   throw new Error('Source directory has no Cloudflare configuration')
 }
 const origin = 'http://127.0.0.1:8787'
+const smokeConfig = resolve(source, '.cloudflare-smoke.local.json')
+if (existsSync(smokeConfig))
+  throw new Error('A prior smoke configuration needs review')
+const configuration = JSON.parse(
+  readFileSync(resolve(source, 'wrangler.cloudflare.json')),
+)
+// This fixture owns its ephemeral HTTP backend; it must never reach the live
+// service named by the deployment configuration. All other bindings are real.
+delete configuration.services
+configuration.vars = {}
 const requests = []
 const media = Buffer.from([137, 80, 78, 71, 0, 255, 42])
 const backend = createServer(async (request, response) => {
@@ -71,13 +81,14 @@ try {
     throw error
   }
 }
+writeFileSync(smokeConfig, JSON.stringify(configuration), { flag: 'wx' })
 const worker = spawn(
   process.execPath,
   [
     resolve(root, 'cloudflare/node_modules/wrangler/bin/wrangler.js'),
     'dev',
     '--config',
-    'wrangler.cloudflare.json',
+    '.cloudflare-smoke.local.json',
     '--local',
     '--ip',
     '127.0.0.1',
@@ -200,4 +211,5 @@ try {
   }
   backend.closeAllConnections()
   await new Promise((accept) => backend.close(accept))
+  unlinkSync(smokeConfig)
 }

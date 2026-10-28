@@ -1,5 +1,55 @@
 # IELTS frontend: DEV Workers migration
 
+## Canonical DEV release
+
+The approved public DEV origin is **https://ielts.woolet.cc**. It retains the
+existing Google/Turnstile host and cookie authority. The separate
+`ielts-web-dev.kairatovalmat2003.workers.dev` alias remains an allowed build
+origin for explicit isolated candidates; arbitrary aliases and production hosts
+are rejected. The release build must explicitly select the canonical DEV origin:
+
+```sh
+pnpm run artifact:cloudflare --revision b05d0622b7bfcc44dcddad3544c6e6d565041019 \
+  --frontend-origin https://ielts.woolet.cc --rolldown-wasm
+```
+
+The Worker configuration binds `IAC_DEV_BACKEND` privately to `ielts-api-dev` and
+sets its native Workers origin for URL construction. This frontend has no VPS/VPC
+origin. The existing `ielts-dev` custom-domain Worker is a separate cutover action;
+these tools never replace it. Root owns deployment, backend import activation,
+provider verification and old-service shutdown. Setting
+`IAC_CANONICAL_FRONTEND_ORIGIN=https://ielts.woolet.cc` at that cutover redirects
+alias GET/HEAD requests, preserving paths and queries. It is deliberately unset
+before the canonical domain is switched. Any other configured canonical origin
+fails closed rather than redirecting to an arbitrary host.
+
+The optional `--rolldown-wasm` build uses the exact selected Rolldown versions
+1.1.5 and 1.2.1 with their matching official WASI bindings, Tailwind oxide 4.3.3
+WASI and Lightning CSS 1.32.0/1.33.0 Wasm. Their dependencies
+are isolated under `cloudflare/`; application package/lock/source stay intact.
+Rolldown 1.2.1's WASI runtime is pinned to the compatible selected 1.2.2 instead
+of its newer incompatible prerelease-peer resolution. The builder records the
+adapter checksum and chosen runtime in its build key and manifest.
+
+On this macOS host, native addons can hang in dyld code validation. The build
+adapter preloads the supported `NAPI_RS_NATIVE_LIBRARY_PATH` override for each
+matching Rolldown/oxide module, then restores every override before loading other
+dependencies. This is necessary because 1.1.5 checks `NAPI_RS_FORCE_WASI` only
+after attempting native loading. A build-only Node resolve hook also models the
+supported absence of the optional `fsevents` filesystem watcher; production
+builds do not watch files. No native binary, signature, quarantine attribute or
+macOS security setting is changed. The normal Node/Docker build is unaffected.
+[Rolldown documents its WASI distribution](https://rolldown.rs/guide/getting-started).
+Lightning CSS imports resolve to the matching version's official Node Wasm
+entry during this isolated build; the application dependency graph stays frozen.
+
+The real-workerd smoke test generates and removes an isolated local config with
+the live service binding omitted. Its ephemeral fixture backend handles every
+API request; no smoke request can reach the imported native DEV database.
+`node --test cloudflare/entry.test.mjs` additionally checks the actual Worker
+entry in workerd with a private fixture service binding, canonical redirects,
+forwarded authority, cookies, backend redirects and invalid configuration.
+
 ## Runtime update — 2026-10-28
 
 DEV deployment is authorized. The selected `b05d0622b7bfcc44dcddad3544c6e6d565041019`

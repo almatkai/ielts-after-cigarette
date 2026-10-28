@@ -6,6 +6,15 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
   "preview_urls": false,
+  "vars": {
+    "IAC_DEV_BACKEND_ORIGIN": "https://ielts-api-dev.kairatovalmat2003.workers.dev"
+  },
+  "services": [
+    {
+      "binding": "IAC_DEV_BACKEND",
+      "service": "ielts-api-dev"
+    }
+  ],
   "assets": {
     "directory": ".output-cloudflare.local/public",
     "binding": "ASSETS",

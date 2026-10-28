@@ -93,6 +93,20 @@ export class IELTSRender extends DurableObject {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
+    if (env.IAC_CANONICAL_FRONTEND_ORIGIN) {
+      if (env.IAC_CANONICAL_FRONTEND_ORIGIN !== 'https://ielts.woolet.cc') {
+        return unavailable(503, 'Invalid DEV frontend configuration')
+      }
+      if (
+        ['GET', 'HEAD'].includes(request.method) &&
+        url.origin !== env.IAC_CANONICAL_FRONTEND_ORIGIN
+      ) {
+        const canonical = new URL(env.IAC_CANONICAL_FRONTEND_ORIGIN)
+        canonical.pathname = url.pathname
+        canonical.search = url.search
+        return Response.redirect(canonical.href, 307)
+      }
+    }
     if (url.pathname === '/api/v1' || url.pathname.startsWith('/api/v1/')) {
       return proxyApi(request, env)
     }

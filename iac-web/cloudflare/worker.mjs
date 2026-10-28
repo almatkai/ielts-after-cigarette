@@ -1,3 +1,4 @@
+import { DurableObject } from 'cloudflare:workers'
 import frontend from '../.output-cloudflare.local/server/index.mjs'
 
 function unavailable(status, message) {
@@ -81,8 +82,16 @@ async function proxyApi(request, env) {
   }
 }
 
+// Rendering uses the Free SQLite DO CPU budget; ingress only proxies and
+// serves static files. No persisted application state belongs to this object.
+export class IELTSRender extends DurableObject {
+  fetch(request) {
+    return frontend.fetch(request, this.env, this.ctx)
+  }
+}
+
 export default {
-  async fetch(request, env, context) {
+  async fetch(request, env) {
     const url = new URL(request.url)
     if (url.pathname === '/api/v1' || url.pathname.startsWith('/api/v1/')) {
       return proxyApi(request, env)
@@ -94,6 +103,12 @@ export default {
     if (!url.pathname.startsWith('/app/')) {
       return unavailable(404, 'Not found')
     }
-    return frontend.fetch(request, env, context)
+    if (['GET', 'HEAD'].includes(request.method)) {
+      const asset = await env.ASSETS.fetch(request)
+      if (asset.status !== 404) return asset
+    }
+    return env.IAC_RENDER.get(
+      env.IAC_RENDER.idFromName('ielts-dev-render-v1'),
+    ).fetch(request)
   },
 }

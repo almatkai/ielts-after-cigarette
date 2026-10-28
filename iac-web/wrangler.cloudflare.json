@@ -12,5 +12,19 @@
     "html_handling": "none",
     "not_found_handling": "none",
     "run_worker_first": true
-  }
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "IAC_RENDER",
+        "class_name": "IELTSRender"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "render-v1",
+      "new_sqlite_classes": ["IELTSRender"]
+    }
+  ]
 }

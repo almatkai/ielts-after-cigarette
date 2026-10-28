@@ -1,4 +1,28 @@
-# IELTS frontend: DEV Workers preparation
+# IELTS frontend: DEV Workers migration
+
+## Runtime update — 2026-10-28
+
+DEV deployment is authorized. The selected `b05d0622b7bfcc44dcddad3544c6e6d565041019`
+frontend has been deployed to `ielts-web-dev.kairatovalmat2003.workers.dev`.
+This is a candidate, not a completed cutover: API remains explicitly unavailable
+until the verified native backend/data deployment is connected. The old DEV proxy
+and VPS are still serving their existing environment.
+
+The entry now forwards SSR to the SQLite-backed `IELTSRender` Durable Object.
+The Free plan provides a separate DO CPU budget; ordinary ingress only handles
+redirects, streams API requests and serves Workers Static Assets. Rendering owns
+no application database or object data. The existing real-workerd integration
+suite passes through this rendering boundary, including deep routes and headers.
+No application source, dependency lockfile, UI or SSR policy is changed.
+
+Use `IAC_DEV_BACKEND` as a Workers service binding for the native API, together
+with its origin in `IAC_DEV_BACKEND_ORIGIN`. R2 and a VPC/VPS connection are not
+required by the frontend. Root is preparing a SQLite DO blob backend so no R2
+subscription is needed for DEV media either. No paid plan has been enabled.
+
+The original preparation evidence below describes the initial tooling commit;
+its pending authorization and architecture decisions are historical. Real data,
+auth/provider configuration, platform acceptance and final cutover remain open.
 
 This is local deployment tooling, not a completed migration. The only configured
 future Worker name is **`ielts-web-dev`**. No account, route, custom domain, VPC

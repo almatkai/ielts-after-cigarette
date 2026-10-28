@@ -77,7 +77,13 @@ async function proxyApi(request, env) {
       }
     }
     return response
-  } catch {
+  } catch (error) {
+    if (
+      /Exceeded allowed rows (read|written) in Durable Objects free tier/.test(
+        error?.message ?? '',
+      )
+    )
+      throw error
     return unavailable(502, 'DEV backend is unavailable')
   }
 }

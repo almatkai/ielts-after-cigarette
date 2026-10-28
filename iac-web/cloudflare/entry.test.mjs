@@ -22,6 +22,21 @@ function harness(canonical = 'https://ielts.woolet.cc') {
     convertV4MiniflareOptions({
       workers: [
         {
+          name: 'frontdoor',
+          modules: [
+            {
+              type: 'ESModule',
+              path: resolve('cloudflare/.fixture-frontdoor.mjs'),
+              contents: readFileSync(
+                new URL('./frontdoor.mjs', import.meta.url),
+                'utf8',
+              ),
+            },
+          ],
+          compatibilityDate: '2026-10-19',
+          serviceBindings: { DEV_WEB: 'frontend' },
+        },
+        {
           name: 'frontend',
           modules: [
             {
@@ -53,6 +68,9 @@ function harness(canonical = 'https://ielts.woolet.cc') {
               path: resolve('cloudflare/.fixture-backend.mjs'),
               contents: `
         export default {async fetch(request) {
+          const failure=new URL(request.url).searchParams.get('fixture-error');
+          if (failure==='read' || failure==='written') throw new Error('Exceeded allowed rows '+failure+' in Durable Objects free tier');
+          if (failure==='unknown') throw new Error('Synthetic unrelated failure');
           return new Response(JSON.stringify({
             method:request.method, url:request.url, body:await request.text(),
             host:request.headers.get('x-forwarded-host'),
@@ -131,6 +149,29 @@ test('an unapproved runtime canonical origin fails closed', async () => {
   try {
     const response = await mf.dispatchFetch('https://ielts.woolet.cc/app/login')
     assert.equal(response.status, 503)
+  } finally {
+    await mf.dispose()
+  }
+})
+
+test('actual private binding chain surfaces only exact quota failures as 503, keeping unrelated failures 502', async () => {
+  const mf = harness()
+  try {
+    for (const operation of ['read', 'written']) {
+      const response = await mf.dispatchFetch(
+        'https://ielts.woolet.cc/api/v1/guest/config?fixture-error=' +
+          operation,
+      )
+      assert.equal(response.status, 503)
+      assert.equal(response.headers.get('cache-control'), 'no-store')
+      assert.ok(Number(response.headers.get('retry-after')) > 0)
+      assert.match(await response.text(), /исчерпан бесплатный суточный лимит/)
+    }
+    const unknown = await mf.dispatchFetch(
+      'https://ielts.woolet.cc/api/v1/guest/config?fixture-error=unknown',
+    )
+    assert.equal(unknown.status, 502)
+    assert.equal(await unknown.text(), 'DEV backend is unavailable')
   } finally {
     await mf.dispose()
   }

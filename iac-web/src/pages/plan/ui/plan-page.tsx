@@ -10,6 +10,8 @@ import {
 } from 'iconsax-react'
 import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { paymentRequiredReason } from '@/features/billing/api'
+import { openPaywall } from '@/features/billing/paywall-store'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Disclosure } from '@/components/ui/disclosure'
 import { Button } from '@/components/ui/button'
@@ -381,6 +383,11 @@ export function PlanPage() {
     try {
       return await mutation.mutateAsync({ operation, name })
     } catch (err) {
+      const paywall = paymentRequiredReason(err)
+      if (paywall) {
+        openPaywall(paywall)
+        return undefined
+      }
       setError(studyError(err))
       requestAnimationFrame(() => errorRef.current?.focus())
       return undefined

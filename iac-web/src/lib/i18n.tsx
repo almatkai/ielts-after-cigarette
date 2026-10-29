@@ -13,6 +13,7 @@ import type { Language, TranslationMap } from './i18n-types'
 import { adminContentTranslations } from './i18n-admin-content'
 import { adminCoreTranslations } from './i18n-admin-core'
 import { authTranslations } from './i18n-auth'
+import { billingTranslations } from './i18n-billing'
 import { blogTranslations } from './i18n-blog'
 import { dashboardTranslations } from './i18n-dashboard'
 import { legalPrivacyTranslations } from './i18n-legal-privacy'
@@ -1679,6 +1680,7 @@ const translations: TranslationMap = {
   ...adminContentTranslations,
   ...adminCoreTranslations,
   ...authTranslations,
+  ...billingTranslations,
   ...blogTranslations,
   ...dashboardTranslations,
   ...legalPrivacyTranslations,

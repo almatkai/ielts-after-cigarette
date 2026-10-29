@@ -3,6 +3,7 @@ import { canGuestVisit, getGuestConfig } from '@/features/auth/guest'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { GuestAccessGate } from '@/components/auth/guest-shell'
 import { tr } from '@/lib/i18n'
+import { PaywallHost } from '@/features/billing/paywall-dialog'
 
 export const Route = createFileRoute('/exam')({
   ssr: false,
@@ -42,6 +43,7 @@ function ExamLayout() {
   return (
     <main className="min-h-dvh bg-background text-foreground">
       <Outlet />
+      <PaywallHost />
     </main>
   )
 }

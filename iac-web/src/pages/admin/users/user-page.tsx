@@ -26,6 +26,7 @@ import {
 } from '@/features/admin/users-api'
 import type { UserDetail, UserUpdate } from '@/features/admin/users-api'
 import { getErrorMessage } from '@/lib/api/client'
+import { UserBilling } from './user-billing'
 import { useLanguage } from '@/lib/i18n'
 import {
   date,
@@ -63,7 +64,9 @@ function UserProfile({ user }: { user: UserDetail }) {
   const navigate = useNavigate()
   const client = useQueryClient()
   const { t } = useLanguage()
-  const [tab, setTab] = useState<'profile' | 'tests' | 'activity'>('profile')
+  const [tab, setTab] = useState<'profile' | 'tests' | 'billing' | 'activity'>(
+    'profile',
+  )
   const [notice, setNotice] = useState('')
   const [dialog, setDialog] = useState<
     'password' | 'delete' | 'sessions' | null
@@ -162,6 +165,7 @@ function UserProfile({ user }: { user: UserDetail }) {
           [
             ['profile', t('Профиль')],
             ['tests', t('Тесты')],
+            ['billing', t('Тариф')],
             ['activity', t('Активность')],
           ] as const
         ).map(([value, label]) => (
@@ -442,6 +446,7 @@ function UserProfile({ user }: { user: UserDetail }) {
         </div>
       )}
       {tab === 'tests' && <UserTests id={user.id} />}
+      {tab === 'billing' && <UserBilling userId={user.id} />}
       {tab === 'activity' && (
         <div className="grid gap-5">
           <dl className="flex flex-wrap gap-8 rounded-xl border border-border bg-card p-5 text-sm">

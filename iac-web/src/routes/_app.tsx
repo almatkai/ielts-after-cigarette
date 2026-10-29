@@ -4,6 +4,7 @@ import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { canGuestVisit, canBrowseWithoutAccount } from '@/features/auth/guest'
 import { GuestAccessGate } from '@/components/auth/guest-shell'
 import { tr } from '@/lib/i18n'
+import { PaywallHost } from '@/features/billing/paywall-dialog'
 
 export const Route = createFileRoute('/_app')({
   ssr: false,
@@ -35,6 +36,7 @@ function DashboardLayout() {
   return (
     <DashboardShell>
       {guestAccessDenied ? <GuestAccessGate /> : <Outlet />}
+      <PaywallHost />
     </DashboardShell>
   )
 }

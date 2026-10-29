@@ -25,6 +25,15 @@ export function formatAccessDate(value: string) {
   return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date)
 }
 
+/** A later paid period exists; the API repeats endsAt when nothing is queued. */
+export function hasQueuedPeriod(access: BillingAccess) {
+  return Boolean(
+    access.queuedUntil &&
+    access.endsAt &&
+    new Date(access.queuedUntil).getTime() > new Date(access.endsAt).getTime(),
+  )
+}
+
 /** Days left until the access ends, rounded up; 0 once it has ended. */
 export function daysLeft(endsAt: string) {
   const ms = new Date(endsAt).getTime() - Date.now()
@@ -55,7 +64,7 @@ export function FreeAllowanceList({
             </dt>
             <dd
               className={cn(
-                'text-xs font-semibold tabular-nums',
+                'text-xs font-semibold whitespace-nowrap tabular-nums',
                 item.remaining === 0
                   ? 'text-muted-foreground'
                   : 'text-foreground',
@@ -90,7 +99,7 @@ export function AccessSummary({ access }: { access: BillingAccess }) {
           {t('Доступ действует до')} {formatAccessDate(access.endsAt)} ·{' '}
           {t('осталось дней:')} {daysLeft(access.endsAt)}
         </p>
-        {access.queuedUntil ? (
+        {access.queuedUntil && hasQueuedPeriod(access) ? (
           <p className="text-muted-foreground">
             {t('Следующий оплаченный период продлит доступ до')}{' '}
             {formatAccessDate(access.queuedUntil)}
@@ -133,7 +142,7 @@ export function SidebarAccess({ onNavigate }: { onNavigate?: () => void }) {
 
   if (access.active && access.endsAt) {
     const left = daysLeft(access.endsAt)
-    const ending = left <= 3 && !access.queuedUntil
+    const ending = left <= 3 && !hasQueuedPeriod(access)
     return (
       <section
         aria-label={t('Тариф')}
@@ -167,7 +176,7 @@ export function SidebarAccess({ onNavigate }: { onNavigate?: () => void }) {
       <p className="text-xs font-semibold text-foreground">
         {t('Бесплатные тесты')}
       </p>
-      <FreeAllowanceList access={access} className="mt-2" />
+      <FreeAllowanceList access={access} className="mt-2 grid-cols-1 gap-y-1" />
       <Link
         to="/pricing"
         onClick={onNavigate}

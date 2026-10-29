@@ -15,7 +15,7 @@ export type AdminEntitlement = {
   revokedAt: string | null
   meetingsTotal: number
   meetingsUsed: number
-  note: string | null
+  note: string
   createdAt: string
 }
 
@@ -62,13 +62,13 @@ export const grantEntitlement = (
   )
 
 export const revokeEntitlement = (id: string, note: string) =>
-  apiClient.request<AdminEntitlement>(
+  apiClient.request<{ ok: boolean }>(
     `/api/v1/admin/entitlements/${id}/revoke`,
     { method: 'POST', body: { note } },
   )
 
 export const setMeetingsUsed = (id: string, meetingsUsed: number) =>
-  apiClient.request<AdminEntitlement>(
+  apiClient.request<{ ok: boolean }>(
     `/api/v1/admin/entitlements/${id}/meetings`,
     { method: 'PATCH', body: { meetingsUsed } },
   )

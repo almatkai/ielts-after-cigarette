@@ -26,6 +26,7 @@ import { Route as AppListeningRouteImport } from './routes/_app.listening'
 import { Route as AppMistakesRouteImport } from './routes/_app.mistakes'
 import { Route as AppPlanRouteImport } from './routes/_app.plan'
 import { Route as AppPracticeRouteImport } from './routes/_app.practice'
+import { Route as AppPricingRouteImport } from './routes/_app.pricing'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppProgressRouteImport } from './routes/_app.progress'
 import { Route as AppReadingRouteImport } from './routes/_app.reading'
@@ -47,6 +48,7 @@ import { Route as BlogRssDotxmlRouteImport } from './routes/blog.rss[.]xml'
 import { Route as BlogSitemapDotxmlRouteImport } from './routes/blog.sitemap[.]xml'
 import { Route as RegisterVerifyRouteImport } from './routes/register.verify'
 import { Route as AppAttemptsAttemptIdRouteImport } from './routes/_app.attempts.$attemptId'
+import { Route as AppBillingReturnRouteImport } from './routes/_app.billing.return'
 import { Route as AppFullMockSessionsSessionIdRouteImport } from './routes/_app.full-mock-sessions.$sessionId'
 import { Route as AppFullMocksMockIdRouteImport } from './routes/_app.full-mocks.$mockId'
 import { Route as AppListeningTestIdRouteImport } from './routes/_app.listening.$testId'
@@ -177,6 +179,11 @@ const AppPracticeRoute = AppPracticeRouteImport.update({
   path: '/practice',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPricingRoute = AppPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -280,6 +287,11 @@ const RegisterVerifyRoute = RegisterVerifyRouteImport.update({
 const AppAttemptsAttemptIdRoute = AppAttemptsAttemptIdRouteImport.update({
   id: '/attempts/$attemptId',
   path: '/attempts/$attemptId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBillingReturnRoute = AppBillingReturnRouteImport.update({
+  id: '/billing/return',
+  path: '/billing/return',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFullMockSessionsSessionIdRoute =
@@ -543,6 +555,7 @@ export interface FileRoutesByFullPath {
   '/mistakes': typeof AppMistakesRoute
   '/plan': typeof AppPlanRoute
   '/practice': typeof AppPracticeRoute
+  '/pricing': typeof AppPricingRoute
   '/profile': typeof AppProfileRoute
   '/progress': typeof AppProgressRoute
   '/reading': typeof AppReadingRouteWithChildren
@@ -564,6 +577,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
+  '/billing/return': typeof AppBillingReturnRoute
   '/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
   '/listening/$testId': typeof AppListeningTestIdRoute
@@ -625,6 +639,7 @@ export interface FileRoutesByTo {
   '/mistakes': typeof AppMistakesRoute
   '/plan': typeof AppPlanRoute
   '/practice': typeof AppPracticeRoute
+  '/pricing': typeof AppPricingRoute
   '/profile': typeof AppProfileRoute
   '/progress': typeof AppProgressRoute
   '/reading': typeof AppReadingRouteWithChildren
@@ -645,6 +660,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
+  '/billing/return': typeof AppBillingReturnRoute
   '/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
   '/listening/$testId': typeof AppListeningTestIdRoute
@@ -704,6 +720,7 @@ export interface FileRoutesById {
   '/_app/mistakes': typeof AppMistakesRoute
   '/_app/plan': typeof AppPlanRoute
   '/_app/practice': typeof AppPracticeRoute
+  '/_app/pricing': typeof AppPricingRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/progress': typeof AppProgressRoute
   '/_app/reading': typeof AppReadingRouteWithChildren
@@ -726,6 +743,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/_app/attempts/$attemptId': typeof AppAttemptsAttemptIdRoute
+  '/_app/billing/return': typeof AppBillingReturnRoute
   '/_app/full-mock-sessions/$sessionId': typeof AppFullMockSessionsSessionIdRoute
   '/_app/full-mocks/$mockId': typeof AppFullMocksMockIdRoute
   '/_app/listening/$testId': typeof AppListeningTestIdRoute
@@ -791,6 +809,7 @@ export interface FileRouteTypes {
     | '/mistakes'
     | '/plan'
     | '/practice'
+    | '/pricing'
     | '/profile'
     | '/progress'
     | '/reading'
@@ -812,6 +831,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/attempts/$attemptId'
+    | '/billing/return'
     | '/full-mock-sessions/$sessionId'
     | '/full-mocks/$mockId'
     | '/listening/$testId'
@@ -873,6 +893,7 @@ export interface FileRouteTypes {
     | '/mistakes'
     | '/plan'
     | '/practice'
+    | '/pricing'
     | '/profile'
     | '/progress'
     | '/reading'
@@ -893,6 +914,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/attempts/$attemptId'
+    | '/billing/return'
     | '/full-mock-sessions/$sessionId'
     | '/full-mocks/$mockId'
     | '/listening/$testId'
@@ -951,6 +973,7 @@ export interface FileRouteTypes {
     | '/_app/mistakes'
     | '/_app/plan'
     | '/_app/practice'
+    | '/_app/pricing'
     | '/_app/profile'
     | '/_app/progress'
     | '/_app/reading'
@@ -973,6 +996,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/_app/attempts/$attemptId'
+    | '/_app/billing/return'
     | '/_app/full-mock-sessions/$sessionId'
     | '/_app/full-mocks/$mockId'
     | '/_app/listening/$testId'
@@ -1161,6 +1185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPracticeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/pricing': {
+      id: '/_app/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof AppPricingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile': {
       id: '/_app/profile'
       path: '/profile'
@@ -1306,6 +1337,13 @@ declare module '@tanstack/react-router' {
       path: '/attempts/$attemptId'
       fullPath: '/attempts/$attemptId'
       preLoaderRoute: typeof AppAttemptsAttemptIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/billing/return': {
+      id: '/_app/billing/return'
+      path: '/billing/return'
+      fullPath: '/billing/return'
+      preLoaderRoute: typeof AppBillingReturnRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/full-mock-sessions/$sessionId': {
@@ -1692,6 +1730,7 @@ interface AppRouteChildren {
   AppMistakesRoute: typeof AppMistakesRoute
   AppPlanRoute: typeof AppPlanRoute
   AppPracticeRoute: typeof AppPracticeRoute
+  AppPricingRoute: typeof AppPricingRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProgressRoute: typeof AppProgressRoute
   AppReadingRoute: typeof AppReadingRouteWithChildren
@@ -1700,6 +1739,7 @@ interface AppRouteChildren {
   AppWritingRoute: typeof AppWritingRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
   AppAttemptsAttemptIdRoute: typeof AppAttemptsAttemptIdRoute
+  AppBillingReturnRoute: typeof AppBillingReturnRoute
   AppFullMockSessionsSessionIdRoute: typeof AppFullMockSessionsSessionIdRoute
   AppWriterPostsPostIdRoute: typeof AppWriterPostsPostIdRoute
   AppWriterPostsNewRoute: typeof AppWriterPostsNewRoute
@@ -1712,6 +1752,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMistakesRoute: AppMistakesRoute,
   AppPlanRoute: AppPlanRoute,
   AppPracticeRoute: AppPracticeRoute,
+  AppPricingRoute: AppPricingRoute,
   AppProfileRoute: AppProfileRoute,
   AppProgressRoute: AppProgressRoute,
   AppReadingRoute: AppReadingRouteWithChildren,
@@ -1720,6 +1761,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppWritingRoute: AppWritingRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
   AppAttemptsAttemptIdRoute: AppAttemptsAttemptIdRoute,
+  AppBillingReturnRoute: AppBillingReturnRoute,
   AppFullMockSessionsSessionIdRoute: AppFullMockSessionsSessionIdRoute,
   AppWriterPostsPostIdRoute: AppWriterPostsPostIdRoute,
   AppWriterPostsNewRoute: AppWriterPostsNewRoute,
@@ -1953,12 +1995,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

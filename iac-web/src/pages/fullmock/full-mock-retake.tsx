@@ -16,6 +16,8 @@ import { authStore, useAuth } from '@/features/auth/auth-store'
 import { retakeGuestMock } from '@/features/auth/guest'
 import { fullMockKeys, startGeneratedFullMock } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { paymentRequiredReason } from '@/features/billing/api'
+import { openPaywall } from '@/features/billing/paywall-store'
 import { useLanguage, tr } from '@/lib/i18n'
 
 export function FullMockRetake({ sessionId }: { sessionId: string }) {
@@ -36,6 +38,12 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
         params: { sessionId: session.id },
       })
       setOpen(false)
+    },
+    onError: (error) => {
+      const reason = paymentRequiredReason(error)
+      if (!reason) return
+      setOpen(false)
+      openPaywall(reason)
     },
   })
   if (!user && guest?.sessionId && guest.sessionId !== sessionId) {
@@ -74,7 +82,7 @@ export function FullMockRetake({ sessionId }: { sessionId: string }) {
               : ''}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {retake.isError ? (
+        {retake.isError && !paymentRequiredReason(retake.error) ? (
           <p role="alert" className="text-sm text-destructive">
             {tr(getErrorMessage(retake.error))}
           </p>

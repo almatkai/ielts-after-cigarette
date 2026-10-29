@@ -6,6 +6,9 @@ import { ErrorState, ExamLoadingScreen } from '@/features/attempts/attempt-ui'
 import { attemptKeys } from '@/features/attempts/api'
 import type { Attempt } from '@/features/attempts/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { billingKeys, paymentRequiredReason } from '@/features/billing/api'
+import { openPaywall } from '@/features/billing/paywall-store'
+import { PaywallScreen } from '@/features/billing/paywall-screen'
 
 export function ExamAttemptShell<TMaterial>({
   skillBadge,
@@ -40,6 +43,8 @@ export function ExamAttemptShell<TMaterial>({
   const startAttempt = async (signal?: AbortSignal) => {
     const result = await startAttemptFn(signal)
     void queryClient.invalidateQueries({ queryKey: attemptKeys.listAll })
+    // A new attempt may have used one of the free tests.
+    void queryClient.invalidateQueries({ queryKey: billingKeys.me })
     return result
   }
 
@@ -66,7 +71,9 @@ export function ExamAttemptShell<TMaterial>({
       queryClient.setQueryData(queryKey, res)
       setSubmittedAttempt(null)
     } catch (e) {
-      alert(getErrorMessage(e))
+      const reason = paymentRequiredReason(e)
+      if (reason) openPaywall(reason)
+      else alert(getErrorMessage(e))
     } finally {
       setIsRetaking(false)
     }
@@ -90,6 +97,9 @@ export function ExamAttemptShell<TMaterial>({
       />
     )
   }
+
+  const paywallReason = paymentRequiredReason(startQuery.error)
+  if (paywallReason) return <PaywallScreen reason={paywallReason} />
 
   if (!startQuery.data || !attempt || !material) {
     return (

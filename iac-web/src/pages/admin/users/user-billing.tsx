@@ -284,7 +284,7 @@ function EntitlementRow({
         <p className="text-xs text-muted-foreground">{item.note}</p>
       ) : null}
       <div className="flex flex-wrap items-center gap-3">
-        {item.meetingsTotal > 0 ? (
+        {item.meetingsTotal > 0 && !item.revokedAt ? (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">
               {t('Проведено встреч:')}

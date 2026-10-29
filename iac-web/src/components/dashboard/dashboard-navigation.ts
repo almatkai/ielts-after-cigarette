@@ -1,6 +1,7 @@
 import {
   CalendarSearch,
   Category,
+  WalletMoney,
   Chart,
   Setting2,
   Warning2,
@@ -40,6 +41,13 @@ export const primaryDashboardNavigation = [
   },
 ] as const
 
+export const pricingDashboardNavigation = {
+  label: 'Тарифы',
+  to: '/pricing',
+  icon: WalletMoney,
+  exact: false,
+} as const
+
 export const settingsDashboardNavigation = {
   label: 'Настройки',
   to: '/settings',
@@ -54,6 +62,8 @@ const secondaryDashboardPages = [
   { label: 'Speaking', to: '/speaking' },
   { label: 'Full Mock', to: '/full-mocks' },
   { label: 'Профиль', to: '/profile' },
+  { label: 'Тарифы', to: '/pricing' },
+  { label: 'Оплата', to: '/billing/return' },
 ] as const
 
 // Writer pages carry their own heading, so the shell header shows no title.
@@ -63,6 +73,7 @@ export function getDashboardPageTitle(pathname: string): string | null {
   const navigationItem = [
     ...primaryDashboardNavigation,
     settingsDashboardNavigation,
+    pricingDashboardNavigation,
     ...secondaryDashboardPages,
   ].find((item) => item.to === pathname)
 

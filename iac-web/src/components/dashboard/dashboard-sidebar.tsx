@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { SidebarProgress } from './sidebar-progress'
+import { SidebarAccess } from '@/features/billing/access-status'
 import { BrandLogo } from '@/components/landing/brand'
 import {
   AlertDialog,
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils'
 import { useLanguage } from '@/lib/i18n'
 
 import {
+  pricingDashboardNavigation,
   primaryDashboardNavigation,
   settingsDashboardNavigation,
 } from './dashboard-navigation'
@@ -131,6 +133,8 @@ export function DashboardSidebar({
           })}
         </nav>
 
+        {auth.user ? <SidebarAccess onNavigate={onNavigate} /> : null}
+
         {auth.user ? (
           <SidebarProgress onNavigate={onNavigate} />
         ) : (
@@ -163,6 +167,26 @@ export function DashboardSidebar({
               <span>{t('Администрирование')}</span>
             </Link>
           ) : null}
+          <Link
+            to={pricingDashboardNavigation.to}
+            activeOptions={{ exact: pricingDashboardNavigation.exact }}
+            onClick={onNavigate}
+            className={navigationLinkClassName}
+            activeProps={{
+              className: activeNavigationClassName,
+            }}
+            inactiveProps={{
+              className:
+                'text-muted-foreground hover:bg-muted hover:text-foreground',
+            }}
+          >
+            <pricingDashboardNavigation.icon
+              className="size-[19px] shrink-0 text-muted-foreground transition-colors"
+              strokeWidth={1.8}
+              aria-hidden
+            />
+            <span>{t(pricingDashboardNavigation.label)}</span>
+          </Link>
           <Link
             to={settingsDashboardNavigation.to}
             activeOptions={{ exact: settingsDashboardNavigation.exact }}

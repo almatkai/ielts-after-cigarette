@@ -7,6 +7,10 @@ import { useAuth } from '@/features/auth/auth-store'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/lib/i18n'
+import {
+  isOnFreeAllowance,
+  useBillingAccess,
+} from '@/features/billing/use-billing'
 
 const skills = [
   {
@@ -58,6 +62,8 @@ export function PracticePage() {
     queryFn: ({ signal }) => getDashboard(signal),
     enabled: Boolean(user),
   })
+  const access = useBillingAccess()
+  const free = isOnFreeAllowance(access.data) ? access.data?.free : undefined
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-4 sm:gap-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -120,6 +126,13 @@ export function PracticePage() {
                     <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-5 sm:leading-6 text-muted-foreground">
                       {t(skill.description)}
                     </p>
+                    {free?.[skill.id] ? (
+                      <p className="mt-2 text-xs font-medium text-foreground">
+                        {free[skill.id].remaining > 0
+                          ? `${t('Бесплатных тестов осталось:')} ${free[skill.id].remaining} ${t('из')} ${free[skill.id].limit}`
+                          : t('Бесплатные тесты закончились — нужен тариф')}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 

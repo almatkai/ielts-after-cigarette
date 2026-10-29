@@ -193,6 +193,13 @@ export function getErrorMessage(error: unknown) {
       return 'Подтверждение через WhatsApp скоро будет доступно.'
     case 'RATE_LIMITED':
       return 'Слишком много попыток. Подождите минуту и попробуйте снова.'
+    case 'PAYMENT_REQUIRED':
+      return (
+        error.message ||
+        'Бесплатные тесты закончились. Выберите тариф, чтобы продолжить.'
+      )
+    case 'PAYMENT_PROVIDER_UNAVAILABLE':
+      return 'Онлайн-оплата временно недоступна. Попробуйте позже или напишите в поддержку.'
     case 'DAILY_LIMIT_EXCEEDED':
       return (
         error.message ||

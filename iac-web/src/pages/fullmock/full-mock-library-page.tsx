@@ -15,6 +15,12 @@ import {
 } from '@/features/fullmock/api'
 import type { FullMockSkill } from '@/features/fullmock/api'
 import { getErrorMessage } from '@/lib/api/client'
+import { billingKeys, paymentRequiredReason } from '@/features/billing/api'
+import { openPaywall } from '@/features/billing/paywall-store'
+import {
+  isOnFreeAllowance,
+  useBillingAccess,
+} from '@/features/billing/use-billing'
 import { useLanguage, tr } from '@/lib/i18n'
 
 const labels: Record<FullMockSkill, string> = {
@@ -46,17 +52,24 @@ function AccountFullMockLibraryPage() {
     staleTime: 0,
     refetchOnMount: 'always',
   })
+  const access = useBillingAccess()
+  const freeOnly = isOnFreeAllowance(access.data)
   const start = useMutation({
     mutationFn: (restart: boolean) => startGeneratedFullMock(restart),
     onSuccess: (session) => {
       void queryClient.invalidateQueries({ queryKey: ['full-mock-overview'] })
+      void queryClient.invalidateQueries({ queryKey: billingKeys.me })
       queryClient.setQueryData(fullMockKeys.session(session.id), session)
       return navigate({
         to: '/exam/full-mock-sessions/$sessionId',
         params: { sessionId: session.id },
       })
     },
-    onError: () => void query.refetch(),
+    onError: (error) => {
+      const reason = paymentRequiredReason(error)
+      if (reason) openPaywall(reason)
+      void query.refetch()
+    },
   })
 
   if (query.isPending) {
@@ -232,7 +245,14 @@ function AccountFullMockLibraryPage() {
       ) : null}
 
       <div className="grid gap-3">
-        {start.isError ? (
+        {freeOnly && !active ? (
+          <p className="text-sm leading-6 text-muted-foreground">
+            {t(
+              'Без тарифа Full Mock засчитывается как один бесплатный тест каждого навыка.',
+            )}
+          </p>
+        ) : null}
+        {start.isError && !paymentRequiredReason(start.error) ? (
           <p role="alert" className="text-sm text-destructive">
             {tr(getErrorMessage(start.error))}
           </p>

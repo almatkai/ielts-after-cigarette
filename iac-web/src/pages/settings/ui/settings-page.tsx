@@ -34,6 +34,9 @@ import {
 import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 import { LanguagePicker } from '@/components/ui/language-picker'
+import { AccessSummary } from '@/features/billing/access-status'
+import { useBillingAccess } from '@/features/billing/use-billing'
+import { Link } from '@tanstack/react-router'
 
 const cardClassName = 'gap-0 rounded-[10px] border-border py-0 shadow-none'
 
@@ -207,6 +210,7 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto grid w-full min-w-0 max-w-[880px] gap-4">
+      <AccessCard />
       <Card className={cardClassName}>
         <SectionHeader
           title={t('Профиль и цель')}
@@ -419,6 +423,31 @@ export function SettingsPage() {
         mascot={{ checked: isMascotVisible, onChange: setMascotVisible }}
       />
     </div>
+  )
+}
+
+function AccessCard() {
+  const { t } = useLanguage()
+  const access = useBillingAccess()
+  if (!access.data) return null
+  return (
+    <Card className={cardClassName}>
+      <SectionHeader title={t('Тариф и доступ')} />
+      <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between">
+        <AccessSummary access={access.data} />
+        {access.data.staff ? null : (
+          <Button
+            asChild
+            variant="outline"
+            className="h-9 shrink-0 rounded-[8px]"
+          >
+            <Link to="/pricing">
+              {access.data.active ? t('Продлить доступ') : t('Выбрать тариф')}
+            </Link>
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 

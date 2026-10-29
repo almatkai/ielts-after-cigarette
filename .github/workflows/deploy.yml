@@ -7,6 +7,8 @@ name: Test, build, and deploy
 # pipeline again.
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [dev, main]
 
@@ -21,7 +23,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+    environment: ${{ github.event_name == 'pull_request' && 'ci' || (github.ref == 'refs/heads/main' && 'production' || 'development') }}
     defaults:
       run:
         working-directory: iac-web

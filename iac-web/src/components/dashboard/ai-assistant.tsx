@@ -13,6 +13,8 @@ import { Badge } from '@/components/ui/badge'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { getErrorMessage } from '@/lib/api/client'
+import { paymentRequiredReason } from '@/features/billing/api'
+import { openPaywall } from '@/features/billing/paywall-store'
 import { streamAssistantChat } from '@/features/assistant/stream'
 import type { ChatMessageDto } from '@/features/assistant/api'
 import { extractPageAsReadme } from '@/features/assistant/page-reader'
@@ -410,6 +412,8 @@ export function AiAssistantChatWindow({
       }
     } catch (err) {
       if (!controller.signal.aborted) {
+        const paywallReason = paymentRequiredReason(err)
+        if (paywallReason) openPaywall(paywallReason)
         setMessages((prev) =>
           prev.map((message) =>
             message.id === botMsg.id

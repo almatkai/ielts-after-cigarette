@@ -83,5 +83,6 @@ export function canBrowseWithoutAccount(pathname: string) {
     '/writing',
     '/speaking',
     '/settings',
+    '/pricing',
   ].includes(pathname)
 }

@@ -11,6 +11,7 @@ import type { FullMockSession } from '@/features/fullmock/api'
 import { AttemptReviewPage } from '@/pages/attempts/attempt-review-page'
 import { useLanguage } from '@/lib/i18n'
 import { FullMockRetake } from './full-mock-retake'
+import { ReportUpsell } from '@/features/billing/report-upsell'
 
 export function FullMockReport({ session }: { session: FullMockSession }) {
   const { language } = useLanguage()
@@ -45,6 +46,7 @@ export function FullMockReport({ session }: { session: FullMockSession }) {
         </div>
         <FullMockRetake sessionId={session.id} />
       </div>
+      {user ? <ReportUpsell /> : null}
       <div
         className="grid grid-cols-2 gap-3 lg:grid-cols-4"
         role="group"

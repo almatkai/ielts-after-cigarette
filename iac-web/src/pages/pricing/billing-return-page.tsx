@@ -89,7 +89,7 @@ export function BillingReturnPage({ orderId }: { orderId?: string }) {
       <>
         {t('Списано')} {formatTenge(order.data.amount)}.{' '}
         {endsAt
-          ? `${t('Доступ открыт до')} ${formatAccessDate(endsAt)}.`
+          ? `${t('Доступ открыт до')} ${formatAccessDate(endsAt)}`
           : t('Доступ открыт.')}
         {order.data.planCode !== 'self'
           ? ` ${t('Мы свяжемся с вами в WhatsApp, чтобы согласовать расписание встреч.')}`

@@ -322,4 +322,9 @@ export const billingTranslations: TranslationMap = {
     kk: 'Платформа + 30 минуттан 4 жеке кездесу',
     en: 'Platform + 4 one-on-one 30-minute sessions',
   },
+  'Новая оплата продлит доступ: следующий период начнётся после окончания текущего.':
+    {
+      kk: 'Жаңа төлем қолжетімділікті ұзартады: келесі кезең ағымдағы кезең аяқталғаннан кейін басталады.',
+      en: 'A new payment extends your access: the next period starts when the current one ends.',
+    },
 }

@@ -45,6 +45,13 @@ export function PricingPage() {
           aria-label={t('Выбор тарифа')}
           className="rounded-[10px] border border-border bg-card p-5 sm:p-7"
         >
+          {user && access.data?.active ? (
+            <p className="mb-4 text-sm leading-6 text-muted-foreground">
+              {t(
+                'Новая оплата продлит доступ: следующий период начнётся после окончания текущего.',
+              )}
+            </p>
+          ) : null}
           {user ? <PlanPicker /> : <GuestPlans />}
         </section>
 

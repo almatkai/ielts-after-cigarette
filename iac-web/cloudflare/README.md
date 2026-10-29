@@ -1,20 +1,23 @@
 # IELTS DEV on ordinary Cloudflare Workers
 
-## Current availability — 2026-10-28
+## Current availability — 2026-10-29
 
-**Database-dependent DEV routes are temporarily unavailable because the shared
-Cloudflare Free SQLite read allowance is exhausted.** The observed guest API
-returns `503`, `Cache-Control: no-store` and `Retry-After` until
-**2026-10-29 00:00 UTC (05:00 Almaty)**. The earlier `/app/` HTML request returned
-`200`; healthy responses continue unchanged. No paid upgrade or VPS fallback was
-introduced. Quota reset and affected routes still require a later confirmation.
+**Bounded native recovery passed after the Free SQL read quota reset.**
+`/app/` and `/api/v1/guest/config` return 200; sampled JS/CSS bytes match the
+immutable artifact. An anonymous profile request returns401, and the Workers
+alias redirects to the canonical authority with path/query retained. See
+[post-reset-acceptance.json](post-reset-acceptance.json). Interactive Google,
+Turnstile and browser hydration checks remain unexecuted.
 
-[quota-boundary-acceptance.json](quota-boundary-acceptance.json) records the
-current deployment, exact preserved binding/variable digests, six local boundary
-checks and one native API check after deployment. Only the exact platform Free
-row read/write quota exception is surfaced through the private frontend proxy;
-the frontdoor converts it to a Russian `503` response. Other proxy failures keep
-the existing `502`, and unknown frontdoor errors still propagate.
+The 28 October quota incident is historical; its precise503/no-store/Retry-After
+boundary remains installed for future Free row read/write quota failures.
+[quota-boundary-acceptance.json](quota-boundary-acceptance.json) retains that
+original deployment/incident receipt, not a claim of current unavailability.
+Other proxy errors retain their existing502 and unknown exceptions propagate.
+No new deployment or provider transaction was required for recovery. Fresh
+control-plane metadata returned403; existing immutable receipts remain the
+version/binding baseline and this run independently checked native behavior.
+All thirteen IELTS DEV/legacy source containers remain stopped/restart=no.
 
 ## Public cutover — 2026-10-28
 

@@ -1,0 +1,139 @@
+{
+  "checkedAt": "2026-10-29T04:55:04.732949Z",
+  "ready": true,
+  "readyScope": "Bounded real native DEV HTTP, artifact parity and auth-boundary recovery after the SQL quota reset",
+  "quotaResetAt": "2026-10-29T00:00:00Z",
+  "quotaObservation": {
+    "checkedAt": "2026-10-29T04:51:54.542Z",
+    "windowStartUTC": "2026-10-29T00:00:00Z",
+    "latestReportedMinute": "2026-10-29T04:49:00Z",
+    "querySha256": "2c3e46c2d594623b30fb72d5c0182bdf626cddc9e5d8839d86c536b3e9c063f7",
+    "accountDOUsage": {
+      "activeTime": 89546817,
+      "cpuTime": 10722644,
+      "duration": 11.461992575999998,
+      "exceededCpuErrors": 0,
+      "exceededMemoryErrors": 0,
+      "fatalInternalErrors": 0,
+      "rowsRead": 65116,
+      "rowsWritten": 2176
+    },
+    "requestsEstimate": 117,
+    "requestErrorsEstimate": 1,
+    "confidence95": {
+      "periodic": {
+        "duration": {
+          "estimate": 11.461992575999998,
+          "isValid": false,
+          "lower": 11.461992575999998,
+          "sampleSize": 24,
+          "upper": 11.461992575999998
+        },
+        "rowsRead": {
+          "estimate": 65116,
+          "isValid": false,
+          "lower": 65116,
+          "sampleSize": 24,
+          "upper": 65116
+        },
+        "rowsWritten": {
+          "estimate": 2176,
+          "isValid": false,
+          "lower": 2176,
+          "sampleSize": 24,
+          "upper": 2176
+        }
+      },
+      "requests": {
+        "estimate": 117,
+        "isValid": true,
+        "lower": 107.0061053968912,
+        "sampleSize": 104,
+        "upper": 126.9938946031088
+      }
+    },
+    "visibleRowsWrittenHeadroom": 97824,
+    "warnings": [
+      "Analytics reporting lag applies; headroom is not reserved.",
+      "Workers Free/Paid subscription and total stored bytes are not verified by this query."
+    ]
+  },
+  "sourceRetirement": {
+    "checkedAt": "2026-10-29T04:49:05.538245+00:00",
+    "all18StoppedAndRestartDisabled": true,
+    "sourceVolumesRetained": true
+  },
+  "paidUpgradePerformed": false,
+  "newCredentialsCreated": false,
+  "providerTransactionsPerformed": false,
+  "interactiveOAuthLoginPerformed": false,
+  "dataReimported": false,
+  "fixturesCreated": false,
+  "productionChanged": false,
+  "controlPlaneMetadataRevalidated": false,
+  "controlPlaneLimitation": "Fresh Worker settings/deployment API reads returned HTTP403 No access to the specified resource. Previously verified immutable deployment receipts remain the version/namespace/secret baseline; native HTTP recovery and asset parity were verified independently.",
+  "format": "ielts-post-reset-acceptance/v1",
+  "canonicalOrigin": "https://ielts.woolet.cc",
+  "requests": [
+    {
+      "project": "ielts",
+      "label": "ielts-app",
+      "origin": "https://ielts.woolet.cc",
+      "path": "/app/",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "bytes": 9952,
+      "sha256": "22fa3137925c6aafa65e6d8eef9409424a374de08cbeca2e4e2bcdada23a5ec3",
+      "ms": 2945,
+      "location": null,
+      "retryAfter": null
+    },
+    {
+      "project": "ielts",
+      "label": "ielts-config",
+      "origin": "https://ielts.woolet.cc",
+      "path": "/api/v1/guest/config",
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "bytes": 79,
+      "sha256": "a48868a21eb5bd50f97e648d4b14081eacd70778511920d05c749890c8c89847",
+      "ms": 1194,
+      "location": null,
+      "retryAfter": null
+    },
+    {
+      "project": "ielts",
+      "path": "/app/assets/index-CzXlRLdM.js",
+      "status": 200,
+      "bytes": 503544,
+      "sha256": "2f3d2b6eac66dc229b335db4b5f74ec5121e031b0b282d8367a5fd8bcdf6d1bd",
+      "exactArtifactBytes": true
+    },
+    {
+      "project": "ielts",
+      "path": "/app/assets/styles-SdS9-JfN.css",
+      "status": 200,
+      "bytes": 123678,
+      "sha256": "3177c262c1ad048201389abd5c1285af235f4aa57c40431e1aa2af96cedd4f14",
+      "exactArtifactBytes": true
+    },
+    {
+      "project": "ielts",
+      "path": "/api/v1/profile",
+      "status": 401,
+      "location": null
+    },
+    {
+      "project": "ielts",
+      "path": "/app/login",
+      "status": 307,
+      "location": "https://ielts.woolet.cc/app/login?post-reset=1&next=%2Fapp%2Fpractice"
+    }
+  ],
+  "frontendSourceRevision": "b05d0622b7bfcc44dcddad3544c6e6d565041019",
+  "lastDeployedVersions": {
+    "ielts-web-dev": "fd7c12cf-8fde-40da-85b5-afdbac72df38",
+    "ielts-dev": "545dbb5f-2d92-4f07-9eaf-c2b8904cf2a7"
+  },
+  "browserHydrationAndInteractiveGoogleTurnstileTested": false
+}

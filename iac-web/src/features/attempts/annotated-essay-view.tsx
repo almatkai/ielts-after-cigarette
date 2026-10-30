@@ -139,7 +139,7 @@ export function AnnotatedEssayView({
           <p className="text-xs font-semibold normal-case text-muted-foreground">
             {'Feedback and improvements'} ({annotations.length})
           </p>
-          <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="grid divide-y divide-border">
             {annotations.map((ann) => {
               const isError = ann.severity === 'error'
               const isSelected = selectedId === ann.id
@@ -158,12 +158,8 @@ export function AnnotatedEssayView({
                     }
                   }}
                   onClick={() => setSelectedId(ann.id)}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                    isSelected
-                      ? isError
-                        ? 'border-destructive bg-destructive-soft/50 shadow-none ring-1 ring-destructive'
-                        : 'border-warning-fg bg-warning-bg/50 shadow-none ring-1 ring-warning-fg'
-                      : 'border-border bg-card hover:border-border-strong hover:shadow-none'
+                  className={`cursor-pointer rounded-lg px-3 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                    isSelected ? 'bg-muted' : 'hover:bg-muted/50'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">

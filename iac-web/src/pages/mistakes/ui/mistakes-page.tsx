@@ -1,3 +1,4 @@
+import { AttemptLearningBridge } from '@/features/study-plan/attempt-learning-bridge'
 import { WritingReview } from '@/features/attempts/writing-review'
 import { ArrowLeft, ArrowRight, MessageQuestion } from 'iconsax-react'
 import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -48,7 +49,7 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 })
 
 export function MistakesPage() {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const { skill, page, attempt } = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
   const queryClient = useQueryClient()
@@ -114,8 +115,8 @@ export function MistakesPage() {
           <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
             <p>
               {skill === 'reading' || skill === 'listening'
-                ? t('Попытки с ошибками')
-                : t('Завершённые разборы')}
+                ? 'Попытки с ошибками'
+                : 'Сохранённые работы'}
             </p>
             <p>{t('Последние сначала')}</p>
           </div>
@@ -170,9 +171,16 @@ export function MistakesPage() {
                       <span
                         className={`text-sm font-medium ${item.mistakeCount !== null ? 'text-destructive' : 'text-primary'}`}
                       >
-                        {item.mistakeCount !== null
-                          ? mistakeCountLabel(item.mistakeCount, language)
-                          : `Band ${item.band?.toFixed(1) ?? '—'}`}
+                        {skill === 'writing' || skill === 'speaking'
+                          ? 'Работа сохранена · без подтверждённой оценки IELTS'
+                          : item.mistakeCount !== null
+                            ? mistakeCountLabel(item.mistakeCount)
+                            : 'Результат сохранён'}
+                        {(skill === 'reading' || skill === 'listening') &&
+                        typeof item.score === 'number' &&
+                        typeof item.maxScore === 'number'
+                          ? ` · ${item.score}/${item.maxScore}`
+                          : ''}
                       </span>
                       <Button
                         variant="outline"
@@ -321,7 +329,9 @@ function AttemptMistakes({
           !detailQuery.data.writingEvaluation &&
           !detailQuery.data.speakingEvaluation ? (
             <p className="py-6 text-sm text-muted-foreground">
-              {t('В этой попытке нет ошибок для разбора.')}
+              {materialType === 'writing' || materialType === 'speaking'
+                ? 'Разбор пока недоступен'
+                : 'В этой попытке нет ошибок для разбора.'}
             </p>
           ) : null}
         </>
@@ -354,12 +364,8 @@ function EmptyMistakesState({ skill }: { skill: AttemptMaterialType }) {
         </p>
         <p className="max-w-md text-sm leading-6 text-muted-foreground">
           {objective
-            ? t(
-                'Здесь появятся завершённые попытки с неверными или пропущенными ответами.',
-              )
-            : t(
-                'Здесь появятся оценки и обратная связь по завершённым попыткам.',
-              )}
+            ? 'Здесь появятся завершённые попытки с неверными или пропущенными ответами.'
+            : 'Здесь появятся комментарии к завершённым работам.'}
         </p>
         <Button asChild variant="outline" className="shadow-none">
           <Link to={`/${skill}`}>
@@ -378,7 +384,6 @@ function AIEvaluationCard({
   detail: MistakeDetail
   skill: AttemptMaterialType
 }) {
-  const { t } = useLanguage()
   if (detail.writingEvaluation) {
     return (
       <WritingReview
@@ -389,11 +394,6 @@ function AIEvaluationCard({
   }
   const evaluation = detail.speakingEvaluation
   if (!evaluation) return null
-  const isSpeaking = skill === 'speaking' || Boolean(detail.speakingEvaluation)
-  const isPronunciationAvailable = Boolean(
-    detail.speakingEvaluation?.pronunciationAvailable &&
-    detail.speakingEvaluation.criteria.pronunciation.band > 0,
-  )
   const criteria = [
     {
       label: 'Fluency & Coherence',
@@ -416,12 +416,10 @@ function AIEvaluationCard({
     {
       label: 'Pronunciation',
       criterion: detail.speakingEvaluation?.criteria.pronunciation,
-      unavailable: !isPronunciationAvailable,
-      feedback: !isPronunciationAvailable
-        ? t(
-            'Наша система пока не может определить Pronunciation (произношение). Оценка сформирована по беглости, словарному запасу и грамматической точности.',
-          )
-        : detail.speakingEvaluation?.criteria.pronunciation.feedback,
+      unavailable: !evaluation.pronunciationAvailable,
+      feedback: evaluation.pronunciationAvailable
+        ? evaluation.criteria.pronunciation.feedback
+        : 'Произношение в этом разборе не определяется. Текст и расшифровка не подтверждают произношение.',
     },
   ]
 
@@ -431,20 +429,28 @@ function AIEvaluationCard({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base tracking-[-0.02em]">
             <MessageQuestion className="size-4 text-primary" aria-hidden />
-            {materialTypeLabels[skill]} · Band{' '}
-            {evaluation.overallBand.toFixed(1)}
+            {materialTypeLabels[skill]} · учебный разбор
           </CardTitle>
-          {isSpeaking && !isPronunciationAvailable ? (
-            <span className="text-xs text-muted-foreground">
-              {t(
-                'Оценка по 3 критериям (произношение пока не определяется нашей системой)',
-              )}
-            </span>
-          ) : null}
         </div>
       </CardHeader>
       <CardContent className="grid gap-4 p-5">
-        <p className="text-sm leading-6 text-primary">{evaluation.summary}</p>
+        <section
+          aria-label="Ограничения учебного разбора"
+          className="grid gap-2 text-sm leading-6 text-muted-foreground"
+        >
+          <p>
+            Автоматические комментарии не проверены специалистом и не являются
+            оценкой IELTS.
+          </p>
+          <p>
+            Текстовый ответ и расшифровка не подтверждают беглость и
+            произношение. Наличие аудиозаписи и её анализ смотрите в полном
+            разборе работы.
+          </p>
+        </section>
+        <p className="text-sm leading-6 text-muted-foreground">
+          {evaluation.summary}
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {criteria.map(({ label, criterion, unavailable, feedback }) =>
             criterion ? (
@@ -459,14 +465,10 @@ function AIEvaluationCard({
                 <p className="flex items-center justify-between gap-2 text-sm font-medium">
                   {label}
                   {unavailable ? (
-                    <span className="rounded-md border border-warning-bg bg-warning-bg px-2 py-0.5 text-xs font-semibold text-warning-fg">
-                      {t('Пока не определяется')}
+                    <span className="text-xs text-muted-foreground">
+                      Пока не определяется
                     </span>
-                  ) : (
-                    <span className="text-primary">
-                      {criterion.band.toFixed(1)}
-                    </span>
-                  )}
+                  ) : null}
                 </p>
                 {feedback ? (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -477,6 +479,7 @@ function AIEvaluationCard({
             ) : null,
           )}
         </div>
+        <AttemptLearningBridge attemptId={detail.attempt.id} />
       </CardContent>
     </Card>
   )

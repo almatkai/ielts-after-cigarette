@@ -29,7 +29,7 @@ export function GuestResultsAccess({ children }: { children: ReactNode }) {
         open={open}
         onOpenChange={setOpen}
         trigger={trigger}
-        description="Войдите, чтобы увидеть оценки всех секций и полный разбор. Завершённый пробный тест сохранится в вашем аккаунте."
+        description="Войдите, чтобы открыть полный разбор всех секций. Завершённый пробный тест сохранится в вашем аккаунте."
         onSuccess={async () => {
           setOpen(false)
           await router.invalidate()
@@ -68,15 +68,10 @@ export function GuestSignInButton({
 export function GuestLockedBand({ skill }: { skill: string }) {
   return (
     <GuestSignInButton
-      label={`${skill}: войти, чтобы увидеть оценку`}
+      label={`${skill}: войти, чтобы увидеть полный разбор`}
       className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-primary-hover transition-colors hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <span
-        aria-hidden
-        className="select-none text-2xl font-semibold blur-[5px]"
-      >
-        —.—
-      </span>
+      <span>Полный разбор</span>
       <Lock aria-hidden className="size-4" />
     </GuestSignInButton>
   )

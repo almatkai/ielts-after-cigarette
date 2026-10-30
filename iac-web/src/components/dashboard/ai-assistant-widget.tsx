@@ -1,5 +1,7 @@
 import { CloseCircle, Messages1 } from 'iconsax-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+
+import { Button } from '@/components/ui/button'
 import { FoxMascot } from './fox-mascot'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
@@ -17,9 +19,11 @@ const focusRing =
 export function AiAssistantFloatingWidget({
   className,
   hidden = false,
+  compact = false,
 }: {
   className?: string
   hidden?: boolean
+  compact?: boolean
 }) {
   const { t } = useLanguage()
   const { isVisible, setVisible } = useMascotVisibility()
@@ -175,7 +179,25 @@ export function AiAssistantFloatingWidget({
           />
         </Suspense>
       ) : null}
-      {!chatIsOpen && !hidden ? (
+
+      {/* 2. Floating Mascot & Comic Speech Bubble (shown when isVisible is true, smoothly hidden when chat is open) */}
+      {!chatIsOpen && !hidden && compact ? (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="min-h-11"
+            aria-label={t('Открыть чат с Юки')}
+            onClick={openChat}
+          >
+            <Messages1
+              size={18}
+              className="text-muted-foreground"
+              aria-hidden
+            />{' '}
+            {t('Спросить Юки')}
+          </Button>
+        </div>
+      ) : !chatIsOpen && !hidden ? (
         <div
           data-testid="yuki-widget"
           className={cn(

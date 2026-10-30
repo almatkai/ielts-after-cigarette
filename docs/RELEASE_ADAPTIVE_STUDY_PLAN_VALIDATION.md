@@ -26,8 +26,11 @@ Release backend https://github.com/almatkai/ielts-after-cigarette-back/pull/18
 first: retain billing migration 000045 and existing manual-grant configuration
 (`PAYWALL_ENABLED=true`, `PAYMENT_PROVIDER=none`), apply new plan46 then
 learning47, deploy backend and verify job processing and API readiness. Existing
-production uses in-process workers; retain its deployment topology. Then deploy
-this frontend. Frontend before backend would encounter missing study APIs.
+production was verified on the live server to use the operational Compose
+worker overlay (`WRITING_WORKER_EXTERNAL=true`), with the same revision for API
+and external worker and shared Speaking storage. Retain this topology; the
+existing backend deploy script updates both containers. Then deploy this
+frontend. Frontend before backend would encounter missing study APIs.
 No merge or deployment was performed during preparation.
 
 ## Commands and evidence

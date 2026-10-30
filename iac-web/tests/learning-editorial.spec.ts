@@ -57,6 +57,8 @@ async function fixture(
   let reads = 0
   await page.route('**/api/v1/**', async (route) => {
     const path = new URL(route.request().url()).pathname
+    if (path === '/api/v1/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/api/v1/auth/refresh')
       return route.fulfill({
         json: {

@@ -108,6 +108,8 @@ async function openProgress(page: Page, data: StudyResponse) {
     const path = new URL(request.url()).pathname.replace('/api/v1', '')
     const json = (value: unknown, status = 200) =>
       route.fulfill({ status, json: value })
+    if (path === '/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/auth/refresh')
       return json({
         accessToken: 'progress-token',

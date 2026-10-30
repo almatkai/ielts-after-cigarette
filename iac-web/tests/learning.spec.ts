@@ -66,6 +66,8 @@ async function setup(page: Page, data = learningFixture()) {
       return json({ code: 'UNAUTHENTICATED' }, 401)
     if (path === '/analytics/ping' && method === 'POST')
       return route.fulfill({ status: 204 })
+    if (path === '/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/auth/refresh' && method === 'POST')
       return json({
         accessToken: `token-${identity}`,

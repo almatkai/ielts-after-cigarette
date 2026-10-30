@@ -45,6 +45,8 @@ async function setup(
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request(),
       path = new URL(request.url()).pathname
+    if (path === '/api/v1/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (request.method() === 'POST' && path === '/api/v1/auth/refresh')
       return route.fulfill({
         json: {

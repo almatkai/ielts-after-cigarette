@@ -17,6 +17,7 @@ const cardClassName =
   'gap-0 rounded-[16px] border-border py-0 shadow-none min-w-0 max-w-full overflow-hidden'
 
 export function ProgressPage() {
+  const { t } = useLanguage()
   const attemptsQuery = useAttemptHistory()
   const moreRef = useRef<HTMLDivElement>(null)
   const { hasNextPage, isFetchingNextPage, fetchNextPage } = attemptsQuery
@@ -56,7 +57,7 @@ export function ProgressPage() {
     <div className="mx-auto grid w-full min-w-0 max-w-[1120px] gap-3.5 sm:gap-5">
       <div>
         <h2 className="text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
-          Прогресс
+          {t('Прогресс')}
         </h2>
       </div>
 
@@ -82,7 +83,7 @@ export function ProgressPage() {
           ) : attempts.length === 0 ? (
             <div className="px-2 py-4 text-center">
               <p className="text-sm font-semibold text-foreground">
-                Попыток пока нет
+                {t('Попыток пока нет')}
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {t('Пройдите первый тест в разделе Listening или Reading.')}

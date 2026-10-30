@@ -64,7 +64,7 @@ export function OverviewPage() {
 }
 
 function AccountOverviewPage() {
-  const { language, t } = useLanguage()
+  const { t } = useLanguage()
   const dashboardQuery = useQuery({
     queryKey: queryKeys.dashboard,
     queryFn: ({ signal }) => getDashboard(signal),
@@ -107,7 +107,7 @@ function AccountOverviewPage() {
   const dashboard = dashboardQuery.data
   const overviewMetrics = [
     {
-      label: 'Целевой балл',
+      label: t('Целевой балл'),
       value:
         dashboard.profile.targetBand === null
           ? '—'
@@ -136,7 +136,7 @@ function AccountOverviewPage() {
       </h1>
       <section
         className="grid min-w-0 gap-2.5 sm:gap-4 sm:grid-cols-2"
-        aria-label="Основные показатели"
+        aria-label={t('Основные показатели')}
       >
         {overviewMetrics.map((metric) => {
           const Icon = metric.icon
@@ -185,7 +185,7 @@ function AccountOverviewPage() {
           <StudyProgress />
           <GoalDialog>
             <Button variant="outline" className="min-h-11 justify-self-start">
-              Настроить цель
+              {t('Настроить цель')}
             </Button>
           </GoalDialog>
         </div>

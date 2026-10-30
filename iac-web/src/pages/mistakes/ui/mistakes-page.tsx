@@ -49,7 +49,7 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 })
 
 export function MistakesPage() {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const { skill, page, attempt } = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
   const queryClient = useQueryClient()
@@ -384,7 +384,6 @@ function AIEvaluationCard({
   detail: MistakeDetail
   skill: AttemptMaterialType
 }) {
-  const { t } = useLanguage()
   if (detail.writingEvaluation) {
     return (
       <WritingReview
@@ -449,7 +448,9 @@ function AIEvaluationCard({
             разборе работы.
           </p>
         </section>
-        <p className="text-sm leading-6 text-muted-foreground">{evaluation.summary}</p>
+        <p className="text-sm leading-6 text-muted-foreground">
+          {evaluation.summary}
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {criteria.map(({ label, criterion, unavailable, feedback }) =>
             criterion ? (

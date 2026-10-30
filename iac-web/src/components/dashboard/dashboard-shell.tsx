@@ -160,7 +160,10 @@ export function DashboardShell({ children }: DashboardShellProps) {
             hidden={isPlanPage || isStudyReview}
             className={isProgressPage ? 'px-3 pb-6 sm:px-7 lg:px-9' : undefined}
           >
-            <AiAssistantFloatingWidget compact={isProgressPage} hidden={navigationIsOpen} />
+            <AiAssistantFloatingWidget
+              compact={isProgressPage}
+              hidden={navigationIsOpen}
+            />
           </div>
         ) : null}
       </div>

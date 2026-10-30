@@ -169,7 +169,9 @@ export function LearningContentPage() {
                 onChange={(e) => setSearch({ q: e.target.value || undefined })}
               />
             </label>
-            <p className="text-sm text-muted-foreground">Найдено: {filtered.length}</p>
+            <p className="text-sm text-muted-foreground">
+              Найдено: {filtered.length}
+            </p>
             {!filtered.length ? (
               <Button
                 variant="outline"
@@ -478,7 +480,9 @@ function EditorialDetail({
               Решение будет записано от имени {user?.displayName || user?.email}
               .
             </p>
-            {reason ? <p className="text-sm text-muted-foreground">{reason}</p> : null}
+            {reason ? (
+              <p className="text-sm text-muted-foreground">{reason}</p>
+            ) : null}
             {stale ? (
               <Button
                 variant="outline"

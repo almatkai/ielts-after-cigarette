@@ -220,7 +220,11 @@ export function ProviderStats({ revision }: { revision: number }) {
           {recent.length > 0 && (
             <Disclosure
               className="border-t border-border"
-              title={<>{t('Последние попытки')} ({recent.length})</>}
+              title={
+                <>
+                  {t('Последние попытки')} ({recent.length})
+                </>
+              }
             >
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">

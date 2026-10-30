@@ -274,6 +274,8 @@ async function mockStudy(page: Page, initial = fixture()) {
       return route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } })
     if (path === '/analytics/ping' && method === 'POST')
       return route.fulfill({ status: 204 })
+    if (path === '/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/auth/refresh')
       return route.fulfill({
         json: {
@@ -985,7 +987,7 @@ test.describe('Study plan — mocked API UI', () => {
       page.getByRole('heading', { name: 'Не удалось загрузить план' }),
     ).toBeVisible()
     mock.fail('GET', '/study-plan', 503, 0)
-    await page.getByRole('button', { name: 'Повторить попытку' }).click()
+    await page.getByRole('button', { name: 'Try again' }).click()
     await expect(
       page.getByRole('heading', { name: 'План', exact: true }),
     ).toBeVisible()
@@ -1524,3 +1526,84 @@ test.describe('Study plan — mocked API UI', () => {
     })
   }
 })
+
+// Release integration: the plan shares production billing and theme state.
+test('release: a plan task 402 opens the existing paywall without navigating', async ({
+  page,
+}) => {
+  const mock = await mockStudy(page)
+  await page.route('**/api/v1/study-plan/assignments/*/start', (route) =>
+    route.fulfill({
+      status: 402,
+      json: {
+        code: 'PAYMENT_REQUIRED',
+        message: 'Paid plan required',
+        details: {
+          feature: 'reading',
+          skill: 'reading',
+          remaining: { reading: 0, listening: 2 },
+        },
+      },
+    }),
+  )
+  await page.route('**/api/v1/billing/plans', (route) =>
+    route.fulfill({ json: { currency: 'KZT', plans: [] } }),
+  )
+  await openPlan(page)
+  await page
+    .getByRole('button', { name: 'Начать', exact: true })
+    .first()
+    .click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Бесплатные тесты Reading закончились' }),
+  ).toBeVisible()
+  await expect(page.getByText('Listening — 2', { exact: false })).toBeVisible()
+  await expect(page).toHaveURL(/\/app\/plan/)
+  noRuntimeErrors(mock)
+})
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`release: ${theme} plan cards, selected minutes and weekdays use theme surfaces`, async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      (value) => localStorage.setItem('yrys-theme', value),
+      theme,
+    )
+    const mock = await mockStudy(page)
+    await openPlan(page)
+    await expect
+      .poll(() =>
+        page.locator('html').evaluate((el) => el.classList.contains('dark')),
+      )
+      .toBe(theme === 'dark')
+    await page.getByRole('button', { name: 'Меню плана', exact: true }).click()
+    await page.getByRole('button', { name: 'Настройки', exact: true }).click()
+    const dialog = page.getByRole('dialog', { name: 'Настройки нагрузки' })
+    const selected = dialog.getByRole('radio', { name: '60', exact: true })
+    await expect(selected).toHaveAttribute('aria-checked', 'true')
+    const colors = await selected.evaluate((el) => {
+      const card = document.createElement('div')
+      card.className = 'bg-card text-foreground'
+      document.body.append(card)
+      const actual = getComputedStyle(el),
+        expected = getComputedStyle(card)
+      const result = {
+        background: actual.backgroundColor,
+        card: expected.backgroundColor,
+        foreground: actual.color,
+        text: expected.color,
+      }
+      card.remove()
+      return result
+    })
+    expect(colors.background).toBe(colors.card)
+    expect(colors.foreground).toBe(colors.text)
+    expect(colors.background).not.toBe(colors.foreground)
+    await expect(
+      dialog.getByRole('button', { name: 'Вс', exact: true }),
+    ).toHaveAttribute('aria-pressed', 'false')
+    noRuntimeErrors(mock)
+  })
+}

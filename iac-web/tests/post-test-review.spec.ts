@@ -720,24 +720,28 @@ test('Full Mock cards select the section and preserve selection in this exam aft
 }) => {
   await fixtures(page)
   await page.goto('./exam/full-mock-sessions/mock-session')
-  const sections = page.getByRole('group', { name: 'Секции Full Mock' })
-  await expect(page.getByText('Итоговый IELTS band', { exact: true })).toHaveCount(0)
+  const sections = page.getByRole('group', { name: 'Full Mock sections' })
   await expect(
-    sections.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+    page.getByText('Итоговый IELTS band', { exact: true }),
+  ).toHaveCount(0)
+  await expect(
+    sections.getByRole('button', { name: 'Show Reading review', exact: true }),
   ).toContainText('1/2')
-  await expect(sections.getByText('Разбор готов', { exact: true })).toHaveCount(2)
+  await expect(sections.getByText('Разбор готов', { exact: true })).toHaveCount(
+    2,
+  )
   await sections
-    .getByRole('button', { name: 'Выбрать Reading', exact: true })
+    .getByRole('button', { name: 'Show Reading review', exact: true })
     .click()
   await expect(
-    sections.getByRole('button', { name: 'Выбрать Reading', exact: true }),
+    sections.getByRole('button', { name: 'Show Reading review', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
   await expect(
     page.getByText('reading: wrong question', { exact: true }),
   ).toBeVisible()
   await expect(page).toHaveURL(/mock-session\?section=2$/)
   await sections
-    .getByRole('button', { name: 'Выбрать Listening', exact: true })
+    .getByRole('button', { name: 'Show Listening review', exact: true })
     .click()
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
@@ -747,19 +751,22 @@ test('Full Mock cards select the section and preserve selection in this exam aft
   ).toHaveCount(0)
   await page.reload()
   await expect(
-    sections.getByRole('button', { name: 'Выбрать Listening', exact: true }),
+    sections.getByRole('button', {
+      name: 'Show Listening review',
+      exact: true,
+    }),
   ).toHaveAttribute('aria-pressed', 'true')
   await expect(
     page.getByText('listening: wrong question', { exact: true }),
   ).toBeVisible()
   await sections
-    .getByRole('button', { name: 'Выбрать Writing', exact: true })
+    .getByRole('button', { name: 'Show Writing review', exact: true })
     .click()
   await expect(
     page.getByText('Writing suggestion', { exact: false }),
   ).toBeVisible()
   await sections
-    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
+    .getByRole('button', { name: 'Show Speaking review', exact: true })
     .click()
   await expect(
     page.getByText('Speaking suggestion', { exact: false }),

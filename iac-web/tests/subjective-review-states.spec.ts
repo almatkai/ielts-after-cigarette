@@ -82,6 +82,8 @@ async function fixture(page: Page, evaluated = true) {
       path = url.pathname.replace('/api/v1', '')
     const json = (value: unknown, status = 200) =>
       route.fulfill({ status, json: value })
+    if (path === '/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/auth/refresh' && req.method() === 'POST')
       return json({
         accessToken: 'fixture-token',
@@ -271,7 +273,7 @@ test('Full Mock distinguishes absent W/S evaluation from ready feedback', async 
 }) => {
   const api = await fixture(page, false)
   await page.goto('exam/full-mock-sessions/mock-state?section=3')
-  const sections = page.getByRole('group', { name: 'Секции Full Mock' })
+  const sections = page.getByRole('group', { name: 'Full Mock sections' })
   await expect(
     sections.getByText('Разбор пока недоступен', { exact: true }),
   ).toHaveCount(2)
@@ -284,7 +286,7 @@ test('Full Mock distinguishes absent W/S evaluation from ready feedback', async 
       .getByText('Разбор пока недоступен', { exact: true }),
   ).toBeVisible()
   await sections
-    .getByRole('button', { name: 'Выбрать Speaking', exact: true })
+    .getByRole('button', { name: 'Show Speaking review', exact: true })
     .click()
   await expect(
     page

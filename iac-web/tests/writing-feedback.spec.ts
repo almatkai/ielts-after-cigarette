@@ -186,6 +186,8 @@ async function openWritingReview(
         return route.abort('connectionfailed')
       return route.fulfill({ json: learning })
     }
+    if (path === '/api/v1/billing/me')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/api/v1/guest/session')
       return route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } })
     if (path === '/api/v1/analytics/ping') return route.fulfill({ status: 204 })
@@ -365,7 +367,7 @@ test('writing comparison pairs the answer and example on desktop and stacks them
     name: 'Пример абзаца для сравнения',
     exact: true,
   })
-  const answer = task.getByText('Текст вашего эссе с замечаниями', {
+  const answer = task.getByText('Your essay with feedback', {
     exact: true,
   })
   for (const width of [1280, 360]) {
@@ -389,11 +391,11 @@ test('writing comparison pairs the answer and example on desktop and stacks them
       fullPage: true,
     })
   }
-  const toggle = model.getByRole('button', { name: 'Скрыть', exact: true })
+  const toggle = model.getByRole('button', { name: 'Hide', exact: true })
   await expect(toggle).toHaveAttribute('aria-expanded', 'true')
   await toggle.click()
   await expect(
-    model.getByRole('button', { name: 'Показать', exact: true }),
+    model.getByRole('button', { name: 'Show', exact: true }),
   ).toHaveAttribute('aria-expanded', 'false')
 })
 

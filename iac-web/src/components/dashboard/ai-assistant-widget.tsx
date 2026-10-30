@@ -186,15 +186,15 @@ export function AiAssistantFloatingWidget({
           <Button
             variant="outline"
             className="min-h-11"
-            aria-label="Открыть чат с Юки"
-            onClick={() => setChatIsOpen(true)}
+            aria-label={t('Открыть чат с Юки')}
+            onClick={openChat}
           >
             <Messages1
               size={18}
               className="text-muted-foreground"
               aria-hidden
             />{' '}
-            Спросить Юки
+            {t('Спросить Юки')}
           </Button>
         </div>
       ) : !chatIsOpen && !hidden ? (
@@ -219,12 +219,12 @@ export function AiAssistantFloatingWidget({
                   openChat()
                 }
               }}
-              className="group/bubble pointer-events-auto relative mb-2 cursor-pointer max-w-[240px] sm:max-w-[280px] rounded-[16px] bg-card/95 p-3.5 shadow-[0_12px_32px_rgba(29,39,61,0.16)] border border-blue-100/90 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-300 hover:shadow-[0_16px_40px_rgba(37,99,235,0.22)] animate-speech-bubble outline-none after:absolute after:-bottom-2.5 after:right-8 sm:after:right-12 after:size-0 after:border-x-8 after:border-x-transparent after:border-t-10 after:border-t-white after:filter after:drop-shadow-[0_2px_1px_rgba(29,39,61,0.06)] dark:border-border dark:bg-popover dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)] dark:backdrop-blur-none dark:hover:border-border-strong dark:hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] dark:after:border-t-popover dark:after:drop-shadow-[0_1px_0_var(--border)]"
+              className="group/bubble pointer-events-auto relative mb-2 cursor-pointer max-w-[240px] sm:max-w-[280px] rounded-[16px] bg-white/95 p-3.5 shadow-[0_12px_32px_rgba(29,39,61,0.16)] border border-blue-100/90 backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-300 hover:shadow-[0_16px_40px_rgba(37,99,235,0.22)] animate-speech-bubble outline-none after:absolute after:-bottom-2.5 after:right-8 sm:after:right-12 after:size-0 after:border-x-8 after:border-x-transparent after:border-t-10 after:border-t-white after:filter after:drop-shadow-[0_2px_1px_rgba(29,39,61,0.06)] dark:border-border dark:bg-popover dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)] dark:backdrop-blur-none dark:hover:border-border-strong dark:hover:shadow-[0_16px_40px_rgba(0,0,0,0.55)] dark:after:border-t-popover dark:after:drop-shadow-[0_1px_0_var(--border)]"
               aria-label={t('Открыть чат с Юки')}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="rounded-full bg-blue-50 px-1.5 py-0.2 text-[9px] font-bold text-primary dark:bg-primary-soft dark:text-[#8db8ff]">
+                  <span className="rounded-full bg-blue-50 px-1.5 py-0.2 text-[9px] font-bold text-[#2563eb] dark:bg-primary-soft dark:text-[#8db8ff]">
                     IELTS AI
                   </span>
                 </div>
@@ -236,7 +236,7 @@ export function AiAssistantFloatingWidget({
                     dismissBubble()
                   }}
                   className={cn(
-                    'absolute -right-0.5 -top-0.5 flex size-11 items-center justify-center text-[#94a3b8] hover:text-[#0f172a] rounded-full hover:bg-slate-100 transition-colors cursor-pointer dark:text-muted-foreground dark:hover:bg-card/5 dark:hover:text-foreground',
+                    'absolute -right-0.5 -top-0.5 flex size-11 items-center justify-center text-[#94a3b8] hover:text-[#0f172a] rounded-full hover:bg-slate-100 transition-colors cursor-pointer dark:text-muted-foreground dark:hover:bg-white/5 dark:hover:text-foreground',
                     focusRing,
                   )}
                   title={t('Скрыть подсказку')}
@@ -251,7 +251,7 @@ export function AiAssistantFloatingWidget({
                 {t('— я твой наставник по IELTS.')}
               </p>
 
-              <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-primary dark:border-border dark:text-[#8db8ff]">
+              <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-semibold text-[#2563eb] dark:border-border dark:text-[#8db8ff]">
                 <span>{t('Открыть чат')}</span>
                 <span className="text-xs transition-transform duration-200 group-hover/bubble:translate-x-1">
                   →
@@ -315,7 +315,7 @@ export function AiAssistantFloatingWidget({
                 className="size-6 transition-transform group-hover:scale-110"
                 variant="Bold"
               />
-              <span className="absolute -top-1 -right-1 flex size-5.5 items-center justify-center rounded-full bg-card shadow-xs border border-blue-100 overflow-hidden">
+              <span className="absolute -top-1 -right-1 flex size-5.5 items-center justify-center rounded-full bg-white shadow-xs border border-blue-100 overflow-hidden">
                 <img
                   src={`${import.meta.env.BASE_URL}thoughtful_arctic_fox.webp`}
                   alt=""

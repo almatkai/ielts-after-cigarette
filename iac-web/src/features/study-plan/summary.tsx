@@ -13,7 +13,7 @@ import { useLearning } from './learning-queries'
 import { evidenceSource, qualifiedBand } from './evidence'
 
 export const planCard =
-  'min-w-0 rounded-[16px] border border-[#e7e7e4] bg-white text-sm text-[#111111] overflow-hidden shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
+  'min-w-0 rounded-[16px] border border-border bg-card text-sm text-foreground overflow-hidden shadow-[0_10px_36px_rgba(17,17,17,0.035)]'
 export const skillLabels = {
   listening: 'Listening',
   reading: 'Reading',
@@ -76,7 +76,7 @@ function EvidenceRow({
       <div className="col-start-1 row-start-2 min-w-0 sm:col-start-2 sm:row-start-1">
         <p className="text-lg font-semibold tabular-nums">
           {pending ? (
-            <span className="inline-flex items-center gap-2 text-sm font-medium text-amber-700">
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-300">
               <Clock className="size-4" aria-hidden />
               Ожидает проверки
             </span>
@@ -107,7 +107,7 @@ function EvidenceRow({
           </p>
         ) : null}
         {stale ? (
-          <p className="mt-1 text-xs text-amber-700">
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
             Данные устарели. Обновите результат {skillLabels[item.skill]}.
           </p>
         ) : null}
@@ -283,16 +283,16 @@ export function TodayPlanSummary() {
   return (
     <section className={`${planCard} p-4 sm:p-5`} aria-label="План на сегодня">
       <h2 className="text-base font-semibold">План на сегодня</h2>
-      <p className="mt-1 text-xs text-[#69696d]">
+      <p className="mt-1 text-xs text-muted-foreground">
         {formatCalendar(data.today, true)} · {data.timezone}
       </p>
       {day ? (
         <>
-          <div className="mt-3 divide-y divide-[#ededeb]">
+          <div className="mt-3 divide-y divide-border">
             {day.assignments.map((a) => (
               <div key={a.id} className="py-3">
                 <p className="font-medium">{a.title}</p>
-                <p className="mt-1 text-xs text-[#69696d]">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {a.durationMinutes} мин · {skillLabels[a.skill]}
                 </p>
                 <p className="mt-1 text-xs">Почему: {a.reason}</p>
@@ -300,7 +300,7 @@ export function TodayPlanSummary() {
                   {a.status === 'COMPLETED' ? (
                     <TickCircle
                       size={14}
-                      className="text-green-600"
+                      className="text-green-600 dark:text-green-400"
                       aria-hidden
                     />
                   ) : a.status === 'BLOCKED' ||
@@ -325,14 +325,14 @@ export function TodayPlanSummary() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-xs text-[#69696d]">
+          <p className="mt-2 text-xs text-muted-foreground">
             {day.isRest
               ? 'Отдых'
               : `Запланировано ${day.plannedMinutes} из ${day.budgetMinutes} мин`}
           </p>
         </>
       ) : (
-        <p className="my-4 text-[#69696d]">
+        <p className="my-4 text-muted-foreground">
           {data.plan
             ? 'Цикл завершён. Откройте план для обзора.'
             : 'Выберите дни и время для первого плана.'}
@@ -521,7 +521,7 @@ export function StudyProgress({ activity = false }: { activity?: boolean }) {
                     className="relative flex h-32 w-full items-end justify-center border-b border-border"
                   >
                     <span
-                      className="absolute bottom-0 w-full max-w-5 rounded-t-sm bg-[#e7e7e4]"
+                      className="absolute bottom-0 w-full max-w-5 rounded-t-sm bg-border"
                       style={{
                         height: row.planned
                           ? `max(4px, ${(row.planned / max) * 100}%)`

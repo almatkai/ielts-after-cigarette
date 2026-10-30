@@ -39,7 +39,7 @@ export function ReviewAcknowledgement({
           <TickCircle
             size={16}
             aria-hidden="true"
-            className="mt-0.5 shrink-0 text-[#15803d]"
+            className="mt-0.5 shrink-0 text-green-700 dark:text-green-400"
           />
           Разбор просмотрен. Это не новая оценка и не подтверждение освоения.
         </p>
@@ -65,7 +65,7 @@ export function ReviewAcknowledgement({
             {mutation.isPending ? 'Сохраняем…' : 'Подтвердить просмотр разбора'}
           </Button>
           {mutation.isError ? (
-            <p role="alert" className="text-sm text-[#e23b3b]">
+            <p role="alert" className="text-sm text-destructive">
               {studyError(mutation.error)}
             </p>
           ) : null}

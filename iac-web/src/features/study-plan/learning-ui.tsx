@@ -62,7 +62,7 @@ export function CycleState({ cycle }: { cycle: LearningCycle }) {
   const Icon = cycle.skippedAt ? Forbidden : done ? TickCircle : Clock
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-xs ${done ? 'text-[#15803d]' : waiting ? 'text-[#b45309]' : 'text-muted-foreground'}`}
+      className={`inline-flex items-center gap-1.5 text-xs ${done ? 'text-green-700 dark:text-green-400' : waiting ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}`}
     >
       <Icon size={16} aria-hidden="true" />
       {cycleStatus(cycle)}
@@ -141,7 +141,7 @@ export function VerdictNotice({
   return (
     <div
       role="status"
-      className={`grid gap-2 rounded-xl p-4 text-sm ${verdict === 'correct' ? 'bg-[#f0fdf4] text-[#166534]' : verdict === 'incorrect' ? 'bg-[#fef2f2] text-[#991b1b]' : 'bg-muted text-muted-foreground'}`}
+      className={`grid gap-2 rounded-xl p-4 text-sm ${verdict === 'correct' ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300' : verdict === 'incorrect' ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300' : 'bg-muted text-muted-foreground'}`}
     >
       <p className="flex items-start gap-2 font-semibold">
         <Icon size={20} className="shrink-0" aria-hidden="true" />
@@ -187,7 +187,7 @@ export function LearningLoad({
 }
 export function MutationError({ error }: { error: unknown }) {
   return error ? (
-    <div role="alert" className="text-sm leading-6 text-[#e23b3b]">
+    <div role="alert" className="text-sm leading-6 text-destructive">
       <p>{learningError(error)}</p>
       {error instanceof ApiError && error.status === 422 && error.details ? (
         <ul>
@@ -603,7 +603,7 @@ export function OwnedRecordingChoice({
             <TickCircle
               size={16}
               aria-hidden="true"
-              className="shrink-0 text-[#15803d]"
+              className="shrink-0 text-green-700 dark:text-green-400"
             />
             Выбрана ваша отправленная работа с аудиозаписью.
           </p>

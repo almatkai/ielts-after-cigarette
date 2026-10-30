@@ -48,14 +48,14 @@ export function LearningStimulus({ text }: { text: string }) {
         role="region"
         aria-label="Данные задания"
         tabIndex={0}
-        className="min-w-0 max-w-full overflow-x-auto rounded-[10px] border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
+        className="min-w-0 max-w-full overflow-x-auto rounded-[10px] border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <table className="w-full border-collapse text-left text-sm leading-6">
           <caption className="sr-only">
             {title || 'Числовые данные задания'}
           </caption>
           <thead>
-            <tr className="bg-[#fafaf8]">
+            <tr className="bg-muted">
               {headers.map((header, i) => (
                 <th
                   scope="col"

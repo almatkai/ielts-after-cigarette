@@ -115,7 +115,7 @@ function CycleRow({
         <Button
           asChild
           variant={primary ? 'default' : 'outline'}
-          className={`${actionClass} ${primary ? 'bg-[#3b82f6] hover:bg-[#2563eb]' : ''}`}
+          className={`${actionClass} ${primary ? 'bg-primary hover:bg-primary/90' : ''}`}
         >
           <Link
             to="/plan/learning/cycles/$cycleId"
@@ -257,7 +257,7 @@ export function LearningPage() {
         <h2 className="text-base font-semibold">
           Ждут правки ({priorities.length})
         </h2>
-        <div className="divide-y divide-[#ededeb]">
+        <div className="divide-y divide-border">
           {(more || filtered ? priorities : priorities.slice(0, 2)).map(
             (cycle, i) => (
               <CycleRow
@@ -290,7 +290,7 @@ export function LearningPage() {
         group.cycles.length ? (
           <section key={group.title} className={`${planCard} p-4 sm:p-5`}>
             <h2 className="text-base font-semibold">{group.title}</h2>
-            <div className="divide-y divide-[#ededeb]">
+            <div className="divide-y divide-border">
               {group.cycles.map((cycle) => (
                 <CycleRow key={cycle.id} cycle={cycle} data={data} />
               ))}
@@ -299,7 +299,7 @@ export function LearningPage() {
         ) : null,
       )}
       <Disclosure className={`${planCard} p-4 sm:p-5`} title="Мало данных">
-        <div className="divide-y divide-[#ededeb]">
+        <div className="divide-y divide-border">
           {data.profiles
             .filter(
               (p) =>
@@ -337,7 +337,7 @@ export function LearningPage() {
         className={`${planCard} p-4 sm:p-5`}
         title="Материалы для тренировки"
       >
-        <div className="divide-y divide-[#ededeb]">
+        <div className="divide-y divide-border">
           {data.inventory.sections.map((inventory) => (
             <div className="grid gap-2 py-4" key={inventory.section}>
               <h3 className="font-semibold">

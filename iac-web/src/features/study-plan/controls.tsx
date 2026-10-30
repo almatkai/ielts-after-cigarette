@@ -14,8 +14,7 @@ import { addDays, formatCalendar, weeklyOfferDate } from './calendar'
 import { TargetLink } from './summary'
 
 export const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-export const actionClass =
-  'min-h-11 rounded-[10px] border-border shadow-none'
+export const actionClass = 'min-h-11 rounded-[10px] border-border shadow-none'
 export type Operation = () => Promise<StudyResponse | StartResult>
 export type Run = (
   operation: Operation,
@@ -62,7 +61,7 @@ export function SettingsForm({
               type="button"
               role="radio"
               aria-checked={draft.dailyMinutes === n}
-              className={`min-h-11 rounded-lg focus-visible:outline-2 focus-visible:outline-primary ${draft.dailyMinutes === n ? 'bg-card font-semibold shadow-sm' : 'text-muted-foreground'}`}
+              className={`min-h-11 rounded-lg focus-visible:outline-2 focus-visible:outline-primary ${draft.dailyMinutes === n ? 'bg-card font-semibold text-foreground shadow-sm' : 'text-muted-foreground'}`}
               onClick={() => setDraft({ ...draft, dailyMinutes: n })}
             >
               {n}
@@ -300,7 +299,7 @@ export function MockOffer({
               </p>
             )}
             {minutes < offer.durationMinutes ? (
-              <p className="text-sm text-[#e23b3b]" role="alert">
+              <p className="text-sm text-destructive" role="alert">
                 На {offer.durationMinutes} мин не хватает окна. Добавьте время
                 или выберите другой день на следующей неделе.
               </p>

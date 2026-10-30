@@ -228,7 +228,7 @@ function DrillContent({
               </>
             ) : (
               <Button
-                className={`${actionClass} justify-self-start bg-[#3b82f6] hover:bg-[#2563eb]`}
+                className={`${actionClass} justify-self-start bg-primary hover:bg-primary/90`}
                 disabled={writer.pending}
                 onClick={() => void start()}
               >
@@ -364,7 +364,7 @@ function DrillContent({
                 </p>
                 <Button
                   type="submit"
-                  className={`${actionClass} justify-self-start bg-[#3b82f6] hover:bg-[#2563eb]`}
+                  className={`${actionClass} justify-self-start bg-primary hover:bg-primary/90`}
                   disabled={
                     writer.pending ||
                     !draft.text.trim() ||

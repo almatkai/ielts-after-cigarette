@@ -246,7 +246,7 @@ function CycleContent({
               <TickCircle
                 size={16}
                 aria-hidden="true"
-                className="mr-1.5 inline text-[#15803d]"
+                className="mr-1.5 inline text-green-700 dark:text-green-400"
               />
               Разбор просмотрен <SourceDate value={cycle.viewedAt} />
             </p>
@@ -330,7 +330,7 @@ function CycleContent({
               />
               <Button
                 type="submit"
-                className={`${actionClass} justify-self-start bg-[#3b82f6] hover:bg-[#2563eb]`}
+                className={`${actionClass} justify-self-start bg-primary hover:bg-primary/90`}
                 disabled={
                   writer.pending ||
                   !draft.text.trim() ||
@@ -374,7 +374,7 @@ function CycleContent({
           className="grid min-w-0 grid-cols-1 scroll-mt-5 gap-3 border-t border-border p-4 sm:p-5 lg:col-span-2"
         >
           <h2 className="font-semibold">Проверка на новом задании</h2>
-          <div className="divide-y divide-[#ededeb]">
+          <div className="divide-y divide-border">
             {cycle.checks.map((check) => (
               <div className="grid gap-2 py-3" key={check.sessionId}>
                 <p className="text-xs text-muted-foreground">
@@ -388,13 +388,13 @@ function CycleContent({
                       <TickCircle
                         size={16}
                         aria-hidden="true"
-                        className="mt-0.5 shrink-0 text-[#15803d]"
+                        className="mt-0.5 shrink-0 text-green-700 dark:text-green-400"
                       />
                     ) : (
                       <CloseCircle
                         size={16}
                         aria-hidden="true"
-                        className="mt-0.5 shrink-0 text-[#991b1b]"
+                        className="mt-0.5 shrink-0 text-red-700 dark:text-red-400"
                       />
                     )
                   ) : (

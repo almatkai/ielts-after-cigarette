@@ -14,8 +14,7 @@ import { addDays, formatCalendar, weeklyOfferDate } from './calendar'
 import { TargetLink } from './summary'
 
 export const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-export const actionClass =
-  'min-h-11 rounded-[10px] border-[#e7e7e4] shadow-none'
+export const actionClass = 'min-h-11 rounded-[10px] border-border shadow-none'
 export type Operation = () => Promise<StudyResponse | StartResult>
 export type Run = (
   operation: Operation,
@@ -62,7 +61,7 @@ export function SettingsForm({
               type="button"
               role="radio"
               aria-checked={draft.dailyMinutes === n}
-              className={`min-h-11 rounded-lg focus-visible:outline-2 focus-visible:outline-primary ${draft.dailyMinutes === n ? 'bg-white font-semibold shadow-sm' : 'text-muted-foreground'}`}
+              className={`min-h-11 rounded-lg focus-visible:outline-2 focus-visible:outline-primary ${draft.dailyMinutes === n ? 'bg-card font-semibold text-foreground shadow-sm' : 'text-muted-foreground'}`}
               onClick={() => setDraft({ ...draft, dailyMinutes: n })}
             >
               {n}
@@ -90,7 +89,7 @@ export function SettingsForm({
               }
             >
               <span
-                className={`flex size-8 items-center justify-center rounded-full border sm:size-10 ${draft.studyDays.includes(i + 1) ? 'border-primary bg-primary/10 text-primary' : 'border-[#e7e7e4] bg-white text-muted-foreground'}`}
+                className={`flex size-8 items-center justify-center rounded-full border sm:size-10 ${draft.studyDays.includes(i + 1) ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-muted-foreground'}`}
               >
                 {day}
               </span>
@@ -199,7 +198,7 @@ export function MockOffer({
   if (offer.status === 'DISABLED') return null
   if (offer.status === 'DECLINED')
     return (
-      <p className="mt-3 text-xs text-[#69696d]">
+      <p className="mt-3 text-xs text-muted-foreground">
         Полный пробный экзамен: не на этой неделе. Решение сохранено.
       </p>
     )
@@ -213,12 +212,12 @@ export function MockOffer({
           {offer.scheduledDate && formatCalendar(offer.scheduledDate, true)} ·
           вне обычного лимита {data.settings.dailyMinutes} мин
         </p>
-        <p className="text-xs text-[#69696d]">
+        <p className="text-xs text-muted-foreground">
           Это расписание. Доступность полного комплекта и начало экзамена
           подтверждаются отдельно.
         </p>
         {readonly ? (
-          <p className="text-xs leading-5 text-[#69696d]">
+          <p className="text-xs leading-5 text-muted-foreground">
             Начало Full Mock в этот день недоступно. Сохранённые работы доступны
             в истории.
           </p>
@@ -238,24 +237,24 @@ export function MockOffer({
       aria-label="Полный пробный экзамен"
       title="Полный пробный экзамен · необязательно"
     >
-      <p className="text-xs leading-5 text-[#69696d]">
+      <p className="text-xs leading-5 text-muted-foreground">
         Разбор Mock будет в следующий учебный день в пределах вашего времени.
       </p>
       <div className="grid gap-3 pt-2">
-        <p className="max-w-[70ch] text-sm leading-6 text-[#69696d]">
+        <p className="max-w-[70ch] text-sm leading-6 text-muted-foreground">
           Займёт {offer.durationMinutes} мин подряд: Listening, Reading, Writing
           и Speaking в одном окне. Это дольше обычного занятия (
           {data.settings.dailyMinutes} мин), поэтому нужно отдельное длинное
           окно.
         </p>
         {data.today < offerDay ? (
-          <p className="text-xs leading-5 text-[#69696d]">
+          <p className="text-xs leading-5 text-muted-foreground">
             Предложение станет доступно в конце учебной недели —{' '}
             {formatCalendar(offerDay, true)}. Отдельное длинное окно выбирается
             после обзора.
           </p>
         ) : readonly ? (
-          <p className="text-xs text-[#69696d]">
+          <p className="text-xs text-muted-foreground">
             Обзор за прошедший период · только чтение
           </p>
         ) : (
@@ -264,7 +263,7 @@ export function MockOffer({
               <label className="grid gap-1.5 text-xs">
                 День длинного окна
                 <select
-                  className="min-h-11 w-full rounded-[10px] border border-[#e7e7e4] bg-white px-3 text-sm"
+                  className="min-h-11 w-full rounded-[10px] border border-border bg-card px-3 text-sm"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                 >
@@ -278,7 +277,7 @@ export function MockOffer({
               <label className="grid gap-1.5 text-xs">
                 Непрерывное окно, минут
                 <input
-                  className="min-h-11 w-full rounded-[10px] border border-[#e7e7e4] px-3 text-sm"
+                  className="min-h-11 w-full rounded-[10px] border border-border px-3 text-sm"
                   type="number"
                   min="1"
                   max="1440"
@@ -289,23 +288,23 @@ export function MockOffer({
               </label>
             </div>
             {!dates.length ? (
-              <p className="text-xs leading-5 text-[#69696d]">
+              <p className="text-xs leading-5 text-muted-foreground">
                 В этом цикле не осталось дат для длинного окна. Следующий цикл
                 можно начать после завершения текущего.
               </p>
             ) : (
-              <p className="text-xs text-[#69696d]">
+              <p className="text-xs text-muted-foreground">
                 Выберите дату в ближайшие 7 дней, до окончания цикла{' '}
                 {data.plan && formatCalendar(data.plan.endDate)}.
               </p>
             )}
             {minutes < offer.durationMinutes ? (
-              <p className="text-sm text-[#e23b3b]" role="alert">
+              <p className="text-sm text-destructive" role="alert">
                 На {offer.durationMinutes} мин не хватает окна. Добавьте время
                 или выберите другой день на следующей неделе.
               </p>
             ) : null}
-            <p className="text-xs leading-5 text-[#69696d]">
+            <p className="text-xs leading-5 text-muted-foreground">
               Выделите всё окно в этот день. Обычные задания будут заменены;
               пропущенные минуты не станут долгом. Планирование не запускает
               экзамен.

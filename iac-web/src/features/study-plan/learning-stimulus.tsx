@@ -40,7 +40,7 @@ export function LearningStimulus({ text }: { text: string }) {
           {title}
         </figcaption>
       ) : null}
-      <p className="text-xs leading-5 text-[#69696d] sm:hidden">
+      <p className="text-xs leading-5 text-muted-foreground sm:hidden">
         Таблицу можно прокрутить вбок. Заголовки указывают годы и единицы
         измерения.
       </p>
@@ -48,19 +48,19 @@ export function LearningStimulus({ text }: { text: string }) {
         role="region"
         aria-label="Данные задания"
         tabIndex={0}
-        className="min-w-0 max-w-full overflow-x-auto rounded-[10px] border border-[#e7e7e4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3b82f6]"
+        className="min-w-0 max-w-full overflow-x-auto rounded-[10px] border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <table className="w-full border-collapse text-left text-sm leading-6">
           <caption className="sr-only">
             {title || 'Числовые данные задания'}
           </caption>
           <thead>
-            <tr className="bg-[#fafaf8]">
+            <tr className="bg-muted">
               {headers.map((header, i) => (
                 <th
                   scope="col"
                   key={i}
-                  className="min-w-24 border-b border-[#e7e7e4] px-3 py-3 font-semibold"
+                  className="min-w-24 border-b border-border px-3 py-3 font-semibold"
                 >
                   {header}
                 </th>
@@ -69,7 +69,7 @@ export function LearningStimulus({ text }: { text: string }) {
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className="border-b border-[#ededeb] last:border-b-0">
+              <tr key={i} className="border-b border-border last:border-b-0">
                 <th scope="row" className="px-3 py-3 font-medium">
                   {row[0]}
                 </th>

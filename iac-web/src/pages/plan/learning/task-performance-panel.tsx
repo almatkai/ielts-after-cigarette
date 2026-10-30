@@ -49,7 +49,7 @@ export function TaskPerformancePanel({ tasks }: { tasks: TaskPerformance[] }) {
               <Tabs.Trigger key={value} value={value} asChild>
                 <Button
                   variant="ghost"
-                  className={`min-h-11 px-4 sm:min-h-9 ${section === value ? 'bg-card text-[#2563eb] shadow-sm' : 'text-muted-foreground'}`}
+                  className={`min-h-11 px-4 sm:min-h-9 ${section === value ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'}`}
                 >
                   {value === 'all' ? 'Все' : skillLabels[value]}
                 </Button>

@@ -228,7 +228,7 @@ function DrillContent({
               </>
             ) : (
               <Button
-                className={`${actionClass} justify-self-start bg-[#3b82f6] hover:bg-[#2563eb]`}
+                className={`${actionClass} justify-self-start bg-primary hover:bg-primary/90`}
                 disabled={writer.pending}
                 onClick={() => void start()}
               >
@@ -261,7 +261,7 @@ function DrillContent({
               )
             ) : null}
             {session.status === 'submitted' ? (
-              <div className="grid gap-3 border-t border-[#ededeb] pt-5">
+              <div className="grid gap-3 border-t border-border pt-5">
                 <VerdictNotice
                   verdict={session.verdict}
                   title={
@@ -335,7 +335,7 @@ function DrillContent({
               </div>
             ) : (
               <form
-                className="grid gap-4 border-t border-[#ededeb] pt-5"
+                className="grid gap-4 border-t border-border pt-5"
                 onSubmit={(e) => {
                   e.preventDefault()
                   void submit()
@@ -358,13 +358,13 @@ function DrillContent({
                   section={drill.section}
                 />
                 <MutationError error={writer.error} />
-                <p className="text-xs leading-5 text-[#69696d]">
+                <p className="text-xs leading-5 text-muted-foreground">
                   Черновик сохраняется на этом устройстве для вашего аккаунта до
                   отправки.
                 </p>
                 <Button
                   type="submit"
-                  className={`${actionClass} justify-self-start bg-[#3b82f6] hover:bg-[#2563eb]`}
+                  className={`${actionClass} justify-self-start bg-primary hover:bg-primary/90`}
                   disabled={
                     writer.pending ||
                     !draft.text.trim() ||
@@ -411,7 +411,7 @@ function DrillContent({
               </p>
             ) : null}
             {!drill.masteryEligible ? (
-              <p className="text-xs leading-5 text-[#69696d]">
+              <p className="text-xs leading-5 text-muted-foreground">
                 Не засчитывается в правило проверки.
               </p>
             ) : null}

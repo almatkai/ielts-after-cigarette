@@ -18,3 +18,4 @@ todos.json
 artifact/
 test-results/
 playwright-report/
+.cloudflare-artifacts/

@@ -1,0 +1,17 @@
+{
+  "name": "iac-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for automating IELTS test creation in IELTS After Cigarette (IAC)",
+  "type": "module",
+  "main": "index.mjs",
+  "bin": {
+    "iac-mcp": "./index.mjs"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "zod": "^3.24.2"
+  }
+}

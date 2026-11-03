@@ -39,6 +39,7 @@ import { Route as AdminAiProvidersRouteImport } from './routes/admin.ai-provider
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminLearningContentRouteImport } from './routes/admin.learning-content'
+import { Route as AdminMcpKeysRouteImport } from './routes/admin.mcp-keys'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
@@ -246,6 +247,11 @@ const AdminFullMocksRoute = AdminFullMocksRouteImport.update({
 const AdminLearningContentRoute = AdminLearningContentRouteImport.update({
   id: '/learning-content',
   path: '/learning-content',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMcpKeysRoute = AdminMcpKeysRouteImport.update({
+  id: '/mcp-keys',
+  path: '/mcp-keys',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -593,6 +599,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/learning-content': typeof AdminLearningContentRoute
+  '/admin/mcp-keys': typeof AdminMcpKeysRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
@@ -680,6 +687,7 @@ export interface FileRoutesByTo {
   '/admin/ai-providers': typeof AdminAiProvidersRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/learning-content': typeof AdminLearningContentRoute
+  '/admin/mcp-keys': typeof AdminMcpKeysRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
@@ -766,6 +774,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/learning-content': typeof AdminLearningContentRoute
+  '/admin/mcp-keys': typeof AdminMcpKeysRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
@@ -859,6 +868,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/full-mocks'
     | '/admin/learning-content'
+    | '/admin/mcp-keys'
     | '/admin/users'
     | '/admin/waitlist'
     | '/admin/preview'
@@ -946,6 +956,7 @@ export interface FileRouteTypes {
     | '/admin/ai-providers'
     | '/admin/analytics'
     | '/admin/learning-content'
+    | '/admin/mcp-keys'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/blog/$slug'
@@ -1031,6 +1042,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/full-mocks'
     | '/admin/learning-content'
+    | '/admin/mcp-keys'
     | '/admin/users'
     | '/admin/waitlist'
     | '/admin_/preview'
@@ -1324,6 +1336,13 @@ declare module '@tanstack/react-router' {
       path: '/learning-content'
       fullPath: '/admin/learning-content'
       preLoaderRoute: typeof AdminLearningContentRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/mcp-keys': {
+      id: '/admin/mcp-keys'
+      path: '/mcp-keys'
+      fullPath: '/admin/mcp-keys'
+      preLoaderRoute: typeof AdminMcpKeysRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/users': {
@@ -1958,6 +1977,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminLearningContentRoute: typeof AdminLearningContentRoute
+  AdminMcpKeysRoute: typeof AdminMcpKeysRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1979,6 +1999,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminLearningContentRoute: AdminLearningContentRoute,
+  AdminMcpKeysRoute: AdminMcpKeysRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -2081,12 +2102,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

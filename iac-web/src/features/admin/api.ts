@@ -14,6 +14,7 @@ export const adminQueryKeys = {
     ['admin', 'reading', 'materials', id] as const,
   waitlist: ['admin', 'waitlist'] as const,
   superAdmins: ['admin', 'super-admins'] as const,
+  mcpKeys: ['admin', 'mcp-keys'] as const,
 }
 
 export function getAdminAccess(signal?: AbortSignal) {
@@ -232,4 +233,38 @@ export function removeSuperAdmin(email: string) {
     `/api/v1/admin/super-admins/${encodeURIComponent(email)}`,
     { method: 'DELETE' },
   )
+}
+
+export type MCPKeyEntry = {
+  id: string
+  name: string
+  keyPrefix: string
+  createdBy: string
+  createdAt: string
+  lastUsedAt?: string | null
+  revokedAt?: string | null
+}
+
+export type CreateMCPKeyResult = MCPKeyEntry & {
+  secretKey: string
+}
+
+export function listMCPKeys(signal?: AbortSignal) {
+  return apiClient.request<{ keys: MCPKeyEntry[] }>(
+    '/api/v1/admin/mcp-keys',
+    { signal },
+  )
+}
+
+export function createMCPKey(name: string) {
+  return apiClient.request<CreateMCPKeyResult>('/api/v1/admin/mcp-keys', {
+    method: 'POST',
+    body: { name },
+  })
+}
+
+export function revokeMCPKey(keyId: string) {
+  return apiClient.request<void>(`/api/v1/admin/mcp-keys/${keyId}`, {
+    method: 'DELETE',
+  })
 }

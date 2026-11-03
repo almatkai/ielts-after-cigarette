@@ -6,6 +6,7 @@ import {
   Edit2,
   Headphone,
   HambergerMenu,
+  Key,
   Logout,
   Microphone2,
   People,
@@ -119,6 +120,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           icon: ClipboardTick,
         },
         { to: '/admin/admins', label: t('Администраторы'), icon: UserEdit },
+        { to: '/admin/mcp-keys', label: t('MCP Ключи'), icon: Key },
       ]),
     },
   ]

@@ -297,7 +297,7 @@ export function MCPKeysPage() {
               </tr>
             </thead>
             <tbody>
-              {keysQuery.data?.keys.map((k) => {
+              {keysQuery.data.keys.map((k) => {
                 const isRevoked = Boolean(k.revokedAt)
                 return (
                   <tr
@@ -353,7 +353,7 @@ export function MCPKeysPage() {
                   </tr>
                 )
               })}
-              {keysQuery.data?.keys.length === 0 && (
+              {keysQuery.data.keys.length === 0 && (
                 <tr>
                   <td
                     colSpan={6}

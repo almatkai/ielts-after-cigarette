@@ -1490,7 +1490,9 @@ export function PlanPage() {
         onToggle={(e) => setReviewed(e.currentTarget.open)}
         className="text-xs text-muted-foreground"
       >
-        {details.isPending ? <LoadingState label={t('Загружаем историю…')} /> : null}
+        {details.isPending ? (
+          <LoadingState label={t('Загружаем историю…')} />
+        ) : null}
         {details.isError ? (
           <ErrorState
             title={t('Не удалось загрузить историю')}

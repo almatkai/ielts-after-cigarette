@@ -338,6 +338,8 @@ async function mockStudy(page: Page, initial = fixture()) {
       return route.fulfill({ status: 401, json: { code: 'UNAUTHENTICATED' } })
     if (path === '/analytics/ping' && method === 'POST')
       return route.fulfill({ status: 204 })
+    if (path === '/billing/me' && method === 'GET')
+      return route.fulfill({ json: { paywallEnabled: false, guest: false } })
     if (path === '/auth/refresh')
       return route.fulfill({
         json: {

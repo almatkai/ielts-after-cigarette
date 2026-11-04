@@ -129,7 +129,23 @@ async function setup(page: Page, data = learningFixture()) {
       })
     if (path === '/full-mock-sessions/active' && method === 'GET')
       return json({ items: [] })
-    if (path === '/study-plan' && method === 'GET') return json(plan)
+    if (path === '/study-plan' && method === 'GET')
+      return json(
+        url.searchParams.has('view')
+          ? {
+              ...plan,
+              learningSummary: {
+                pendingCorrections: data.cycles.filter(
+                  (c) =>
+                    !c.skippedAt &&
+                    (c.status === 'needs-practice' ||
+                      c.correction?.verdict === 'incorrect'),
+                ).length,
+                readOnly: data.readOnly,
+              },
+            }
+          : plan,
+      )
     if (path === '/listening/media/owned-listening' && method === 'GET') {
       expect(req.headers().authorization).toBe('Bearer token-student-a')
       return route.fulfill({

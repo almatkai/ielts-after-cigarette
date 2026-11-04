@@ -1,3 +1,4 @@
+import { invalidateStudyPlan } from '@/features/study-plan/cache'
 import { useThemePreference } from '@/features/theme/theme'
 import { useForm } from '@tanstack/react-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -127,6 +128,7 @@ export function SettingsPage() {
         })
         authStore.updateUser(updated)
         queryClient.setQueryData(queryKeys.profile, updated)
+        await invalidateStudyPlan(queryClient, updated.id)
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setProfileMessage('Профиль сохранён.')
       } catch (error) {
@@ -151,6 +153,7 @@ export function SettingsPage() {
         })
         authStore.updateUser(updated)
         queryClient.setQueryData(queryKeys.profile, updated)
+        await invalidateStudyPlan(queryClient, updated.id)
         await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
         setGoalMessage('Цель обновлена.')
       } catch (error) {

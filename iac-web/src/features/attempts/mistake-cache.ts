@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { invalidateStudyPlan } from '../study-plan/cache.ts'
 
 import type { Language } from '@/lib/i18n'
 import type { AttemptMaterialType } from './api'
@@ -50,7 +51,12 @@ export function invalidateMistakeResults(
   client: QueryClient,
   attemptId: string,
 ) {
+  const refreshPlan = async () => {
+    await invalidateStudyPlan(client)
+    await client.invalidateQueries({ queryKey: ['academic-learning'] })
+  }
   return Promise.all([
+    refreshPlan(),
     client.invalidateQueries({ queryKey: mistakeKeys.lists }),
     client.invalidateQueries({ queryKey: ['attempts', 'list'] }),
     client.invalidateQueries({ queryKey: ['dashboard'] }),

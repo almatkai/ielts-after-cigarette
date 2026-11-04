@@ -621,7 +621,43 @@ export function OwnedRecordingChoice({
     </div>
   )
 }
-export function LearningEventSummary({
+// Calendar progress already contains these event counts. Keep its compact
+// summary independent of the full cycles/drills/answers query.
+export function LearningEventSummary(props: {
+  compact?: boolean
+  dates?: string[]
+  progress?: StudyResponse['progress']
+}) {
+  if (props.compact && props.progress) {
+    const rows = props.progress.filter(
+      (day) => !props.dates || props.dates.includes(day.date),
+    )
+    return (
+      <section
+        aria-label="Итог недели"
+        className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs leading-5 text-muted-foreground"
+      >
+        <p>
+          Коротких тренировок сохранено:{' '}
+          {rows.reduce((sum, day) => sum + (day.drillsCompleted ?? 0), 0)}
+        </p>
+        <p>
+          Правок сохранено:{' '}
+          {rows.reduce((sum, day) => sum + (day.correctionsSaved ?? 0), 0)}
+        </p>
+        <p>
+          Проверок на новых заданиях:{' '}
+          {rows.reduce(
+            (sum, day) => sum + (day.independentChecksPassed ?? 0),
+            0,
+          )}
+        </p>
+      </section>
+    )
+  }
+  return <DetailedLearningEventSummary {...props} />
+}
+function DetailedLearningEventSummary({
   dates,
   progress,
   compact = false,

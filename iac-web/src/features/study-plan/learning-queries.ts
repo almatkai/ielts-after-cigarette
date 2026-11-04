@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { authStore, useAuth } from '@/features/auth/auth-store'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
-import { studyPlanKeys } from './api'
+import { invalidateStudyPlan, studyPlanKeys } from './cache'
 import {
   getLearning,
   getLearningCycle,
@@ -84,10 +84,7 @@ export function useLearningWriter() {
   const refresh = () =>
     Promise.all([
       client.invalidateQueries({ queryKey: learningKeys.all(user?.id) }),
-      client.invalidateQueries({
-        queryKey: studyPlanKeys.current(user?.id),
-        exact: true,
-      }),
+      invalidateStudyPlan(client, user?.id),
     ])
   async function run<T>(operation: () => Promise<T>): Promise<T | undefined> {
     if (lock.current || !current()) return undefined
@@ -95,6 +92,7 @@ export function useLearningWriter() {
     setPending(true)
     setError(null)
     try {
+      await client.cancelQueries({ queryKey: studyPlanKeys.user(user?.id) })
       const result = await operation()
       if (!current()) return undefined
       await refresh()

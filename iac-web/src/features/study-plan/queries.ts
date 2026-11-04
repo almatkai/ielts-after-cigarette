@@ -1,9 +1,14 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import type { QueryClient } from '@tanstack/react-query'
+import { addDays, daysBetween } from './calendar'
 import { authStore, useAuth } from '@/features/auth/auth-store'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
 import { getStudyPlan, studyPlanKeys } from './api'
-import type { StudyResponse } from './api'
+import { invalidateStudyPlan } from './cache'
+import type { StudyResponse, StudyView } from './api'
+
+export { invalidateStudyPlan } from './cache'
 
 export function useStudyPlan() {
   const { user } = useAuth()
@@ -21,6 +26,117 @@ export function useStudyPlan() {
         ? 15_000
         : false,
   })
+}
+
+function canonicalDate(
+  data: StudyResponse | undefined,
+  view: StudyView,
+  date?: string,
+) {
+  if (!date) return undefined
+  const plan = data?.plan
+  if (!plan || view === 'day') return date
+  if (view === 'week') {
+    const selected =
+      data.today > plan.endDate && date > plan.endDate ? plan.endDate : date
+    return selected >= plan.startDate && selected <= plan.endDate
+      ? addDays(
+          plan.startDate,
+          Math.floor(daysBetween(plan.startDate, selected) / 7) * 7,
+        )
+      : date
+  }
+  const selected =
+    data.today > plan.endDate && date > plan.endDate ? plan.startDate : date
+  return addDays(
+    plan.startDate,
+    Math.floor(daysBetween(plan.startDate, selected) / 30) * 30,
+  )
+}
+export function scopedStudyOptions(
+  client: QueryClient,
+  userId: string | undefined,
+  view: StudyView,
+  date?: string,
+  details = false,
+) {
+  const known = client
+    .getQueriesData<StudyResponse>({ queryKey: studyPlanKeys.user(userId) })
+    .map(([, value]) => value)
+    .filter((value) => value?.plan)
+    .sort((a, b) => (b?.plan?.revision ?? 0) - (a?.plan?.revision ?? 0))[0]
+  const canonical = canonicalDate(known, view, date)
+  const key = studyPlanKeys.scope(userId, view, canonical, details)
+  return {
+    queryKey: key,
+    staleTime: 30_000,
+    retry: false as const,
+    retryOnMount: false,
+    queryFn: async ({ signal }: { signal: AbortSignal }) => {
+      const result = await getStudyPlan(signal, {
+        view,
+        date: canonical,
+        details,
+      })
+      if (signal.aborted || authStore.getSnapshot().user?.id !== userId)
+        throw new DOMException('Identity changed', 'AbortError')
+      const resolved =
+        view === 'day'
+          ? (result.scope?.date ?? result.today)
+          : (result.scope?.startDate ?? canonical)
+      const resolvedKey = studyPlanKeys.scope(userId, view, resolved, details)
+      if (JSON.stringify(key) !== JSON.stringify(resolvedKey))
+        client.setQueryData(resolvedKey, result)
+      return result
+    },
+  }
+}
+export function useScopedStudyPlan(
+  view: StudyView,
+  date?: string,
+  details = false,
+  enabled = true,
+) {
+  const { user } = useAuth()
+  const client = useQueryClient()
+  const query = useQuery({
+    ...scopedStudyOptions(client, user?.id, view, date, details),
+    enabled: !!user && enabled,
+    refetchInterval: (q) =>
+      !details &&
+      q.state.data?.plan?.days.some((day) =>
+        day.assignments.some((a) => a.status === 'AWAITING_RESULT'),
+      )
+        ? 15_000
+        : false,
+  })
+  // Effects run after the selected day has committed. Background errors and
+  // fetching status belong to the week cache and never disable day actions.
+  useEffect(() => {
+    if (
+      view !== 'day' ||
+      details ||
+      !enabled ||
+      !user ||
+      !query.data?.plan ||
+      query.isError
+    )
+      return
+    const selected = date ?? query.data.today
+    const options = scopedStudyOptions(client, user.id, 'week', selected)
+    if (client.getQueryState(options.queryKey)?.status !== 'error')
+      void client.prefetchQuery(options)
+  }, [
+    client,
+    user?.id,
+    view,
+    date,
+    details,
+    enabled,
+    query.data,
+    query.isError,
+  ])
+  return query
 }
 
 export function studyError(error: unknown) {
@@ -48,15 +164,13 @@ export function useStudyWriter() {
     if (lock.current || !current()) return undefined
     lock.current = true
     try {
+      await client.cancelQueries({ queryKey: studyPlanKeys.user(user?.id) })
       const result = await operation()
       if (!current()) return undefined
-      if ('today' in result)
+      await client.cancelQueries({ queryKey: studyPlanKeys.user(user?.id) })
+      if ('today' in result && !result.scope)
         client.setQueryData(studyPlanKeys.current(user?.id), result)
-      else
-        await client.invalidateQueries({
-          queryKey: studyPlanKeys.current(user?.id),
-          exact: true,
-        })
+      await invalidateStudyPlan(client, user?.id)
       return current() ? result : undefined
     } catch (error) {
       if (
@@ -64,10 +178,7 @@ export function useStudyWriter() {
         error instanceof ApiError &&
         (error.status === 409 || error.status === 404)
       ) {
-        await client.invalidateQueries({
-          queryKey: studyPlanKeys.current(user?.id),
-          exact: true,
-        })
+        await invalidateStudyPlan(client, user?.id)
       }
       throw error
     } finally {

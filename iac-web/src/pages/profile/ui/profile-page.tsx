@@ -1,3 +1,4 @@
+import { invalidateStudyPlan } from '@/features/study-plan/cache'
 import {
   Camera,
   DirectRight,
@@ -75,6 +76,7 @@ export function ProfilePage() {
     onSuccess: async (profile) => {
       authStore.updateUser(profile)
       queryClient.setQueryData(queryKeys.profile, profile)
+      await invalidateStudyPlan(queryClient, profile.id)
       await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
       setGoalMessage(t('Цель обновлена — dashboard уже получил новые данные.'))
     },

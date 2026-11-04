@@ -48,7 +48,7 @@ import {
 } from '@/features/study-plan/calendar'
 import {
   studyError,
-  useStudyPlan,
+  useScopedStudyPlan,
   useStudyWriter,
 } from '@/features/study-plan/queries'
 import {
@@ -57,7 +57,6 @@ import {
   planCard,
   skillLabels,
 } from '@/features/study-plan/summary'
-import { useLearning } from '@/features/study-plan/learning-queries'
 import { LearningEventSummary } from '@/features/study-plan/learning-ui'
 import { cn } from '@/lib/utils'
 import { authStore, useAuth } from '@/features/auth/auth-store'
@@ -85,12 +84,11 @@ const skipReasonLabels: Partial<Record<string, string>> = {
 }
 export function PlanPage() {
   const { user } = useAuth()
-  const query = useStudyPlan()
+  const search = useSearch({ from: '/_app/plan' })
+  const query = useScopedStudyPlan(search.view, search.date)
   const queryClient = useQueryClient()
   const [examDate, setExamDate] = useState('')
   const [notice, setNotice] = useState('')
-  const learning = useLearning()
-  const search = useSearch({ from: '/_app/plan' })
   const navigate = useNavigate()
   const write = useStudyWriter()
   const [error, setError] = useState<string | null>(null)
@@ -104,7 +102,17 @@ export function PlanPage() {
     mutationFn: (input: { operation: Operation; name: string }) =>
       write(input.operation),
   })
-  const data = query.data
+  const details = useScopedStudyPlan(search.view, search.date, true, reviewed)
+  const last = useRef<{
+    userId: string
+    data: NonNullable<typeof query.data>
+  } | null>(null)
+  useEffect(() => {
+    if (query.data && user) last.current = { userId: user.id, data: query.data }
+  }, [query.data, user?.id])
+  const data =
+    query.data ??
+    (last.current?.userId === user?.id ? last.current?.data : undefined)
   const date = search.date ?? data?.today
   const view = search.view
   const select = (nextDate: string, nextView = view, replace = false) =>
@@ -150,9 +158,9 @@ export function PlanPage() {
         </Link>
       </div>
     )
-  if (query.isPending)
+  if (query.isPending && !data)
     return <LoadingState label="Загружаем план…" className="min-h-[360px]" />
-  if (query.isError || !data || !date)
+  if (!data || !date)
     return (
       <ErrorState
         title="Не удалось загрузить план"
@@ -188,18 +196,18 @@ export function PlanPage() {
       : view === 'week'
         ? `${formatCalendar(startOfWeek)} – ${formatCalendar(currentWeek?.endDate ?? startOfWeek)}`
         : `${formatCalendar(periodStart)} – ${formatCalendar(periodEnd)}`
-  const pending = mutation.isPending || query.isFetching
+  const pending =
+    mutation.isPending || query.isFetching || !query.data || query.isError
   const examReadOnly =
     !!(data.goal.examDate && data.today >= data.goal.examDate) ||
-    learning.data?.readOnly === true
+    data.learningSummary?.readOnly === true
   const revision = plan?.revision ?? 0
-  const meaningfulChanges =
-    plan?.changes.filter(
-      (change) =>
-        /^(SKIP|REPLAN|REENTRY|SETTINGS|NEW_EVIDENCE|MOCK_SCHEDULED|MOVED|REMOVED|SHORTENED)$/.test(
-          change.type,
-        ) && change.description.trim(),
-    ) ?? []
+  const meaningfulChanges = (details.data?.plan?.changes ?? []).filter(
+    (change) =>
+      /^(SKIP|REPLAN|REENTRY|SETTINGS|NEW_EVIDENCE|MOCK_SCHEDULED|MOVED|REMOVED|SHORTENED)$/.test(
+        change.type,
+      ) && change.description.trim(),
+  )
   const activeAssignment =
     mutation.isPending && mutation.variables.name.startsWith('start:')
       ? mutation.variables.name.slice(6)
@@ -260,7 +268,11 @@ export function PlanPage() {
     const assignments = next
       ? [next, ...day.assignments.filter((a) => a.id !== next.id)]
       : day.assignments
-    const nextDay = plan?.days.find((d) => d.date > day.date && !d.isRest)
+    const nextDay =
+      plan?.days.find((d) => d.date > day.date && !d.isRest) ??
+      (data?.scope?.nextStudyDate
+        ? { date: data.scope.nextStudyDate }
+        : undefined)
     return (
       <>
         <div className="p-4 sm:p-5">
@@ -335,7 +347,7 @@ export function PlanPage() {
               <TickCircle size={18} className="text-green-600" aria-hidden />
               На сегодня всё
             </p>
-            {plan?.days.some((d) => d.date === addDays(day.date, 1)) ? (
+            {plan && addDays(day.date, 1) <= plan.endDate ? (
               <Button
                 variant="ghost"
                 className="min-h-11 text-primary"
@@ -561,13 +573,7 @@ export function PlanPage() {
       currentWeek.mockOffer.scheduledDate === selectedDay.date
     )
 
-  const correctionCount =
-    learning.data?.cycles.filter(
-      (c) =>
-        !c.skippedAt &&
-        (c.status === 'needs-practice' ||
-          c.correction?.verdict === 'incorrect'),
-    ).length ?? 0
+  const correctionCount = data.learningSummary?.pendingCorrections ?? 0
   const correctionPlural = new Intl.PluralRules('ru-RU').select(correctionCount)
   const correctionSummary = `${correctionCount} ${correctionPlural === 'one' ? 'ошибка ждёт' : correctionPlural === 'few' ? 'ошибки ждут' : 'ошибок ждут'} правки`
   const activeWeekDay =
@@ -780,7 +786,15 @@ export function PlanPage() {
           День экзамена и после него — только просмотр.
         </p>
       ) : null}
-      {!plan ? (
+      {query.isError ? (
+        <ErrorState
+          title="Не удалось загрузить план"
+          message={studyError(query.error)}
+          onRetry={() => void query.refetch()}
+        />
+      ) : !query.data ? (
+        <LoadingState label="Загружаем план…" className="min-h-[360px]" />
+      ) : !plan ? (
         <section className={`${planCard} grid max-w-lg gap-5 p-5`}>
           <div>
             <h3 className="text-base font-semibold">
@@ -1186,6 +1200,14 @@ export function PlanPage() {
         onToggle={(e) => setReviewed(e.currentTarget.open)}
         className="text-xs text-muted-foreground"
       >
+        {details.isPending ? <LoadingState label="Загружаем историю…" /> : null}
+        {details.isError ? (
+          <ErrorState
+            title="Не удалось загрузить историю"
+            message={studyError(details.error)}
+            onRetry={() => void details.refetch()}
+          />
+        ) : null}
         <section aria-label="Версии плана" className="space-y-3 pb-4">
           <p>
             Версия плана {revision} · Календарь: {data.timezone}. Сегодня{' '}
@@ -1221,7 +1243,7 @@ export function PlanPage() {
         </section>
         <section className="mb-4" aria-label="Что изменить">
           <h3 className="text-base font-semibold">Что изменить</h3>
-          {data.recommendations.slice(0, 3).map((r) => (
+          {(details.data?.recommendations ?? []).slice(0, 3).map((r) => (
             <div key={r.id} className="border-b border-border py-3">
               <p className="font-medium text-foreground">{r.title}</p>
               <p className="mt-1 leading-5">{r.reason}</p>
@@ -1246,7 +1268,7 @@ export function PlanPage() {
               </div>
             </div>
           ))}
-          {!data.recommendations.length ? (
+          {!details.data?.recommendations.length && !details.isPending ? (
             <p className="py-3">Пока нет рекомендаций по новым работам.</p>
           ) : null}
           <Button asChild variant="ghost">
@@ -1257,7 +1279,7 @@ export function PlanPage() {
           </Button>
         </section>
         <div className="grid gap-4">
-          <EvidenceSection data={data} />
+          {details.data ? <EvidenceSection data={details.data} /> : null}
         </div>
       </Disclosure>
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>

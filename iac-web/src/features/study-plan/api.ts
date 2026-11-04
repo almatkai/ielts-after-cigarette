@@ -69,7 +69,18 @@ export type StudyEvidence = {
   source: string
   limitations: string[]
 }
+export type StudyView = 'day' | 'week' | 'month'
+export type StudyScope = {
+  view: StudyView
+  date: string
+  startDate: string
+  endDate: string
+  details: boolean
+  nextStudyDate: string | null
+}
 export type StudyResponse = {
+  scope?: StudyScope
+  learningSummary?: { pendingCorrections: number; readOnly: boolean }
   today: string
   timezone: string
   settings: StudySettings
@@ -117,15 +128,24 @@ export type StartResult = {
   target: string
   planRevision: number
 }
-export const studyPlanKeys = {
-  all: ['study-plan'] as const,
-  current: (userId?: string) => ['study-plan', userId ?? 'signed-out'] as const,
-}
+export { studyPlanKeys } from './cache'
 const root = '/api/v1/study-plan'
-export async function getStudyPlan(signal?: AbortSignal) {
-  const response = await apiClient.request<Partial<StudyResponse>>(root, {
-    signal,
-  })
+export async function getStudyPlan(
+  signal?: AbortSignal,
+  scope?: { view: StudyView; date?: string; details?: boolean },
+) {
+  const params = new URLSearchParams()
+  if (scope) {
+    params.set('view', scope.view)
+    if (scope.date) params.set('date', scope.date)
+    if (scope.details) params.set('details', '1')
+  }
+  const response = await apiClient.request<Partial<StudyResponse>>(
+    scope ? `${root}?${params}` : root,
+    {
+      signal,
+    },
+  )
   if (
     !response.today ||
     !response.timezone ||

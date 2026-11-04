@@ -1,3 +1,4 @@
+import { invalidateStudyPlan } from '@/features/study-plan/cache'
 import { TickCircle } from 'iconsax-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -181,6 +182,7 @@ export function GoalDialog({ children }: GoalDialogProps) {
     onSuccess: async (profile) => {
       authStore.updateUser(profile)
       queryClient.setQueryData(queryKeys.profile, profile)
+      await invalidateStudyPlan(queryClient, profile.id)
       await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
       setDraft({})
       setMessage(null)

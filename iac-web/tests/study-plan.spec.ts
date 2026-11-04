@@ -1,7 +1,7 @@
 // These are UI tests against an explicit fake Study Plan API, not real-backend tests.
 import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
-import type { Page } from '@playwright/test'
+import type { Page, Request } from '@playwright/test'
 import type {
   StudyAssignment,
   StudyResponse,
@@ -250,6 +250,70 @@ const material = {
   body: 'A published reading passage.',
   questionGroups: [],
 }
+function scopedFixture(
+  full: StudyResponse,
+  params: URLSearchParams,
+): StudyResponse {
+  const view = params.get('view') as 'day' | 'week' | 'month' | null
+  if (!view) return structuredClone(full)
+  const out = structuredClone(full)
+  const date = params.get('date') ?? full.today
+  let startDate = date,
+    endDate = date
+  const plan = full.plan
+  if (plan && view === 'week') {
+    const week =
+      plan.weeks.find((w) => date >= w.startDate && date <= w.endDate) ??
+      (full.today > plan.endDate && date > plan.endDate
+        ? plan.weeks.at(-1)
+        : undefined)
+    if (week) {
+      startDate = week.startDate
+      endDate = week.endDate
+    }
+  }
+  if (plan && view === 'month') {
+    const selected =
+      full.today > plan.endDate && date > plan.endDate ? plan.startDate : date
+    startDate = addDays(
+      plan.startDate,
+      Math.floor(daysBetween(plan.startDate, selected) / 30) * 30,
+    )
+    endDate = addDays(startDate, 29)
+  }
+  const details = params.get('details') === '1'
+  out.scope = {
+    view,
+    date,
+    startDate,
+    endDate,
+    details,
+    nextStudyDate:
+      plan?.days.find((d) => d.date > endDate && !d.isRest)?.date ?? null,
+  }
+  out.learningSummary = {
+    pendingCorrections: 0,
+    readOnly: !!(full.goal.examDate && full.today >= full.goal.examDate),
+  }
+  if (out.plan) {
+    out.plan.days = out.plan.days.filter(
+      (d) => d.date >= startDate && d.date <= endDate,
+    )
+    out.plan.weeks = out.plan.weeks.filter(
+      (w) =>
+        view === 'day' || (w.endDate >= startDate && w.startDate <= endDate),
+    )
+    if (!details) out.plan.changes = []
+  }
+  out.progress = out.progress.filter(
+    (d) => d.date >= startDate && d.date <= endDate,
+  )
+  if (!details) {
+    out.evidence = []
+    out.recommendations = []
+  }
+  return out
+}
 async function mockStudy(page: Page, initial = fixture()) {
   let data = structuredClone(initial)
   const archived: StudyResponse['plan'][] = []
@@ -354,7 +418,7 @@ async function mockStudy(page: Page, initial = fixture()) {
         })
       }
       if (method === 'GET' && path === '/study-plan')
-        return route.fulfill({ json: data })
+        return route.fulfill({ json: scopedFixture(data, url.searchParams) })
       if (method === 'POST' && path === '/study-plan') {
         if (data.plan && data.today <= data.plan.endDate)
           return route.fulfill({ json: data })
@@ -1339,18 +1403,28 @@ test.describe('Study plan — mocked API UI', () => {
           },
         }),
       )
-      await page.route('**/api/v1/study-plan', async (route) => {
+      await page.route(/\/api\/v1\/study-plan(?:\?.*)?$/, async (route) => {
         if (route.request().headers().authorization === 'Bearer mock-B')
-          return route.fulfill({ json: b })
+          return route.fulfill({
+            json: scopedFixture(b, new URL(route.request().url()).searchParams),
+          })
         if (kind === 'GET') {
           aStarted = true
           await delayed
           try {
-            await route.fulfill({ json: a })
+            await route.fulfill({
+              json: scopedFixture(
+                a,
+                new URL(route.request().url()).searchParams,
+              ),
+            })
           } finally {
             aReturned = true
           }
-        } else await route.fulfill({ json: a })
+        } else
+          await route.fulfill({
+            json: scopedFixture(a, new URL(route.request().url()).searchParams),
+          })
       })
       if (kind === 'mutation')
         await page.route('**/api/v1/study-plan/replan', async (route) => {
@@ -1607,3 +1681,199 @@ for (const theme of ['light', 'dark'] as const) {
     noRuntimeErrors(mock)
   })
 }
+
+function gate() {
+  let release!: () => void
+  const promise = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  return { promise, release }
+}
+// Vite's development StrictMode may abort/restart the first mount. Count
+// effective requests, retaining every completed or still-running HTTP request.
+function trackStudyRequests(page: Page) {
+  const incoming: Request[] = []
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/api/v1/study-plan')
+      incoming.push(request)
+  })
+  return () =>
+    incoming
+      .filter((r) => !r.failure())
+      .map((r) => {
+        const p = new URL(r.url()).searchParams
+        return (p.get('view') ?? 'full') + (p.has('details') ? '-details' : '')
+      })
+}
+test('progressive: day commits before background week, clicking week joins it, month waits for opening', async ({
+  page,
+}) => {
+  const mock = await mockStudy(page)
+  const day = gate(),
+    week = gate(),
+    month = gate()
+  const requests = trackStudyRequests(page)
+  await page.route(/\/api\/v1\/study-plan(?:\?.*)?$/, async (route) => {
+    const params = new URL(route.request().url()).searchParams
+    const view = params.get('view')!
+    await { day, week, month }[view as 'day' | 'week' | 'month'].promise
+    await route.fulfill({ json: scopedFixture(mock.data(), params) })
+  })
+  const forbidden: string[] = []
+  page.on('request', (request) => {
+    const url = new URL(request.url())
+    if (
+      url.pathname === '/api/v1/study-plan/learning' ||
+      (url.pathname === '/api/v1/study-plan' && !url.searchParams.has('view'))
+    )
+      forbidden.push(url.pathname)
+  })
+  await page.goto('./plan')
+  await expect.poll(() => requests()).toEqual(['day'])
+  await expect(page.getByTestId('study-assignment')).toHaveCount(0)
+  day.release()
+  await expect(page.getByTestId('study-assignment')).toHaveCount(2)
+  await expect.poll(() => requests()).toEqual(['day', 'week'])
+  await expect(
+    page.getByRole('button', { name: 'Действия: Новый текст: городские сады' }),
+  ).toBeEnabled()
+  await page
+    .getByRole('button', { name: 'Действия: Новый текст: городские сады' })
+    .click()
+  await page
+    .getByRole('button', { name: 'Пропустить', exact: true })
+    .first()
+    .click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await page.getByRole('radio', { name: 'Неделя', exact: true }).click()
+  await expect(page.getByText('Загружаем план…', { exact: true })).toBeVisible()
+  expect(requests()).toEqual(['day', 'week'])
+  await expect(
+    page.getByRole('radio', { name: 'Месяц', exact: true }),
+  ).toBeEnabled()
+  week.release()
+  await expect(page.getByRole('heading', { name: 'Цели недели' })).toBeVisible()
+  expect(requests()).toEqual(['day', 'week'])
+  await page.getByRole('button', { name: '25', exact: false }).first().click()
+  expect(requests()).toEqual(['day', 'week'])
+  await page.getByRole('radio', { name: 'Месяц', exact: true }).click()
+  await expect.poll(() => requests()).toEqual(['day', 'week', 'month'])
+  await expect(page.getByText('Загружаем план…', { exact: true })).toBeVisible()
+  month.release()
+  await expect(page.getByRole('heading', { name: /^Неделя 1 ·/ })).toBeVisible()
+  expect(forbidden).toEqual([])
+  noRuntimeErrors(mock)
+})
+
+test('progressive: failed week stays separate from day and has an explicit retry', async ({
+  page,
+}) => {
+  const mock = await mockStudy(page)
+  let weeks = 0
+  const wait = gate()
+  await page.route(/\/api\/v1\/study-plan\?.*$/, async (route) => {
+    const params = new URL(route.request().url()).searchParams
+    if (params.get('view') !== 'week') return route.fallback()
+    weeks++
+    if (weeks === 1) {
+      await wait.promise
+      return route.fulfill({
+        status: 503,
+        json: { message: 'week unavailable' },
+      })
+    }
+    return route.fulfill({ json: scopedFixture(mock.data(), params) })
+  })
+  await page.goto('./plan')
+  await expect(page.getByTestId('study-assignment')).toHaveCount(2)
+  await expect.poll(() => weeks).toBe(1)
+  await page.getByRole('radio', { name: 'Неделя', exact: true }).click()
+  wait.release()
+  await expect(
+    page.getByText('Не удалось загрузить план', { exact: true }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Try again' }).click()
+  await expect(page.getByRole('heading', { name: 'Цели недели' })).toBeVisible()
+  expect(weeks).toBe(2)
+  await page.getByRole('radio', { name: 'День', exact: true }).click()
+  await expect(page.getByTestId('study-assignment')).toHaveCount(2)
+  await expect(
+    page.getByRole('button', { name: 'Действия: Новый текст: городские сады' }),
+  ).toBeEnabled()
+  noRuntimeErrors(mock)
+})
+
+for (const view of ['week', 'month'])
+  test(`progressive: explicit ${view} deep link loads only that view`, async ({
+    page,
+  }) => {
+    const mock = await mockStudy(page, defensiveFixture())
+    const requests = trackStudyRequests(page)
+    await page.goto(`./plan?view=${view}&date=2026-10-24`)
+    await expect(
+      page.getByRole('heading', { name: 'План', exact: true }),
+    ).toBeVisible()
+    await expect(
+      page.getByText('Загружаем план…', { exact: true }),
+    ).toHaveCount(0)
+    expect(requests()).toEqual([view])
+    noRuntimeErrors(mock)
+  })
+
+test('progressive: mutation invalidates previously cached day, week and month and cancels an old week projection', async ({
+  page,
+}) => {
+  const mock = await mockStudy(page)
+  const requests = trackStudyRequests(page)
+  const stale = gate()
+  let firstWeek = true
+  let oldReturned = false
+  await page.route(/\/api\/v1\/study-plan\?.*$/, async (route) => {
+    const params = new URL(route.request().url()).searchParams
+    if (params.get('view') === 'week' && firstWeek) {
+      firstWeek = false
+      const old = scopedFixture(mock.data(), params)
+      await stale.promise
+      try {
+        await route.fulfill({ json: old })
+      } finally {
+        oldReturned = true
+      }
+      return
+    }
+    return route.fulfill({ json: scopedFixture(mock.data(), params) })
+  })
+  await page.goto('./plan')
+  await expect(page.getByTestId('study-assignment')).toHaveCount(2)
+  await expect.poll(() => requests()).toEqual(['day', 'week'])
+  await page.getByRole('radio', { name: 'Месяц', exact: true }).click()
+  await expect(page.getByRole('heading', { name: /^Неделя 1 ·/ })).toBeVisible()
+  await page.getByRole('radio', { name: 'День', exact: true }).click()
+  await page
+    .getByRole('button', { name: 'Действия: Новый текст: городские сады' })
+    .click()
+  await page
+    .getByRole('button', { name: 'Пропустить', exact: true })
+    .first()
+    .click()
+  await page.getByRole('button', { name: 'Подтвердить пропуск' }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  expect(mock.data().plan!.revision).toBe(2)
+  stale.release()
+  await expect.poll(() => oldReturned).toBe(true)
+  await page.getByRole('radio', { name: 'Неделя', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Цели недели' })).toBeVisible()
+  await expect(
+    page
+      .getByTestId('study-assignment')
+      .filter({ hasText: 'Новый текст: городские сады' }),
+  ).toContainText('Пропущено')
+  await page.getByRole('radio', { name: 'Месяц', exact: true }).click()
+  await expect(page.getByRole('heading', { name: /^Неделя 1 ·/ })).toBeVisible()
+  expect(requests().filter((v) => v === 'month')).toHaveLength(2)
+  expect(requests().filter((v) => v === 'day')).toHaveLength(2)
+  // The canceled old projection is excluded; exactly one fresh week survives.
+  expect(requests().filter((v) => v === 'week')).toHaveLength(1)
+  noRuntimeErrors(mock)
+})

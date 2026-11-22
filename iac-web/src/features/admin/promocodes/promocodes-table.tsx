@@ -13,6 +13,14 @@ import { formatTenge } from '@/features/billing/api'
 import { useLanguage } from '@/lib/i18n'
 import { PromocodeRedemptionsDialog } from './promocode-redemptions-dialog'
 
+const planLabels: Record<string, string> = {
+  self: '1 месяц',
+  month_1: '1 месяц',
+  month_2: '2 месяца',
+  month_6: '6 месяцев',
+  year_1: '1 год',
+}
+
 export function PromocodesTable({
   promocodes,
   showPartnerColumn = true,
@@ -136,7 +144,9 @@ export function PromocodesTable({
                   <td className="py-3 pr-4 text-muted-foreground">
                     <div>
                       {promo.planCode ? (
-                        <span className="text-foreground">{promo.planCode}</span>
+                        <span className="text-foreground">
+                          {t(planLabels[promo.planCode] ?? promo.planCode)}
+                        </span>
                       ) : (
                         <span>{t('Все тарифы')}</span>
                       )}

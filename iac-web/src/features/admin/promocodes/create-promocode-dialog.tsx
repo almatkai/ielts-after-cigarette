@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TicketDiscount } from 'iconsax-react'
 
@@ -45,7 +45,7 @@ export function CreatePromocodeDialog({
 
   const [code, setCode] = useState('')
   const [discountType, setDiscountType] = useState<'FREE' | 'PERCENT' | 'FIXED'>('FREE')
-  const [discountValue, setDiscountValue] = useState<number>(100)
+  const [discountValue, setDiscountValue] = useState<string>('20')
   const [planCode, setPlanCode] = useState<string>('all')
   const [minPriceKzt, setMinPriceKzt] = useState<string>('')
   const [allowOnSale, setAllowOnSale] = useState(true)
@@ -56,10 +56,50 @@ export function CreatePromocodeDialog({
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
 
+  const handleDiscountValueChange = (val: string) => {
+    let cleaned = val.replace(',', '.')
+    cleaned = cleaned.replace(/[^0-9.]/g, '')
+    const parts = cleaned.split('.')
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('')
+    }
+    // Remove redundant leading zero before another digit (e.g. "099" -> "99"),
+    // but keep "0" and "0."
+    if (/^0[0-9]+/.test(cleaned)) {
+      cleaned = cleaned.replace(/^0+/, '')
+    }
+    setDiscountValue(cleaned)
+  }
+
+  const previewDiscountText = useMemo(() => {
+    if (discountType === 'FREE') return null
+    const raw = discountValue.trim()
+    if (!raw) {
+      return discountType === 'PERCENT'
+        ? t('От 1% до 100% (например: 20 или 99)')
+        : t('Скидка в тенге от стоимости тарифа')
+    }
+    const num = parseFloat(raw)
+    if (isNaN(num) || num <= 0) {
+      return t('Укажите положительное число')
+    }
+    if (discountType === 'PERCENT') {
+      if (num > 0 && num < 1) {
+        const converted = Math.round(num * 100)
+        return `${t('Будет применена скидка')}: ${converted}% (${raw} = ${converted}%)`
+      }
+      if (num > 100) {
+        return t('Максимальная скидка в процентах — 100%')
+      }
+      return `${t('Будет применена скидка')}: ${Math.round(num)}%`
+    }
+    return `${t('Скидка')}: ${Math.round(num).toLocaleString('ru-RU')} ₸`
+  }, [discountType, discountValue, t])
+
   const resetForm = () => {
     setCode('')
     setDiscountType('FREE')
-    setDiscountValue(100)
+    setDiscountValue('20')
     setPlanCode('all')
     setMinPriceKzt('')
     setAllowOnSale(true)
@@ -95,13 +135,38 @@ export function CreatePromocodeDialog({
       return
     }
 
+    let finalDiscountValue = 100
+    if (discountType !== 'FREE') {
+      const raw = discountValue.trim().replace(',', '.')
+      let num = parseFloat(raw)
+      if (isNaN(num) || num <= 0) {
+        setError(t('Укажите корректный размер скидки'))
+        return
+      }
+      if (discountType === 'PERCENT') {
+        if (num > 0 && num < 1) {
+          num = Math.round(num * 100)
+        } else {
+          num = Math.round(num)
+        }
+        if (num < 1 || num > 100) {
+          setError(t('Скидка в процентах должна быть от 1% до 100%'))
+          return
+        }
+        finalDiscountValue = num
+      } else {
+        finalDiscountValue = Math.round(num)
+        if (finalDiscountValue < 1) {
+          setError(t('Скидка в тенге должна быть не менее 1 ₸'))
+          return
+        }
+      }
+    }
+
     const payload: CreatePromocodeInput = {
       code: cleanCode,
       discountType,
-      discountValue:
-        discountType === 'FREE'
-          ? 100
-          : Number(discountValue) || (discountType === 'PERCENT' ? 10 : 1000),
+      discountValue: finalDiscountValue,
       planCode: planCode === 'all' ? null : (planCode as PlanCode),
       minPriceKzt: minPriceKzt ? Math.max(0, parseInt(minPriceKzt, 10)) : null,
       allowOnSale,
@@ -173,7 +238,7 @@ export function CreatePromocodeDialog({
                 type="button"
                 onClick={() => {
                   setDiscountType('FREE')
-                  setDiscountValue(100)
+                  setDiscountValue('100')
                 }}
                 className={`rounded-lg border p-2.5 text-center text-xs transition-colors ${
                   discountType === 'FREE'
@@ -191,7 +256,7 @@ export function CreatePromocodeDialog({
                 type="button"
                 onClick={() => {
                   setDiscountType('PERCENT')
-                  if (discountValue === 100) setDiscountValue(20)
+                  if (discountValue === '100' || !discountValue) setDiscountValue('20')
                 }}
                 className={`rounded-lg border p-2.5 text-center text-xs transition-colors ${
                   discountType === 'PERCENT'
@@ -209,7 +274,7 @@ export function CreatePromocodeDialog({
                 type="button"
                 onClick={() => {
                   setDiscountType('FIXED')
-                  if (discountValue <= 100) setDiscountValue(2000)
+                  if (Number(discountValue) <= 100 || !discountValue) setDiscountValue('2000')
                 }}
                 className={`rounded-lg border p-2.5 text-center text-xs transition-colors ${
                   discountType === 'FIXED'
@@ -236,14 +301,19 @@ export function CreatePromocodeDialog({
               </Label>
               <Input
                 id="promo-value"
-                type="number"
-                min={1}
-                max={discountType === 'PERCENT' ? 100 : 1000000}
+                type="text"
+                inputMode="decimal"
+                placeholder={discountType === 'PERCENT' ? '20' : '2000'}
                 value={discountValue}
-                onChange={(e) => setDiscountValue(Number(e.target.value))}
+                onChange={(e) => handleDiscountValueChange(e.target.value)}
                 required
-                className="mt-1"
+                className="mt-1 font-mono"
               />
+              {previewDiscountText && (
+                <span className="mt-1 block text-[11px] text-muted-foreground">
+                  {previewDiscountText}
+                </span>
+              )}
             </div>
           )}
 

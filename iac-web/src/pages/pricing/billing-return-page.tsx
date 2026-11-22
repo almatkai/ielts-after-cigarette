@@ -17,23 +17,31 @@ import { useLanguage } from '@/lib/i18n'
 // The bank confirms payment with a server callback, which can land a little
 // after the student is redirected back. Poll for a while before giving up.
 const pollMs = 2_000
-const pollLimitMs = 2 * 60_000
+const pollLimitMs = 45_000
 
-export function BillingReturnPage({ orderId }: { orderId?: string }) {
+export function BillingReturnPage({
+  orderId,
+  initialStatus,
+}: {
+  orderId?: string
+  initialStatus?: string
+}) {
   const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [startedAt] = useState(() => Date.now())
+  const isExplicitFailed = initialStatus === 'failed'
+
   const order = useQuery({
     queryKey: billingKeys.order(orderId ?? ''),
     queryFn: ({ signal }) => getBillingOrder(orderId ?? '', signal),
-    enabled: Boolean(orderId),
+    enabled: Boolean(orderId) && !isExplicitFailed,
     refetchInterval: (query) =>
       query.state.data?.status === 'PENDING' &&
       Date.now() - startedAt < pollLimitMs
         ? pollMs
         : false,
   })
-  const status = order.data?.status
+  const status = isExplicitFailed ? 'FAILED' : order.data?.status
   const access = useBillingAccess()
 
   useEffect(() => {
@@ -49,13 +57,22 @@ export function BillingReturnPage({ orderId }: { orderId?: string }) {
     title = 'Заказ не найден'
     body = t('В ссылке нет номера заказа. Откройте тарифы и попробуйте снова.')
     action = <PricingButton />
+  } else if (isExplicitFailed || status === 'FAILED') {
+    title = 'Оплата не прошла'
+    body = t(
+      'Деньги не списаны или будут возвращены банком. Попробуйте ещё раз или выберите другую карту.',
+    )
+    action = <PricingButton />
   } else if (order.isError) {
     title = 'Не удалось проверить оплату'
     body = t(getErrorMessage(order.error))
     action = (
-      <Button type="button" onClick={() => void order.refetch()}>
-        {t('Проверить ещё раз')}
-      </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" onClick={() => void order.refetch()}>
+          {t('Проверить ещё раз')}
+        </Button>
+        <PricingButton variant="outline" />
+      </div>
     )
   } else if (!order.data || status === 'PENDING') {
     const waitedTooLong = Date.now() - startedAt >= pollLimitMs
@@ -76,12 +93,16 @@ export function BillingReturnPage({ orderId }: { orderId?: string }) {
     ) : (
       t('Не закрывайте страницу, это займёт несколько секунд.')
     )
-    if (waitedTooLong)
-      action = (
-        <Button type="button" onClick={() => void order.refetch()}>
-          {t('Проверить ещё раз')}
-        </Button>
-      )
+    action = (
+      <div className="flex flex-wrap items-center gap-2">
+        {waitedTooLong ? (
+          <Button type="button" onClick={() => void order.refetch()}>
+            {t('Проверить ещё раз')}
+          </Button>
+        ) : null}
+        <PricingButton variant={waitedTooLong ? 'outline' : 'secondary'} />
+      </div>
+    )
   } else if (status === 'PAID') {
     title = 'Оплата прошла'
     const endsAt = access.data?.queuedUntil ?? access.data?.endsAt
@@ -115,15 +136,19 @@ export function BillingReturnPage({ orderId }: { orderId?: string }) {
         {t(title)}
       </h1>
       <p className="text-sm leading-6 text-muted-foreground">{body}</p>
-      {action ? <div className="mt-2">{action}</div> : null}
+      <div className="mt-2">{action}</div>
     </section>
   )
 }
 
-function PricingButton() {
+function PricingButton({
+  variant = 'default',
+}: {
+  variant?: 'default' | 'outline' | 'secondary'
+}) {
   const { t } = useLanguage()
   return (
-    <Button asChild>
+    <Button asChild variant={variant}>
       <Link to="/pricing">{t('К тарифам')}</Link>
     </Button>
   )

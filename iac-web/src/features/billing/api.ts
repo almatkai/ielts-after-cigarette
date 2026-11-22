@@ -8,7 +8,6 @@ export type PlanCode =
   | 'self'
   | 'group'
   | 'personal'
-  | string
 export type BillingSkill = 'listening' | 'reading' | 'writing' | 'speaking'
 export type PaywallFeature = BillingSkill | 'full_mock' | 'assistant'
 

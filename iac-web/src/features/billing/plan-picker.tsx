@@ -1,14 +1,21 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import { CloseCircle, TicketDiscount } from 'iconsax-react'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { landingHref } from '@/features/blog/links'
 import { ApiError, getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
-import { createCheckout, formatTenge, planDiscountPercent } from './api'
-import type { BillingPlan, PlanCode } from './api'
+import {
+  createCheckout,
+  formatTenge,
+  planDiscountPercent,
+  validatePromocode,
+} from './api'
+import type { BillingPlan, PlanCode, PromocodeValidation } from './api'
 import { useBillingPlans } from './use-billing'
 
 export const billingSupportEmail = 'kairatovalmat2003@gmail.com'
@@ -39,9 +46,33 @@ export function PlanPicker({
   const plans = useBillingPlans()
   const [selected, setSelected] = useState<PlanCode>(initialPlan)
   const [accepted, setAccepted] = useState(false)
+  const [promocodeInput, setPromocodeInput] = useState('')
+  const [appliedPromo, setAppliedPromo] = useState<PromocodeValidation | null>(
+    null,
+  )
+  const [promoError, setPromoError] = useState<string | null>(null)
+
+  const validateMutation = useMutation({
+    mutationFn: ({ code, planCode }: { code: string; planCode: PlanCode }) =>
+      validatePromocode(code, planCode),
+    onSuccess: (data) => {
+      setAppliedPromo(data)
+      setPromoError(null)
+    },
+    onError: (err) => {
+      setAppliedPromo(null)
+      setPromoError(getErrorMessage(err))
+    },
+  })
 
   const checkout = useMutation({
-    mutationFn: (code: PlanCode) => createCheckout(code),
+    mutationFn: ({
+      code,
+      promocode,
+    }: {
+      code: PlanCode
+      promocode?: string
+    }) => createCheckout(code, promocode),
     onSuccess: (result) => window.location.assign(result.redirectUrl),
   })
 
@@ -81,6 +112,31 @@ export function PlanPicker({
     checkout.error instanceof ApiError &&
     checkout.error.code === 'PAYMENT_PROVIDER_UNAVAILABLE'
 
+  const finalPrice = appliedPromo ? appliedPromo.finalPrice : current.price
+  const isFree = Boolean(appliedPromo?.isFree || finalPrice === 0)
+
+  const handleApplyPromo = (e: React.FormEvent) => {
+    e.preventDefault()
+    const clean = promocodeInput.trim()
+    if (!clean) return
+    setPromoError(null)
+    validateMutation.mutate({ code: clean, planCode: current.code })
+  }
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null)
+    setPromocodeInput('')
+    setPromoError(null)
+  }
+
+  const handlePlanSelect = (code: PlanCode) => {
+    setSelected(code)
+    checkout.reset()
+    if (appliedPromo) {
+      validateMutation.mutate({ code: appliedPromo.code, planCode: code })
+    }
+  }
+
   return (
     <div className={cn('grid gap-4', className)}>
       <fieldset className="grid gap-2">
@@ -90,10 +146,7 @@ export function PlanPicker({
             key={plan.code}
             plan={plan}
             checked={plan.code === current.code}
-            onSelect={() => {
-              setSelected(plan.code)
-              checkout.reset()
-            }}
+            onSelect={() => handlePlanSelect(plan.code)}
             description={t(
               planDescriptions[plan.code] ??
                 'Все тесты, полные пробные экзамены и AI-разборы.',
@@ -101,6 +154,72 @@ export function PlanPicker({
           />
         ))}
       </fieldset>
+
+      {/* Promocode input & status */}
+      <div className="rounded-[10px] border border-border bg-card/60 p-3">
+        {appliedPromo ? (
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <TicketDiscount size={16} />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-xs font-bold tracking-wide text-foreground">
+                    {appliedPromo.code}
+                  </span>
+                  <span className="rounded bg-success/15 px-1.5 py-0.5 text-[10px] font-semibold text-success">
+                    {appliedPromo.isFree
+                      ? t('100% скидка')
+                      : appliedPromo.discountType === 'PERCENT'
+                        ? `−${appliedPromo.discountValue}%`
+                        : `−${formatTenge(appliedPromo.discountAmount)}`}
+                  </span>
+                </div>
+                <p className="truncate text-[11px] text-muted-foreground">
+                  {appliedPromo.isFree
+                    ? t('Полный бесплатный доступ без оплаты')
+                    : `${t('Скидка')} ${formatTenge(appliedPromo.discountAmount)}`}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemovePromo}
+              className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              title={t('Отменить промокод')}
+            >
+              <CloseCircle size={18} />
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleApplyPromo} className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder={t('Промокод')}
+                value={promocodeInput}
+                onChange={(e) =>
+                  setPromocodeInput(e.target.value.toUpperCase())
+                }
+                className="h-8 font-mono text-xs uppercase tracking-wider"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="outline"
+              size="sm"
+              disabled={!promocodeInput.trim() || validateMutation.isPending}
+              className="h-8 shrink-0 text-xs"
+            >
+              {validateMutation.isPending ? t('Проверка…') : t('Применить')}
+            </Button>
+          </form>
+        )}
+
+        {promoError && (
+          <p className="mt-1.5 text-xs text-destructive">{t(promoError)}</p>
+        )}
+      </div>
 
       <p className="text-xs leading-5 text-muted-foreground">
         {t('Доступ на')} {accessDays}{' '}
@@ -161,15 +280,24 @@ export function PlanPicker({
         type="button"
         size="lg"
         disabled={!accepted || checkout.isPending}
-        onClick={() => checkout.mutate(current.code)}
+        onClick={() =>
+          checkout.mutate({
+            code: current.code,
+            promocode: appliedPromo?.code,
+          })
+        }
         className="w-full"
       >
         {checkout.isPending
-          ? t('Переходим к оплате…')
-          : `${t('Оплатить')} ${formatTenge(current.price)}`}
+          ? t('Оформляем…')
+          : isFree
+            ? t('Получить доступ бесплатно')
+            : `${t('Оплатить')} ${formatTenge(finalPrice)}`}
       </Button>
       <p className="text-center text-[11px] leading-4 text-muted-foreground">
-        {t('Данные карты вводятся на защищённой странице банка.')}
+        {isFree
+          ? t('Доступ будет предоставлен моментально без перехода к оплате.')
+          : t('Данные карты вводятся на защищённой странице банка.')}
       </p>
     </div>
   )

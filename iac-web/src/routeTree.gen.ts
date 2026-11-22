@@ -40,6 +40,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminFullMocksRouteImport } from './routes/admin.full-mocks'
 import { Route as AdminLearningContentRouteImport } from './routes/admin.learning-content'
 import { Route as AdminMcpKeysRouteImport } from './routes/admin.mcp-keys'
+import { Route as AdminPromocodesRouteImport } from './routes/admin.promocodes'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminWaitlistRouteImport } from './routes/admin.waitlist'
 import { Route as AdminPreviewRouteImport } from './routes/admin_.preview'
@@ -252,6 +253,11 @@ const AdminLearningContentRoute = AdminLearningContentRouteImport.update({
 const AdminMcpKeysRoute = AdminMcpKeysRouteImport.update({
   id: '/mcp-keys',
   path: '/mcp-keys',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPromocodesRoute = AdminPromocodesRouteImport.update({
+  id: '/promocodes',
+  path: '/promocodes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -600,6 +606,7 @@ export interface FileRoutesByFullPath {
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/learning-content': typeof AdminLearningContentRoute
   '/admin/mcp-keys': typeof AdminMcpKeysRoute
+  '/admin/promocodes': typeof AdminPromocodesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
@@ -688,6 +695,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/learning-content': typeof AdminLearningContentRoute
   '/admin/mcp-keys': typeof AdminMcpKeysRoute
+  '/admin/promocodes': typeof AdminPromocodesRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin/preview': typeof AdminPreviewRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
@@ -775,6 +783,7 @@ export interface FileRoutesById {
   '/admin/full-mocks': typeof AdminFullMocksRouteWithChildren
   '/admin/learning-content': typeof AdminLearningContentRoute
   '/admin/mcp-keys': typeof AdminMcpKeysRoute
+  '/admin/promocodes': typeof AdminPromocodesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/admin_/preview': typeof AdminPreviewRouteWithChildren
@@ -869,6 +878,7 @@ export interface FileRouteTypes {
     | '/admin/full-mocks'
     | '/admin/learning-content'
     | '/admin/mcp-keys'
+    | '/admin/promocodes'
     | '/admin/users'
     | '/admin/waitlist'
     | '/admin/preview'
@@ -957,6 +967,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/learning-content'
     | '/admin/mcp-keys'
+    | '/admin/promocodes'
     | '/admin/waitlist'
     | '/admin/preview'
     | '/blog/$slug'
@@ -1043,6 +1054,7 @@ export interface FileRouteTypes {
     | '/admin/full-mocks'
     | '/admin/learning-content'
     | '/admin/mcp-keys'
+    | '/admin/promocodes'
     | '/admin/users'
     | '/admin/waitlist'
     | '/admin_/preview'
@@ -1343,6 +1355,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp-keys'
       fullPath: '/admin/mcp-keys'
       preLoaderRoute: typeof AdminMcpKeysRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/promocodes': {
+      id: '/admin/promocodes'
+      path: '/promocodes'
+      fullPath: '/admin/promocodes'
+      preLoaderRoute: typeof AdminPromocodesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/users': {
@@ -1978,6 +1997,7 @@ interface AdminRouteChildren {
   AdminFullMocksRoute: typeof AdminFullMocksRouteWithChildren
   AdminLearningContentRoute: typeof AdminLearningContentRoute
   AdminMcpKeysRoute: typeof AdminMcpKeysRoute
+  AdminPromocodesRoute: typeof AdminPromocodesRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -2000,6 +2020,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFullMocksRoute: AdminFullMocksRouteWithChildren,
   AdminLearningContentRoute: AdminLearningContentRoute,
   AdminMcpKeysRoute: AdminMcpKeysRoute,
+  AdminPromocodesRoute: AdminPromocodesRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,

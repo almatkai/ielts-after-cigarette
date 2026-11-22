@@ -11,6 +11,7 @@ import {
   Microphone2,
   People,
   ShieldTick,
+  TicketDiscount,
   TrendUp,
   UserEdit,
 } from 'iconsax-react'
@@ -106,6 +107,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       visible: isAdmin,
       items: linkOptions([
         { to: '/admin/users', label: t('Пользователи'), icon: People },
+        {
+          to: '/admin/promocodes',
+          label: t('Промокоды'),
+          icon: TicketDiscount,
+        },
         { to: '/admin/waitlist', label: 'Waitlist', icon: People },
       ]),
     },

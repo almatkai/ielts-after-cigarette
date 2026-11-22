@@ -27,6 +27,7 @@ import {
 import type { UserDetail, UserUpdate } from '@/features/admin/users-api'
 import { getErrorMessage } from '@/lib/api/client'
 import { UserBilling } from './user-billing'
+import { UserPromocodesCard } from './user-promocodes-card'
 import { useLanguage } from '@/lib/i18n'
 import {
   date,
@@ -184,14 +185,15 @@ function UserProfile({ user }: { user: UserDetail }) {
       </nav>
       {tab === 'profile' && (
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              setNotice('')
-              save.mutate()
-            }}
-            className="grid gap-5 rounded-xl border border-border bg-card p-5"
-          >
+          <div className="grid gap-5">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                setNotice('')
+                save.mutate()
+              }}
+              className="grid gap-5 rounded-xl border border-border bg-card p-5"
+            >
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t('Имя')} id="displayName">
                 <Input
@@ -380,7 +382,9 @@ function UserProfile({ user }: { user: UserDetail }) {
               <Info label="ID" value={user.id} />
             </dl>
           </form>
-          <div className="grid gap-5">
+          <UserPromocodesCard user={user} />
+        </div>
+        <div className="grid gap-5">
             <div className="rounded-xl border border-border bg-card p-4">
               <h2 className="mb-3 text-sm font-semibold">{t('Доступ')}</h2>
               <div className="grid gap-2">

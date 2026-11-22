@@ -79,10 +79,43 @@ export const getBillingPlans = (signal?: AbortSignal) =>
 export const getBillingAccess = (signal?: AbortSignal) =>
   apiClient.request<BillingAccess>('/api/v1/billing/me', { signal })
 
-export const createCheckout = (planCode: PlanCode) =>
-  apiClient.request<{ orderId: string; redirectUrl: string }>(
+export type PromocodeValidation = {
+  valid: boolean
+  code: string
+  discountType: 'FREE' | 'PERCENT' | 'FIXED'
+  discountValue: number
+  discountAmount: number
+  originalPrice: number
+  finalPrice: number
+  isFree: boolean
+  message?: string
+}
+
+export const validatePromocode = (
+  code: string,
+  planCode: PlanCode,
+  signal?: AbortSignal,
+) =>
+  apiClient.request<PromocodeValidation>(
+    '/api/v1/billing/promocodes/validate',
+    {
+      method: 'POST',
+      body: { code, planCode },
+      signal,
+    },
+  )
+
+export const createCheckout = (planCode: PlanCode, promocode?: string) =>
+  apiClient.request<{ orderId: string; redirectUrl: string; free?: boolean }>(
     '/api/v1/billing/checkout',
-    { method: 'POST', body: { planCode, acceptedTerms: true } },
+    {
+      method: 'POST',
+      body: {
+        planCode,
+        acceptedTerms: true,
+        ...(promocode ? { promocode } : {}),
+      },
+    },
   )
 
 export const getBillingOrder = (id: string, signal?: AbortSignal) =>

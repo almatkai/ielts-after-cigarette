@@ -72,3 +72,102 @@ export const setMeetingsUsed = (id: string, meetingsUsed: number) =>
     `/api/v1/admin/entitlements/${id}/meetings`,
     { method: 'PATCH', body: { meetingsUsed } },
   )
+
+export type AdminPromocode = {
+  id: string
+  code: string
+  discountType: 'FREE' | 'PERCENT' | 'FIXED'
+  discountValue: number
+  planCode: PlanCode | null
+  minPriceKzt: number | null
+  allowOnSale: boolean
+  maxUses: number | null
+  usedCount: number
+  maxUsesPerUser: number
+  startsAt: string
+  expiresAt: string | null
+  isActive: boolean
+  partnerUserId: string | null
+  partnerName?: string | null
+  createdBy: string | null
+  note: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreatePromocodeInput = {
+  code: string
+  discountType: 'FREE' | 'PERCENT' | 'FIXED'
+  discountValue: number
+  planCode?: PlanCode | null
+  minPriceKzt?: number | null
+  allowOnSale?: boolean
+  maxUses?: number | null
+  maxUsesPerUser?: number
+  startsAt?: string | null
+  expiresAt?: string | null
+  partnerUserId?: string | null
+  note?: string
+}
+
+export type AdminPromocodeRedemption = {
+  id: string
+  promocodeId: string
+  userId: string
+  userEmail?: string
+  userName?: string
+  orderId: string | null
+  discountAmount: number
+  finalPrice: number
+  createdAt: string
+}
+
+export const adminPromocodesKey = (partnerUserId?: string) =>
+  ['admin', 'billing', 'promocodes', partnerUserId ?? 'all'] as const
+
+export const listAdminPromocodes = (
+  partnerUserId?: string,
+  activeOnly?: boolean,
+  signal?: AbortSignal,
+) => {
+  const params = new URLSearchParams()
+  if (partnerUserId) params.set('partnerUserId', partnerUserId)
+  if (activeOnly !== undefined) params.set('activeOnly', String(activeOnly))
+  const qs = params.toString() ? `?${params.toString()}` : ''
+  return apiClient.request<AdminPromocode[]>(
+    `/api/v1/admin/billing/promocodes${qs}`,
+    { signal },
+  )
+}
+
+export const createAdminPromocode = (input: CreatePromocodeInput) =>
+  apiClient.request<AdminPromocode>('/api/v1/admin/billing/promocodes', {
+    method: 'POST',
+    body: input,
+  })
+
+export const toggleAdminPromocodeStatus = (id: string, isActive: boolean) =>
+  apiClient.request<AdminPromocode>(
+    `/api/v1/admin/billing/promocodes/${id}/status`,
+    {
+      method: 'PATCH',
+      body: { isActive },
+    },
+  )
+
+export const deleteAdminPromocode = (id: string) =>
+  apiClient.request<{ ok: boolean }>(
+    `/api/v1/admin/billing/promocodes/${id}`,
+    {
+      method: 'DELETE',
+    },
+  )
+
+export const getAdminPromocodeRedemptions = (
+  id: string,
+  signal?: AbortSignal,
+) =>
+  apiClient.request<AdminPromocodeRedemption[]>(
+    `/api/v1/admin/billing/promocodes/${id}/redemptions`,
+    { signal },
+  )

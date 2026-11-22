@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { SearchNormal1, ArrowRight2 } from 'iconsax-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowRight2, SearchNormal1, Trash } from 'iconsax-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { listUsers, usersKey } from '@/features/admin/users-api'
+import { Label } from '@/components/ui/label'
+import { deleteUser, listUsers, usersKey } from '@/features/admin/users-api'
+import type { AdminUser } from '@/features/admin/users-api'
 import { getErrorMessage } from '@/lib/api/client'
 import { useLanguage } from '@/lib/i18n'
 import {
@@ -17,10 +27,13 @@ import {
 
 export function UsersPage() {
   const { t } = useLanguage()
+  const client = useQueryClient()
   const [search, setSearch] = useState('')
   const [q, setQ] = useState('')
   const [role, setRole] = useState('')
   const [page, setPage] = useState(1)
+  const [target, setTarget] = useState<AdminUser | null>(null)
+  const [email, setEmail] = useState('')
   useEffect(() => {
     const timer = setTimeout(() => {
       setQ(search)
@@ -32,6 +45,19 @@ export function UsersPage() {
     queryKey: [...usersKey, { q, role, page }],
     queryFn: ({ signal }) => listUsers(q, role, page, signal),
   })
+  const remove = useMutation({
+    mutationFn: (user: AdminUser) => deleteUser(user.id, email),
+    onSuccess: async () => {
+      setTarget(null)
+      setEmail('')
+      await client.invalidateQueries({ queryKey: usersKey })
+    },
+  })
+  const openDelete = (user: AdminUser) => {
+    remove.reset()
+    setEmail('')
+    setTarget(user)
+  }
   return (
     <div className="grid gap-5">
       <div className="flex items-baseline gap-3">
@@ -82,15 +108,15 @@ export function UsersPage() {
         />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-card">
-          <table className="w-full min-w-[680px] text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-border bg-background text-xs text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-medium">{t('Пользователь')}</th>
                 <th className="px-4 py-3 font-medium">{t('Роль')}</th>
                 <th className="px-4 py-3 font-medium">{t('Тесты')}</th>
                 <th className="px-4 py-3 font-medium">{t('Активность')}</th>
-                <th className="w-10">
-                  <span className="sr-only">{t('Открыть')}</span>
+                <th className="w-24">
+                  <span className="sr-only">{t('Действия')}</span>
                 </th>
               </tr>
             </thead>
@@ -162,14 +188,25 @@ export function UsersPage() {
                       {date(user.lastActiveAt)}
                     </td>
                     <td className="pr-4">
-                      <Link
-                        to="/admin/users/$userId"
-                        params={{ userId: user.id }}
-                        aria-label={`${t('Открыть')} ${user.displayName}`}
-                        className="grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                      >
-                        <ArrowRight2 className="size-4" aria-hidden />
-                      </Link>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`${t('Удалить')} ${user.displayName}`}
+                          className="text-muted-foreground hover:bg-destructive-soft hover:text-destructive"
+                          onClick={() => openDelete(user)}
+                        >
+                          <Trash className="size-4" aria-hidden />
+                        </Button>
+                        <Link
+                          to="/admin/users/$userId"
+                          params={{ userId: user.id }}
+                          aria-label={`${t('Открыть')} ${user.displayName}`}
+                          className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-primary-soft hover:text-primary"
+                        >
+                          <ArrowRight2 className="size-4" aria-hidden />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -191,6 +228,70 @@ export function UsersPage() {
       {query.data && (
         <Pagination page={page} total={query.data.total} onChange={setPage} />
       )}
+      <Dialog
+        open={target !== null}
+        onOpenChange={(value) => {
+          if (!value && !remove.isPending) setTarget(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('Удалить аккаунт?')}</DialogTitle>
+            <DialogDescription>
+              {t(
+                'Профиль, тесты, записи и статьи будут удалены без восстановления.',
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (target) remove.mutate(target)
+            }}
+            className="grid gap-4"
+          >
+            <div className="grid gap-2">
+              <Label htmlFor="confirmDeleteEmail" className="text-xs text-muted-foreground">
+                {`${t('Введите')} ${target?.email ?? ''}`}
+              </Label>
+              <Input
+                id="confirmDeleteEmail"
+                type="email"
+                autoComplete="off"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            {remove.isError && (
+              <p role="alert" className="text-sm text-destructive">
+                {t(getErrorMessage(remove.error))}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="border-border"
+                disabled={remove.isPending}
+                onClick={() => setTarget(null)}
+              >
+                {t('Отмена')}
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={
+                  remove.isPending ||
+                  email.trim().toLowerCase() !== (target?.email ?? '').toLowerCase()
+                }
+              >
+                {remove.isPending ? t('Подождите…') : t('Удалить навсегда')}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

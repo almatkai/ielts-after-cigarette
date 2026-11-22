@@ -613,7 +613,7 @@ function UserProfile({ user }: { user: UserDetail }) {
                 disabled={
                   action.isPending ||
                   (dialog === 'delete' &&
-                    email.trim().toLowerCase() !== user.email)
+                    email.trim().toLowerCase() !== user.email.toLowerCase())
                 }
               >
                 {action.isPending

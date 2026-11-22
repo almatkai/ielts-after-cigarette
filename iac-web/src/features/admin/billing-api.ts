@@ -125,19 +125,23 @@ export type AdminPromocodeRedemption = {
 export const adminPromocodesKey = (partnerUserId?: string) =>
   ['admin', 'billing', 'promocodes', partnerUserId ?? 'all'] as const
 
-export const listAdminPromocodes = (
+export const listAdminPromocodes = async (
   partnerUserId?: string,
   activeOnly?: boolean,
   signal?: AbortSignal,
-) => {
+): Promise<AdminPromocode[]> => {
   const params = new URLSearchParams()
   if (partnerUserId) params.set('partnerUserId', partnerUserId)
-  if (activeOnly !== undefined) params.set('activeOnly', String(activeOnly))
+  if (activeOnly !== undefined) {
+    params.set('active', String(activeOnly))
+    params.set('activeOnly', String(activeOnly))
+  }
   const qs = params.toString() ? `?${params.toString()}` : ''
-  return apiClient.request<AdminPromocode[]>(
-    `/api/v1/admin/billing/promocodes${qs}`,
-    { signal },
-  )
+  const res = await apiClient.request<
+    { promocodes?: AdminPromocode[] } | AdminPromocode[]
+  >(`/api/v1/admin/billing/promocodes${qs}`, { signal })
+  if (Array.isArray(res)) return res
+  return res.promocodes ?? []
 }
 
 export const createAdminPromocode = (input: CreatePromocodeInput) =>
@@ -156,18 +160,17 @@ export const toggleAdminPromocodeStatus = (id: string, isActive: boolean) =>
   )
 
 export const deleteAdminPromocode = (id: string) =>
-  apiClient.request<{ ok: boolean }>(
-    `/api/v1/admin/billing/promocodes/${id}`,
-    {
-      method: 'DELETE',
-    },
-  )
+  apiClient.request<void>(`/api/v1/admin/billing/promocodes/${id}`, {
+    method: 'DELETE',
+  })
 
-export const getAdminPromocodeRedemptions = (
+export const getAdminPromocodeRedemptions = async (
   id: string,
   signal?: AbortSignal,
-) =>
-  apiClient.request<AdminPromocodeRedemption[]>(
-    `/api/v1/admin/billing/promocodes/${id}/redemptions`,
-    { signal },
-  )
+): Promise<AdminPromocodeRedemption[]> => {
+  const res = await apiClient.request<
+    { redemptions?: AdminPromocodeRedemption[] } | AdminPromocodeRedemption[]
+  >(`/api/v1/admin/billing/promocodes/${id}/redemptions`, { signal })
+  if (Array.isArray(res)) return res
+  return res.redemptions ?? []
+}

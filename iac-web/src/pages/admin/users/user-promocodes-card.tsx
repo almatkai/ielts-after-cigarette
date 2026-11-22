@@ -21,7 +21,8 @@ export function UserPromocodesCard({ user }: { user: UserDetail }) {
     queryFn: ({ signal }) => listAdminPromocodes(user.id, undefined, signal),
   })
 
-  const promocodes = query.data ?? []
+  const rawData = query.data
+  const promocodes = Array.isArray(rawData) ? rawData : []
 
   return (
     <section className="mt-5 rounded-xl border border-border bg-card p-5">

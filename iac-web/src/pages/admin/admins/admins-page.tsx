@@ -34,6 +34,9 @@ export function AdminsPage() {
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.superAdmins,
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['admin', 'users'],
+      })
     },
   })
 
@@ -42,6 +45,9 @@ export function AdminsPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: adminQueryKeys.superAdmins,
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['admin', 'users'],
       })
     },
   })
@@ -194,6 +200,7 @@ export function AdminsPage() {
                         className="text-destructive hover:text-destructive"
                         disabled={busy}
                         onClick={() => void handleRemove(admin)}
+                        title={t('Снять права администратора и перевести в статус студента')}
                       >
                         <Trash aria-hidden />
                         {t('Удалить')}

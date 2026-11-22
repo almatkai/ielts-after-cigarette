@@ -47,7 +47,7 @@ export function PromocodeRedemptionsDialog({
             <p className="py-6 text-center text-sm text-muted-foreground">{t('Загрузка…')}</p>
           ) : query.isError ? (
             <p className="py-6 text-center text-sm text-destructive">{t('Ошибка загрузки')}</p>
-          ) : !query.data || query.data.length === 0 ? (
+          ) : query.data.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               {t('Этот промокод ещё никто не использовал.')}
             </p>

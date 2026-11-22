@@ -154,7 +154,6 @@ function useQueryData(
   activeOnly?: boolean,
 ) {
   return useMemo(() => {
-    if (!promocodes) return []
     const term = search.trim().toLowerCase()
     return promocodes.filter((promo) => {
       if (activeOnly !== undefined && promo.isActive !== activeOnly) {

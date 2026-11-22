@@ -1,6 +1,14 @@
 import { ApiError, apiClient } from '@/lib/api/client'
 
-export type PlanCode = 'self' | 'group' | 'personal'
+export type PlanCode =
+  | 'month_1'
+  | 'month_2'
+  | 'month_6'
+  | 'year_1'
+  | 'self'
+  | 'group'
+  | 'personal'
+  | string
 export type BillingSkill = 'listening' | 'reading' | 'writing' | 'speaking'
 export type PaywallFeature = BillingSkill | 'full_mock' | 'assistant'
 

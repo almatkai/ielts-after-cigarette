@@ -63,6 +63,11 @@ export function CreatePromocodeDialog({
     if (parts.length > 2) {
       cleaned = parts[0] + '.' + parts.slice(1).join('')
     }
+    // Limit to 2 decimal places after dot
+    if (cleaned.includes('.')) {
+      const [intPart, decPart] = cleaned.split('.')
+      cleaned = intPart + '.' + decPart.slice(0, 2)
+    }
     // Remove redundant leading zero before another digit (e.g. "099" -> "99"),
     // but keep "0" and "0."
     if (/^0[0-9]+/.test(cleaned)) {
@@ -76,7 +81,7 @@ export function CreatePromocodeDialog({
     const raw = discountValue.trim()
     if (!raw) {
       return discountType === 'PERCENT'
-        ? t('От 1% до 100% (например: 20 или 99)')
+        ? t('От 0.01% до 100% (например: 20 или 20.5)')
         : t('Скидка в тенге от стоимости тарифа')
     }
     const num = parseFloat(raw)
@@ -84,16 +89,14 @@ export function CreatePromocodeDialog({
       return t('Укажите положительное число')
     }
     if (discountType === 'PERCENT') {
-      if (num > 0 && num < 1) {
-        const converted = Math.round(num * 100)
-        return `${t('Будет применена скидка')}: ${converted}% (${raw} = ${converted}%)`
-      }
       if (num > 100) {
         return t('Максимальная скидка в процентах — 100%')
       }
-      return `${t('Будет применена скидка')}: ${Math.round(num)}%`
+      const rounded = Math.round(num * 100) / 100
+      return `${t('Будет применена скидка')}: ${rounded}%`
     }
-    return `${t('Скидка')}: ${Math.round(num).toLocaleString('ru-RU')} ₸`
+    const rounded = Math.round(num * 100) / 100
+    return `${t('Скидка')}: ${rounded.toLocaleString('ru-RU')} ₸`
   }, [discountType, discountValue, t])
 
   const resetForm = () => {
@@ -143,23 +146,19 @@ export function CreatePromocodeDialog({
         setError(t('Укажите корректный размер скидки'))
         return
       }
+      num = Math.round(num * 100) / 100
       if (discountType === 'PERCENT') {
-        if (num > 0 && num < 1) {
-          num = Math.round(num * 100)
-        } else {
-          num = Math.round(num)
-        }
-        if (num < 1 || num > 100) {
-          setError(t('Скидка в процентах должна быть от 1% до 100%'))
+        if (num <= 0 || num > 100) {
+          setError(t('Скидка в процентах должна быть от 0.01% до 100%'))
           return
         }
         finalDiscountValue = num
       } else {
-        finalDiscountValue = Math.round(num)
-        if (finalDiscountValue < 1) {
+        if (num < 1) {
           setError(t('Скидка в тенге должна быть не менее 1 ₸'))
           return
         }
+        finalDiscountValue = num
       }
     }
 

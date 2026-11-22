@@ -24,7 +24,9 @@ export function PromocodesPage() {
     queryFn: ({ signal }) => listAdminPromocodes(undefined, undefined, signal),
   })
 
-  const list = useQueryData(query.data ?? [], search, activeOnly)
+  const rawData = query.data
+  const promocodes = Array.isArray(rawData) ? rawData : []
+  const list = useQueryData(promocodes, search, activeOnly)
 
   return (
     <div className="mx-auto max-w-[1280px] p-5 sm:p-7">
@@ -154,6 +156,7 @@ function useQueryData(
   activeOnly?: boolean,
 ) {
   return useMemo(() => {
+    if (!Array.isArray(promocodes)) return []
     const term = search.trim().toLowerCase()
     return promocodes.filter((promo) => {
       if (activeOnly !== undefined && promo.isActive !== activeOnly) {

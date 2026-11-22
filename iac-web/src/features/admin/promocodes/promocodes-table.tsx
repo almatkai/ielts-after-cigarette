@@ -61,7 +61,7 @@ export function PromocodesTable({
     },
   })
 
-  if (promocodes.length === 0) {
+  if (!Array.isArray(promocodes) || promocodes.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-muted-foreground">
         {t('Промокодов пока нет.')}

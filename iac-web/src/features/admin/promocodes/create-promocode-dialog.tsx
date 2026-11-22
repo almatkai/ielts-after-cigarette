@@ -257,7 +257,7 @@ export function CreatePromocodeDialog({
               className="mt-1 h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground"
             >
               <option value="all">{t('Все тарифы')}</option>
-              <option value="month_1">{t('1 месяц (30 дней)')}</option>
+              <option value="self">{t('1 месяц (30 дней)')}</option>
               <option value="month_2">{t('2 месяца (60 дней)')}</option>
               <option value="month_6">{t('6 месяцев (180 дней)')}</option>
               <option value="year_1">{t('1 год (365 дней)')}</option>

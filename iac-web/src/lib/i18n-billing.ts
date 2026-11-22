@@ -327,4 +327,29 @@ export const billingTranslations: TranslationMap = {
       kk: 'Жаңа төлем қолжетімділікті ұзартады: келесі кезең ағымдағы кезең аяқталғаннан кейін басталады.',
       en: 'A new payment extends your access: the next period starts when the current one ends.',
     },
+  '1 месяц': { kk: '1 ай', en: '1 month' },
+  '2 месяца': { kk: '2 ай', en: '2 months' },
+  '6 месяцев': { kk: '6 ай', en: '6 months' },
+  '1 год': { kk: '1 жыл', en: '1 year' },
+  '30 дней полного доступа: все тесты, пробные экзамены и AI-разборы.': {
+    kk: '30 күн толық қолжетімділік: барлық тесттер, сынақ емтихандары және AI-талдаулары.',
+    en: '30 days of full access: all tests, full mock exams, and AI analyses.',
+  },
+  '60 дней доступа. Оптимальный срок для спокойной подготовки.': {
+    kk: '60 күн қолжетімділік. Емтиханға толық дайындалу үшін оңтайлы мерзім.',
+    en: '60 days of access. Optimal duration for thorough preparation.',
+  },
+  '180 дней доступа. Полный курс от текущего уровня до целевого балла.': {
+    kk: '180 күн қолжетімділік. Ағымдағы деңгейден мақсатты баллға дейінгі толық курс.',
+    en: '180 days of access. Complete course from current level to target score.',
+  },
+  '365 дней доступа. Максимальная выгода для долгосрочной подготовки.': {
+    kk: '365 күн қолжетімділік. Ұзақ мерзімді дайындық үшін максималды тиімділік.',
+    en: '365 days of access. Maximum savings for long-term preparation.',
+  },
+  'Разовая оплата без автосписаний. Полный доступ ко всем тестам, пробным экзаменам и AI-разборам.':
+    {
+      kk: 'Автоұзартусыз бір реттік төлем. Барлық тесттерге, сынақ емтихандарына және AI-талдауларына толық қолжетімділік.',
+      en: 'One-time payment, no auto-renewal. Full access to all tests, mock exams, and AI analyses.',
+    },
 }

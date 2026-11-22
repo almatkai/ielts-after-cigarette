@@ -13,7 +13,11 @@ import { useBillingPlans } from './use-billing'
 
 export const billingSupportEmail = 'kairatovalmat2003@gmail.com'
 
-const planDescriptions: Record<PlanCode, string> = {
+const planDescriptions: Record<string, string> = {
+  month_1: '30 дней полного доступа: все тесты, пробные экзамены и AI-разборы.',
+  month_2: '60 дней доступа. Оптимальный срок для спокойной подготовки.',
+  month_6: '180 дней доступа. Полный курс от текущего уровня до целевого балла.',
+  year_1: '365 дней доступа. Максимальная выгода для долгосрочной подготовки.',
   self: 'Все тесты, полные пробные экзамены и AI-разборы.',
   group: 'Платформа и 4 онлайн-занятия с преподавателем в мини-группе.',
   personal:
@@ -25,7 +29,7 @@ export function legalHref(slug: 'terms' | 'payment-refund', language: string) {
 }
 
 export function PlanPicker({
-  initialPlan = 'self',
+  initialPlan = 'month_1',
   className,
 }: {
   initialPlan?: PlanCode
@@ -90,7 +94,10 @@ export function PlanPicker({
               setSelected(plan.code)
               checkout.reset()
             }}
-            description={t(planDescriptions[plan.code])}
+            description={t(
+              planDescriptions[plan.code] ??
+                'Все тесты, полные пробные экзамены и AI-разборы.',
+            )}
           />
         ))}
       </fieldset>

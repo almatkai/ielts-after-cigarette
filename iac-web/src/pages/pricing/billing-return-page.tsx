@@ -29,6 +29,13 @@ export function BillingReturnPage({
   const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [startedAt] = useState(() => Date.now())
+  // Polling stops after pollLimitMs without changing the data, so nothing would
+  // re-render; flip a flag to switch to the "still waiting" state with a retry.
+  const [waitedTooLong, setWaitedTooLong] = useState(false)
+  useEffect(() => {
+    const timer = window.setTimeout(() => setWaitedTooLong(true), pollLimitMs)
+    return () => window.clearTimeout(timer)
+  }, [])
   const isExplicitFailed = initialStatus === 'failed'
 
   const order = useQuery({
@@ -75,7 +82,6 @@ export function BillingReturnPage({
       </div>
     )
   } else if (!order.data || status === 'PENDING') {
-    const waitedTooLong = Date.now() - startedAt >= pollLimitMs
     title = waitedTooLong ? 'Ждём подтверждение от банка' : 'Проверяем оплату…'
     body = waitedTooLong ? (
       <>
